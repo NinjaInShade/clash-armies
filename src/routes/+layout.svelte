@@ -30,6 +30,8 @@
 		darkBarrack: null,
 		laboratory: null,
 		spellFactory: null,
+		darkSpellFactory: null,
+		workshop: null,
 		// general app state
 		modals: []
 	});

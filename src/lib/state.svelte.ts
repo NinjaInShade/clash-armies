@@ -10,6 +10,8 @@ export function createAppState(initial: AppState) {
 	let darkBarrack = $state<AppState['darkBarrack']>(initial.barrack);
 	let laboratory = $state<AppState['laboratory']>(initial.laboratory);
 	let spellFactory = $state<AppState['spellFactory']>(initial.spellFactory);
+	let darkSpellFactory = $state<AppState['darkSpellFactory']>(initial.darkSpellFactory);
+	let workshop = $state<AppState['workshop']>(initial.workshop);
 	let modals = $state<AppState['modals']>([]);
 
 	return {
@@ -32,6 +34,8 @@ export function createAppState(initial: AppState) {
 			darkBarrack = thData.maxDarkBarracks;
 			laboratory = thData.maxLaboratory;
 			spellFactory = thData.maxSpellFactory;
+			darkSpellFactory = thData.maxDarkSpellFactory;
+			workshop = thData.maxWorkshop;
 		},
 		get barrack() {
 			return barrack;
@@ -44,6 +48,12 @@ export function createAppState(initial: AppState) {
 		},
 		get spellFactory() {
 			return spellFactory;
+		},
+		get darkSpellFactory() {
+			return darkSpellFactory;
+		},
+		get workshop() {
+			return workshop;
 		},
 		get troops() {
 			return troops;

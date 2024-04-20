@@ -53,6 +53,8 @@ type TownHallData = {
 	maxDarkBarracks: number;
 	maxLaboratory: number;
 	maxSpellFactory: number;
+	maxDarkSpellFactory: number;
+	maxWorkshop: number;
 };
 
 export type AppState = {
@@ -67,6 +69,8 @@ export type AppState = {
 	darkBarrack: number | null;
 	laboratory: number | null;
 	spellFactory: number | null;
+	darkSpellFactory: number | null;
+	workshop: number | null;
 	// general app state
 	modals: Modal[];
 };

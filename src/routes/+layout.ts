@@ -20,12 +20,13 @@ async function fetchJSON<T>(ev: LayoutLoadEvent, url: string): Promise<T> {
 }
 
 async function getTownHalls(ev: LayoutLoadEvent): Promise<AppState['townHalls']> {
+	// TODO: we shouldn't need to fetch townhalls, just get thdata from buildings
 	const buildingData = await fetchJSON<RawBuildingData>(ev, '/clash/buildings/buildings.json');
 	const townHallData = await fetchJSON<RawTownHallData>(ev, '/clash/buildings/townHalls.json');
 	return townHallData.map((th, i) => {
 		const thLevel = i + 1;
 
-		const findMaxLevel = (buildingType: 'Barracks' | 'Dark Barracks' | 'Laboratory' | 'Spell Factory') => {
+		const findMaxLevel = (buildingType: 'Barracks' | 'Dark Barracks' | 'Laboratory' | 'Spell Factory' | 'Dark Spell Factory' | 'Workshop') => {
 			const availableBuildingLevels = Object.values(buildingData[buildingType]).reduce<number[]>((prev, curr) => {
 				const requiredTHLevel = curr.TownHallLevel;
 				const buildingLevel = curr.BuildingLevel;
@@ -54,7 +55,9 @@ async function getTownHalls(ev: LayoutLoadEvent): Promise<AppState['townHalls']>
 			maxBarracks: findMaxLevel('Barracks'),
 			maxDarkBarracks: findMaxLevel('Dark Barracks'),
 			maxLaboratory: findMaxLevel('Laboratory'),
-			maxSpellFactory: findMaxLevel('Spell Factory')
+			maxSpellFactory: findMaxLevel('Spell Factory'),
+			maxDarkSpellFactory: findMaxLevel('Dark Spell Factory'),
+			maxWorkshop: findMaxLevel('Workshop')
 		};
 	});
 }
