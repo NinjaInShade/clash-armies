@@ -141,8 +141,8 @@ html.hide-overflow {
 	--txt-stroke-dark: 1px hsla(0, 0%, 10%, 1);
 	--txt-shadow-dark: 2px 2px 0px hsla(0, 0%, 10%, 1);
 
-	/* --fs-sm: 14px;
-    --fs-sm-lh: 21px; */
+	--fs-sm: 14px;
+    --fs-sm-lh: 21px;
 
 	--fs: 16px;
 	--fs-lh: 24px;
@@ -182,11 +182,13 @@ html.hide-overflow {
 	--primary-200: hsl(33, 78%, 82%);
 	--primary-100: hsl(33, 78%, 90%);
 
+	--grey-1000: hsl(0, 0%, 7.4%);
 	--grey-900: hsl(0, 0%, 10%);
 	--grey-850: hsl(0, 0%, 14%);
 	--grey-800: hsl(0, 0%, 16%);
 	--grey-700: hsl(0, 0%, 18%);
 	--grey-600: hsl(0, 0%, 20%);
+	--grey-550: hsl(0, 0%, 25%);
 	--grey-500: hsl(0, 0%, 36%);
 	--grey-550: hsl(0, 0%, 42%);
 	--grey-400: hsl(0, 0%, 58%);
@@ -314,6 +316,16 @@ button span {
 	line-height: var(--fs-lh);
 	color: var(--grey-100);
 	position: relative;
+}
+
+.btn-sm {
+	padding: 7.5px 16px;
+	gap: 6px;
+}
+
+.btn-sm, .btn-sm span {
+	font-size: var(--fs-sm);
+	line-height: var(--fs-sm-lh);
 }
 
 .btn::before {

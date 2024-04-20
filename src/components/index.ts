@@ -7,6 +7,7 @@ export { default as Input } from './Input.svelte';
 export { default as Modal } from './Modal.svelte';
 export { default as FocusTrap } from './FocusTrap.svelte';
 export { default as Alert } from './Alert.svelte';
+export { default as Table } from './Table.svelte';
 
 // App specific components
 export { default as TownHall } from './TownHall.svelte';
