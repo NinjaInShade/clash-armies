@@ -4,7 +4,7 @@
 	import { ARMY_CREATE_TROOP_FILLER, ARMY_CREATE_SPELL_FILLER, HOLD_ADD_SPEED, HOLD_REMOVE_SPEED, SECOND, MINUTE, HOUR } from '~/lib/constants';
 	import { getLevel, generateLink, openLink } from '~/lib/army';
 	import Alert from './Alert.svelte';
-	import AssetDisplay from './AssetDisplay.svelte';
+	import UnitDisplay from './UnitDisplay.svelte';
 	import Button from './Button.svelte';
 
 	type Entries<T> = {
@@ -289,7 +289,7 @@
 						remove(unit.name);
 					}}
 				>
-					<AssetDisplay {...unit} />
+					<UnitDisplay {...unit} />
 				</button>
 			</li>
 		{/each}
@@ -324,7 +324,7 @@
 						add(unit);
 					}}
 				>
-					<AssetDisplay {...unit} {level} {title} />
+					<UnitDisplay {...unit} {level} {title} />
 				</button>
 			</li>
 		{/each}
