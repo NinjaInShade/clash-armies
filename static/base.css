@@ -275,6 +275,7 @@ button:disabled {
 
 @media (max-width: 1100px) {
     :root {
+        --side-padding: 32px;
         /* --h1: 45px;
         --h1-lh: 49px;
 
@@ -290,5 +291,11 @@ button:disabled {
     :root {
         /* --h1: 38px;
         --h1-lh: 44px; */
+    }
+}
+
+@media(max-width: 500px) {
+    :root {
+        --side-padding: 24px;
     }
 }
