@@ -14,6 +14,11 @@ const config = {
 		adapter: adapter(),
 		alias: {
 			'~': 'src'
+		},
+		files: {
+			hooks: {
+				server: 'src/lib/hooks.server.ts'
+			}
 		}
 	}
 };

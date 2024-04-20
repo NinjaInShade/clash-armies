@@ -1,0 +1,15 @@
+version: '3.5'
+services:
+  db:
+    image: mariadb:11.3
+    ports:
+      - ${DB_PORT}:3306
+    environment:
+      MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MARIADB_USER: ${DB_USER}
+      MARIADB_PASSWORD: ${DB_PASSWORD}
+      MARIADB_DATABASE: clash-armies
+    volumes:
+      - clash-armies-db:/var/lib/mysql
+volumes:
+  clash-armies-db: {}
