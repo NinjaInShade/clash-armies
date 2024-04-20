@@ -113,6 +113,21 @@ html.hide-overflow {
 	overflow: hidden;
 }
 
+::-webkit-scrollbar-track {
+	border-left: 1px solid var(--grey-600);
+	background-color: var(--grey-800);
+}
+
+::-webkit-scrollbar {
+	background-color: var(--grey-800);
+	width: 12px;
+}
+
+::-webkit-scrollbar-thumb {
+	background-color: var(--grey-500);
+	border-radius: 4px;
+}
+
 :root {
 	scroll-behavior: smooth;
 	font-size: 16px;
