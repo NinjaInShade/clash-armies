@@ -27,7 +27,7 @@
 		<div class="banner-overlay">
 			<div>
 				<h1>{army.name}</h1>
-				<b>Assembled by <a href="/user/{army.createdBy}">@{army.username}</a></b>
+				<b>Assembled by <a href="/user/{army.username}">@{army.username}</a></b>
 			</div>
 			<div>
 				<small class="total">
@@ -218,6 +218,6 @@
 
 	:global(body) {
 		/* Must match .actions height */
-		margin-bottom: 76px;
+		padding-bottom: 76px;
 	}
 </style>

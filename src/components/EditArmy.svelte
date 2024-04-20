@@ -1,10 +1,10 @@
 <script lang="ts">
 	import { onMount, getContext } from 'svelte';
-	import type { AppState, Army, Unit, ArmyUnit, Banner, UnitType } from '~/lib/shared/types';
+	import type { AppState, Army, Unit, ArmyUnit, Banner, UnitType, FetchErrors } from '~/lib/shared/types';
 	import { getTotals, getUnitLevel, formatTime, copyLink, openInGame, getCopyBtnTitle, getOpenBtnTitle } from '~/lib/client/army';
 	import { ARMY_EDIT_FILLER, HOLD_ADD_SPEED, HOLD_REMOVE_SPEED } from '~/lib/shared/utils';
-	import { deserialize, applyAction } from '$app/forms';
-	import { invalidateAll } from '$app/navigation';
+	import { deserialize } from '$app/forms';
+	import { invalidateAll, goto } from '$app/navigation';
 	import C from '~/components';
 
 	type TitleOptions = {
@@ -18,7 +18,7 @@
 	const { army } = $props<Props>();
 	const app = getContext<AppState>('app');
 
-	let errors = $state<Record<string, string[]>>({});
+	let errors = $state<FetchErrors | null>(null);
 
 	let createdBy = $state<number>(1);
 	let username = $state<string>('NinjaInShade');
@@ -145,47 +145,41 @@
 		app.openModal(C.EditBanner, { banner, onSave });
 	}
 
-	async function handleSubmit(ev: SubmitEvent & { currentTarget: EventTarget & HTMLFormElement }) {
-		ev.preventDefault();
-
-		if (!ev.submitter) {
-			return;
-		}
-
-		const deletingArmy = ev.submitter.id === 'delete-army';
-		const action = deletingArmy ? ev.submitter.getAttribute('formaction') : ev.currentTarget.action;
-		if (!action) {
-			return;
-		}
-		if (deletingArmy) {
-			const confirmed = window.confirm('Are you sure you want to delete this army warrior? This cannot be undone!');
-			if (!confirmed) {
-				return;
-			}
-		}
-
-		// Create request body data
-		const body = new FormData();
-		if (deletingArmy) {
-			body.append('id', JSON.stringify(army?.id));
-		} else {
-			const updatedArmy = { id: army?.id, name, units, banner, townHall: app.townHall };
-			body.append('army', JSON.stringify(updatedArmy));
-		}
-
-		// Fetch and deserialize response
-		const response = await fetch(action, { method: 'POST', body });
+	async function saveArmy() {
+		const data = { id: army?.id, name, units, banner, townHall: app.townHall };
+		const response = await fetch('/create?/saveArmy', { method: 'POST', body: JSON.stringify(data) });
 		const result = deserialize(await response.text());
-
-		if (result.type === 'failure' && result.data?.fieldErrors) {
-			errors = result.data.fieldErrors as Record<string, string[]>;
-			return;
+		if (result.type === 'failure') {
+			errors = result.data?.errors as FetchErrors;
+		} else if (result.type === 'redirect') {
+			goto(result.location);
+		} else {
+			errors = null;
+			await invalidateAll();
 		}
 		if (army) {
 			// TODO: display toast "Army successfully saved"
 		}
-		await invalidateAll();
-		return applyAction(result);
+	}
+
+	async function deleteArmy() {
+		if (!army) return;
+
+		const confirmed = window.confirm('Are you sure you want to delete this army warrior? This cannot be undone!');
+		if (!confirmed) {
+			return;
+		}
+
+		const response = await fetch('/create?/deleteArmy', { method: 'POST', body: JSON.stringify(army.id) });
+		const result = deserialize(await response.text());
+		if (result.type === 'failure') {
+			errors = result.data?.errors as FetchErrors;
+		} else if (result.type === 'redirect') {
+			goto(result.location);
+		} else {
+			errors = null;
+			await invalidateAll();
+		}
 	}
 </script>
 
@@ -200,97 +194,86 @@
 	}}
 />
 
-<form method="POST" action="/create?/saveArmy" onsubmit={handleSubmit}>
-	{#if Object.keys(errors).length}
-		<section class="errors" class:creating={!army}>
-			<div class="container">
-				<b>Sorry warrior, the army could not be {army ? 'saved' : 'created'}:</b>
-				<ul>
-					{#each Object.entries(errors) as [field, messages]}
-						{#each messages as error}
-							<li>{`${field[0].toUpperCase()}${field.slice(1)}`}: <span>{error}</span></li>
-						{/each}
-					{/each}
-				</ul>
-			</div>
-		</section>
-	{/if}
+<section class="errors" class:creating={!army}>
+	<div class="container">
+		<C.Errors {errors} />
+	</div>
+</section>
 
-	<section class="banner" class:creating={!army}>
-		<div class="container">
-			<img src="/clash/banners/{banner}.png" alt="Clash of clans banner artwork" class="banner-img" />
-			<div class="banner-overlay">
-				<div>
-					<C.Fieldset label="Army name:" htmlName="name">
-						<C.Input bind:value={name} maxlength={25} --input-width="250px" />
-					</C.Fieldset>
-					<b>Assembled by <a href="/user/{createdBy}">@{username}</a></b>
-				</div>
-				<div>
+<section class="banner" class:creating={!army}>
+	<div class="container">
+		<img src="/clash/banners/{banner}.png" alt="Clash of clans banner artwork" class="banner-img" />
+		<div class="banner-overlay">
+			<div>
+				<C.Fieldset label="Army name:" htmlName="name">
+					<C.Input bind:value={name} maxlength={25} --input-width="250px" />
+				</C.Fieldset>
+				<b>Assembled by <a href="/user/{createdBy}">@{username}</a></b>
+			</div>
+			<div>
+				<small class="total">
+					<img src="/clash/ui/clock.png" alt="Clash of clans clock (time to train army)" />
+					{formatTime(housingSpaceUsed.time * 1000)}
+				</small>
+				<div class="totals">
 					<small class="total">
-						<img src="/clash/ui/clock.png" alt="Clash of clans clock (time to train army)" />
-						{formatTime(housingSpaceUsed.time * 1000)}
+						<img src="/clash/ui/troops.png" alt="Clash of clans troop capacity" />
+						{housingSpaceUsed.troops}/{capacity.troop}
 					</small>
-					<div class="totals">
+					{#if capacity.spell > 0}
 						<small class="total">
-							<img src="/clash/ui/troops.png" alt="Clash of clans troop capacity" />
-							{housingSpaceUsed.troops}/{capacity.troop}
+							<img src="/clash/ui/spells.png" alt="Clash of clans spell capacity" />
+							{housingSpaceUsed.spells}/{capacity.spell}
 						</small>
-						{#if capacity.spell > 0}
-							<small class="total">
-								<img src="/clash/ui/spells.png" alt="Clash of clans spell capacity" />
-								{housingSpaceUsed.spells}/{capacity.spell}
-							</small>
-						{/if}
-						{#if capacity.siege > 0}
-							<small class="total">
-								<img src="/clash/ui/sieges.png" alt="Clash of clans siege machine capacity" />
-								{housingSpaceUsed.sieges}/{capacity.siege}
-							</small>
-						{/if}
-					</div>
+					{/if}
+					{#if capacity.siege > 0}
+						<small class="total">
+							<img src="/clash/ui/sieges.png" alt="Clash of clans siege machine capacity" />
+							{housingSpaceUsed.sieges}/{capacity.siege}
+						</small>
+					{/if}
 				</div>
 			</div>
-			<button class="select-banner-btn" type="button" onclick={editBanner}>
-				<svg width="27" height="27" viewBox="0 0 27 27" fill="none" xmlns="http://www.w3.org/2000/svg">
-					<path
-						d="M3 27C2.175 27 1.469 26.7065 0.882 26.1195C0.295 25.5325 0.001 24.826 0 24V3C0 2.175 0.294 1.469 0.882 0.882C1.47 0.295 2.176 0.001 3 0H24C24.825 0 25.5315 0.294 26.1195 0.882C26.7075 1.47 27.001 2.176 27 3V24C27 24.825 26.7065 25.5315 26.1195 26.1195C25.5325 26.7075 24.826 27.001 24 27H3ZM4.5 21H22.5L16.875 13.5L12.375 19.5L9 15L4.5 21Z"
-						fill="white"
-					/>
-				</svg>
-			</button>
 		</div>
-	</section>
+		<button class="select-banner-btn" type="button" onclick={editBanner}>
+			<svg width="27" height="27" viewBox="0 0 27 27" fill="none" xmlns="http://www.w3.org/2000/svg">
+				<path
+					d="M3 27C2.175 27 1.469 26.7065 0.882 26.1195C0.295 25.5325 0.001 24.826 0 24V3C0 2.175 0.294 1.469 0.882 0.882C1.47 0.295 2.176 0.001 3 0H24C24.825 0 25.5315 0.294 26.1195 0.882C26.7075 1.47 27.001 2.176 27 3V24C27 24.825 26.7065 25.5315 26.1195 26.1195C25.5325 26.7075 24.826 27.001 24 27H3ZM4.5 21H22.5L16.875 13.5L12.375 19.5L9 15L4.5 21Z"
+					fill="white"
+				/>
+			</svg>
+		</button>
+	</div>
+</section>
 
-	<section class="units">
-		<div class="container">
-			<h2>Units</h2>
-			{@render unitsSelected()}
-			{@render unitsPicker('Troop')}
-			{#if app.armyCapacity.spell > 0}
-				{@render unitsPicker('Spell')}
-			{/if}
-			{#if app.armyCapacity.siege > 0}
-				{@render unitsPicker('Siege')}
-			{/if}
-		</div>
-	</section>
+<section class="units">
+	<div class="container">
+		<h2>Units</h2>
+		{@render unitsSelected()}
+		{@render unitsPicker('Troop')}
+		{#if app.armyCapacity.spell > 0}
+			{@render unitsPicker('Spell')}
+		{/if}
+		{#if app.armyCapacity.siege > 0}
+			{@render unitsPicker('Siege')}
+		{/if}
+	</div>
+</section>
 
-	<section class="actions">
-		<div class="container">
-			<div class="left">
-				<C.Button onclick={async () => copyLink(units)} disabled={!units.length} title={getCopyBtnTitle(units)}>Copy link</C.Button>
-				<C.Button onclick={() => openInGame(units)} disabled={!units.length} title={getOpenBtnTitle(units)}>Open in-game</C.Button>
-			</div>
-			<div class="right">
-				{#if army}
-					<C.Button type="submit" formaction="/create?/deleteArmy" theme="danger" id="delete-army">Delete</C.Button>
-				{/if}
-				<C.Button type="submit" disabled={saveDisabled}>{army ? 'Save' : 'Create'}</C.Button>
-			</div>
+<section class="actions">
+	<div class="container">
+		<div class="left">
+			<C.Button onclick={async () => copyLink(units)} disabled={!units.length} title={getCopyBtnTitle(units)}>Copy link</C.Button>
+			<C.Button onclick={() => openInGame(units)} disabled={!units.length} title={getOpenBtnTitle(units)}>Open in-game</C.Button>
 		</div>
-	</section>
-</form>
+		<div class="right">
+			{#if army}
+				<C.Button onclick={deleteArmy} theme="danger">Delete</C.Button>
+			{/if}
+			<C.Button onclick={saveArmy} disabled={saveDisabled}>{army ? 'Save' : 'Create'}</C.Button>
+		</div>
+	</div>
+</section>
 
 {#snippet unitsSelected()}
 	<ul class="selected-grid">
@@ -362,20 +345,6 @@
 	}
 	.errors.creating {
 		padding-top: 50px;
-	}
-	.errors .container {
-		border-radius: 4px;
-		padding: 12px 16px;
-		background-color: #3f2727;
-		border: 1px solid var(--error-500);
-		color: var(--grey-100);
-	}
-	.errors ul {
-		margin-top: 4px;
-	}
-	.errors li {
-		list-style: square;
-		list-style-position: inside;
 	}
 
 	.banner {
@@ -576,6 +545,6 @@
 
 	:global(body) {
 		/* Must match .actions height */
-		margin-bottom: 76px;
+		padding-bottom: 76px;
 	}
 </style>
