@@ -2,6 +2,7 @@
 	import { fade } from 'svelte/transition';
 	import { sineInOut } from 'svelte/easing';
 	import { onMount, setContext, type Snippet } from 'svelte';
+	import { version } from '$app/environment';
 	import type { LayoutData } from './$types';
 	import { createAppState, requireHTML } from '~/lib/client/state.svelte';
 	import C from '~/components';
@@ -57,14 +58,21 @@
 		appState.modals.pop();
 		requireHTML().classList.remove('hide-overflow');
 	}
+
+	function openChangelog() {
+		// TODO: add changelog modal
+	}
 </script>
 
 <nav>
 	<div class="container">
-		<a class="logo" href="/">
-			<img src="/clash/ui/swords.png" alt="Clash of clans overlapping swords" />
-			Clash <span>Armies</span>
-		</a>
+		<div class="left">
+			<a class="logo" href="/">
+				<img src="/clash/ui/swords.png" alt="Clash of clans overlapping swords" />
+				Clash <span>Armies</span>
+			</a>
+			<button class="version" onclick={openChangelog}><span>v</span>{version}</button>
+		</div>
 		<ul class="links">
 			<li>
 				<a class="body" href="/armies">Find</a>
@@ -124,6 +132,39 @@
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
+		gap: 1em;
+	}
+
+	.left {
+		display: flex;
+		align-items: center;
+		gap: 0.3em;
+	}
+
+	.version {
+		display: block;
+		outline: none;
+		background: none;
+		border: 1px dashed var(--primary-400);
+		color: var(--primary-400);
+		padding: 5px 10px 3px 10px;
+		border-radius: 50px;
+		font-weight: 700;
+		font-size: 12px;
+		line-height: 12px;
+		transition:
+			background-color,
+			color 0.15s;
+	}
+
+	.version span {
+		display: inline-block;
+		font-size: 10px;
+	}
+
+	.version:hover {
+		background-color: var(--primary-400);
+		color: var(--grey-100);
 	}
 
 	.logo {
