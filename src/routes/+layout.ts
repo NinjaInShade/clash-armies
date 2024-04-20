@@ -2,17 +2,18 @@ import type { LayoutLoad, LayoutLoadEvent } from './$types';
 import type { AppState, TroopData, SpellData, SiegeData } from '~/lib/types';
 import { CURRENT_TROOPS, CURRENT_SPELLS, CURRENT_SIEGES, OBJECT_ID_PREFIXES, NAME_TO_OBJECT_ID_NAME } from '~/lib/constants';
 
-// TODO: disable troops not available at town hall level
-// TODO: display troop level in Troop.svelte
-// TODO: click to add troop to army
-// TODO: display total capacity used
+type BuildingsJSON = Record<string, Record<string, Record<string, string | number | boolean>>>;
+type TroopsJSON = Record<string, Record<string, Record<string, string | number | boolean>>>;
+type SpellsJSON = Record<string, Record<string, Record<string, string | number | boolean>>>;
+type ObjectIdsJSON = Record<string, string>;
+type ObjectKey = string | number;
 
-type RawBuildingData = Record<string, Record<string, Record<string, string | number | boolean>>>;
-type RawTownHallData = Record<string, number>[];
-type RawTroopData = Record<string, Record<string, Record<string, string | number | boolean>>>;
-type RawSpellData = Record<string, Record<string, Record<string, string | number | boolean>>>;
-type RawObjectIdsData = Record<string, string>;
-type ObjectsToId = Record<string, string>;
+function swapKeysAndValues(obj: Record<ObjectKey, ObjectKey>) {
+	return Object.entries(obj).reduce((prev, [id, name]) => {
+		prev[name] = id;
+		return prev;
+	}, {});
+}
 
 async function fetchJSON<T>(ev: LayoutLoadEvent, url: string): Promise<T> {
 	// TODO: add error handling
@@ -21,13 +22,10 @@ async function fetchJSON<T>(ev: LayoutLoadEvent, url: string): Promise<T> {
 	return parsed;
 }
 
-async function getTownHalls(ev: LayoutLoadEvent): Promise<AppState['townHalls']> {
-	// TODO: we shouldn't need to fetch townhalls, just get thdata from buildings
-	const buildingData = await fetchJSON<RawBuildingData>(ev, '/clash/buildings/buildings.json');
-	const townHallData = await fetchJSON<RawTownHallData>(ev, '/clash/buildings/townHalls.json');
-	return townHallData.map((th, i) => {
-		const thLevel = i + 1;
-
+async function getTownHalls(ev: LayoutLoadEvent) {
+	const buildingData = await fetchJSON<BuildingsJSON>(ev, '/clash/buildings/buildings.json');
+	const townHallLevels = Object.keys(buildingData['Town Hall']).map((lvl) => +lvl);
+	return townHallLevels.map((thLevel) => {
 		const findMaxLevel = (buildingType: 'Barracks' | 'Dark Barracks' | 'Laboratory' | 'Spell Factory' | 'Dark Spell Factory' | 'Workshop') => {
 			const availableBuildingLevels = Object.values(buildingData[buildingType]).reduce<number[]>((prev, curr) => {
 				const requiredTHLevel = curr.TownHallLevel;
@@ -64,9 +62,9 @@ async function getTownHalls(ev: LayoutLoadEvent): Promise<AppState['townHalls']>
 	});
 }
 
-async function getTroops(ev: LayoutLoadEvent, ids: ObjectsToId): Promise<{ troops: AppState['troops']; sieges: AppState['sieges'] }> {
+async function getTroops(ev: LayoutLoadEvent, ids: ObjectIdsJSON) {
 	// TODO: improve name typing & type check error message
-	const data = await fetchJSON<RawTroopData>(ev, '/clash/troops/troops.json');
+	const data = await fetchJSON<TroopsJSON>(ev, '/clash/troops/troops.json');
 	const troops = {} as AppState['troops'];
 	const sieges = {} as AppState['sieges'];
 
@@ -108,9 +106,9 @@ async function getTroops(ev: LayoutLoadEvent, ids: ObjectsToId): Promise<{ troop
 	return { troops, sieges };
 }
 
-async function getSpells(ev: LayoutLoadEvent, ids: ObjectsToId): Promise<AppState['spells']> {
+async function getSpells(ev: LayoutLoadEvent, ids: ObjectIdsJSON) {
 	// TODO: improve name typing & type check error message
-	const data = await fetchJSON<RawSpellData>(ev, '/clash/spells/spells.json');
+	const data = await fetchJSON<SpellsJSON>(ev, '/clash/spells/spells.json');
 	const spells = {} as AppState['spells'];
 
 	Object.entries(data).forEach(([name, data]) => {
@@ -146,12 +144,8 @@ async function getSpells(ev: LayoutLoadEvent, ids: ObjectsToId): Promise<AppStat
 }
 
 export const load: LayoutLoad = async (ev: LayoutLoadEvent) => {
-	const idData = await fetchJSON<RawObjectIdsData>(ev, '/clash/objectIds.json');
-	const objectsToId = Object.entries(idData).reduce<Record<string, string>>((prev, [id, name]) => {
-		prev[name] = id;
-		return prev;
-	}, {});
-
+	const idsToObject = await fetchJSON<ObjectIdsJSON>(ev, '/clash/objectIds.json');
+	const objectsToId = swapKeysAndValues(idsToObject); // makes it easier to lookup by object name
 	const { troops, sieges } = await getTroops(ev, objectsToId);
 
 	return {
