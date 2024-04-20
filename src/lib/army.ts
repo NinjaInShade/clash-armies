@@ -1,4 +1,4 @@
-import type { Unit, Units, TroopName, SiegeName, SpellName, AppState, Level } from './types';
+import type { Unit, TroopName, SiegeName, SpellName, AppState, Level } from './types';
 import { SUPER_TO_REGULAR } from './constants';
 
 /**
@@ -141,6 +141,32 @@ export function getSpellLevel(name: SpellName, app: AppState): Level {
 }
 
 /**
+ * Given the passed in army, calculates how much housing space
+ * has been used and how long it will take to train the army.
+ */
+export function getTotals(units: Unit[]) {
+	if (!units.length) {
+		return { troops: 0, sieges: 0, spells: 0, time: 0 };
+	}
+	// These types can train at the same time.
+	// The total time to train then is the max out of them all.
+	const ParallelTimeCount = { troops: 0, spells: 0, sieges: 0 };
+	return units.reduce(
+		(prev, curr) => {
+			const data = Object.values<Unit['data'][number]>(curr.data);
+			const housingSpace = data[data.length - 1].housingSpace;
+			const trainingTime = data[data.length - 1].trainingTime;
+			const key = curr.type.toLowerCase() + 's';
+			ParallelTimeCount[key] += trainingTime * curr.amount;
+			prev[key] += housingSpace * curr.amount;
+			prev.time = Math.max(...Object.values(ParallelTimeCount));
+			return prev;
+		},
+		{ troops: 0, sieges: 0, spells: 0, time: 0 }
+	);
+}
+
+/**
  * For the unit given, this calculates the highest level the user has access to
  * based on the users building levels (town hall, barracks, lab, etc...)
  *
@@ -170,7 +196,7 @@ export function getLevel(unit: { type: Unit['type']; name: Unit['name'] }, app: 
  * - First is 1 spell with id 9, which is a Poison Spell.
  * - Second is 3 spells with id 2, which is a Rage Spell.
  */
-export function generateLink(units: Units): string {
+export function generateLink(units: Unit[]): string {
 	let url = 'https://link.clashofclans.com/?action=CopyArmy&army=';
 
 	const selectedTroops = units.filter((item) => item.type === 'Troop' || item.type === 'Siege');
@@ -209,10 +235,6 @@ export function generateLink(units: Units): string {
  * The army=querystring value can be parsed with regex into two groups (troops and spells):
  * - u([\d+x-]+)s([\d+x-]+)
  */
-export function parseLink(link: string): Units {
+export function parseLink(link: string): Unit[] {
 	// TODO: implement when adding "Load from link" input
-}
-
-export function openLink(href: string, openInNewTab = true) {
-	window.open(href, openInNewTab ? '_blank' : undefined, 'rel="noreferrer"');
 }
