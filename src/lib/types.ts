@@ -82,15 +82,28 @@ export type AppState = {
 	modals: Modal[];
 };
 
-export type HousingSpace = {
-	troops: number;
-	sieges: number;
-	spells: number;
-};
-export type Selected = {
+/**
+ * An army unit which can be a Troop, Siege or Spell.
+ */
+export type Unit = {
 	type: 'Troop' | 'Siege' | 'Spell';
 	name: TroopName | SiegeName | SpellName;
 	data: TroopData | SiegeData | SpellData;
 	amount: number;
 };
-export type SelectedTotals = HousingSpace & { time: number };
+export type Units = Unit[];
+
+/**
+ * A complete saved army
+ */
+export type Army = {
+	id: number;
+	name: string;
+	units: Units;
+}
+
+export type HousingSpace = {
+	troops: number;
+	sieges: number;
+	spells: number;
+};

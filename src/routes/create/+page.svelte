@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { getContext } from 'svelte';
-	import type { AppState, TroopName, TroopData, SpellName, SpellData, SiegeName, SiegeData, Selected, HousingSpace, SelectedTotals } from '~/lib/types';
+	import type { AppState, TroopName, TroopData, SpellName, SpellData, SiegeName, SiegeData, Unit, Units, HousingSpace } from '~/lib/types';
 	import { ARMY_CREATE_TROOP_FILLER, ARMY_CREATE_SPELL_FILLER } from '~/lib/constants';
 	import { getTroopLevel, getSiegeLevel, getSpellLevel, generateLink, openLink } from '~/lib/army';
 	import Alert from '~/components/Alert.svelte';
@@ -9,21 +9,23 @@
 
 	type TitleOptions = {
 		level: number;
-		type: Selected['type'];
+		type: Unit['type'];
 		reachedMaxAmount: boolean;
 		reachedSuperLimit?: boolean;
 	};
+	type UnitWithoutAmount = Omit<Unit, 'amount'>;
+	type Totals = HousingSpace & { time: number };
 
 	const HOLD_ADD_SPEED = 200;
 	const HOLD_REMOVE_SPEED = 200;
 
 	const app = getContext<AppState>('app');
 
-	let selected = $state<Selected[]>([]);
-	let selectedTroops = $derived(selected.filter((item) => item.type === 'Troop' || item.type === 'Siege'));
-	let selectedSpells = $derived(selected.filter((item) => item.type === 'Spell'));
+	let units = $state<Units>([]);
+	let troopUnits = $derived(units.filter((item) => item.type === 'Troop' || item.type === 'Siege'));
+	let spellUnits = $derived(units.filter((item) => item.type === 'Spell'));
 
-	let reachedSuperLimit = $derived(selectedTroops.filter((t) => t.type === 'Troop' && t.data[1].isSuper).length === 2);
+	let reachedSuperLimit = $derived(troopUnits.filter((t) => t.type === 'Troop' && t.data[1].isSuper).length === 2);
 
 	let maxHousingSpace: HousingSpace = { troops: 320, spells: 11, sieges: 1 }; // TODO: calculate dynamically
 	let housingSpaceUsed = $derived.call(getSelectedTotals);
@@ -31,46 +33,46 @@
 	let holdAddInterval: ReturnType<typeof setInterval> | null = null;
 	let holdRemoveInterval: ReturnType<typeof setInterval> | null = null;
 
-	function add(item: Omit<Selected, 'amount'>, arr: Selected[] = selected) {
-		const existing = arr.find((sel) => sel.name === item.name);
+	function add(unit: UnitWithoutAmount, arr = units) {
+		const existing = arr.find((item) => item.name === unit.name);
 		if (existing) {
 			existing.amount += 1;
 		} else {
-			arr.push({ ...item, amount: 1 });
+			arr.push({ ...unit, amount: 1 });
 		}
 		return arr;
 	}
 
-	function remove(name: Selected['name']) {
-		const existingIndex = selected.findIndex((sel) => sel.name === name);
-		if (selected[existingIndex].amount === 1) {
-			selected.splice(existingIndex, 1);
+	function remove(name: Unit['name']) {
+		const existingIndex = units.findIndex((item) => item.name === name);
+		if (units[existingIndex].amount === 1) {
+			units.splice(existingIndex, 1);
 		} else {
-			selected[existingIndex].amount -= 1;
+			units[existingIndex].amount -= 1;
 		}
 	}
 
-	function initHoldAdd(item: Omit<Selected, 'amount'>) {
-		if (willOverflowHousingSpace(item)) {
+	function initHoldAdd(unit: UnitWithoutAmount) {
+		if (willOverflowHousingSpace(unit)) {
 			return;
 		}
 		// add straight away in case user clicked
-		add(item);
+		add(unit);
 		holdAddInterval = setInterval(() => {
 			// if no more housing space  don't try adding & stop
-			if (willOverflowHousingSpace(item)) {
+			if (willOverflowHousingSpace(unit)) {
 				stopHoldAdd();
 				return;
 			}
-			add(item);
+			add(unit);
 		}, HOLD_ADD_SPEED);
 	}
 
-	function initHoldRemove(name: Selected['name']) {
+	function initHoldRemove(name: Unit['name']) {
 		// remove straight away in case user clicked
 		remove(name);
 		// if we removed the last troop/spell stop removing
-		const exists = selected.find((item) => item.name === name);
+		const exists = units.find((item) => item.name === name);
 		if (!exists) {
 			stopHoldRemove();
 			return;
@@ -78,7 +80,7 @@
 		holdRemoveInterval = setInterval(() => {
 			remove(name);
 			// if we removed the last troop/spell stop removing
-			const exists = selected.find((item) => item.name === name);
+			const exists = units.find((item) => item.name === name);
 			if (!exists) {
 				stopHoldRemove();
 			}
@@ -98,14 +100,14 @@
 	}
 
 	async function copyLink() {
-		const link = generateLink(selected);
+		const link = generateLink(units);
 		await navigator.clipboard.writeText(link);
 		alert(`Successfully copied "${link}" to clipboard!`);
 		// TODO: change to a toast notification
 	}
 
 	function openInGame() {
-		const link = generateLink(selected);
+		const link = generateLink(units);
 		openLink(link);
 	}
 
@@ -142,7 +144,7 @@
 		return parts.length ? parts.join(' ') : '0s';
 	}
 
-	function getSelectedTotals(arr: Selected[] = selected) {
+	function getSelectedTotals(arr = units) {
 		if (!arr.length) {
 			return { troops: 0, sieges: 0, spells: 0, time: 0 };
 		}
@@ -153,9 +155,9 @@
 			spells: 0,
 			sieges: 0
 		};
-		return arr.reduce<SelectedTotals>(
+		return arr.reduce<Totals>(
 			(prev, curr) => {
-				const data = Object.values<Selected['data'][number]>(curr.data);
+				const data = Object.values<Unit['data'][number]>(curr.data);
 				const housingSpace = data[data.length - 1].housingSpace;
 				const trainingTime = data[data.length - 1].trainingTime;
 				const key = curr.type.toLowerCase() + 's';
@@ -170,9 +172,9 @@
 		);
 	}
 
-	function willOverflowHousingSpace(troop: Omit<Selected, 'amount'>) {
-		const selectedCopy: Selected[] = JSON.parse(JSON.stringify(selected));
-		const selectedPreview = add(troop, selectedCopy);
+	function willOverflowHousingSpace(unit: UnitWithoutAmount) {
+		const selectedCopy: Units = JSON.parse(JSON.stringify(units));
+		const selectedPreview = add(unit, selectedCopy);
 		const { troops, sieges, spells } = getSelectedTotals(selectedPreview);
 		return troops > maxHousingSpace.troops || sieges > maxHousingSpace.sieges || spells > maxHousingSpace.spells;
 	}
@@ -197,7 +199,7 @@
 </svelte:head>
 
 <svelte:window
-	on:mouseup={() => {
+	onmouseup={() => {
 		// handle this on window in case user mouses cursor from the
 		// card (maybe we should stop adding/removing if mouse leaves card?)
 		stopHoldAdd();
@@ -218,15 +220,17 @@
 	<div class="container">
 		<h2 class="heading"><span>1</span> Troops</h2>
 		<ul class="grid">
-			{#each selectedTroops as troop}
-				{@const { type, name, amount, data } = troop}
+			{#each troopUnits as troop}
 				<li>
-					<button class="object-card" on:mousedown={() => initHoldRemove(troop.name)}>
-						<AssetDisplay {type} {name} {amount} {data} />
+					<button
+						class="object-card"
+						onmousedown={() => initHoldRemove(troop.name)}
+					>
+						<AssetDisplay {...troop} />
 					</button>
 				</li>
 			{/each}
-			{#each Array.from({ length: ARMY_CREATE_TROOP_FILLER - selectedTroops.length > 0 ? ARMY_CREATE_TROOP_FILLER - selectedTroops.length : 0 }) as filler}
+			{#each Array.from({ length: ARMY_CREATE_TROOP_FILLER - troopUnits.length > 0 ? ARMY_CREATE_TROOP_FILLER - troopUnits.length : 0 }) as filler}
 				<button class="object-card">
 					<svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg" class="add-icon">
 						<path
@@ -247,13 +251,13 @@
 				{@const reachedMaxAmount = willOverflowHousingSpace(troop)}
 				<!-- Disable if reached max unique super limit of 2 and this troop isn't one of those -->
 				<!-- TOOD: fix data[1].isSuper, properties like isSuper that apply to all levels should not live in level data -->
-				{@const disableSuper = data[1].isSuper && !selected.find(sel => sel.name === troop.name) && reachedSuperLimit}
+				{@const disableSuper = data[1].isSuper && !units.find(sel => sel.name === troop.name) && reachedSuperLimit}
 				{@const title = getCardTitle({ level, type, reachedMaxAmount, reachedSuperLimit: disableSuper })}
 				<li>
 					<button
 						class="picker-card"
 						disabled={reachedMaxAmount || disableSuper || level === -1}
-						on:mousedown={() => initHoldAdd(troop)}
+						onmousedown={() => initHoldAdd(troop)}
 					>
 						<AssetDisplay {type} {name} {data} {level} {title} />
 					</button>
@@ -273,7 +277,7 @@
 					<button
 						class="picker-card"
 						disabled={reachedMaxAmount || level === -1}
-						on:mousedown={() => initHoldAdd(siege)}
+						onmousedown={() => initHoldAdd(siege)}
 					>
 						<AssetDisplay {type} {name} {data} {level} {title} />
 					</button>
@@ -287,15 +291,17 @@
 	<div class="container">
 		<h2 class="heading"><span>2</span> Spells</h2>
 		<ul class="grid">
-			{#each selectedSpells as spell}
-				{@const { type, name, amount, data } = spell}
+			{#each spellUnits as spell}
 				<li>
-					<button class="object-card" on:mousedown={() => initHoldRemove(spell.name)}>
-						<AssetDisplay {type} {name} {amount} {data} />
+					<button
+						class="object-card"
+						onmousedown={() => initHoldRemove(spell.name)}
+					>
+						<AssetDisplay {...spell} />
 					</button>
 				</li>
 			{/each}
-			{#each Array.from({ length: ARMY_CREATE_SPELL_FILLER - selectedSpells.length > 0 ? ARMY_CREATE_SPELL_FILLER - selectedSpells.length : 0 }) as filler}
+			{#each Array.from({ length: ARMY_CREATE_SPELL_FILLER - spellUnits.length > 0 ? ARMY_CREATE_SPELL_FILLER - spellUnits.length : 0 }) as filler}
 				<button class="object-card">
 					<svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg" class="add-icon">
 						<path
@@ -319,7 +325,7 @@
 					<button
 						class="picker-card"
 						disabled={reachedMaxAmount || level === -1}
-						on:mousedown={() => initHoldAdd(spell)}
+						onmousedown={() => initHoldAdd(spell)}
 					>
 						<AssetDisplay {type} {name} {data} {level} {title} />
 					</button>
@@ -353,8 +359,8 @@
 		<div class="right">
 			<Button
 				onclick={copyLink}
-				disabled={!selected.length}
-				title={!selected.length
+				disabled={!units.length}
+				title={!units.length
 					? 'Army cannot be shared when empty'
 					: "Copies an army link to your clipboard for sharing.\nNote: may not work if the army isn't at full capacity"}
 			>
@@ -362,8 +368,8 @@
 			</Button>
 			<Button
 				onclick={openInGame}
-				disabled={!selected.length}
-				title={!selected.length
+				disabled={!units.length}
+				title={!units.length
 					? 'Army cannot be opened in-game when empty'
 					: "Opens clash of clans and allows you to paste your army in one of your slots.\nNote: may not work if the army isn't at full capacity"}
 			>

@@ -1,4 +1,4 @@
-import type { Selected, TroopName, SiegeName, SpellName, AppState, Level } from './types';
+import type { Units, TroopName, SiegeName, SpellName, AppState, Level } from './types';
 import { SUPER_TO_REGULAR } from './constants';
 
 /**
@@ -153,11 +153,11 @@ export function getSpellLevel(name: SpellName, app: AppState): Level {
  * - First is 1 spell with id 9, which is a Poison Spell.
  * - Second is 3 spells with id 2, which is a Rage Spell.
  */
-export function generateLink(selected: Selected[]): string {
+export function generateLink(units: Units): string {
 	let url = 'https://link.clashofclans.com/?action=CopyArmy&army=';
 
-	const selectedTroops = selected.filter((item) => item.type === 'Troop' || item.type === 'Siege');
-	const selectedSpells = selected.filter((item) => item.type === 'Spell');
+	const selectedTroops = units.filter((item) => item.type === 'Troop' || item.type === 'Siege');
+	const selectedSpells = units.filter((item) => item.type === 'Spell');
 
 	// generate troops
 	if (selectedTroops.length) {
@@ -192,7 +192,7 @@ export function generateLink(selected: Selected[]): string {
  * The army=querystring value can be parsed with regex into two groups (troops and spells):
  * - u([\d+x-]+)s([\d+x-]+)
  */
-export function parseLink(link: string): Selected[] {
+export function parseLink(link: string): Units {
 	// TODO: implement when adding "Load from link" input
 }
 
