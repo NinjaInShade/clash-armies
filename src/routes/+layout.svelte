@@ -83,6 +83,9 @@
 			<li>
 				<a class="body" href="/account">Account</a>
 			</li>
+			<li>
+				<a class="body" href="/admin">Admin</a>
+			</li>
 			<li class="control">
 				<C.Button>Log in</C.Button>
 			</li>

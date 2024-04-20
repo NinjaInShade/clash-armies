@@ -32,7 +32,7 @@
 	}
 
 	header .body {
-		margin: 24px 0 32px 0;
+		margin: 16px 0 32px 0;
 		max-width: 365px;
 	}
 

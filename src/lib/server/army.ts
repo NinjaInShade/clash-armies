@@ -81,7 +81,10 @@ export async function getArmy(opts: GetArmyParams) {
 }
 
 export async function getTownHalls() {
-	return db.getRows<TownHall>('town_halls');
+	return db.query<TownHall>(`
+		SELECT *, level AS id
+		FROM town_halls
+	`, []);
 }
 
 export async function getUnits(opts: GetUnitsParams = {}) {

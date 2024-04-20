@@ -44,7 +44,7 @@
 		/** Defines whether the table is sortable @default true */
 		sortable?: boolean;
 		/** Function that fires of upon selection of a row */
-		onSelect?: (row: Row, e: MouseEvent) => Promise<void> | void;
+		onSelect?: (row: Row, e: KeyboardEvent | MouseEvent) => Promise<void> | void;
 	};
 	let { columns, data, defaultSortKey, defaultSortDir = 'desc', selectedKeys, selectable = true, sortable = true, onSelect } = $props<Props>();
 
@@ -160,7 +160,14 @@
 		}
 	};
 
-	const handleSelect = async (row: Row, e: MouseEvent) => {
+	const handleEnter = async (row: Row, e: KeyboardEvent) => {
+		if (e.key !== 'Enter') {
+			return;
+		}
+		await handleSelect(row, e);
+	};
+
+	const handleSelect = async (row: Row, e: KeyboardEvent | MouseEvent) => {
 		if (!selectable) {
 			return;
 		}
@@ -232,7 +239,12 @@
 		</thead>
 		<tbody>
 			{#each tableData as row}
-				<tr class:selected={selectedKeys && selectedKeys.includes(row.id)} on:click={async (e) => await handleSelect(row, e)}>
+				<tr
+					class:selected={selectedKeys && selectedKeys.includes(row.id)}
+					onclick={async (e) => await handleSelect(row, e)}
+					onkeydown={async (e) => await handleEnter(row, e)}
+					tabindex={selectable ? 0 : null}
+				>
 					{#each columns as col}
 						{@const title = getTitle(row, col)}
 						{@const style = getCellStyle(col)}
@@ -290,6 +302,7 @@
 
 	tr {
 		display: flex;
+		border: 1px solid transparent;
 	}
 
 	th {
@@ -326,7 +339,6 @@
 	.cell {
 		white-space: nowrap;
 		height: 50px;
-		border: 1px solid transparent;
 		border-bottom: 1px solid var(--grey-600);
 	}
 
@@ -338,21 +350,20 @@
 		cursor: pointer;
 	}
 
-	.table.selectable tr:hover .cell,
-	tr.selected .cell {
+	.selectable tr:hover,
+	.selectable tr:focus,
+	.selectable tr:focus-visible,
+	.selected {
+		outline: none;
+		background: none;
+		border: 1px solid var(--primary-400);
+	}
+
+	.selectable tr:hover .cell,
+	.selectable tr:focus .cell,
+	.selectable tr:focus-visible .cell,
+	.selected .cell {
 		background-color: var(--grey-900);
-		border-top: 1px solid var(--primary-400);
-		border-bottom: 1px solid var(--primary-400);
-	}
-
-	.table.selectable tr:hover .cell:first-child,
-	tr.selected .cell:first-child {
-		border-left: 1px solid var(--primary-400);
-	}
-
-	.table.selectable tr:hover .cell:last-child,
-	tr.selected .cell:last-child {
-		border-right: 1px solid var(--primary-400);
 	}
 
 	.th-cell button {
