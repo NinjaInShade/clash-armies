@@ -1,6 +1,21 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
 	import { page } from '$app/stores';
 	import Link from '~/components/Link.svelte';
+
+	let pageRef: HTMLElement | null = null;
+
+	onMount(() => {
+		if (!pageRef) {
+			return;
+		}
+
+		// Focus back to home button for UX
+		const link = pageRef.querySelector<HTMLElement>('a[href="/"]');
+		if (link) {
+			link.focus();
+		}
+	});
 
 	function getMessage(diagnostics: typeof $page) {
 		const status = diagnostics.status;
@@ -15,7 +30,7 @@
 	}
 </script>
 
-<header>
+<header bind:this={pageRef}>
 	<div class="container">
 		<h1>{$page.status}!</h1>
 		<p class="body">{getMessage($page)}</p>
