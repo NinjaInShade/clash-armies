@@ -168,6 +168,29 @@ export const NAME_TO_OBJECT_ID_NAME = {
 	'Hog Rider': 'Boar Rider'
 } as const;
 
+/**
+ * TODO: fix this - static data does not include enough information to infer this
+ * The max troop capacity grouped by town hall (assuming max level barracks & max amount)
+ */
+export const TROOP_CAPACITY_BY_TH = {
+	1: 20,
+	2: 30,
+	3: 70,
+	4: 80,
+	5: 135,
+	6: 150,
+	7: 200,
+	8: 200,
+	9: 220,
+	10: 240,
+	11: 260,
+	12: 280,
+	13: 300,
+	14: 300,
+	15: 320,
+	16: 320
+} as const;
+
 export const ARMY_EDIT_FILLER = 10;
 
 export const HOLD_ADD_SPEED = 100;

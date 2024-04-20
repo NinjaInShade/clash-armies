@@ -1,8 +1,8 @@
 import type { LayoutLoad, LayoutLoadEvent } from './$types';
-import type { AppState, TroopData, SpellData, SiegeData } from '~/lib/types';
-import { CURRENT_TROOPS, CURRENT_SPELLS, CURRENT_SIEGES, OBJECT_ID_PREFIXES, NAME_TO_OBJECT_ID_NAME } from '~/lib/constants';
+import type { AppState, TroopData, SpellData, SiegeData, BuildingName, BuildingData } from '~/lib/types';
+import { CURRENT_TROOPS, CURRENT_SPELLS, CURRENT_SIEGES, OBJECT_ID_PREFIXES, NAME_TO_OBJECT_ID_NAME, TROOP_CAPACITY_BY_TH } from '~/lib/constants';
 
-type BuildingsJSON = Record<string, Record<string, Record<string, string | number | boolean>>>;
+type BuildingsJSON = Record<BuildingName, BuildingData>;
 type TroopsJSON = Record<string, Record<string, Record<string, string | number | boolean>>>;
 type SpellsJSON = Record<string, Record<string, Record<string, string | number | boolean>>>;
 type ObjectIdsJSON = Record<string, string>;
@@ -26,11 +26,12 @@ async function getTownHalls(ev: LayoutLoadEvent) {
 	const buildingData = await fetchJSON<BuildingsJSON>(ev, '/clash/buildings/buildings.json');
 	const townHallLevels = Object.keys(buildingData['Town Hall']).map((lvl) => +lvl);
 	return townHallLevels.map((thLevel) => {
-		const findMaxLevel = (buildingType: 'Barracks' | 'Dark Barracks' | 'Laboratory' | 'Spell Factory' | 'Dark Spell Factory' | 'Workshop') => {
-			const availableBuildingLevels = Object.values(buildingData[buildingType]).reduce<number[]>((prev, curr) => {
-				const requiredTHLevel = curr.TownHallLevel;
-				const buildingLevel = curr.BuildingLevel;
-
+		/** Finds the max level building that is unlocked for the current townhall */
+		const findMaxLevel = (name: BuildingName) => {
+			let maxLevelBuilding: Record<string, string | number | boolean | undefined> = {};
+			for (const level of Object.values(buildingData[name])) {
+				const requiredTHLevel = level.TownHallLevel;
+				const buildingLevel = level.BuildingLevel;
 				if (typeof requiredTHLevel !== 'number') {
 					throw new Error('Expected buildings required town hall level to be a number');
 				}
@@ -38,26 +39,42 @@ async function getTownHalls(ev: LayoutLoadEvent) {
 					throw new Error('Expected buildings level to be a number');
 				}
 				if (requiredTHLevel <= thLevel) {
-					prev.push(buildingLevel);
+					maxLevelBuilding = level;
+				} else {
+					break;
 				}
-				return prev;
-			}, []);
-			if (!availableBuildingLevels.length) {
-				// prevents Math.max() returning -Infinity and allows us to
-				// differentiate between not found/undefined and not unlocked yet
-				return -1;
 			}
-			return Math.max(...availableBuildingLevels);
+			return maxLevelBuilding;
 		};
+
+		const barracks = findMaxLevel('Barracks');
+		const darkBarracks = findMaxLevel('Dark Barracks');
+		const lab = findMaxLevel('Laboratory');
+		const spellFactory = findMaxLevel('Spell Factory');
+		const darkSpellFactory = findMaxLevel('Dark Spell Factory');
+		const workshop = findMaxLevel('Workshop');
+
+		const spellHousing = spellFactory.HousingSpaceAlt;
+		const darkSpellHousing = darkSpellFactory.HousingSpaceAlt;
+		if ((spellHousing !== undefined && typeof spellHousing !== 'number') || (darkSpellHousing !== undefined && typeof darkSpellHousing !== 'number')) {
+			throw new Error('Expected spell factory housing space to be a number');
+		}
+
+		const troopCapacity = TROOP_CAPACITY_BY_TH[thLevel]; // TODO: fix this, look at definition for more information
+		const spellCapacity = (spellHousing ?? 0) + (darkSpellHousing ?? 0);
+		const siegeCapacity = workshop.BuildingLevel ? 1 : 0; // can't find a dynamic way of finding this out, but I don't see this changing anyway so fine for now
 
 		return {
 			level: thLevel,
-			maxBarracks: findMaxLevel('Barracks'),
-			maxDarkBarracks: findMaxLevel('Dark Barracks'),
-			maxLaboratory: findMaxLevel('Laboratory'),
-			maxSpellFactory: findMaxLevel('Spell Factory'),
-			maxDarkSpellFactory: findMaxLevel('Dark Spell Factory'),
-			maxWorkshop: findMaxLevel('Workshop')
+			maxBarracks: barracks.BuildingLevel ?? -1,
+			maxDarkBarracks: darkBarracks.BuildingLevel ?? -1,
+			maxLaboratory: lab.BuildingLevel ?? -1,
+			maxSpellFactory: spellFactory.BuildingLevel ?? -1,
+			maxDarkSpellFactory: darkSpellFactory.BuildingLevel ?? -1,
+			maxWorkshop: workshop.BuildingLevel ?? -1,
+			troopCapacity: troopCapacity,
+			spellCapacity: spellCapacity,
+			siegeCapacity: siegeCapacity
 		};
 	});
 }

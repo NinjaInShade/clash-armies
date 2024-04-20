@@ -20,6 +20,7 @@ export function createAppState(initial: Omit<AppState, 'openModal'>) {
 	let spellFactory = $state<AppState['spellFactory']>(initial.spellFactory);
 	let darkSpellFactory = $state<AppState['darkSpellFactory']>(initial.darkSpellFactory);
 	let workshop = $state<AppState['workshop']>(initial.workshop);
+	let armyCapacity = $state<AppState['armyCapacity']>(initial.armyCapacity);
 	let modals = $state<AppState['modals']>([]);
 
 	return {
@@ -44,6 +45,7 @@ export function createAppState(initial: Omit<AppState, 'openModal'>) {
 			spellFactory = thData.maxSpellFactory;
 			darkSpellFactory = thData.maxDarkSpellFactory;
 			workshop = thData.maxWorkshop;
+			armyCapacity = { troop: thData.troopCapacity, spell: thData.spellCapacity, siege: thData.siegeCapacity };
 		},
 		get barrack() {
 			return barrack;
@@ -71,6 +73,9 @@ export function createAppState(initial: Omit<AppState, 'openModal'>) {
 		},
 		get spells() {
 			return spells;
+		},
+		get armyCapacity() {
+			return armyCapacity;
 		},
 		get modals() {
 			return modals;

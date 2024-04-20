@@ -5,6 +5,9 @@ export type SvelteComponentGeneric = typeof SvelteComponent<Record<string, unkno
 
 export type Level = number;
 
+export type BuildingName = 'Town Hall' | 'Barracks' | 'Dark Barracks' | 'Laboratory' | 'Spell Factory' | 'Dark Spell Factory' | 'Workshop';
+export type BuildingData = Record<Level, Record<string, string | number | boolean>>;
+
 export type TroopName = (typeof CURRENT_TROOPS)[number];
 export type TroopData = Record<
 	Level,
@@ -68,6 +71,9 @@ type TownHallData = {
 	maxSpellFactory: number;
 	maxDarkSpellFactory: number;
 	maxWorkshop: number;
+	troopCapacity: number;
+	spellCapacity: number;
+	siegeCapacity: number;
 };
 
 export type AppState = {
@@ -84,6 +90,7 @@ export type AppState = {
 	spellFactory: number | null;
 	darkSpellFactory: number | null;
 	workshop: number | null;
+	armyCapacity: { troop: number; spell: number; siege: number };
 	// general app state
 	modals: Modal[];
 	openModal(component: Modal['component'], props?: Modal['props']): void;

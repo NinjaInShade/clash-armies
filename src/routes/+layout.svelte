@@ -34,6 +34,7 @@
 		spellFactory: null,
 		darkSpellFactory: null,
 		workshop: null,
+		armyCapacity: { troop: 0, spell: 0, siege: 0 },
 		// general app state
 		modals: []
 	});

@@ -31,10 +31,7 @@
 	let orderedUnits = $derived([...troopUnits, ...siegeUnits, ...spellUnits]);
 
 	let reachedSuperLimit = $derived(troopUnits.filter((t) => t.data[1].isSuper).length === 2);
-
-	let maxHousingSpace: HousingSpace = { troops: 320, spells: 11, sieges: 1 }; // TODO: calculate dynamically
 	let housingSpaceUsed = $derived.call(getSelectedTotals);
-
 	let holdAddInterval: ReturnType<typeof setInterval> | null = null;
 	let holdRemoveInterval: ReturnType<typeof setInterval> | null = null;
 
@@ -177,7 +174,7 @@
 		const selectedCopy: Units = JSON.parse(JSON.stringify(units));
 		const selectedPreview = add(unit, selectedCopy);
 		const { troops, sieges, spells } = getSelectedTotals(selectedPreview);
-		return troops > maxHousingSpace.troops || sieges > maxHousingSpace.sieges || spells > maxHousingSpace.spells;
+		return troops > app.armyCapacity.troop || sieges > app.armyCapacity.siege || spells > app.armyCapacity.spell;
 	}
 
 	function getCardTitle(opts: TitleOptions) {
@@ -221,8 +218,12 @@
 		<h2 class="heading"><span>1</span> Units</h2>
 		{@render unitsSelected()}
 		{@render unitsPicker('Troop')}
-		{@render unitsPicker('Siege')}
-		{@render unitsPicker('Spell')}
+		{#if app.armyCapacity.spell > 0}
+			{@render unitsPicker('Spell')}
+		{/if}
+		{#if app.armyCapacity.siege > 0}
+			{@render unitsPicker('Siege')}
+		{/if}
 	</div>
 </section>
 
@@ -231,16 +232,20 @@
 		<div class="left">
 			<small class="total">
 				<img src="/clash/ui/troops.png" alt="Clash of clans troop capacity" />
-				{housingSpaceUsed.troops} / {maxHousingSpace.troops}
+				{housingSpaceUsed.troops} / {app.armyCapacity.troop}
 			</small>
-			<small class="total">
-				<img src="/clash/ui/spells.png" alt="Clash of clans spell capacity" />
-				{housingSpaceUsed.spells} / {maxHousingSpace.spells}
-			</small>
-			<small class="total">
-				<img src="/clash/ui/sieges.png" alt="Clash of clans siege machine capacity" />
-				{housingSpaceUsed.sieges} / {maxHousingSpace.sieges}
-			</small>
+			{#if app.armyCapacity.spell > 0}
+				<small class="total">
+					<img src="/clash/ui/spells.png" alt="Clash of clans spell capacity" />
+					{housingSpaceUsed.spells} / {app.armyCapacity.spell}
+				</small>
+			{/if}
+			{#if app.armyCapacity.siege > 0}
+				<small class="total">
+					<img src="/clash/ui/sieges.png" alt="Clash of clans siege machine capacity" />
+					{housingSpaceUsed.sieges} / {app.armyCapacity.siege}
+				</small>
+			{/if}
 			<small class="total">
 				<img src="/clash/ui/clock.png" alt="Clash of clans clock (time to train army)" />
 				{formatTime(housingSpaceUsed.time * 1000)}
@@ -347,6 +352,7 @@
 		font-size: 0.85em;
 		height: 26px;
 	}
+
 	.total img {
 		max-height: 32px;
 		margin-left: -12px;
