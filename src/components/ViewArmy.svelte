@@ -1,48 +1,9 @@
-<script lang="ts" context="module">
-	import type { Army, Unit } from '~/lib/types';
-
-	export function getCopyBtnTitle(units: Unit[]) {
-		if (units.length) {
-			return "Copies an army link to your clipboard for sharing.\nNote: may not work in game if the army isn't at full capacity";
-		}
-		return 'Army cannot be shared when empty';
-	}
-
-	export function getOpenBtnTitle(units: Unit[]) {
-		if (units.length) {
-			return "Opens clash of clans and allows you to paste your army in one of your slots.\nNote: may not work in game if the army isn't at full capacity";
-		}
-		return 'Army cannot be opened in-game when empty';
-	}
-
-	export async function copyLink(units: Unit[]) {
-		const link = generateLink(units);
-		await navigator.clipboard.writeText(link);
-		alert(`Successfully copied "${link}" to clipboard!`); // TODO: change to a toast notification
-	}
-
-	export function openInGame(units: Unit[]) {
-		const link = generateLink(units);
-		openLink(link);
-	}
-
-	export function getTags(army: Army) {
-		const tags: string[] = [];
-		tags.push(`TH${army.townHall}`);
-		tags.push(`Air`);
-		tags.push(`Has guide`);
-		return tags;
-	}
-</script>
-
 <script lang="ts">
-	import { formatTime, openLink } from '~/lib/utils';
-	import { getTotals, generateLink } from '~/lib/army';
+	import { getTotals, formatTime, copyLink, openInGame, getTags, getCopyBtnTitle, getOpenBtnTitle } from '~/lib/client/army';
+	import type { Army } from '~/lib/shared/types';
 	import C from '~/components';
 
-	type Props = {
-		army: Army & { armyCapacity: { troop: number; spell: number; siege: number } };
-	};
+	type Props = { army: Army };
 	const { army } = $props<Props>();
 	const { units } = $derived(army);
 
@@ -76,18 +37,18 @@
 				<div class="totals">
 					<small class="total">
 						<img src="/clash/ui/troops.png" alt="Clash of clans troop capacity" />
-						{housingSpaceUsed.troops}/{army.armyCapacity.troop}
+						{housingSpaceUsed.troops}/{army.troopCapacity}
 					</small>
-					{#if army.armyCapacity.spell > 0}
+					{#if army.spellCapacity > 0}
 						<small class="total">
 							<img src="/clash/ui/spells.png" alt="Clash of clans spell capacity" />
-							{housingSpaceUsed.spells}/{army.armyCapacity.spell}
+							{housingSpaceUsed.spells}/{army.spellCapacity}
 						</small>
 					{/if}
-					{#if army.armyCapacity.siege > 0}
+					{#if army.siegeCapacity > 0}
 						<small class="total">
 							<img src="/clash/ui/sieges.png" alt="Clash of clans siege machine capacity" />
-							{housingSpaceUsed.sieges}/{army.armyCapacity.siege}
+							{housingSpaceUsed.sieges}/{army.siegeCapacity}
 						</small>
 					{/if}
 				</div>

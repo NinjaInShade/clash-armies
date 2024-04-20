@@ -1,10 +1,10 @@
 <script lang="ts">
-	import type { TroopName, TroopData, SiegeName, SiegeData, SpellName, SpellData } from '~/lib/types';
+	import type { UnitLevel, UnitType } from '~/lib/shared/types';
 
 	type Props = {
-		type: 'Troop' | 'Siege' | 'Spell';
-		name: TroopName | SiegeName | SpellName;
-		data: TroopData | SiegeData | SpellData;
+		name: string;
+		type: UnitType;
+		levels: UnitLevel[];
 		/**
 		 * Title to use for the card
 		 * @default props.name
@@ -13,26 +13,10 @@
 		amount?: number;
 		level?: number;
 	};
-	const { type, name, amount, level, title, data } = $props<Props>();
-
-	const types = {
-		Troop: {
-			assetDir: 'troops',
-			altSuffix: 'troop'
-		},
-		Siege: {
-			assetDir: 'troops',
-			altSuffix: 'siege machine'
-		},
-		Spell: {
-			assetDir: 'spells',
-			altSuffix: 'spell'
-		}
-	};
+	const { type, name, amount, level, title, levels } = $props<Props>();
 
 	function isMaxLevel() {
-		const dataKeys = Object.keys(data);
-		return level === +dataKeys[dataKeys.length - 1];
+		return level === Math.max(...levels.map((x) => x.level));
 	}
 </script>
 
@@ -43,7 +27,7 @@
 	{#if level && level > 0}
 		<b class="unit-lvl" class:max-lvl={isMaxLevel()}>{level}</b>
 	{/if}
-	<img class="unit-img" src="/clash/{types[type].assetDir}/{name}.png" alt="{name} {types[type].altSuffix}" />
+	<img class="unit-img" src="/clash/units/{name}.png" alt="{type}: {name}" />
 </div>
 
 <style>

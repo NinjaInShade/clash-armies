@@ -6,4 +6,10 @@ export const db = new MySQL({
 	password: DB_PASSWORD,
 	port: +DB_PORT,
 	database: 'clash-armies',
+	typeCast: function(field, next) {
+		if (field.type === 'TINY' && field.length === 1) {
+			return field.string() === '1'; // 1 = true, 0 = false
+		}
+		return next();
+	}
 });

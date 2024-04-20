@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
-	import type { SvelteComponentGeneric } from '~/lib/types';
+	import type { SvelteComponentGeneric } from '~/lib/shared/types';
 	import C from '~/components';
 
 	type ComponentRendering = {

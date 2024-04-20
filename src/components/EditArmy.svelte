@@ -1,10 +1,8 @@
 <script lang="ts">
 	import { onMount, getContext } from 'svelte';
-	import type { AppState, Army, Unit, Banner } from '~/lib/types';
-	import { formatTime, getEntries } from '~/lib/utils';
-	import { getTotals, getLevel } from '~/lib/army';
-	import { ARMY_EDIT_FILLER, HOLD_ADD_SPEED, HOLD_REMOVE_SPEED } from '~/lib/constants';
-	import { getCopyBtnTitle, getOpenBtnTitle, copyLink, openInGame } from '~/components/ViewArmy.svelte';
+	import type { AppState, Army, Unit, ArmyUnit, Banner, UnitType } from '~/lib/shared/types';
+	import { getTotals, getUnitLevel, formatTime, copyLink, openInGame, getCopyBtnTitle, getOpenBtnTitle } from '~/lib/client/army';
+	import { ARMY_EDIT_FILLER, HOLD_ADD_SPEED, HOLD_REMOVE_SPEED } from '~/lib/shared/utils';
 	import { deserialize, applyAction } from '$app/forms';
 	import { invalidateAll } from '$app/navigation';
 	import C from '~/components';
@@ -15,8 +13,7 @@
 		reachedMaxAmount: boolean;
 		reachedSuperLimit?: boolean;
 	};
-	type UnitWithoutAmount = Omit<Unit, 'amount'>;
-	type Props = { army?: Army & { armyCapacity: { troop: number; spell: number; siege: number } } };
+	type Props = { army?: Army };
 
 	const { army } = $props<Props>();
 	const app = getContext<AppState>('app');
@@ -27,14 +24,14 @@
 	let username = $state<string>('NinjaInShade');
 	let banner = $state<Banner>('dark-ages');
 	let name = $state<string | null>(null);
-	let units = $state<Unit[]>([]);
+	let units = $state<ArmyUnit[]>([]);
 
 	let saveDisabled = $derived(!name || name.length < 5 || name.length > 25 || !units.length);
 
 	let troopUnits = $derived(units.filter((item) => item.type === 'Troop'));
 	let siegeUnits = $derived(units.filter((item) => item.type === 'Siege'));
 	let spellUnits = $derived(units.filter((item) => item.type === 'Spell'));
-	let reachedSuperLimit = $derived(troopUnits.filter((t) => t.data[1].isSuper).length === 2);
+	let reachedSuperLimit = $derived(troopUnits.filter((t) => Boolean(app.units.find((x) => x.type === t.type && x.name === t.name)?.isSuper)).length === 2);
 
 	let holdInterval: ReturnType<typeof setInterval> | null = null;
 
@@ -50,19 +47,23 @@
 
 	const capacity = $derived.call(() => {
 		return {
-			troop: army?.armyCapacity.troop ?? app.armyCapacity.troop,
-			spell: army?.armyCapacity.spell ?? app.armyCapacity.spell,
-			siege: army?.armyCapacity.siege ?? app.armyCapacity.siege
+			troop: army?.troopCapacity ?? app.armyCapacity.troop,
+			spell: army?.spellCapacity ?? app.armyCapacity.spell,
+			siege: army?.siegeCapacity ?? app.armyCapacity.siege
 		};
 	});
 	const housingSpaceUsed = $derived.call(() => getTotals(units));
 
-	function add(unit: UnitWithoutAmount, arr = units) {
+	function add(unit: ArmyUnit, arr = units) {
 		const existing = arr.find((item) => item.name === unit.name);
 		if (existing) {
 			existing.amount += 1;
 		} else {
-			arr.push({ ...unit, amount: 1 });
+			const _unit = app.units.find((x) => x.type === unit.type && x.name === unit.name);
+			if (!_unit) {
+				throw new Error(`Unknown unit: "${unit.name}"`);
+			}
+			arr.push({ ...unit, unitId: _unit.id, amount: 1 });
 		}
 		return arr;
 	}
@@ -76,7 +77,7 @@
 		}
 	}
 
-	function initHoldAdd(unit: UnitWithoutAmount) {
+	function initHoldAdd(unit: ArmyUnit) {
 		if (willOverflowHousingSpace(unit)) {
 			return;
 		}
@@ -116,8 +117,8 @@
 		holdInterval = null;
 	}
 
-	function willOverflowHousingSpace(unit: UnitWithoutAmount) {
-		const selectedCopy: Unit[] = JSON.parse(JSON.stringify(units));
+	function willOverflowHousingSpace(unit: ArmyUnit) {
+		const selectedCopy: ArmyUnit[] = JSON.parse(JSON.stringify(units));
 		const selectedPreview = add(unit, selectedCopy);
 		const { troops, sieges, spells } = getTotals(selectedPreview);
 		return troops > capacity.troop || sieges > capacity.siege || spells > capacity.spell;
@@ -315,19 +316,16 @@
 	</ul>
 {/snippet}
 
-{#snippet unitsPicker(type: 'Troop' | 'Siege' | 'Spell')}
-	<!-- I have to admit, messing around with the type param like this isn't the prettiest thing, but I'm more comfortable with the logic being defined in one place :^ -->
-	{@const entries = type === 'Troop' ? getEntries(app.troops) : type === 'Siege' ? getEntries(app.sieges) : getEntries(app.spells)}
+{#snippet unitsPicker(type: UnitType)}
+	{@const appUnits = app.units.filter((x) => x.type === type)}
 	{@const heading = `Select ${type === 'Troop' ? 'troops' : type === 'Siege' ? 'siege machine' : 'spells'}`}
 	<h3>{heading}</h3>
 	<ul class="picker-grid">
-		{#each entries as [name, data]}
-			{@const unit = { type, name, data }}
-			{@const level = getLevel(unit, app)}
-			{@const reachedMaxAmount = willOverflowHousingSpace(unit)}
+		{#each appUnits as unit}
 			<!-- Disable if reached max unique super limit of 2 and this troop isn't one already selected -->
-			<!-- TOOD: fix data[1].isSuper, properties like isSuper that apply to all levels should not live in level data -->
-			{@const disableSuper = type === 'Troop' && data[1].isSuper && !units.find((item) => item.name === unit.name) && reachedSuperLimit}
+			{@const disableSuper = unit.isSuper && !units.find((item) => item.name === unit.name) && reachedSuperLimit}
+			{@const level = getUnitLevel(unit, app)}
+			{@const reachedMaxAmount = willOverflowHousingSpace(unit)}
 			{@const title = getCardTitle({ level, type, reachedMaxAmount, reachedSuperLimit: disableSuper })}
 			<li>
 				<button

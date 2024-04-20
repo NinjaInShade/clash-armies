@@ -1,29 +1,22 @@
-import type { Army } from '~/lib/types';
-import { error } from '@sveltejs/kit';
-import { getTownHalls, getTroops, getSpells } from "~/lib/server/utils";
+import type { Army, TownHall, Unit, UnitType } from '~/lib/shared/types';
 import { db } from "~/lib/server/db";
-import { BANNERS } from '~/lib/shared';
+import { BANNERS } from '~/lib/shared/utils';
 import z from 'zod';
 
 type GetArmiesParams = {
-	// Temporary until units/town halls are in database
-	troops: Awaited<ReturnType<typeof getTroops>>;
-	spells: Awaited<ReturnType<typeof getSpells>>;
-	townHalls: Awaited<ReturnType<typeof getTownHalls>>;
 	id?: number;
 };
 
 type GetArmyParams = {
-	troops: Awaited<ReturnType<typeof getTroops>>;
-	spells: Awaited<ReturnType<typeof getSpells>>;
-	townHalls: Awaited<ReturnType<typeof getTownHalls>>;
 	id: number;
 }
 
-type ArmyWithCapacity = (Army & { armyCapacity: { troop: number; spell: number; siege: number } });
+type GetUnitsParams = {
+	type?: UnitType;
+}
 
-export async function getArmies(opts: GetArmiesParams) {
-	const { id, townHalls } = opts;
+export async function getArmies(opts: GetArmiesParams = {}) {
+	const { id } = opts;
 
 	const args: number[] = [];
 	let query = `
@@ -32,12 +25,29 @@ export async function getArmies(opts: GetArmiesParams) {
 			u.username,
             JSON_ARRAYAGG(JSON_OBJECT(
                 'id', au.id,
-                'name', au.name,
-                'amount', au.amount
-            )) AS units
+				'armyId', a.id,
+				'unitId', un.id,
+                'amount', au.amount,
+                'name', un.name,
+				'type', un.type,
+				'objectId', un.objectId,
+				'housingSpace', un.housingSpace,
+				'trainingTime', un.trainingTime,
+				'productionBuilding', un.productionBuilding,
+				'isSuper', un.isSuper,
+				'isFlying', un.isFlying,
+				'isJumper', un.isJumper,
+				'airTargets', un.airTargets,
+				'groundTargets', un.groundTargets
+            )) AS units,
+			th.troopCapacity,
+			th.siegeCapacity,
+			th.spellCapacity
 		FROM armies a
 		LEFT JOIN users u ON u.id = a.createdBy
         LEFT JOIN army_units au ON au.armyId = a.id
+		LEFT JOIN units un ON un.id = au.unitId
+		LEFT JOIN town_halls th ON th.level = a.townHall
     `;
 
 	if (id) {
@@ -51,35 +61,11 @@ export async function getArmies(opts: GetArmiesParams) {
         GROUP BY a.id
     `;
 
-	const armies = await db.query<ArmyWithCapacity>(query, args);
+	const armies = await db.query<Army>(query, args);
 
 	for (const army of armies) {
 		// Parse JSON units
 		army.units = JSON.parse(army.units);
-
-		// attach unit data (temporary)
-		for (const unit of army.units) {
-			const troopData = opts.troops.troops[unit.name];
-			const spellData = opts.spells[unit.name];
-			const siegeData = opts.troops.sieges[unit.name];
-			if (troopData !== undefined) {
-				unit.data = troopData;
-				unit.type = 'Troop';
-			} else if (spellData) {
-				unit.data = spellData;
-				unit.type = 'Spell';
-			} else {
-				unit.data = siegeData;
-				unit.type = 'Siege';
-			}
-		}
-
-		// attach capacity (temporary)
-		const thData = townHalls.find((t) => t.level === army.townHall);
-		if (!thData) {
-			return error(500);
-		}
-		army.armyCapacity = { troop: thData.troopCapacity, spell: thData.spellCapacity, siege: thData.siegeCapacity };
 	}
 
 	return armies;
@@ -94,9 +80,65 @@ export async function getArmy(opts: GetArmyParams) {
 	return armies[0];
 }
 
+export async function getTownHalls() {
+	return db.getRows<TownHall>('town_halls');
+}
+
+export async function getUnits(opts: GetUnitsParams = {}) {
+	const { type } = opts;
+
+	const args: (string | number)[] = [];
+	let query = `
+		SELECT
+			u.id,
+			u.type,
+			u.name,
+			u.objectId,
+			u.housingSpace,
+			u.trainingTime,
+			u.productionBuilding,
+			u.isSuper,
+			u.isFlying,
+			u.isJumper,
+			u.airTargets,
+			u.groundTargets,
+			JSON_ARRAYAGG(JSON_OBJECT(
+				'id', ul.id,
+				'unitId', ul.unitId,
+				'level', ul.level,
+				'spellFactoryLevel', ul.spellFactoryLevel,
+				'barrackLevel', ul.barrackLevel,
+				'laboratoryLevel', ul.laboratoryLevel
+			)) AS levels
+		FROM units u
+		LEFT JOIN unit_levels ul ON ul.unitId = u.id
+		WHERE TRUE
+	`;
+
+	if (type) {
+		query += `
+			AND u.type = ?
+		`;
+		args.push(type);
+	}
+
+	query += `
+		GROUP BY u.id
+	`
+
+	const units = await db.query<Unit>(query, args);
+
+	for (const unit of units) {
+		// Parse JSON levels
+		unit.levels = JSON.parse(unit.levels);
+	}
+
+	return units;
+}
+
 const unitSchemaCreating = z.object({
 	id: z.number().positive().optional(),
-	name: z.string().min(1).max(45),
+	unitId: z.number().positive(),
 	amount: z.number().positive()
 })
 const armySchemaCreating = z.object({
@@ -122,7 +164,7 @@ export async function saveArmy(data: Partial<Army>) {
 				banner: army.banner,
 				createdBy: 1, // TODO: change to id of logged in user when auth added
 			});
-			await tx.insertMany('army_units', army.units.map((unit) => ({ armyId: _armyId, name: unit.name, amount: unit.amount })));
+			await tx.insertMany('army_units', army.units.map((unit) => ({ armyId: _armyId, unitId: unit.unitId, amount: unit.amount })));
 		});
 	} else {
 		// Updating existing army
@@ -141,17 +183,17 @@ export async function saveArmy(data: Partial<Army>) {
 			// Upsert units (TODO: move into @ninjalib/sql)
 			const args: (string | number | null)[] = []
 			let query = `
-				INSERT INTO army_units (id, armyId, name, amount) VALUES
+				INSERT INTO army_units (id, armyId, unitId, amount) VALUES
 			`;
 			query += army.units.map((u) => {
-				args.push(u.id ?? null, army.id, u.name, u.amount);
+				args.push(u.id ?? null, army.id, u.unitId, u.amount);
 				return `(?, ?, ?, ?)`
 			}).join(',\n')
 			query += `
 				ON DUPLICATE KEY UPDATE
 					id = VALUES(id),
 					armyId = VALUES(armyId),
-					name = VALUES(name),
+					unitId = VALUES(unitId),
 					amount = VALUES(amount)
 			`;
 			await tx.query(query, args);

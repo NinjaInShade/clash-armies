@@ -1,4 +1,4 @@
-import type { AppState, Modal } from './types';
+import type { AppState, Modal } from '~/lib/shared/types';
 
 export function requireHTML() {
 	const html = document.querySelector('html');
@@ -9,9 +9,7 @@ export function requireHTML() {
 }
 
 export function createAppState(initial: Omit<AppState, 'openModal'>) {
-	const troops = $state<AppState['troops']>(initial.troops);
-	const sieges = $state<AppState['sieges']>(initial.sieges);
-	const spells = $state<AppState['spells']>(initial.spells);
+	const units = $state<AppState['units']>(initial.units);
 	const townHalls = $state<AppState['townHalls']>(initial.townHalls);
 	let townHall = $state<AppState['townHall']>(initial.townHall);
 	let barrack = $state<AppState['barrack']>(initial.barrack);
@@ -65,14 +63,8 @@ export function createAppState(initial: Omit<AppState, 'openModal'>) {
 		get workshop() {
 			return workshop;
 		},
-		get troops() {
-			return troops;
-		},
-		get sieges() {
-			return sieges;
-		},
-		get spells() {
-			return spells;
+		get units() {
+			return units;
 		},
 		get armyCapacity() {
 			return armyCapacity;

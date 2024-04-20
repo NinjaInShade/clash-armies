@@ -3,7 +3,7 @@
 	import { sineInOut } from 'svelte/easing';
 	import { onMount, setContext, type Snippet } from 'svelte';
 	import type { LayoutData } from './$types';
-	import { createAppState, requireHTML } from '~/lib/state.svelte';
+	import { createAppState, requireHTML } from '~/lib/client/state.svelte';
 	import C from '~/components';
 
 	type Props = {
@@ -20,9 +20,7 @@
 	 */
 	const appState = createAppState({
 		// frequently used data (cache)
-		troops: data.troops,
-		sieges: data.sieges,
-		spells: data.spells,
+		units: data.units,
 		townHalls: data.townHalls,
 		// user state
 		townHall: null,

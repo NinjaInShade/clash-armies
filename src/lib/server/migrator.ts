@@ -1,13 +1,13 @@
 import type { MySQL } from "@ninjalib/sql";
 
-export type MigrationFn = (step: number, query: string) => void;
+export type MigrationFn = (step: number, query: string | ((db: MySQL) => Promise<void>)) => void;
 export type Migration = (runStep: MigrationFn) => void;
 
 // TODO: move to @ninjalib/sql
 export async function migrate(migration: Migration, db: MySQL) {
-    const steps: { step: number, query: string }[] = [];
+    const steps: { step: number, query: string | ((db: MySQL) => Promise<void>) }[] = [];
 
-    function runStep(step: number, query: string) {
+    function runStep(step: number, query: string | ((db: MySQL) => Promise<void>)) {
         const expectedStep = (steps[steps.length - 1]?.step ?? 0) + 1;
         if (step !== expectedStep) {
             throw new Error(`Invalid step, expected "${expectedStep}" but got "${step}"`);
@@ -43,13 +43,19 @@ export async function migrate(migration: Migration, db: MySQL) {
             // Already ran
             continue;
         }
+        console.log(`Migrating step ${migration.step}...`)
         await db.transaction(async () => {
             try {
-                await db.query(migration.query);
+                if (typeof migration.query === 'function') {
+                    await migration.query(db);
+                } else {
+                    await db.query(migration.query);
+                }
                 await db.query('UPDATE __migration__ SET step = step + 1');
             } catch (err) {
                 throw new Error(`Failed to migrate step "${migration.step}": ${err}`);
             }
         })
+        console.log(`Finished migrating step ${migration.step}`)
     }
 }

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import type { Banner } from '~/lib/types';
-	import { BANNERS } from '~/lib/shared';
+	import type { Banner } from '~/lib/shared/types';
+	import { BANNERS } from '~/lib/shared/utils';
 	import C from '~/components';
 
 	type Props = {

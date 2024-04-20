@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { AppState } from '~/lib/types';
+	import type { AppState } from '~/lib/shared/types';
 	import C from '~/components';
 
 	type Props = {
