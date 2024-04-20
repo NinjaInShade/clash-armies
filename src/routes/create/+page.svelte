@@ -7,32 +7,87 @@
 	import AssetDisplay from '~/components/AssetDisplay.svelte';
 	import Button from '~/components/Button.svelte';
 
+	const HOLD_ADD_SPEED = 200;
+	const HOLD_REMOVE_SPEED = 200;
+
 	const app = getContext<AppState>('app');
 
 	let selected = $state<Selected[]>([]);
 	let selectedTroops = $derived(selected.filter((item) => item.type === 'Troop' || item.type === 'Siege'));
 	let selectedSpells = $derived(selected.filter((item) => item.type === 'Spell'));
 
+	let reachedSuperLimit = $derived(selectedTroops.filter((t) => t.type === 'Troop' && t.data[1].isSuper).length === 2);
+
 	let maxHousingSpace: HousingSpace = { troops: 320, spells: 11, sieges: 1 }; // TODO: calculate dynamically
 	let housingSpaceUsed = $derived.call(getSelectedTotals);
 
-	function add(troop: Omit<Selected, 'amount'>, arr: Selected[] = selected) {
-		const existing = arr.find((item) => item.name === troop.name);
+	let holdAddInterval: ReturnType<typeof setInterval> | null = null;
+	let holdRemoveInterval: ReturnType<typeof setInterval> | null = null;
+
+	function add(item: Omit<Selected, 'amount'>, arr: Selected[] = selected) {
+		const existing = arr.find((sel) => sel.name === item.name);
 		if (existing) {
 			existing.amount += 1;
 		} else {
-			arr.push({ ...troop, amount: 1 });
+			arr.push({ ...item, amount: 1 });
 		}
 		return arr;
 	}
 
 	function remove(name: Selected['name']) {
-		const existingIndex = selected.findIndex((item) => item.name === name);
+		const existingIndex = selected.findIndex((sel) => sel.name === name);
 		if (selected[existingIndex].amount === 1) {
 			selected.splice(existingIndex, 1);
 		} else {
 			selected[existingIndex].amount -= 1;
 		}
+	}
+
+	function initHoldAdd(item: Omit<Selected, 'amount'>) {
+		if (willOverflowHousingSpace(item)) {
+			return;
+		}
+		// add straight away in case user clicked
+		add(item);
+		holdAddInterval = setInterval(() => {
+			// if no more housing space  don't try adding & stop
+			if (willOverflowHousingSpace(item)) {
+				stopHoldAdd();
+				return;
+			}
+			add(item);
+		}, HOLD_ADD_SPEED);
+	}
+
+	function initHoldRemove(name: Selected['name']) {
+		// remove straight away in case user clicked
+		remove(name);
+		// if we removed the last troop/spell stop removing
+		const exists = selected.find((item) => item.name === name);
+		if (!exists) {
+			stopHoldRemove();
+			return;
+		}
+		holdRemoveInterval = setInterval(() => {
+			remove(name);
+			// if we removed the last troop/spell stop removing
+			const exists = selected.find((item) => item.name === name);
+			if (!exists) {
+				stopHoldRemove();
+			}
+		}, HOLD_REMOVE_SPEED);
+	}
+
+	function stopHoldAdd() {
+		if (!holdAddInterval) return;
+		clearInterval(holdAddInterval);
+		holdAddInterval = null;
+	}
+
+	function stopHoldRemove() {
+		if (!holdRemoveInterval) return;
+		clearInterval(holdRemoveInterval);
+		holdRemoveInterval = null;
 	}
 
 	async function copyLink() {
@@ -122,6 +177,15 @@
 	<title>ClashArmies • Create Army</title>
 </svelte:head>
 
+<svelte:window
+	on:mouseup={() => {
+		// handle this on window in case user mouses cursor from the
+		// card (maybe we should stop adding/removing if mouse leaves card?)
+		stopHoldAdd();
+		stopHoldRemove();
+	}}
+/>
+
 <div class="alert">
 	<div class="container">
 		<Alert>
@@ -138,16 +202,7 @@
 			{#each selectedTroops as troop}
 				{@const { type, name, amount, data } = troop}
 				<li>
-					<button
-						class="object-card"
-						onclick={() => {
-							if (!troop) {
-								console.error('Expected troop, what happened?');
-								return;
-							}
-							remove(troop.name);
-						}}
-					>
+					<button class="object-card" on:mousedown={() => initHoldRemove(troop.name)}>
 						<AssetDisplay {type} {name} {amount} {data} />
 					</button>
 				</li>
@@ -170,13 +225,14 @@
 				{@const troop = { type: 'Troop', name, data } as const}
 				{@const level = getTroopLevel(name, app)}
 				{@const reachedMaxAmount = willOverflowHousingSpace(troop)}
-				{@const reachedMaxSupers = data[1].isSuper && selectedTroops.filter(t => t.type === 'Troop' && t.data[1].isSuper).length === 2}
-				{@const addTroop = () => add(troop)}
+				<!-- Disable if reached max unique super limit of 2 and this troop isn't one of those -->
+				<!-- TOOD: fix data[1].isSuper, properties like isSuper that apply to all levels should not live in level data -->
+				{@const disableSuper = data[1].isSuper && !selected.find(sel => sel.name === troop.name) && reachedSuperLimit}
 				<li>
 					<button
 						class="picker-card"
-						onclick={addTroop}
-						disabled={reachedMaxAmount || reachedMaxSupers || level === -1}
+						disabled={reachedMaxAmount || disableSuper || level === -1}
+						on:mousedown={() => initHoldAdd(troop)}
 					>
 						<AssetDisplay type="Troop" {name} {data} {level} />
 					</button>
@@ -190,12 +246,11 @@
 				{@const siege = { type: 'Siege', name, data } as const}
 				{@const level = getSiegeLevel(name, app)}
 				{@const reachedMaxAmount = willOverflowHousingSpace(siege)}
-				{@const addSiege = () => add(siege)}
 				<li>
 					<button
 						class="picker-card"
-						onclick={addSiege}
 						disabled={reachedMaxAmount || level === -1}
+						on:mousedown={() => initHoldAdd(siege)}
 					>
 						<AssetDisplay type="Siege" {name} {data} {level} />
 					</button>
@@ -212,16 +267,7 @@
 			{#each selectedSpells as spell}
 				{@const { type, name, amount, data } = spell}
 				<li>
-					<button
-						class="object-card"
-						onclick={() => {
-							if (!spell) {
-								console.error('Expected spell, what happened?');
-								return;
-							}
-							remove(spell.name);
-						}}
-					>
+					<button class="object-card" on:mousedown={() => initHoldRemove(spell.name)}>
 						<AssetDisplay {type} {name} {amount} {data} />
 					</button>
 				</li>
@@ -244,12 +290,11 @@
 				{@const spell = { type: 'Spell', name, data } as const}
 				{@const level = getSpellLevel(name, app)}
 				{@const reachedMaxAmount = willOverflowHousingSpace(spell)}
-				{@const addSpell = () => add(spell)}
 				<li>
 					<button
 						class="picker-card"
-						onclick={addSpell}
 						disabled={reachedMaxAmount || level === -1}
+						on:mousedown={() => initHoldAdd(spell)}
 					>
 						<AssetDisplay type="Spell" {name} {data} {level} />
 					</button>
