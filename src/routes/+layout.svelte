@@ -5,6 +5,7 @@
 	import { version } from '$app/environment';
 	import type { LayoutData } from './$types';
 	import { createAppState, requireHTML } from '~/lib/client/state.svelte';
+	import type { AppState } from '~/lib/shared/types';
 	import C from '~/components';
 
 	type Props = {
@@ -14,6 +15,19 @@
 	let { data, children } = $props<Props>();
 
 	let devDebugOpen: boolean = $state(false);
+
+	/** Extends user to include properties AppState needs */
+	function extendUser(user: LayoutData['user']): AppState['user'] {
+		if (!user) {
+			return null;
+		}
+		return {
+			...user,
+			hasRoles(...roles: string[]) {
+				return roles.every((role) => user.roles.includes(role));
+			}
+		};
+	}
 
 	/**
 	 * Due to first render being SSR, any state that will be overridden by localStorage onMount
@@ -34,7 +48,7 @@
 		armyCapacity: { troop: 0, spell: 0, siege: 0 },
 		// general app state
 		modals: [],
-		user: data.user
+		user: extendUser(data.user)
 	});
 	setContext('app', appState);
 
@@ -87,7 +101,7 @@
 			</ul>
 		</div>
 		<ul class="links">
-			{#if appState.user}
+			{#if appState.user && appState.user.hasRoles('admin')}
 				<li>
 					<a class="body" href="/admin">Admin</a>
 				</li>

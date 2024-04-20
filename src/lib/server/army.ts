@@ -2,6 +2,7 @@ import type { Army, TownHall, Unit, UnitType } from '~/lib/shared/types';
 import { db } from "~/lib/server/db";
 import { BANNERS } from '~/lib/shared/utils';
 import z from 'zod';
+import type { RequestEvent } from '@sveltejs/kit';
 
 type GetArmiesParams = {
 	id?: number;
@@ -158,25 +159,42 @@ const armySchemaCreating = z.object({
 
 const armySchemaSaving = armySchemaCreating.required({ id: true });
 
-export async function saveArmy(data: Partial<Army>) {
-	let _armyId: number | null = null;
+export async function saveArmy(event: RequestEvent, data: Partial<Army>) {
+	const user = event.locals.requireAuth();
 
 	if (!data.id) {
 		// Creating army
 		const army = armySchemaCreating.parse(data);
-		await db.transaction(async (tx) => {
-			_armyId = await tx.insertOne('armies', {
+		return db.transaction(async (tx) => {
+			const armyId = await tx.insertOne('armies', {
 				name: army.name,
 				townHall: army.townHall,
 				banner: army.banner,
-				createdBy: 1, // TODO: change to id of logged in user when auth added
+				createdBy: user.id
 			});
-			await tx.insertMany('army_units', army.units.map((unit) => ({ armyId: _armyId, unitId: unit.unitId, amount: unit.amount })));
+			await tx.insertMany('army_units', army.units.map((unit) => {
+				return {
+					armyId,
+					unitId: unit.unitId,
+					amount: unit.amount
+				}
+			}));
+			return armyId;
 		});
 	} else {
 		// Updating existing army
 		const army = armySchemaSaving.parse(data);
-		await db.transaction(async (tx) => {
+		const existing = await db.getRow<Army, null>('armies', { id: army.id });
+		if (!existing) {
+			throw new Error("This army doesn't exist");
+		}
+		if (user.id === existing.createdBy) {
+			// allow user to edit his own army
+		} else {
+			// otherwise must be an admin to edit someone elses army
+			event.locals.requireRoles('admin');
+		}
+		return db.transaction(async (tx) => {
 			// Update army
 			await tx.query(`
 				UPDATE armies SET
@@ -206,15 +224,24 @@ export async function saveArmy(data: Partial<Army>) {
 					amount = VALUES(amount)
 			`;
 			await tx.query(query, args);
-		});
-		_armyId = army.id;
-	}
 
-	const { armyId } = z.object({ armyId: z.number().positive() }).parse({ armyId: _armyId });
-	return armyId;
+			return army.id;
+		});
+	}
 }
 
-export async function deleteArmy(armyId: number) {
+export async function deleteArmy(event: RequestEvent, armyId: number) {
 	const { id } = z.object({ id: z.number() }).parse({ id: armyId });
+	const user = event.locals.requireAuth();
+	const existing = await db.getRow<Army, null>('armies', { id });
+	if (!existing) {
+		throw new Error("This army doesn't exist");
+	}
+	if (user.id === existing.createdBy) {
+		// allow user to delete his own army
+	} else {
+		// otherwise must be an admin to delete someone elses army
+		event.locals.requireRoles('admin');
+	}
 	await db.query('DELETE FROM armies WHERE id = ?', [id]);
 }

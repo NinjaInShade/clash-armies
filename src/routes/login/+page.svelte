@@ -1,3 +1,7 @@
+<svelte:head>
+	<title>ClashArmies • Login</title>
+</svelte:head>
+
 <section>
 	<div class="container">
 		<div class="login-card">

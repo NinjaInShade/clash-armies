@@ -10,11 +10,9 @@ export const load: PageServerLoad = async (event) => {
 
 export const actions = {
 	saveArmy: async (event) => {
-		event.locals.requireAuth();
-
 		return actionWrap(async function() {
 			const army = await event.request.json();
-			const id = await saveArmy(army);
+			const id = await saveArmy(event, army);
 			if (!army.id) {
 				// If creating army, redirect to it's page after creating
 				return redirect(308, `/armies/${id}`)
@@ -22,11 +20,9 @@ export const actions = {
 		});
 	},
 	deleteArmy: async (event) => {
-		event.locals.requireAuth();
-
 		return actionWrap(async function() {
 			const id = await event.request.json();
-			await deleteArmy(id);
+			await deleteArmy(event, id);
 			return redirect(308, '/armies');
 		});
 	}

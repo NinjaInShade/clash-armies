@@ -7,11 +7,21 @@ declare global {
 		// interface Error {}
 		interface Locals {
 			/**
-			 * Use this to protect server load and action functions against un-authenticated users
-			 *
-			 * Redirects user to `/login` if they aren't authenticated.
+			 * Returns true if user is authenticated.
 			 */
-			requireAuth: () => void;
+			hasAuth: () => boolean;
+			/**
+			 * Ensures user is authenticated and returns their user object. Redirects to `login` if un-authenticated.
+			 */
+			requireAuth: () => User;
+			/**
+			 * Returns true if user is authenticated and has every role specified.
+			 */
+			hasRoles: (...roles: string[]) => boolean;
+			/**
+			 * Ensures user is authenticated and has all roles specified. Throws `403` if user doesn't any of the role/s .
+			 */
+			requireRoles: (...roles: string[]) => User;
 			user: User | null;
 			session: Session | null;
 		}

@@ -2,10 +2,14 @@
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
 	import type { PageData } from './$types';
+	import { getContext } from 'svelte';
+	import type { AppState } from '~/lib/shared/types';
 	import C from '~/components';
 
 	const { data } = $props<{ data: PageData }>();
 	const { army } = $derived(data);
+
+	const app = getContext<AppState>('app');
 
 	// TODO: add warning before switching to view or navigating away if user has unsaved changes
 
@@ -22,16 +26,22 @@
 	}
 </script>
 
-<div class="outer">
-	<div class="container">
-		<C.Switch bind:value={editing} onToggle={onModeChange} offText="View" onText="Edit" labelStyle="font-family: 'Clash', sans-serif;" htmlName="mode" />
+{#if app.user && (app.user.id === army.createdBy || app.user.hasRoles('admin'))}
+	<div class="outer">
+		<div class="container">
+			<C.Switch bind:value={editing} onToggle={onModeChange} offText="View" onText="Edit" labelStyle="font-family: 'Clash', sans-serif;" htmlName="mode" />
+		</div>
 	</div>
-</div>
 
-{#if !editing}
-	<C.ViewArmy {army} />
+	{#if !editing}
+		<C.ViewArmy {army} />
+	{:else}
+		<C.EditArmy {army} />
+	{/if}
 {:else}
-	<C.EditArmy {army} />
+	<div class="outer">
+		<C.ViewArmy {army} />
+	</div>
 {/if}
 
 <style>

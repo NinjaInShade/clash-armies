@@ -49,10 +49,19 @@ export async function GET(event: RequestEvent): Promise<Response> {
             // default username, user will be able to change this after (TODO: in the future allow user to set username on creation)
             const maxId = (await db.query<{ maxId: number }>('SELECT MAX(id) AS maxId FROM users'))[0].maxId;
             const username = `Warrior ${maxId + 1}`;
-            const userId = await db.insertOne('users', {
-                username,
-                googleId,
+
+            let userId: number | null = null;
+            await db.transaction(async (tx) => {
+                userId = await tx.insertOne('users', {
+                    username,
+                    googleId,
+                })
+                await tx.insertOne('user_roles', { userId, role: 'user' });
             })
+            if (!userId) {
+                throw new Error('Expected user id');
+            }
+
             const session = await lucia.createSession(userId, {});
             const sessionCookie = lucia.createSessionCookie(session.id);
             event.cookies.set(sessionCookie.name, sessionCookie.value, {

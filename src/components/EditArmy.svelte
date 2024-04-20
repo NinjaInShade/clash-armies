@@ -208,7 +208,7 @@
 				<C.Fieldset label="Army name:" htmlName="name">
 					<C.Input bind:value={name} maxlength={25} --input-width="250px" />
 				</C.Fieldset>
-				<b>Assembled by <a href="/user/{createdBy}">@{username}</a></b>
+				<b>Assembled by <a href="/users/{createdBy}">@{username}</a></b>
 			</div>
 			<div>
 				<small class="total">

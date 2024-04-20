@@ -78,7 +78,7 @@ const unitSchemaCreating = unitSchema.extend({
 })
 
 export const load: PageServerLoad = async (event) => {
-    event.locals.requireAuth();
+    event.locals.requireRoles('admin');
 
 	return {
         units: await getUnits(),
@@ -88,7 +88,7 @@ export const load: PageServerLoad = async (event) => {
 
 export const actions = {
     saveTownHall: async (event) => {
-        event.locals.requireAuth();
+        event.locals.requireRoles('admin');
 
         return actionWrap(async function() {
             const formData = await event.request.formData();
@@ -146,7 +146,7 @@ export const actions = {
         })
     },
     deleteTownHall: async (event) => {
-        event.locals.requireAuth();
+        event.locals.requireRoles('admin');
 
         return actionWrap(async function() {
             const formData = await event.request.formData();
@@ -160,7 +160,7 @@ export const actions = {
         })
     },
     saveUnit: async (event) => {
-        event.locals.requireAuth();
+        event.locals.requireRoles('admin');
 
         return actionWrap(async function() {
             const formData = await event.request.formData();
@@ -232,7 +232,7 @@ export const actions = {
         })
     },
     deleteUnit: async (event) => {
-        event.locals.requireAuth();
+        event.locals.requireRoles('admin');
 
         return actionWrap(async function() {
             const formData = await event.request.formData();

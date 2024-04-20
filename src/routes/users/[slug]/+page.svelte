@@ -1,15 +1,22 @@
 <script lang="ts">
 	import C from '~/components';
+	import { getContext } from 'svelte';
+	import type { AppState } from '~/lib/shared/types';
 	import type { PageData } from './$types';
 	import { page } from '$app/stores';
 
 	const { data } = $props<{ data: PageData }>();
 	const { armies, user } = $derived(data);
 
-	const username = $derived($page.params.slug);
+	const app = getContext<AppState>('app');
 
-	const currentUser = Math.random() >= 0.5 ? 'NinjaInShade' : 'ClashBob';
+	const username = $derived($page.params.slug);
+	const currentUser = $derived(app.user ? app.user.username : null);
 </script>
+
+<svelte:head>
+	<title>ClashArmies • {currentUser === username ? 'Account' : `Users • ${user.username}`}</title>
+</svelte:head>
 
 <header>
 	<div class="container">
@@ -31,7 +38,7 @@
 	<div class="container">
 		<h2 class="armies-title">Armies</h2>
 		{#if armies.length}
-			<ul>
+			<ul class="armies-list">
 				{#each armies as army}
 					<C.ArmyCard {army} />
 				{/each}
@@ -125,6 +132,12 @@
 
 	.armies-title {
 		margin-bottom: 0.75em;
+	}
+
+	.armies-list {
+		display: flex;
+		flex-flow: column nowrap;
+		gap: 0.5em;
 	}
 
 	.no-armies {

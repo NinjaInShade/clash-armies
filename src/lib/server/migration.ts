@@ -13,6 +13,14 @@ export function migration(runStep: MigrationFn) {
         )
     `);
     runStep(2, `
+        CREATE TABLE user_roles (
+            userId INT NOT NULL,
+            role VARCHAR(255) NOT NULL,
+            PRIMARY KEY (userId, role),
+            CONSTRAINT fk_user_roles_user_id FOREIGN KEY (userId) REFERENCES users (id) ON DELETE CASCADE
+        )
+    `);
+    runStep(3, `
         CREATE TABLE sessions (
             id VARCHAR(255) NOT NULL PRIMARY KEY,
             userId INT NOT NULL,
@@ -20,7 +28,7 @@ export function migration(runStep: MigrationFn) {
             CONSTRAINT fk_sessions_user_id FOREIGN KEY (userId) REFERENCES users (id) ON DELETE CASCADE
         )
     `);
-    runStep(3, `
+    runStep(4, `
         CREATE TABLE units (
             id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
             type VARCHAR(20) NOT NULL,
@@ -37,7 +45,7 @@ export function migration(runStep: MigrationFn) {
             CONSTRAINT unique_units_type_name UNIQUE (type, name)
         )
     `);
-    runStep(4, `
+    runStep(5, `
         CREATE TABLE unit_levels (
             id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
             unitId INT NOT NULL,
@@ -48,7 +56,7 @@ export function migration(runStep: MigrationFn) {
             CONSTRAINT fk_unit_levels_unit_id FOREIGN KEY (unitId) REFERENCES units (id) ON DELETE CASCADE
         )
     `);
-    runStep(5, `
+    runStep(6, `
         CREATE TABLE town_halls (
             level SMALLINT UNSIGNED NOT NULL PRIMARY KEY,
             maxBarracks SMALLINT DEFAULT NULL,
@@ -62,15 +70,15 @@ export function migration(runStep: MigrationFn) {
             siegeCapacity SMALLINT
         )
     `);
-    runStep(6, async (db) => {
+    runStep(7, async (db) => {
         // Insert initial town hall seed data
         await insertInitialTownHalls(db);
     })
-    runStep(7, async (db) => {
+    runStep(8, async (db) => {
         // Insert initial units seed data
         await insertInitialUnits(db);
     }),
-    runStep(8, `
+    runStep(9, `
         CREATE TABLE armies (
             id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
             name VARCHAR(75) NOT NULL,
@@ -83,7 +91,7 @@ export function migration(runStep: MigrationFn) {
             CONSTRAINT fk_armies_town_hall FOREIGN KEY (townHall) REFERENCES town_halls (level)
         )
     `);
-    runStep(9, `
+    runStep(10, `
         CREATE TABLE army_units (
             id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
             armyId INT NOT NULL,
@@ -93,7 +101,7 @@ export function migration(runStep: MigrationFn) {
             CONSTRAINT fk_army_units_unit_id FOREIGN KEY (unitId) REFERENCES units (id)
         )
     `);
-    runStep(10, `
+    runStep(11, `
         CREATE TABLE army_votes (
             armyId INT NOT NULL,
             votedBy INT NOT NULL,

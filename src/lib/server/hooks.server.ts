@@ -1,8 +1,9 @@
-import { type Handle, redirect } from '@sveltejs/kit';
+import type { Handle } from '@sveltejs/kit';
 import { db } from '~/lib/server/db';
 import { migration } from '~/lib/server/migration';
 import { migrate } from '~/lib/server/migrator';
 import { lucia } from "~/lib/server/auth/lucia";
+import { hasAuth, requireAuth, hasRoles, requireRoles } from "~/lib/server/auth/utils";
 import { CronJob } from 'cron';
 
 const hourlyTask = new CronJob('0 0 * * * *', async function() {
@@ -11,7 +12,7 @@ const hourlyTask = new CronJob('0 0 * * * *', async function() {
 
 const serverInit = (async () => {
 	hourlyTask.start();
-	await db.connect();
+	await db.connect(); // TODO: this should only throw for fatal errors and only resolve when connected
 	await migrate(migration, db); // TODO: move into @ninjalib/sql
 })();
 
@@ -19,11 +20,10 @@ export const handle: Handle = async ({ event, resolve }) => {
 	// One-time setup upon starting the server
 	await serverInit;
 
-	event.locals.requireAuth = () => {
-		if (!event.locals.user) {
-			redirect(302, "/login")
-		};
-	}
+	event.locals.hasAuth = () => hasAuth(event);
+	event.locals.requireAuth = () => requireAuth(event);
+	event.locals.hasRoles = (...roles: string[]) => hasRoles(event, ...roles)
+	event.locals.requireRoles = (...roles: string[]) => requireRoles(event, ...roles)
 
 	const sessionId = event.cookies.get(lucia.sessionCookieName);
 	if (!sessionId) {

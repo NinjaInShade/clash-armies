@@ -74,6 +74,10 @@
 	}
 </script>
 
+<svelte:head>
+	<title>ClashArmies • Admin panel</title>
+</svelte:head>
+
 <header>
 	<div class="container">
 		<h1 class="title">

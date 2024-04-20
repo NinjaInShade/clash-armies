@@ -19,6 +19,7 @@ export type User = {
 	id: number;
 	googleId: string;
 	username: string;
+	roles: string[];
 	playerTag: string | null;
 	level: number | null;
 }
@@ -101,6 +102,13 @@ export type Army = {
 	spellCapacity: number;
 };
 
+type UserUtils = {
+	/**
+	 * Returns true if user has every role specified.
+	 */
+	hasRoles: (...roles: string[]) => boolean;
+ }
+
 export type AppState = {
 	// frequently used data (cache)
 	units: Unit[];
@@ -117,7 +125,7 @@ export type AppState = {
 	// general app state
 	modals: Modal[];
 	openModal(component: Modal['component'], props?: Modal['props']): void;
-	user: User | null;
+	user: (User & UserUtils) | null;
 };
 
 export type Banner = typeof BANNERS[number];

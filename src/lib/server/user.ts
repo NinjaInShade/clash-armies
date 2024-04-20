@@ -14,9 +14,11 @@ export async function getUsers(opts: GetUsersParams = {}) {
         SELECT
 			u.id,
 			u.googleId,
+			JSON_ARRAYAGG(ur.role) AS roles,
             u.username,
             u.playerTag
 		FROM users u
+		LEFT JOIN user_roles ur ON ur.userId = u.id
     `;
 
 	if (username) {
@@ -26,9 +28,19 @@ export async function getUsers(opts: GetUsersParams = {}) {
 		args.push(username);
 	}
 
-	// TODO: fetch player level (and other stats if added) from clash of clans API if player tag is defined
+	query += `
+		GROUP BY u.id
+	`;
 
-	return db.query<User>(query, args);
+
+	const users = await db.query<User>(query, args);
+	for (const user of users) {
+		user.roles = JSON.parse(user.roles);
+
+		// TODO: fetch player level (and other stats if added) from clash of clans API if player tag is defined
+		user.level = null;
+	}
+	return users;
 }
 
 export async function getUser(username: string) {

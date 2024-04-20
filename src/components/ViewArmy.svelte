@@ -1,11 +1,14 @@
 <script lang="ts">
+	import { getContext } from 'svelte';
 	import { getTotals, formatTime, copyLink, openInGame, getTags, getCopyBtnTitle, getOpenBtnTitle } from '~/lib/client/army';
-	import type { Army } from '~/lib/shared/types';
+	import type { Army, AppState } from '~/lib/shared/types';
 	import C from '~/components';
 
 	type Props = { army: Army };
 	const { army } = $props<Props>();
 	const { units } = $derived(army);
+
+	const app = getContext<AppState>('app');
 
 	let troopUnits = $derived(units.filter((item) => item.type === 'Troop'));
 	let siegeUnits = $derived(units.filter((item) => item.type === 'Siege'));
@@ -27,7 +30,7 @@
 		<div class="banner-overlay">
 			<div>
 				<h1>{army.name}</h1>
-				<b>Assembled by <a href="/user/{army.username}">@{army.username}</a></b>
+				<b>Assembled by <a href="/users/{army.username}">@{army.username}</a></b>
 			</div>
 			<div>
 				<small class="total">
@@ -82,7 +85,9 @@
 			<C.Button onclick={() => openInGame(units)} disabled={!units.length} title={getOpenBtnTitle(units)}>Open in-game</C.Button>
 		</div>
 		<div class="right">
-			<C.Votes bind:votes bind:userVote />
+			{#if app.user && app.user.id !== army.createdBy}
+				<C.Votes bind:votes bind:userVote />
+			{/if}
 		</div>
 	</div>
 </section>

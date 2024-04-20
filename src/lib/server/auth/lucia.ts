@@ -24,6 +24,7 @@ export const lucia = new Lucia(adapter, {
 		return {
 			username: attributes.username,
 			playerTag: attributes.playerTag,
+			roles: attributes.roles,
 		};
 	}
 });
@@ -38,6 +39,7 @@ declare module "lucia" {
             username: string;
             googleId: string;
             playerTag: string | null;
+			roles: string[];
         };
 	}
 }

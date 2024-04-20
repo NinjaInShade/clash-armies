@@ -80,7 +80,8 @@ export class sqlAdapter {
         if (!user) {
             return null;
         }
+        const userRoles = await this.db.getRows<{ userId: number, role: string }>('user_roles', { userId: user.id });
         const { id, googleId, username, playerTag } = user;
-        return { id, attributes: { username, googleId, playerTag } }
+        return { id, attributes: { username, googleId, playerTag, roles: userRoles.map(x => x.role) } }
     }
 }
