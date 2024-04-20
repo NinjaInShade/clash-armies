@@ -197,8 +197,7 @@
 
 <svelte:window
 	onmouseup={() => {
-		// handle this on window in case user mouses cursor from the
-		// card (maybe we should stop adding/removing if mouse leaves card?)
+		// handle this on window in case user mouses cursor from the card then does mouseup
 		stopHoldAdd();
 		stopHoldRemove();
 	}}
@@ -282,6 +281,7 @@
 				<button
 					class="object-card"
 					onmousedown={() => initHoldRemove(unit.name)}
+					onmouseleave={() => stopHoldRemove()}
 					onkeypress={(ev) => {
 						if (ev.key !== 'Enter') {
 							return;
@@ -316,6 +316,7 @@
 					class="picker-card"
 					disabled={reachedMaxAmount || level === -1 || disableSuper}
 					onmousedown={() => initHoldAdd(unit)}
+					onmouseleave={() => stopHoldAdd()}
 					onkeypress={(ev) => {
 						if (ev.key !== 'Enter') {
 							return;
