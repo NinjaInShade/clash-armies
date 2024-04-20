@@ -9,7 +9,6 @@
 		if (!pageRef) {
 			return;
 		}
-
 		// Focus back to home button for UX
 		const link = pageRef.querySelector<HTMLElement>('a[href="/"]');
 		if (link) {
@@ -20,11 +19,11 @@
 	function getMessage(diagnostics: typeof $page) {
 		const status = diagnostics.status;
 		const error = diagnostics.error;
-		if (status === 404) {
-			return "This page doesn't exist warrior!";
-		}
 		if (!error) {
 			return 'Internal error';
+		}
+		if (status === 404 && error.message === 'Not Found') {
+			return "This page doesn't exist warrior!";
 		}
 		return error.message;
 	}
