@@ -1,5 +1,5 @@
 import type { MigrationFn } from './migrator';
-import { insertInitialTownHalls, insertInitialUnits } from "./migration-utils";
+import { insertInitialTownHalls, insertInitialUnits } from './migration-utils';
 
 // prettier-ignore
 export function migration(runStep: MigrationFn) {

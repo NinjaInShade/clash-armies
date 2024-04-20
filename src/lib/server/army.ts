@@ -5,6 +5,7 @@ import z from 'zod';
 
 type GetArmiesParams = {
 	id?: number;
+	username?: string;
 };
 
 type GetArmyParams = {
@@ -16,9 +17,9 @@ type GetUnitsParams = {
 }
 
 export async function getArmies(opts: GetArmiesParams = {}) {
-	const { id } = opts;
+	const { id, username } = opts;
 
-	const args: number[] = [];
+	const args: (number | string)[] = [];
 	let query = `
         SELECT
 			a.*,
@@ -55,6 +56,13 @@ export async function getArmies(opts: GetArmiesParams = {}) {
             WHERE a.id = ?
         `;
 		args.push(id);
+	}
+
+	if (username) {
+		query += `
+			WHERE u.username = ?
+		`;
+		args.push(username);
 	}
 
 	query += `

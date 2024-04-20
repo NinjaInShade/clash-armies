@@ -15,6 +15,8 @@
 
 	let devDebugOpen: boolean = $state(false);
 
+	const username = 'NinjaInShade';
+
 	/**
 	 * Due to first render being SSR, any state that will be overridden by localStorage onMount
 	 * should start as null and consumers should show loading animations until the values are set.
@@ -88,7 +90,7 @@
 				<a class="body" href="/admin">Admin</a>
 			</li>
 			<li>
-				<a class="body" href="/account">Account</a>
+				<a class="body" href="/users/{username}">Account</a>
 			</li>
 			<li class="control">
 				<C.Button>Log in</C.Button>

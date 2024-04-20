@@ -15,6 +15,13 @@ export type Modal = {
 	props?: Record<string, unknown>;
 };
 
+export type User = {
+	id: number;
+	username: string;
+	playerTag: string | null;
+	level: number | null;
+}
+
 export type TownHall = {
 	level: number;
 	maxBarracks: number;
