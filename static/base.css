@@ -123,6 +123,12 @@ html {
     --container: 1200px;
     --side-padding: 40px;
 
+    --txt-stroke: 1px hsla(0, 0%, 10%, 0.5);
+    --txt-shadow: 2px 2px 0px hsla(0, 0%, 10%, 0.5);
+
+    --txt-stroke-dark: 1px hsla(0, 0%, 10%, 1);
+    --txt-shadow-dark: 2px 2px 0px hsla(0, 0%, 10%, 1);
+
     /* --fs-sm: 14px;
     --fs-sm-lh: 21px; */
 
@@ -141,6 +147,9 @@ html {
     /* --h3: 30px;
     --h3-lh: 36px; */
 
+    --heading: 24px;
+    --heading-lg: 35px;
+
     --primary-900: hsl(33, 78%, 10%);
     --primary-800: hsl(33, 78%, 20%);
     --primary-700: hsl(33, 78%, 30%);
@@ -154,6 +163,7 @@ html {
     --grey-900: hsl(0, 0%, 10%);
     --grey-850: hsl(0, 0%, 14%);
     --grey-800: hsl(0, 0%, 16%);
+    --grey-700: hsl(0, 0%, 18%);
     --grey-600: hsl(0, 0%, 20%);
     --grey-500: hsl(0, 0%, 36%);
     --grey-400: hsl(0, 0%, 58%);
@@ -264,7 +274,8 @@ button:disabled {
 }
 
 .btn, .btn span {
-    text-shadow: 2px 2px 0px hsla(33, 78%, 10%, 0.5);
+    text-shadow: var(--txt-shadow);
+    -webkit-text-stroke: var(--txt-stroke);
     font-family: 'Clash', sans-serif;
     font-weight: 700;
     font-size: var(--fs);
