@@ -191,10 +191,10 @@ export const TROOP_CAPACITY_BY_TH = {
 	16: 320
 } as const;
 
-export const ARMY_EDIT_FILLER = 10;
+export const ARMY_EDIT_FILLER = 14;
 
-export const HOLD_ADD_SPEED = 100;
-export const HOLD_REMOVE_SPEED = 100;
+export const HOLD_ADD_SPEED = 150;
+export const HOLD_REMOVE_SPEED = 150;
 
 export const SECOND = 1000;
 export const MINUTE = SECOND * 60;
