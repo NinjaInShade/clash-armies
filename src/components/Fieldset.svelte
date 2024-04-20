@@ -29,7 +29,7 @@
 		align-items: flex-start;
 		user-select: none;
 		white-space: nowrap;
-		gap: 4px;
+		gap: 6px;
 	}
 
 	label {
