@@ -1,5 +1,5 @@
 <script lang="ts">
-	import EditArmy from '~/components/EditArmy.svelte';
+	import C from '~/components';
 </script>
 
-<EditArmy />
+<C.EditArmy />

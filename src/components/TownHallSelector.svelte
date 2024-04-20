@@ -1,7 +1,6 @@
 <script lang="ts">
 	import type { AppState } from '~/lib/types';
-	import TownHall from '~/components/TownHall.svelte';
-	import Modal from './Modal.svelte';
+	import C from '~/components';
 
 	type Props = {
 		/** App state so we can access and change selected town hall */
@@ -18,15 +17,15 @@
 	}
 </script>
 
-<Modal title="Select your town hall" {close}>
+<C.Modal title="Select your town hall" {close}>
 	<div class="flex">
 		{#each appState.townHalls as th}
 			{@const isSelected = appState.townHall === th.level}
 			{@const btnAttributes = { title: isSelected ? `Town hall ${th.level} is already selected` : `Town hall ${th.level}`, disabled: isSelected }}
-			<TownHall onclick={setTownHall} level={th.level} {...btnAttributes} />
+			<C.TownHall onclick={setTownHall} level={th.level} {...btnAttributes} />
 		{/each}
 	</div>
-</Modal>
+</C.Modal>
 
 <style>
 	.flex {

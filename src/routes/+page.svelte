@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Link from '~/components/Link.svelte';
+	import C from '~/components';
 </script>
 
 <svelte:head>
@@ -10,7 +10,7 @@
 	<div class="container">
 		<h1>Find the best<br />armies <span>EVER!</span></h1>
 		<p class="body">The number one tool to find, create, learn and share the best armies in the game</p>
-		<Link href="/armies">Find armies</Link>
+		<C.Link href="/armies">Find armies</C.Link>
 
 		<img class="graphic" src="/header-barbarian.png" alt="Angry clash of clans barbarian" />
 	</div>

@@ -4,9 +4,7 @@
 	import { onMount, setContext, type Snippet } from 'svelte';
 	import type { LayoutData } from './$types';
 	import { createAppState, requireHTML } from '~/lib/state.svelte';
-	import TownHall from '~/components/TownHall.svelte';
-	import TownHallSelector from '~/components/TownHallSelector.svelte';
-	import Button from '~/components/Button.svelte';
+	import C from '~/components';
 
 	type Props = {
 		data: LayoutData;
@@ -50,7 +48,7 @@
 		if (appState.townHall === null) {
 			return;
 		}
-		appState.openModal(TownHallSelector, { appState });
+		appState.openModal(C.TownHallSelector, { appState });
 	}
 
 	function toggleDevDebug() {
@@ -80,10 +78,10 @@
 				<a class="body" href="/account">Account</a>
 			</li>
 			<li class="control">
-				<Button>Log in</Button>
+				<C.Button>Log in</C.Button>
 			</li>
 			<li class="control">
-				<TownHall level={appState.townHall} onclick={openTownHallSelector} --width="80px" />
+				<C.TownHall level={appState.townHall} onclick={openTownHallSelector} --width="80px" />
 			</li>
 		</ul>
 	</div>
