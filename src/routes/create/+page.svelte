@@ -3,11 +3,18 @@
 	import type { AppState, TroopName, TroopData, SpellName, SpellData, SiegeName, SiegeData } from '~/lib/types';
 	import Alert from '~/components/Alert.svelte';
 	import AssetDisplay from '~/components/AssetDisplay.svelte';
+	import Button from '~/components/Button.svelte';
 
 	const app = getContext<AppState>('app');
 	const TROOP_FILL = 20;
 	const SPELL_FILL = 10;
 
+	type HousingSpace = {
+		troops: number;
+		sieges: number;
+		spells: number;
+	};
+	type SelectedTotals = HousingSpace & { time: number };
 	type Selected = {
 		type: 'Troop' | 'Siege' | 'Spell';
 		name: TroopName | SiegeName | SpellName;
@@ -17,20 +24,18 @@
 	let selected = $state<Selected[]>([]);
 	let selectedTroops = $derived(selected.filter((item) => item.type === 'Troop' || item.type === 'Siege'));
 	let selectedSpells = $derived(selected.filter((item) => item.type === 'Spell'));
-	let siegesDisabled = $derived(Boolean(selectedTroops.find((x) => x.type === 'Siege')));
 
-	function add(type: Selected['type'], name: Selected['name'], data: Selected['data']) {
-		const existing = selected.find((item) => item.name === name);
+	let maxHousingSpace: HousingSpace = { troops: 320, spells: 11, sieges: 1 }; // TODO: calculate dynamically
+	let housingSpaceUsed = $derived.call(getSelectedTotals);
+
+	function add(troop: Omit<Selected, 'amount'>, arr: Selected[] = selected) {
+		const existing = arr.find((item) => item.name === troop.name);
 		if (existing) {
 			existing.amount += 1;
 		} else {
-			selected.push({
-				type,
-				name,
-				data,
-				amount: 1
-			});
+			arr.push({ ...troop, amount: 1 });
 		}
+		return arr;
 	}
 
 	function remove(name: Selected['name']) {
@@ -41,6 +46,77 @@
 			selected[existingIndex].amount -= 1;
 		}
 	}
+
+	/**
+	 * @param time: the time to format in miliseconds
+	 * @returns formatted time string e.g. '1m 20s'
+	 */
+	function formatTime(time: number) {
+		const SECOND = 1000;
+		const MINUTE = SECOND * 60;
+		const HOUR = MINUTE * 60;
+
+		let parts: string[] = [];
+
+		if (time >= HOUR) {
+			const hours = Math.floor(time / HOUR);
+			parts.push(`${hours}h`);
+			time -= hours * HOUR;
+		}
+		if (time >= MINUTE) {
+			const mins = Math.floor(time / MINUTE);
+			parts.push(`${mins}m`);
+			time -= mins * MINUTE;
+		}
+		if (time >= SECOND) {
+			const secs = Math.floor(time / SECOND);
+			parts.push(`${secs}s`);
+			time -= secs * SECOND;
+		}
+		if (time > 0) {
+			throw new Error(`Unexpected time left over after formatting: "${time}"`);
+		}
+
+		return parts.length ? parts.join(' ') : '0s';
+	}
+
+	function getSelectedTotals(arr: Selected[] = selected) {
+		if (!arr.length) {
+			return { troops: 0, sieges: 0, spells: 0, time: 0 };
+		}
+		// These types can train at the same time.
+		// The total time to train then is the max out of them all.
+		const ParallelTimeCount = {
+			troops: 0,
+			spells: 0,
+			sieges: 0
+		};
+		return arr.reduce<SelectedTotals>(
+			(prev, curr) => {
+				const data = Object.values<Selected['data'][number]>(curr.data);
+				const housingSpace = data[data.length - 1].housingSpace;
+				const trainingTime = data[data.length - 1].trainingTime;
+				const key = curr.type.toLowerCase() + 's';
+
+				ParallelTimeCount[key] += trainingTime * curr.amount;
+				prev[key] += housingSpace * curr.amount;
+				prev.time = Math.max(...Object.values(ParallelTimeCount));
+
+				return prev;
+			},
+			{ troops: 0, sieges: 0, spells: 0, time: 0 }
+		);
+	}
+
+	function willOverflowHousingSpace(troop: Omit<Selected, 'amount'>) {
+		const selectedCopy: Selected[] = JSON.parse(JSON.stringify(selected));
+		const selectedPreview = add(troop, selectedCopy);
+		const { troops, sieges, spells } = getSelectedTotals(selectedPreview);
+		return troops > maxHousingSpace.troops || sieges > maxHousingSpace.sieges || spells > maxHousingSpace.spells;
+	}
+
+	// TODO: add warning somewhere that max limit reached (title on asset display/icon in capacity bar??)
+	// TODO: allow no more than two types of super troops
 </script>
 
 <div class="alert">
@@ -88,8 +164,15 @@
 		<ul class="picker-grid">
 			<!-- prettier-ignore -->
 			{#each (Object.entries(app.troops) as [TroopName, TroopData][]) as [name, data]}
+				{@const troop = { type: 'Troop', name, data } as const}
+				{@const reachedMaxAmount = willOverflowHousingSpace(troop)}
+				{@const addTroop = () => add(troop)}
 				<li>
-					<button class="picker-card" onclick={() => add('Troop', name, app.troops[name])}>
+					<button
+						class="picker-card"
+						onclick={addTroop}
+						disabled={reachedMaxAmount}
+					>
 						<AssetDisplay type="Troop" {name} {data} />
 					</button>
 				</li>
@@ -99,8 +182,15 @@
 		<ul class="picker-grid">
 			<!-- prettier-ignore -->
 			{#each (Object.entries(app.sieges) as [SiegeName, SiegeData][]) as [name, data]}
+				{@const siege = { type: 'Siege', name, data } as const}
+				{@const reachedMaxAmount = willOverflowHousingSpace(siege)}
+				{@const addSiege = () => add(siege)}
 				<li>
-					<button class="picker-card" onclick={() => add('Siege', name, app.sieges[name])} disabled={siegesDisabled}>
+					<button
+						class="picker-card"
+						onclick={addSiege}
+						disabled={reachedMaxAmount}
+					>
 						<AssetDisplay type="Siege" {name} {data} />
 					</button>
 				</li>
@@ -145,8 +235,15 @@
 		<ul class="picker-grid">
 			<!-- prettier-ignore -->
 			{#each (Object.entries(app.spells) as [SpellName, SpellData][]) as [name, data]}
+				{@const spell = { type: 'Spell', name, data } as const}
+				{@const reachedMaxAmount = willOverflowHousingSpace(spell)}
+				{@const addSpell = () => add(spell)}
 				<li>
-					<button class="picker-card" onclick={() => add('Spell', name, app.spells[name])}>
+					<button
+						class="picker-card"
+						onclick={addSpell}
+						disabled={reachedMaxAmount}
+					>
 						<AssetDisplay type="Spell" {name} {data} />
 					</button>
 				</li>
@@ -155,7 +252,55 @@
 	</div>
 </section>
 
+<section class="actions">
+	<div class="container">
+		<div class="left">
+			<!-- TOOO: make totals components -->
+			<small class="capacity">
+				<img src="/clash/ui/troops.png" alt="Clash of clans troop capacity image" />
+				{housingSpaceUsed.troops} / {maxHousingSpace.troops}
+			</small>
+			<small class="capacity">
+				<img src="/clash/ui/spells.png" alt="Clash of clans spell capacity image" />
+				{housingSpaceUsed.spells} / {maxHousingSpace.spells}
+			</small>
+			<small class="capacity">
+				<img src="/clash/ui/sieges.png" alt="Clash of clans siege machine capacity image" />
+				{housingSpaceUsed.sieges} / {maxHousingSpace.sieges}
+			</small>
+			<small class="capacity">
+				<img src="/clash/ui/clock.png" alt="Clash of clans clock (time to train army) image" />
+				{formatTime(housingSpaceUsed.time * 1000)}
+			</small>
+		</div>
+		<div class="right">
+			<Button>Save</Button>
+		</div>
+	</div>
+</section>
+
 <style>
+	/* TODO: move capacity styles to component */
+	.capacity {
+		display: flex;
+		align-items: center;
+		background-color: var(--grey-900);
+		font-family: 'Clash', sans-serif;
+		color: var(--grey-100);
+		border-radius: 6px;
+		padding-right: 8px;
+		font-size: 0.85em;
+		height: 26px;
+	}
+	.capacity img {
+		max-height: 32px;
+		margin-left: -12px;
+		margin-right: 16px;
+		height: 100%;
+		width: auto;
+	}
+	/* TODO: move capacity styles to component */
+
 	.alert {
 		padding: 50px var(--side-padding) 0 var(--side-padding);
 	}
@@ -163,6 +308,43 @@
 	.troops,
 	.spells {
 		padding: 50px var(--side-padding);
+	}
+
+	.extras .container {
+		border: 1px dashed var(--grey-500);
+		padding: 32px;
+	}
+
+	:global(body) {
+		/* Must match .actions height */
+		margin-bottom: 76px;
+	}
+
+	.actions {
+		position: fixed;
+		box-shadow: hsla(0, 0%, 30%, 0.4) 0px -20px 30px -10px;
+		background-color: var(--grey-800);
+		padding: 16px var(--side-padding);
+		width: 100%;
+		bottom: 0;
+		left: 0;
+	}
+
+	.actions .container,
+	.actions .left,
+	.actions .right {
+		display: flex;
+		align-items: center;
+		gap: 1em;
+	}
+
+	.actions .left {
+		padding-left: 12px;
+		gap: 1.5em;
+	}
+
+	.actions .container {
+		justify-content: space-between;
 	}
 
 	.heading,
@@ -210,6 +392,7 @@
 		display: flex;
 		justify-content: center;
 		align-items: center;
+		overflow: hidden;
 		border-radius: 6px;
 		width: 100%;
 	}
