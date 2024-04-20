@@ -21,7 +21,7 @@
 	<div class="loading" />
 {:else}
 	<button class="town-hall" onclick={handleSelect} title="Town hall {level}" {...rest}>
-		<img src="/clash/town-halls/town-hall-{level}.png" alt="Town hall {level}" />
+		<img src="/clash/buildings/town-hall-{level}.png" alt="Town hall {level}" />
 		<p class="body">{level}</p>
 	</button>
 {/if}

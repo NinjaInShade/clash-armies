@@ -20,10 +20,10 @@
 
 <Modal title="Select your town hall" {close}>
 	<div class="flex">
-		{#each appState.townHallLevels as level}
-			{@const isSelected = appState.townHall === level}
-			{@const btnAttributes = { title: isSelected ? `Town hall ${level} is already selected` : `Town hall ${level}`, disabled: isSelected }}
-			<TownHall onclick={setTownHall} {level} {...btnAttributes} />
+		{#each appState.townHalls as th}
+			{@const isSelected = appState.townHall === th.level}
+			{@const btnAttributes = { title: isSelected ? `Town hall ${th.level} is already selected` : `Town hall ${th.level}`, disabled: isSelected }}
+			<TownHall onclick={setTownHall} level={th.level} {...btnAttributes} />
 		{/each}
 	</div>
 </Modal>

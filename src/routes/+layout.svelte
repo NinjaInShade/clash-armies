@@ -23,21 +23,22 @@
 		troops: data.troops,
 		sieges: data.sieges,
 		spells: data.spells,
-		townHallLevels: data.townHalls,
+		townHalls: data.townHalls,
 		// user state
 		townHall: null,
+		barrack: null,
+		darkBarrack: null,
+		laboratory: null,
+		spellFactory: null,
 		// general app state
 		modals: []
 	});
 	setContext('app', appState);
 
 	onMount(async () => {
+		// Use local storage is present & valid, otherwise default to max TH
 		const savedTownHall = +(localStorage.getItem('townHall') ?? '??');
-		if (!Number.isNaN(savedTownHall)) {
-			appState.townHall = savedTownHall;
-		} else {
-			appState.townHall = data.townHalls[data.townHalls.length - 1];
-		}
+		appState.townHall = !Number.isNaN(savedTownHall) ? savedTownHall : data.townHalls.length;
 	});
 
 	function openTownHallSelector() {

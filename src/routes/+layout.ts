@@ -1,5 +1,5 @@
 import type { LayoutLoad, LayoutLoadEvent } from './$types';
-import type { AppState, TroopData, Troops, SpellData, Spells, SiegeData, Sieges } from "~/lib/state.svelte";
+import type { AppState, TroopData, SpellData, SiegeData } from "~/lib/state.svelte";
 import { CURRENT_TROOPS, CURRENT_SPELLS, CURRENT_SIEGES } from "~/lib/state.svelte";
 
 // TODO: disable troops not available at town hall level
@@ -7,6 +7,7 @@ import { CURRENT_TROOPS, CURRENT_SPELLS, CURRENT_SIEGES } from "~/lib/state.svel
 // TODO: click to add troop to army
 // TODO: display total capacity used
 
+type RawBuildingData = Record<string, Record<string, Record<string, string | number | boolean>>>
 type RawTownHallData = Record<string, number>[];
 type RawTroopData = Record<string, Record<string, Record<string, string | number | boolean>>>;
 type RawSpellData = Record<string, Record<string, Record<string, string | number | boolean>>>;
@@ -18,9 +19,44 @@ async function fetchJSON<T>(ev: LayoutLoadEvent, url: string): Promise<T> {
     return parsed;
 }
 
-async function getTownHalls(ev: LayoutLoadEvent): Promise<AppState['townHallLevels']> {
-    const data = await fetchJSON<RawTownHallData>(ev, '/clash/town-halls/townhall_levels.json');
-    return Array.from({ length: data.length }, (_, i) => i + 1);
+async function getTownHalls(ev: LayoutLoadEvent): Promise<AppState['townHalls']> {
+    const buildingData = await fetchJSON<RawBuildingData>(ev, '/clash/buildings/buildings.json');
+    const townHallData = await fetchJSON<RawTownHallData>(ev, '/clash/buildings/townHalls.json');
+    return townHallData.map((th, i) => {
+        const thLevel = i + 1;
+
+        const findMaxLevel = (buildingType: 'Barracks' | 'Dark Barracks' | 'Laboratory' | 'Spell Factory') => {
+            const availableBuildingLevels = Object.values(buildingData[buildingType]).reduce<number[]>((prev, curr) => {
+                const requiredTHLevel = curr.TownHallLevel
+                const buildingLevel = curr.BuildingLevel;
+
+                if (typeof requiredTHLevel !== 'number') {
+                    throw new Error('Expected buildings required town hall level to be a number');
+                }
+                if (typeof buildingLevel !== 'number') {
+                    throw new Error('Expected buildings level to be a number');
+                }
+                if (requiredTHLevel <= thLevel) {
+                    prev.push(buildingLevel);
+                }
+                return prev;
+            }, []);
+            if (!availableBuildingLevels.length) {
+                // prevents Math.max() returning -Infinity and allows us to
+                // differentiate between not found/undefined and not unlocked yet
+                return -1;
+            }
+            return Math.max(...availableBuildingLevels)
+        }
+
+        return {
+            level: thLevel,
+            maxBarracks: findMaxLevel('Barracks'),
+            maxDarkBarracks: findMaxLevel('Dark Barracks'),
+            maxLaboratory: findMaxLevel('Laboratory'),
+            maxSpellFactory: findMaxLevel('Spell Factory')
+        }
+    })
 }
 
 async function getTroops(ev: LayoutLoadEvent): Promise<{ troops: AppState['troops'], sieges: AppState['sieges'] }> {
