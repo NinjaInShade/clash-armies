@@ -63,16 +63,16 @@
 	.modal {
 		display: flex;
 		flex-flow: column nowrap;
-		position: absolute;
-		transform: translate(-50%, -50%);
+		position: fixed;
+		transform: translate(-50%, 50%);
 		box-shadow: 0 7px 100px 0 hsla(0, 0%, 0%, 0.9);
 		border-radius: 4px;
 		background-color: var(--grey-800);
 		max-width: var(--modal-width, 575px);
 		height: var(--modal-height, auto);
 		width: 100%;
+		bottom: 50%;
 		left: 50%;
-		top: 50%;
 	}
 
 	.modal-header {

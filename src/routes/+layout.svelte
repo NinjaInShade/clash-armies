@@ -182,11 +182,11 @@
 	.modal-backdrop {
 		background-color: hsla(0, 0%, 0%, 0.7);
 		backdrop-filter: blur(10px);
-		position: absolute;
+		position: fixed;
 		height: 100%;
 		width: 100%;
+		bottom: 0;
 		left: 0;
-		top: 0;
 	}
 
 	.dev-debug-container {
