@@ -19,11 +19,17 @@
 	 * should start as null and consumers should show loading animations until the values are set.
 	 */
 	const appState = createAppState({
+		// frequently used data (cache)
+		troops: data.troops,
+		sieges: data.sieges,
+		spells: data.spells,
 		townHallLevels: data.townHalls,
+		// user state
 		townHall: null,
+		// general app state
 		modals: []
 	});
-	setContext('townHall', appState);
+	setContext('app', appState);
 
 	onMount(async () => {
 		const savedTownHall = +(localStorage.getItem('townHall') ?? '??');

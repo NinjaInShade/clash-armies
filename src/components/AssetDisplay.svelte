@@ -1,13 +1,13 @@
 <script lang="ts">
-	import type { Troop, TroopName, Siege, SiegeName, Spell, SpellName } from '~/lib/state.svelte';
+	import type { TroopName, TroopData, SiegeName, SiegeData, SpellName, SpellData } from '~/lib/state.svelte';
 
 	type Props = {
 		type: 'Troop' | 'Siege' | 'Spell';
 		name: TroopName | SiegeName | SpellName;
-		data: Troop | Siege | Spell;
+		data: TroopData | SiegeData | SpellData;
 		amount?: number;
 	};
-	let { type, name, amount, data } = $props<Props>();
+	const { type, name, amount, data } = $props<Props>();
 
 	const types = {
 		Troop: {
