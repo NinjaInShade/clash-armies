@@ -1,16 +1,10 @@
 <script lang="ts">
-	import { ValidationError } from '~/lib/shared';
 	import type { HTMLInputAttributes } from 'svelte/elements';
 	import { getContext } from 'svelte';
 
 	type Props = {
 		/** Sets the bound value */
 		value: string | null;
-		/**
-		 * Validate function, called on blur.
-		 * If a `ValidationError` is thrown, the displayed error will be set from error.message, otherwise the error is re-thrown.
-		 */
-		validateFn?: (value: string | null) => void;
 		/** Sets the onchange handler */
 		onChange?: (value: string | null) => Promise<void> | void;
 		/** Sets the disabled state */
@@ -20,7 +14,7 @@
 		/** Sets the placeholder display */
 		placeholder?: string;
 	} & HTMLInputAttributes;
-	let { value, onChange, validateFn, disabled, error, placeholder, ...rest } = $props<Props>();
+	let { value, onChange, disabled, error, placeholder, ...rest } = $props<Props>();
 
 	// Passed down from context in parent <Fieldset />
 	const htmlName = getContext<string>('htmlName');
@@ -31,28 +25,12 @@
 		}
 		await onChange(e.target?.value || null);
 	}
-
-	function validateValue() {
-		if (!validateFn) {
-			return;
-		}
-		try {
-			validateFn(value);
-			error = null;
-		} catch (err) {
-			if (err instanceof ValidationError) {
-				error = err.message;
-			} else {
-				throw err;
-			}
-		}
-	}
 </script>
 
 <!-- Input -->
 <div class="outer-container" class:error>
 	<div class="inner-container">
-		<input bind:value oninput={_onChange} onblur={validateValue} class="input" type="text" name={htmlName} id={htmlName} {disabled} {placeholder} {...rest} />
+		<input bind:value oninput={_onChange} class="input" type="text" name={htmlName} id={htmlName} {disabled} {placeholder} {...rest} />
 	</div>
 	{#if error}
 		<small class="error-container">
@@ -76,8 +54,8 @@
 	/* Input */
 	.input {
 		outline: none;
-		background-color: var(--grey-900);
-		border: 1px solid var(--grey-600);
+		background-color: var(--grey-700);
+		border: 1px dashed var(--grey-500);
 		font-size: var(--fs);
 		line-height: var(--fs-lh);
 		color: var(--grey-100);
