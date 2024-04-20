@@ -1,16 +1,28 @@
 <script lang="ts">
+	import type { Snippet } from 'svelte';
 	import type { SvelteComponentGeneric } from '~/lib/state.svelte';
 	import FocusTrap from './FocusTrap.svelte';
 
+	type ComponentRendering = {
+		/** Sets the component the modal renders. Uses children as fallback */
+		component: SvelteComponentGeneric;
+		children?: never;
+	};
+	type ChildrenRendering = {
+		/** The modals content if the component prop is not passed in */
+		children: Snippet;
+		component?: never;
+	};
 	type Props = {
 		/** Sets the title of the modal */
 		title?: string;
-		/** Sets the component the modal renders. Uses <slot /> as fallback */
-		component?: SvelteComponentGeneric;
 		/** Function that closes the modal */
 		close: () => void;
-	};
-	let { title, component, close, ...componentProps } = $props<Props>();
+		/** Optional controls snippet, rendered in the footer */
+		controls?: Snippet;
+	} & (ComponentRendering | ChildrenRendering);
+
+	let { title, component, close, children, controls, ...componentProps } = $props<Props>();
 
 	function onKeyDown(e: KeyboardEvent) {
 		if (e.key === 'Escape') {
@@ -32,13 +44,13 @@
 		<div class="modal-content">
 			{#if component}
 				<svelte:component this={component} {...componentProps} />
-			{:else}
-				<slot />
+			{:else if children}
+				{@render children()}
 			{/if}
 		</div>
 		<div class="modal-footer">
-			{#if $$slots.controls}
-				<slot name="controls" />
+			{#if controls}
+				{@render controls()}
 			{:else}
 				<button class="btn" on:click={close}>Close</button>
 			{/if}

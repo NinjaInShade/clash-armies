@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { fade } from 'svelte/transition';
 	import { sineInOut } from 'svelte/easing';
-	import { onMount, setContext } from 'svelte';
+	import { onMount, setContext, type Snippet } from 'svelte';
 	import type { LayoutData } from './$types';
 	import { createAppState } from '~/lib/state.svelte';
 	import TownHall from '~/components/TownHall.svelte';
@@ -9,8 +9,9 @@
 
 	type Props = {
 		data: LayoutData;
+		children: Snippet;
 	};
-	let { data } = $props<Props>();
+	let { data, children } = $props<Props>();
 
 	/**
 	 * Due to first render being SSR, any state that will be overridden by localStorage onMount
@@ -63,7 +64,7 @@
 	</div>
 </nav>
 
-<slot />
+{@render children()}
 
 {#if appState.modals.length}
 	<div transition:fade={{ duration: 150, easing: sineInOut }}>

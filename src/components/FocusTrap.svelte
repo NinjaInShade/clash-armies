@@ -5,13 +5,15 @@
 </script>
 
 <script lang="ts">
-	import { onMount } from 'svelte';
+	import { onMount, type Snippet } from 'svelte';
 
 	type Props = {
 		/** Whether focus is returned after the trap is deactivated / destroyed */
 		returnFocus?: boolean;
+		/** The container which the focus will be trapped in */
+		children: Snippet;
 	};
-	let { returnFocus = true } = $props<Props>();
+	let { returnFocus = true, children } = $props<Props>();
 
 	let trapContainer: HTMLElement | null = $state(null);
 
@@ -110,5 +112,5 @@
 <svelte:window on:keydown={onKeyDown} />
 
 <div bind:this={trapContainer}>
-	<slot />
+	{@render children()}
 </div>
