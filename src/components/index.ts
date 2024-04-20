@@ -20,5 +20,6 @@ export { default as EditArmy } from './EditArmy.svelte';
 export { default as EditBanner } from './EditBanner.svelte';
 export { default as Votes } from './Votes.svelte';
 export { default as Errors } from './Errors.svelte';
+export { default as ArmyCard } from './ArmyCard.svelte';
 
 export * as default from './index';

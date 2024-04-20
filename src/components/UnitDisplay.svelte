@@ -4,6 +4,7 @@
 	type Props = {
 		name: string;
 		type: UnitType;
+		isSuper: boolean;
 		levels: UnitLevel[];
 		/**
 		 * Title to use for the card
@@ -11,18 +12,23 @@
 		 */
 		title?: string;
 		amount?: number;
+		/**
+		 * Whether to display card as inline or a block style
+		 * @default 'inline'
+		 */
+		display?: 'inline' | 'block';
 		level?: number;
 	};
-	const { type, name, amount, level, title, levels } = $props<Props>();
+	const { type, name, isSuper, amount, display, level, title, levels } = $props<Props>();
 
 	function isMaxLevel() {
 		return level === Math.max(...levels.map((x) => x.level));
 	}
 </script>
 
-<div class="unit-display" title={title ?? name}>
+<div class="unit-display {display} {type} {isSuper ? 'Super' : ''}" title={title ?? name}>
 	{#if amount}
-		<b class="unit-amount">{amount}</b>
+		<b class="unit-amount {display}">x{amount}</b>
 	{/if}
 	{#if level && level > 0}
 		<b class="unit-lvl" class:max-lvl={isMaxLevel()}>{level}</b>
@@ -34,12 +40,29 @@
 	.unit-display {
 		position: relative;
 		display: flex;
-		align-items: flex-end;
-		background-color: #60a7d8;
+		flex-flow: column nowrap;
+		align-items: center;
 		border-radius: 10px;
 		overflow: hidden;
 		height: 100%;
 		width: 100%;
+	}
+
+	.unit-display.Troop,
+	.unit-display.Siege {
+		background-color: #60a7d8;
+	}
+
+	.unit-display.Spell {
+		background-color: #655fd0;
+	}
+
+	.unit-display.Super {
+		background-color: #aa0c29;
+	}
+
+	.unit-display.block {
+		border-radius: 6px;
 	}
 
 	.unit-img {
@@ -58,6 +81,30 @@
 		font-size: 2em;
 		left: 4px;
 		top: 4px;
+	}
+
+	.unit-amount.block {
+		position: initial;
+		text-align: center;
+		text-shadow: none;
+		padding: 3px 0 1.5px 0;
+		width: 100%;
+	}
+
+	.Troop .unit-amount.block,
+	.Siege .unit-amount.block {
+		background: rgb(57, 110, 164);
+		background: linear-gradient(0deg, rgba(57, 110, 164, 1) 0%, rgba(78, 146, 210, 1) 100%);
+	}
+
+	.Spell .unit-amount.block {
+		background: rgb(77, 62, 167);
+		background: linear-gradient(0deg, rgba(77, 62, 167, 1) 0%, rgba(125, 93, 226, 1) 100%);
+	}
+
+	.Super .unit-amount.block {
+		background: rgb(128, 5, 15);
+		background: linear-gradient(0deg, rgba(128, 5, 15, 1) 0%, rgba(133, 13, 19, 1) 100%);
 	}
 
 	.unit-lvl {

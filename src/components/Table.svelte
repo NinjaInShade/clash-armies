@@ -296,8 +296,7 @@
 
 	thead tr {
 		position: sticky;
-		z-index: 1;
-		top: 0;
+		top: -1px;
 	}
 
 	tr {
