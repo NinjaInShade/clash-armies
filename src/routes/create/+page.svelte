@@ -225,6 +225,12 @@
 					<button
 						class="object-card"
 						onmousedown={() => initHoldRemove(troop.name)}
+						onkeypress={(ev) => {
+							if (ev.key !== 'Enter') {
+								return;
+							}
+							remove(troop.name);
+						}}
 					>
 						<AssetDisplay {...troop} />
 					</button>
@@ -258,6 +264,12 @@
 						class="picker-card"
 						disabled={reachedMaxAmount || disableSuper || level === -1}
 						onmousedown={() => initHoldAdd(troop)}
+						onkeypress={(ev) => {
+							if (ev.key !== 'Enter') {
+								return;
+							}
+							add(troop);
+						}}
 					>
 						<AssetDisplay {type} {name} {data} {level} {title} />
 					</button>
@@ -278,6 +290,12 @@
 						class="picker-card"
 						disabled={reachedMaxAmount || level === -1}
 						onmousedown={() => initHoldAdd(siege)}
+						onkeypress={(ev) => {
+							if (ev.key !== 'Enter') {
+								return;
+							}
+							add(siege);
+						}}
 					>
 						<AssetDisplay {type} {name} {data} {level} {title} />
 					</button>
@@ -296,6 +314,12 @@
 					<button
 						class="object-card"
 						onmousedown={() => initHoldRemove(spell.name)}
+						onkeypress={(ev) => {
+							if (ev.key !== 'Enter') {
+								return;
+							}
+							remove(spell.name);
+						}}
 					>
 						<AssetDisplay {...spell} />
 					</button>
@@ -326,6 +350,12 @@
 						class="picker-card"
 						disabled={reachedMaxAmount || level === -1}
 						onmousedown={() => initHoldAdd(spell)}
+						onkeypress={(ev) => {
+							if (ev.key !== 'Enter') {
+								return;
+							}
+							add(spell);
+						}}
 					>
 						<AssetDisplay {type} {name} {data} {level} {title} />
 					</button>
