@@ -241,6 +241,12 @@ button:disabled {
 	opacity: 0.5;
 }
 
+button span {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+}
+
 .body {
 	color: var(--grey-300);
 	font-size: var(--fs);
@@ -309,6 +315,20 @@ button:disabled {
 
 .btn:focus-visible {
 	outline: var(--grey-100) dotted 2px;
+}
+
+.btn.danger {
+	background-color: var(--danger-500);
+}
+.btn.danger::before {
+	background-color: var(--danger-400);
+}
+.btn.danger:hover:not(:disabled)::before {
+	background-color: var(--danger-500);
+}
+.btn.danger:hover:not(:disabled),
+.btn.danger:focus-visible {
+	background-color: var(--danger-600);
 }
 
 @media (max-width: 1100px) {

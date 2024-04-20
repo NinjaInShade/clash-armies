@@ -4,12 +4,14 @@
 
 	type Props = {
 		children: Snippet;
+		/** Sets the theme of the button @default primary */
+		theme?: 'primary' | 'danger';
 	} & HTMLButtonAttributes;
 
-	let { children, ...rest } = $props<Props>();
+	let { children, theme, ...rest } = $props<Props>();
 </script>
 
-<button class="btn" {...rest}>
+<button class="btn {theme}" type="button" {...rest}>
 	<span>
 		{@render children()}
 	</span>
