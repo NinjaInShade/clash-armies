@@ -36,18 +36,18 @@
 	}
 </script>
 
-<div class="asset-bg" title={title ?? name}>
+<div class="unit-display" title={title ?? name}>
 	{#if amount}
-		<b class="asset-amount">{amount}</b>
+		<b class="unit-amount">{amount}</b>
 	{/if}
 	{#if level && level > 0}
-		<b class="asset-lvl" class:max-lvl={isMaxLevel()}>{level}</b>
+		<b class="unit-lvl" class:max-lvl={isMaxLevel()}>{level}</b>
 	{/if}
-	<img class="asset-img" src="/clash/{types[type].assetDir}/{name}.png" alt="{name} {types[type].altSuffix}" />
+	<img class="unit-img" src="/clash/{types[type].assetDir}/{name}.png" alt="{name} {types[type].altSuffix}" />
 </div>
 
 <style>
-	.asset-bg {
+	.unit-display {
 		position: relative;
 		display: flex;
 		align-items: flex-end;
@@ -57,14 +57,14 @@
 		width: 100%;
 	}
 
-	.asset-img {
+	.unit-img {
 		pointer-events: none;
 		display: block;
 		height: 100%;
 		width: 100%;
 	}
 
-	.asset-amount {
+	.unit-amount {
 		font-family: 'Clash', sans-serif;
 		-webkit-text-stroke: var(--txt-stroke-dark);
 		text-shadow: var(--txt-shadow-dark);
@@ -75,7 +75,7 @@
 		top: 4px;
 	}
 
-	.asset-lvl {
+	.unit-lvl {
 		font-family: 'Clash', sans-serif;
 		-webkit-text-stroke: var(--txt-stroke-dark);
 		text-shadow: var(--txt-shadow-dark);
@@ -89,7 +89,7 @@
 		left: 4px;
 	}
 
-	.asset-lvl.max-lvl {
+	.unit-lvl.max-lvl {
 		text-shadow: var(--txt-shadow);
 		background-color: #f5ab3d;
 	}
