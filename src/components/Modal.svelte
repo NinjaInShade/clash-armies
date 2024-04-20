@@ -2,6 +2,7 @@
 	import type { Snippet } from 'svelte';
 	import type { SvelteComponentGeneric } from '~/lib/state.svelte';
 	import FocusTrap from './FocusTrap.svelte';
+	import Button from './Button.svelte';
 
 	type ComponentRendering = {
 		/** Sets the component the modal renders. Uses children as fallback */
@@ -52,7 +53,7 @@
 			{#if controls}
 				{@render controls()}
 			{:else}
-				<button class="btn" on:click={close}>Close</button>
+				<Button onclick={close}>Close</Button>
 			{/if}
 		</div>
 	</div>

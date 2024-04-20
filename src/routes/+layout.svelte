@@ -6,6 +6,7 @@
 	import { createAppState } from '~/lib/state.svelte';
 	import TownHall from '~/components/TownHall.svelte';
 	import TownHallSelector from '~/components/TownHallSelector.svelte';
+	import Button from '~/components/Button.svelte';
 
 	type Props = {
 		data: LayoutData;
@@ -55,7 +56,7 @@
 				<a class="body" href="/account">Account</a>
 			</li>
 			<li class="control">
-				<button class="btn">Log in</button>
+				<Button>Log in</Button>
 			</li>
 			<li class="control">
 				<TownHall level={appState.townHall} onclick={openTownHallSelector} --width="80px" />
@@ -96,7 +97,7 @@
 	}
 
 	.logo span {
-		color: var(--primary-300);
+		color: var(--primary-400);
 	}
 
 	.links {

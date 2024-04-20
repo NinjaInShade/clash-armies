@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/stores';
+	import Link from '~/components/Link.svelte';
 
 	function getMessage(diagnostics: typeof $page) {
 		const status = diagnostics.status;
@@ -18,7 +19,7 @@
 	<div class="container">
 		<h1>{$page.status}!</h1>
 		<p class="body">{getMessage($page)}</p>
-		<a class="btn" href="/">Back to home</a>
+		<Link href="/">Go to home</Link>
 	</div>
 </header>
 
