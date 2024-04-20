@@ -14,6 +14,8 @@
 	};
 	let { data, children } = $props<Props>();
 
+	let devDebugOpen: boolean = $state(false);
+
 	/**
 	 * Due to first render being SSR, any state that will be overridden by localStorage onMount
 	 * should start as null and consumers should show loading animations until the values are set.
@@ -48,6 +50,10 @@
 			return;
 		}
 		appState.openModal(TownHallSelector, { appState });
+	}
+
+	function toggleDevDebug() {
+		devDebugOpen = !devDebugOpen;
 	}
 </script>
 
@@ -85,6 +91,24 @@
 		{#each appState.modals as modal}
 			<svelte:component this={modal.component} {...modal.props} />
 		{/each}
+	</div>
+{/if}
+
+{#if import.meta.env.DEV}
+	<div class="dev-debug-container" class:open={devDebugOpen}>
+		<div class="dev-debug">
+			<b>DEBUG</b>
+			<p>• Town hall <span>{appState.townHall}</span></p>
+			<p>• Barrack <span>{appState.barrack}</span></p>
+			<p>• Dark barrack <span>{appState.darkBarrack}</span></p>
+			<p>• Laboratory <span>{appState.laboratory}</span></p>
+			<p>• Spell factory <span>{appState.spellFactory}</span></p>
+			<p>• Dark spell factory <span>{appState.darkSpellFactory}</span></p>
+			<p>• Workshop <span>{appState.workshop}</span></p>
+		</div>
+		<button class="toggle-open" onclick={toggleDevDebug}>
+			{'>'}
+		</button>
 	</div>
 {/if}
 
@@ -158,5 +182,60 @@
 		width: 100%;
 		left: 0;
 		top: 0;
+	}
+
+	.dev-debug-container {
+		position: fixed;
+		display: flex;
+		align-items: center;
+		transition: transform 0.1s ease-in-out;
+		transform: translateY(-50%) translateX(calc(-100% + 20px));
+		top: 50%;
+		left: 0;
+	}
+
+	.dev-debug-container.open {
+		transform: translateY(-50%) translateX(0);
+	}
+
+	.dev-debug-container .toggle-open {
+		color: var(--grey-100);
+		background-color: var(--grey-900);
+		border-radius: 0 4px 4px 0;
+		border-left: 1px solid var(--grey-600);
+		padding: 6px 0;
+		width: 20px;
+	}
+
+	.dev-debug {
+		border-radius: 0 8px 8px 0;
+		background-color: var(--grey-900);
+		padding: 1em;
+	}
+
+	.dev-debug b {
+		display: block;
+		color: var(--grey-100);
+		padding-bottom: 0.4em;
+		margin-bottom: 0.6em;
+		border-bottom: 1px solid var(--grey-700);
+	}
+
+	.dev-debug p {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		color: var(--grey-100);
+		font-weight: 500;
+		font-size: 1em;
+		gap: 0.75em;
+	}
+
+	.dev-debug p span {
+		color: var(--grey-500);
+	}
+
+	.dev-debug p:not(:last-child) {
+		margin-bottom: 0.5em;
 	}
 </style>
