@@ -7,6 +7,13 @@
 	import AssetDisplay from '~/components/AssetDisplay.svelte';
 	import Button from '~/components/Button.svelte';
 
+	type TitleOptions = {
+		level: number;
+		type: Selected['type'];
+		reachedMaxAmount: boolean;
+		reachedSuperLimit?: boolean;
+	};
+
 	const HOLD_ADD_SPEED = 200;
 	const HOLD_REMOVE_SPEED = 200;
 
@@ -170,7 +177,19 @@
 		return troops > maxHousingSpace.troops || sieges > maxHousingSpace.sieges || spells > maxHousingSpace.spells;
 	}
 
-	// TODO: add warning somewhere that max limit reached (title on asset display/icon in capacity bar??)
+	function getCardTitle(opts: TitleOptions) {
+		const { level, type, reachedMaxAmount, reachedSuperLimit } = opts;
+		if (level === -1) {
+			return `You do not have this ${type.toLowerCase()} unlocked warrior!`;
+		}
+		if (reachedMaxAmount) {
+			return `There is no space left to house this ${type.toLowerCase()} warrior!`;
+		}
+		if (reachedSuperLimit) {
+			return 'You have reached the max two super troops per army limit warrior!';
+		}
+		return undefined;
+	}
 </script>
 
 <svelte:head>
@@ -222,19 +241,21 @@
 		<ul class="picker-grid">
 			<!-- prettier-ignore -->
 			{#each (Object.entries(app.troops) as [TroopName, TroopData][]) as [name, data]}
-				{@const troop = { type: 'Troop', name, data } as const}
+				{@const type = 'Troop'}
+				{@const troop = { type, name, data } as const}
 				{@const level = getTroopLevel(name, app)}
 				{@const reachedMaxAmount = willOverflowHousingSpace(troop)}
 				<!-- Disable if reached max unique super limit of 2 and this troop isn't one of those -->
 				<!-- TOOD: fix data[1].isSuper, properties like isSuper that apply to all levels should not live in level data -->
 				{@const disableSuper = data[1].isSuper && !selected.find(sel => sel.name === troop.name) && reachedSuperLimit}
+				{@const title = getCardTitle({ level, type, reachedMaxAmount, reachedSuperLimit: disableSuper })}
 				<li>
 					<button
 						class="picker-card"
 						disabled={reachedMaxAmount || disableSuper || level === -1}
 						on:mousedown={() => initHoldAdd(troop)}
 					>
-						<AssetDisplay type="Troop" {name} {data} {level} />
+						<AssetDisplay {type} {name} {data} {level} {title} />
 					</button>
 				</li>
 			{/each}
@@ -243,16 +264,18 @@
 		<ul class="picker-grid">
 			<!-- prettier-ignore -->
 			{#each (Object.entries(app.sieges) as [SiegeName, SiegeData][]) as [name, data]}
-				{@const siege = { type: 'Siege', name, data } as const}
+				{@const type = 'Siege'}
+				{@const siege = { type, name, data } as const}
 				{@const level = getSiegeLevel(name, app)}
 				{@const reachedMaxAmount = willOverflowHousingSpace(siege)}
+				{@const title = getCardTitle({ level, type, reachedMaxAmount })}
 				<li>
 					<button
 						class="picker-card"
 						disabled={reachedMaxAmount || level === -1}
 						on:mousedown={() => initHoldAdd(siege)}
 					>
-						<AssetDisplay type="Siege" {name} {data} {level} />
+						<AssetDisplay {type} {name} {data} {level} {title} />
 					</button>
 				</li>
 			{/each}
@@ -287,16 +310,18 @@
 		<ul class="picker-grid">
 			<!-- prettier-ignore -->
 			{#each (Object.entries(app.spells) as [SpellName, SpellData][]) as [name, data]}
-				{@const spell = { type: 'Spell', name, data } as const}
+				{@const type = 'Spell'}
+				{@const spell = { type, name, data } as const}
 				{@const level = getSpellLevel(name, app)}
 				{@const reachedMaxAmount = willOverflowHousingSpace(spell)}
+				{@const title = getCardTitle({ level, type, reachedMaxAmount })}
 				<li>
 					<button
 						class="picker-card"
 						disabled={reachedMaxAmount || level === -1}
 						on:mousedown={() => initHoldAdd(spell)}
 					>
-						<AssetDisplay type="Spell" {name} {data} {level} />
+						<AssetDisplay {type} {name} {data} {level} {title} />
 					</button>
 				</li>
 			{/each}

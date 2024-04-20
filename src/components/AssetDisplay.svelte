@@ -5,10 +5,15 @@
 		type: 'Troop' | 'Siege' | 'Spell';
 		name: TroopName | SiegeName | SpellName;
 		data: TroopData | SiegeData | SpellData;
+		/**
+		 * Title to use for the card
+		 * @default props.name
+		 */
+		title?: string;
 		amount?: number;
 		level?: number;
 	};
-	const { type, name, amount, level, data } = $props<Props>();
+	const { type, name, amount, level, title, data } = $props<Props>();
 
 	const types = {
 		Troop: {
@@ -33,7 +38,7 @@
 	}
 </script>
 
-<div class="asset-bg" title={name}>
+<div class="asset-bg" title={title ?? name}>
 	{#if amount}
 		<b class="asset-amount">{amount}</b>
 	{/if}
