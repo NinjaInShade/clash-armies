@@ -1,119 +1,112 @@
 /* poppins-regular - latin */
 @font-face {
-    font-family: "Poppins";
-    font-style: normal;
-    font-weight: 400;
-    src:
-        local(""),
-        url("/fonts/poppins-v19-latin-regular.woff2") format("woff2"),
-        /* Chrome 26+, Opera 23+, Firefox 39+ */
-        url("/fonts/poppins-v19-latin-regular.woff") format("woff");
-        /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
+	font-family: 'Poppins';
+	font-style: normal;
+	font-weight: 400;
+	src:
+		local(''),
+		url('/fonts/poppins-v19-latin-regular.woff2') format('woff2'),
+		/* Chrome 26+, Opera 23+, Firefox 39+ */ url('/fonts/poppins-v19-latin-regular.woff') format('woff');
+	/* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
 }
 
 /* poppins-500 - latin */
 @font-face {
-    font-family: "Poppins";
-    font-style: normal;
-    font-weight: 500;
-    src:
-        local(""),
-        url("/fonts/poppins-v19-latin-500.woff2") format("woff2"),
-        /* Chrome 26+, Opera 23+, Firefox 39+ */
-        url("/fonts/poppins-v19-latin-500.woff") format("woff");
-        /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
+	font-family: 'Poppins';
+	font-style: normal;
+	font-weight: 500;
+	src:
+		local(''),
+		url('/fonts/poppins-v19-latin-500.woff2') format('woff2'),
+		/* Chrome 26+, Opera 23+, Firefox 39+ */ url('/fonts/poppins-v19-latin-500.woff') format('woff');
+	/* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
 }
 
 /* poppins-500italic - latin */
 @font-face {
-    font-family: "Poppins";
-    font-style: italic;
-    font-weight: 500;
-    src:
-        local(""),
-        url("/fonts/poppins-v19-latin-500italic.woff2") format("woff2"),
-        /* Chrome 26+, Opera 23+, Firefox 39+ */
-        url("/fonts/poppins-v19-latin-500italic.woff") format("woff");
-        /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
+	font-family: 'Poppins';
+	font-style: italic;
+	font-weight: 500;
+	src:
+		local(''),
+		url('/fonts/poppins-v19-latin-500italic.woff2') format('woff2'),
+		/* Chrome 26+, Opera 23+, Firefox 39+ */ url('/fonts/poppins-v19-latin-500italic.woff') format('woff');
+	/* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
 }
 
 /* poppins-600 - latin */
 @font-face {
-    font-family: "Poppins";
-    font-style: normal;
-    font-weight: 600;
-    src:
-        local(""),
-        url("/fonts/poppins-v19-latin-600.woff2") format("woff2"),
-        /* Chrome 26+, Opera 23+, Firefox 39+ */
-        url("/fonts/poppins-v19-latin-600.woff") format("woff");
-        /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
+	font-family: 'Poppins';
+	font-style: normal;
+	font-weight: 600;
+	src:
+		local(''),
+		url('/fonts/poppins-v19-latin-600.woff2') format('woff2'),
+		/* Chrome 26+, Opera 23+, Firefox 39+ */ url('/fonts/poppins-v19-latin-600.woff') format('woff');
+	/* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
 }
 
 /* poppins-700 - latin */
 @font-face {
-    font-family: "Poppins";
-    font-style: normal;
-    font-weight: 700;
-    src:
-        local(""),
-        url("/fonts/poppins-v19-latin-700.woff2") format("woff2"),
-        /* Chrome 26+, Opera 23+, Firefox 39+ */
-        url("/fonts/poppins-v19-latin-700.woff") format("woff");
-        /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
+	font-family: 'Poppins';
+	font-style: normal;
+	font-weight: 700;
+	src:
+		local(''),
+		url('/fonts/poppins-v19-latin-700.woff2') format('woff2'),
+		/* Chrome 26+, Opera 23+, Firefox 39+ */ url('/fonts/poppins-v19-latin-700.woff') format('woff');
+	/* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
 }
 
 /* poppins-900 - latin */
 @font-face {
-    font-family: "Poppins";
-    font-style: normal;
-    font-weight: 900;
-    src:
-        local(""),
-        url("/fonts/poppins-v19-latin-900.woff2") format("woff2"),
-        /* Chrome 26+, Opera 23+, Firefox 39+ */
-        url("/fonts/poppins-v19-latin-900.woff") format("woff");
-        /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
+	font-family: 'Poppins';
+	font-style: normal;
+	font-weight: 900;
+	src:
+		local(''),
+		url('/fonts/poppins-v19-latin-900.woff2') format('woff2'),
+		/* Chrome 26+, Opera 23+, Firefox 39+ */ url('/fonts/poppins-v19-latin-900.woff') format('woff');
+	/* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
 }
 
 /* clash bold */
 @font-face {
-    font-family: "Clash";
-    font-style: normal;
-    font-weight: 700;
-    src:
-        local(""),
-        url("/fonts/Clash_Bold.otf") format("opentype"),
+	font-family: 'Clash';
+	font-style: normal;
+	font-weight: 700;
+	src:
+		local(''),
+		url('/fonts/Clash_Bold.otf') format('opentype');
 }
 
 /* clash regular */
 @font-face {
-    font-family: "Clash";
-    font-style: normal;
-    font-weight: 400;
-    src:
-        local(""),
-        url("/fonts/Clash_Regular.otf") format("opentype"),
+	font-family: 'Clash';
+	font-style: normal;
+	font-weight: 400;
+	src:
+		local(''),
+		url('/fonts/Clash_Regular.otf') format('opentype');
 }
 
-
 * {
-    font-family: 'Poppins', sans-serif;
-    box-sizing: border-box;
-    text-decoration: none;
-    list-style: none;
-    margin: 0;
-    padding: 0;
+	font-family: 'Poppins', sans-serif;
+	box-sizing: border-box;
+	text-decoration: none;
+	list-style: none;
+	margin: 0;
+	padding: 0;
 }
 
 html,
 body {
-    width: 100%;
-    overflow-x: hidden;
+	width: 100%;
+	overflow-x: hidden;
 }
 
 html {
-    background-color: var(--grey-600);
+	background-color: var(--grey-600);
 }
 
 html.hide-overflow {
@@ -121,82 +114,82 @@ html.hide-overflow {
 }
 
 :root {
-    scroll-behavior: smooth;
-    font-size: 16px;
+	scroll-behavior: smooth;
+	font-size: 16px;
 
-    --container: 1200px;
-    --side-padding: 40px;
+	--container: 1200px;
+	--side-padding: 40px;
 
-    --txt-stroke: 1px hsla(0, 0%, 10%, 0.5);
-    --txt-shadow: 2px 2px 0px hsla(0, 0%, 10%, 0.5);
+	--txt-stroke: 1px hsla(0, 0%, 10%, 0.5);
+	--txt-shadow: 2px 2px 0px hsla(0, 0%, 10%, 0.5);
 
-    --txt-stroke-dark: 1px hsla(0, 0%, 10%, 1);
-    --txt-shadow-dark: 2px 2px 0px hsla(0, 0%, 10%, 1);
+	--txt-stroke-dark: 1px hsla(0, 0%, 10%, 1);
+	--txt-shadow-dark: 2px 2px 0px hsla(0, 0%, 10%, 1);
 
-    /* --fs-sm: 14px;
+	/* --fs-sm: 14px;
     --fs-sm-lh: 21px; */
 
-    --fs: 16px;
-    --fs-lh: 24px;
+	--fs: 16px;
+	--fs-lh: 24px;
 
-    /* --fs-lg: 18px;
+	/* --fs-lg: 18px;
     --fs-lg-lh: 26px; */
 
-    --h1: 56px;
-    --h1-lh: 68px;
+	--h1: 56px;
+	--h1-lh: 68px;
 
-    /* --h2: 38px;
+	/* --h2: 38px;
     --h2-lh: 42px; */
 
-    /* --h3: 30px;
+	/* --h3: 30px;
     --h3-lh: 36px; */
 
-    --heading: 24px;
-    --heading-lg: 35px;
+	--heading: 24px;
+	--heading-lg: 35px;
 
-    --primary-900: hsl(33, 78%, 10%);
-    --primary-800: hsl(33, 78%, 20%);
-    --primary-700: hsl(33, 78%, 30%);
-    --primary-600: hsl(33, 78%, 40%);
-    --primary-500: hsl(33, 78%, 47%);
-    --primary-400: hsl(33, 78%, 57%);
-    --primary-300: hsl(33, 78%, 70%);
-    --primary-200: hsl(33, 78%, 82%);
-    --primary-100: hsl(33, 78%, 90%);
+	--primary-900: hsl(33, 78%, 10%);
+	--primary-800: hsl(33, 78%, 20%);
+	--primary-700: hsl(33, 78%, 30%);
+	--primary-600: hsl(33, 78%, 40%);
+	--primary-500: hsl(33, 78%, 47%);
+	--primary-400: hsl(33, 78%, 57%);
+	--primary-300: hsl(33, 78%, 70%);
+	--primary-200: hsl(33, 78%, 82%);
+	--primary-100: hsl(33, 78%, 90%);
 
-    --grey-900: hsl(0, 0%, 10%);
-    --grey-850: hsl(0, 0%, 14%);
-    --grey-800: hsl(0, 0%, 16%);
-    --grey-700: hsl(0, 0%, 18%);
-    --grey-600: hsl(0, 0%, 20%);
-    --grey-500: hsl(0, 0%, 36%);
-    --grey-400: hsl(0, 0%, 58%);
-    --grey-300: hsl(0, 0%, 77%);
-    --grey-100: hsl(0, 0%, 94%);
+	--grey-900: hsl(0, 0%, 10%);
+	--grey-850: hsl(0, 0%, 14%);
+	--grey-800: hsl(0, 0%, 16%);
+	--grey-700: hsl(0, 0%, 18%);
+	--grey-600: hsl(0, 0%, 20%);
+	--grey-500: hsl(0, 0%, 36%);
+	--grey-400: hsl(0, 0%, 58%);
+	--grey-300: hsl(0, 0%, 77%);
+	--grey-100: hsl(0, 0%, 94%);
 
-    --grey-800-shimmer: hsla(0, 0%, 16%, 0.4);
+	--grey-800-shimmer: hsla(0, 0%, 16%, 0.4);
 }
 
 h1,
 h2,
 h3 {
-    font-family: 'Clash', sans-serif;
-    font-weight: 700;
-    color: var(--grey-100);
+	font-family: 'Clash', sans-serif;
+	font-weight: 700;
+	color: var(--grey-100);
 }
 
 h1 span,
 h2 span,
 h3 span {
-    font-family: 'Clash', sans-serif;
-    font-weight: 700;
-    color: var(--primary-400);
+	font-family: 'Clash', sans-serif;
+	font-weight: 700;
+	color: var(--primary-400);
 }
 
 h1,
 .h2 {
-    font-size: var(--h1);
-    line-height: var(--h1-lh);
+	font-size: var(--h1);
+	line-height: var(--h1-lh);
 }
 
 /* h2,
@@ -213,42 +206,44 @@ h3,
 } */
 
 .container {
-    margin: 0 auto;
-    width: 100%;
+	margin: 0 auto;
+	width: 100%;
 }
 
 .container {
-    max-width: var(--container);
+	max-width: var(--container);
 }
 
 img,
 picture {
-    object-fit: cover;
-    min-width: 0;
+	object-fit: cover;
+	min-width: 0;
 }
 
-button, a {
-    transition: all 0.15s ease-in-out;
-    cursor: pointer;
-    background: none;
-    outline: none;
-    border: none;
+button,
+a {
+	transition: all 0.15s ease-in-out;
+	cursor: pointer;
+	background: none;
+	outline: none;
+	border: none;
 }
 
-button:focus, a:focus {
-    outline: var(--grey-100) dotted 2px;
+button:focus,
+a:focus {
+	outline: var(--grey-100) dotted 2px;
 }
 
 button:disabled {
-    cursor: not-allowed;
-    opacity: 0.5;
+	cursor: not-allowed;
+	opacity: 0.5;
 }
 
 .body {
-    color: var(--grey-300);
-    font-size: var(--fs);
-    line-height: var(--fs-lh);
-    font-weight: 500;
+	color: var(--grey-300);
+	font-size: var(--fs);
+	line-height: var(--fs-lh);
+	font-weight: 500;
 }
 
 /* .body-sm {
@@ -262,61 +257,62 @@ button:disabled {
 } */
 
 .btn svg path {
-    transition: 0.15s ease-in-out;
+	transition: 0.15s ease-in-out;
 }
 
 .btn {
-    transition: 0.15s ease-in-out;
-    display: inline-flex;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-    padding: 10px 18px;
-    background-color: var(--primary-500);
-    border-radius: 8px;
-    gap: 10px;
+	transition: 0.15s ease-in-out;
+	display: inline-flex;
+	justify-content: center;
+	align-items: center;
+	cursor: pointer;
+	padding: 10px 18px;
+	background-color: var(--primary-500);
+	border-radius: 8px;
+	gap: 10px;
 }
 
-.btn, .btn span {
-    text-shadow: var(--txt-shadow);
-    -webkit-text-stroke: var(--txt-stroke);
-    font-family: 'Clash', sans-serif;
-    font-weight: 700;
-    font-size: var(--fs);
-    line-height: var(--fs-lh);
-    color: var(--grey-100);
-    position: relative;
+.btn,
+.btn span {
+	text-shadow: var(--txt-shadow);
+	-webkit-text-stroke: var(--txt-stroke);
+	font-family: 'Clash', sans-serif;
+	font-weight: 700;
+	font-size: var(--fs);
+	line-height: var(--fs-lh);
+	color: var(--grey-100);
+	position: relative;
 }
 
 .btn::before {
-    transition: 0.15s ease-in-out;
-    background-color: var(--primary-400);
-    border-radius: 8px 8px 4px 4px;
-    width: calc(100% - 8px);
-    height: calc(50% - 4px);
-    position: absolute;
-    content: '';
-    left: 4px;
-    top: 4px;
+	transition: 0.15s ease-in-out;
+	background-color: var(--primary-400);
+	border-radius: 8px 8px 4px 4px;
+	width: calc(100% - 8px);
+	height: calc(50% - 4px);
+	position: absolute;
+	content: '';
+	left: 4px;
+	top: 4px;
 }
 
 .btn:hover:not(:disabled),
 .btn:focus-visible {
-    background-color: var(--primary-600);
+	background-color: var(--primary-600);
 }
 
 .btn:hover:not(:disabled)::before {
-    background-color: var(--primary-500);
+	background-color: var(--primary-500);
 }
 
 .btn:focus-visible {
-    outline: var(--grey-100) dotted 2px;
+	outline: var(--grey-100) dotted 2px;
 }
 
 @media (max-width: 1100px) {
-    :root {
-        --side-padding: 32px;
-        /* --h1: 45px;
+	:root {
+		--side-padding: 32px;
+		/* --h1: 45px;
         --h1-lh: 49px;
 
         --h2: 34px;
@@ -324,18 +320,18 @@ button:disabled {
 
         --h3: 27px;
         --h3-lh: 34px; */
-    }
+	}
 }
 
 @media (max-width: 850px) {
-    :root {
-        /* --h1: 38px;
+	:root {
+		/* --h1: 38px;
         --h1-lh: 44px; */
-    }
+	}
 }
 
-@media(max-width: 500px) {
-    :root {
-        --side-padding: 24px;
-    }
+@media (max-width: 500px) {
+	:root {
+		--side-padding: 24px;
+	}
 }
