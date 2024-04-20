@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
-	import type { SvelteComponentGeneric } from '~/lib/state.svelte';
+	import type { SvelteComponentGeneric } from '~/lib/types';
 	import FocusTrap from './FocusTrap.svelte';
 	import Button from './Button.svelte';
 

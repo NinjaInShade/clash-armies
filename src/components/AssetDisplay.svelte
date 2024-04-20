@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { TroopName, TroopData, SiegeName, SiegeData, SpellName, SpellData } from '~/lib/state.svelte';
+	import type { TroopName, TroopData, SiegeName, SiegeData, SpellName, SpellData } from '~/lib/types';
 
 	type Props = {
 		type: 'Troop' | 'Siege' | 'Spell';

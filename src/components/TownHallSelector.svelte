@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { AppState } from '~/lib/state.svelte';
+	import type { AppState } from '~/lib/types';
 	import TownHall from '~/components/TownHall.svelte';
 	import Modal from './Modal.svelte';
 

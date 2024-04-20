@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { AppState } from '~/lib/state.svelte';
+	import type { AppState } from '~/lib/types';
 
 	type Props = {
 		/** Town hall level */

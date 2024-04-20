@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { getContext } from 'svelte';
-	import type { AppState, TroopName, TroopData, SpellName, SpellData, SiegeName, SiegeData } from '~/lib/state.svelte';
+	import type { AppState, TroopName, TroopData, SpellName, SpellData, SiegeName, SiegeData } from '~/lib/types';
 	import Alert from '~/components/Alert.svelte';
 	import AssetDisplay from '~/components/AssetDisplay.svelte';
 
