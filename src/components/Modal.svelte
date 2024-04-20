@@ -80,7 +80,7 @@
 		justify-content: space-between;
 		align-items: center;
 		background-color: var(--grey-900);
-		padding: 14px 18px;
+		padding: 14px 24px;
 		height: 70px;
 	}
 
@@ -109,11 +109,11 @@
 	}
 
 	.modal-content {
-		padding: 24px 18px;
+		padding: 24px 24px;
 		flex: 1 0 0px;
 	}
 
 	.modal-footer {
-		padding: 14px 18px;
+		padding: 14px 24px;
 	}
 </style>
