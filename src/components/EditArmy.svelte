@@ -200,14 +200,14 @@
 	}}
 />
 
-<div class="alert">
+<!-- <div class="alert">
 	<div class="container">
 		<Alert>
 			Clan castle troops/spells, pets, heroes and hero equipment must be manually edited in game after opening the army via the generated link. Hopefully one
 			day Supercell allows this!
 		</Alert>
 	</div>
-</div>
+</div> -->
 
 <section class="troops">
 	<div class="container">
@@ -429,9 +429,12 @@
 		padding: 50px var(--side-padding) 0 var(--side-padding);
 	}
 
-	.troops,
-	.spells {
+	.troops {
 		padding: 50px var(--side-padding);
+	}
+
+	.spells {
+		padding: 0 var(--side-padding) 50px var(--side-padding);
 	}
 
 	.extras .container {
