@@ -2,6 +2,10 @@
 	import Link from '~/components/Link.svelte';
 </script>
 
+<svelte:head>
+	<title>ClashArmies • Home</title>
+</svelte:head>
+
 <header>
 	<div class="container">
 		<h1>Find the best<br />armies <span>EVER!</span></h1>

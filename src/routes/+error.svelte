@@ -30,6 +30,10 @@
 	}
 </script>
 
+<svelte:head>
+	<title>ClashArmies • {$page.status}</title>
+</svelte:head>
+
 <header bind:this={pageRef}>
 	<div class="container">
 		<h1>{$page.status}!</h1>

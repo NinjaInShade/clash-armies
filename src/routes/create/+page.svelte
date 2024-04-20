@@ -106,6 +106,10 @@
 	// TODO: allow no more than two types of super troops
 </script>
 
+<svelte:head>
+	<title>ClashArmies • Create Army</title>
+</svelte:head>
+
 <div class="alert">
 	<div class="container">
 		<Alert>
