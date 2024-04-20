@@ -1,6 +1,7 @@
 import type { User } from '~/lib/shared/types';
 import { db } from "~/lib/server/db";
 import z from 'zod';
+import type { RequestEvent } from '@sveltejs/kit';
 
 type GetUsersParams = {
 	username?: string;
@@ -50,4 +51,39 @@ export async function getUser(username: string) {
 		return null;
 	}
 	return users[0];
+}
+
+const userSchema = z.object({
+	id: z.number(),
+	username: z.string().min(3).max(45),
+})
+
+export async function saveUser(event: RequestEvent, userData: Partial<User>) {
+	const authUser = event.locals.requireAuth();
+	const user = userSchema.parse(userData);
+
+	const existing = await db.getRow<User, null>('users', { id: user.id });
+	if (!existing) {
+		throw new Error("This user doesn't exist");
+	}
+
+	const usernameExists = await db.getRows<User>('users', { username: user.username });
+	if (usernameExists.find(u => u.id !== user.id)) {
+		throw new Error("This username is already taken");
+	}
+
+	if (authUser.id === existing.id) {
+		// allow user to save his own details
+	} else {
+		// otherwise must be an admin to save someone elses details
+		event.locals.requireRoles('admin');
+	}
+
+	const query = `
+		UPDATE users SET
+			username = ?
+		WHERE id = ?
+	`;
+	await db.query(query, [user.username, user.id]);
+
 }

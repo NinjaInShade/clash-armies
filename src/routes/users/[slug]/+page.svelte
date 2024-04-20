@@ -3,6 +3,7 @@
 	import { getContext } from 'svelte';
 	import type { AppState } from '~/lib/shared/types';
 	import type { PageData } from './$types';
+	import EditUser from './EditUser.svelte';
 	import { page } from '$app/stores';
 
 	const { data } = $props<{ data: PageData }>();
@@ -12,6 +13,10 @@
 
 	const username = $derived($page.params.slug);
 	const currentUser = $derived(app.user ? app.user.username : null);
+
+	function editUser() {
+		app.openModal(EditUser, { user });
+	}
 </script>
 
 <svelte:head>
@@ -20,16 +25,23 @@
 
 <header>
 	<div class="container">
-		<div class="profile-pic">
-			<img src="/clash/ui/barb-king.png" alt="Barbarian king" class="profile-pic-img" />
-		</div>
-		<div class="user-data">
-			<div class="level">
-				<b class="level-value">{user.level ?? '?'}</b>
-				<img src="/clash/ui/experience.png" alt="Clash of clans experience" class="level-img" />
+		<div class="left">
+			<div class="profile-pic">
+				<img src="/clash/ui/barb-king.png" alt="Barbarian king" class="profile-pic-img" />
 			</div>
-			<h2 class="username">{username}</h2>
-			<h3 class="player-tag">#{user.playerTag ?? '??????'}</h3>
+			<div class="user-data">
+				<div class="level">
+					<b class="level-value">{user.level ?? '?'}</b>
+					<img src="/clash/ui/experience.png" alt="Clash of clans experience" class="level-img" />
+				</div>
+				<h2 class="username">{username}</h2>
+				<h3 class="player-tag">#{user.playerTag ?? '??????'}</h3>
+			</div>
+		</div>
+		<div class="right">
+			{#if username === currentUser || app.user?.hasRoles('admin')}
+				<C.Button onclick={editUser}>Edit</C.Button>
+			{/if}
 		</div>
 	</div>
 </header>
@@ -40,7 +52,7 @@
 		{#if armies.length}
 			<ul class="armies-list">
 				{#each armies as army}
-					<C.ArmyCard {army} />
+					<C.ArmyCard {army} hideUsername />
 				{/each}
 			</ul>
 		{:else}
@@ -68,10 +80,16 @@
 
 	header .container {
 		display: flex;
-		justify-content: flex-start;
-		align-items: center;
+		justify-content: space-between;
+		align-items: flex-end;
 		border-bottom: 1px solid var(--grey-500);
 		padding-bottom: 1.5em;
+		gap: 1em;
+	}
+
+	header .left {
+		display: flex;
+		align-items: center;
 		gap: 1em;
 	}
 
