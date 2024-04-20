@@ -1,6 +1,6 @@
 import type { LayoutLoad, LayoutLoadEvent } from './$types';
 import type { AppState, TroopData, SpellData, SiegeData } from '~/lib/types';
-import { CURRENT_TROOPS, CURRENT_SPELLS, CURRENT_SIEGES } from '~/lib/state.svelte';
+import { CURRENT_TROOPS, CURRENT_SPELLS, CURRENT_SIEGES } from '~/lib/constants';
 
 // TODO: disable troops not available at town hall level
 // TODO: display troop level in Troop.svelte

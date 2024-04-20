@@ -1,26 +1,13 @@
 <script lang="ts">
 	import { getContext } from 'svelte';
-	import type { AppState, TroopName, TroopData, SpellName, SpellData, SiegeName, SiegeData } from '~/lib/types';
+	import type { AppState, TroopName, TroopData, SpellName, SpellData, SiegeName, SiegeData, Selected, HousingSpace, SelectedTotals } from '~/lib/types';
+	import { ARMY_CREATE_TROOP_FILLER, ARMY_CREATE_SPELL_FILLER } from '~/lib/constants';
 	import Alert from '~/components/Alert.svelte';
 	import AssetDisplay from '~/components/AssetDisplay.svelte';
 	import Button from '~/components/Button.svelte';
 
 	const app = getContext<AppState>('app');
-	const TROOP_FILL = 20;
-	const SPELL_FILL = 10;
 
-	type HousingSpace = {
-		troops: number;
-		sieges: number;
-		spells: number;
-	};
-	type SelectedTotals = HousingSpace & { time: number };
-	type Selected = {
-		type: 'Troop' | 'Siege' | 'Spell';
-		name: TroopName | SiegeName | SpellName;
-		data: TroopData | SiegeData | SpellData;
-		amount: number;
-	};
 	let selected = $state<Selected[]>([]);
 	let selectedTroops = $derived(selected.filter((item) => item.type === 'Troop' || item.type === 'Siege'));
 	let selectedSpells = $derived(selected.filter((item) => item.type === 'Spell'));
@@ -149,7 +136,7 @@
 					</button>
 				</li>
 			{/each}
-			{#each Array.from({ length: TROOP_FILL - selectedTroops.length > 0 ? TROOP_FILL - selectedTroops.length : 0 }) as filler}
+			{#each Array.from({ length: ARMY_CREATE_TROOP_FILLER - selectedTroops.length > 0 ? ARMY_CREATE_TROOP_FILLER - selectedTroops.length : 0 }) as filler}
 				<button class="object-card">
 					<svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg" class="add-icon">
 						<path
@@ -220,7 +207,7 @@
 					</button>
 				</li>
 			{/each}
-			{#each Array.from({ length: SPELL_FILL - selectedSpells.length > 0 ? SPELL_FILL - selectedSpells.length : 0 }) as filler}
+			{#each Array.from({ length: ARMY_CREATE_SPELL_FILLER - selectedSpells.length > 0 ? ARMY_CREATE_SPELL_FILLER - selectedSpells.length : 0 }) as filler}
 				<button class="object-card">
 					<svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg" class="add-icon">
 						<path

@@ -1,5 +1,5 @@
 import type { SvelteComponent } from 'svelte';
-import { CURRENT_TROOPS, CURRENT_SIEGES, CURRENT_SPELLS } from './state.svelte';
+import { CURRENT_TROOPS, CURRENT_SIEGES, CURRENT_SPELLS } from './constants';
 
 export type SvelteComponentGeneric = typeof SvelteComponent<Record<string, unknown>>;
 
@@ -70,3 +70,16 @@ export type AppState = {
 	// general app state
 	modals: Modal[];
 };
+
+export type HousingSpace = {
+	troops: number;
+	sieges: number;
+	spells: number;
+};
+export type Selected = {
+	type: 'Troop' | 'Siege' | 'Spell';
+	name: TroopName | SiegeName | SpellName;
+	data: TroopData | SiegeData | SpellData;
+	amount: number;
+};
+export type SelectedTotals = HousingSpace & { time: number };
