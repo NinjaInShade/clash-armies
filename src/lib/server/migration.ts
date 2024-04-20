@@ -64,12 +64,12 @@ export function migration(runStep: MigrationFn) {
         CREATE TABLE armies (
             id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
             name VARCHAR(75) NOT NULL,
-            townHall TINYINT UNSIGNED NOT NULL,
+            townHall SMALLINT UNSIGNED NOT NULL,
             banner VARCHAR(255) NOT NULL,
             createdBy INT NOT NULL,
             createdTime TIMESTAMP DEFAULT NOW(),
             updatedTime TIMESTAMP DEFAULT NOW() ON UPDATE NOW(),
-            CONSTRAINT fk_armies_created_by FOREIGN KEY (createdBy) REFERENCES users (id) ON DELETE CASCADE
+            CONSTRAINT fk_armies_created_by FOREIGN KEY (createdBy) REFERENCES users (id) ON DELETE CASCADE,
             CONSTRAINT fk_armies_town_hall FOREIGN KEY (townHall) REFERENCES town_halls (level)
         )
     `);
