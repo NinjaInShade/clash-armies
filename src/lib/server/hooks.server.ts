@@ -1,7 +1,6 @@
 import type { Handle } from '@sveltejs/kit';
 import { db } from '~/lib/server/db';
 import { migration } from '~/lib/server/migration';
-import { migrate } from '~/lib/server/migrator';
 import { lucia } from "~/lib/server/auth/lucia";
 import { hasAuth, requireAuth, hasRoles, requireRoles } from "~/lib/server/auth/utils";
 import { CronJob } from 'cron';
@@ -13,7 +12,7 @@ const hourlyTask = new CronJob('0 0 * * * *', async function() {
 const serverInit = (async () => {
 	hourlyTask.start();
 	await db.connect(); // TODO: this should only throw for fatal errors and only resolve when connected
-	await migrate(migration, db); // TODO: move into @ninjalib/sql
+	await db.migrate(migration);
 })();
 
 export const handle: Handle = async ({ event, resolve }) => {

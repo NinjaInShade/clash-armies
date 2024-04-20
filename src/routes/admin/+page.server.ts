@@ -204,25 +204,9 @@ export const actions = {
                     // Remove deleted unit levels
                     await tx.query('DELETE FROM unit_levels WHERE unitId = ? AND id NOT IN (?)', [id, levels.map(x => x.id)]);
 
-                    // Upsert unit levels (TODO: move into @ninjalib/sql)
-                    const args: (string | number | null)[] = []
-                    let query = `
-                        INSERT INTO unit_levels (id, unitId, level, spellFactoryLevel, barrackLevel, laboratoryLevel) VALUES
-                    `;
-                    query += levels.map((x) => {
-                        args.push(x.id ?? null, x.unitId, x.level, x.spellFactoryLevel, x.barrackLevel, x.laboratoryLevel);
-                        return `(?, ?, ?, ?, ?, ?)`
-                    }).join(',\n')
-                    query += `
-                        ON DUPLICATE KEY UPDATE
-                            id = VALUES(id),
-                            unitId = VALUES(unitId),
-                            level = VALUES(level),
-                            spellFactoryLevel = VALUES(spellFactoryLevel),
-                            barrackLevel = VALUES(barrackLevel),
-                            laboratoryLevel = VALUES(laboratoryLevel)
-                    `;
-                    await tx.query(query, args);
+                    // Upsert unit levels
+                    const unitsData = levels.map(x => ({ ...x, id: x.id ?? null }));
+                    await tx.upsert('unit_levels', unitsData);
 
                     if (image && image.size > 0) {
                         await fs.writeFile(`static/clash/units/${name}.png`, Buffer.from(await image.arrayBuffer()));

@@ -207,23 +207,9 @@ export async function saveArmy(event: RequestEvent, data: Partial<Army>) {
 			// Remove deleted units
 			await tx.query('DELETE FROM army_units WHERE armyId = ? AND unitId NOT IN (?)', [army.id, army.units.map(u => u.unitId)]);
 
-			// Upsert units (TODO: move into @ninjalib/sql)
-			const args: (string | number | null)[] = []
-			let query = `
-				INSERT INTO army_units (id, armyId, unitId, amount) VALUES
-			`;
-			query += army.units.map((u) => {
-				args.push(u.id ?? null, army.id, u.unitId, u.amount);
-				return `(?, ?, ?, ?)`
-			}).join(',\n')
-			query += `
-				ON DUPLICATE KEY UPDATE
-					id = VALUES(id),
-					armyId = VALUES(armyId),
-					unitId = VALUES(unitId),
-					amount = VALUES(amount)
-			`;
-			await tx.query(query, args);
+			// Upsert units
+			const unitsData = army.units.map(u => ({ ...u, armyId: army.id, id: u.id ?? null }));
+			await tx.upsert('army_units', unitsData);
 
 			return army.id;
 		});

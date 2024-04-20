@@ -21,9 +21,9 @@ export async function actionWrap(fn: () => Promise<Response | void>) {
         } else if (err instanceof Error) {
             body = { errors: err.message };
         } else {
-            console.error('Invalid error!', err);
             body = { errors: 'Invalid error' };
         }
+        console.error('Error:', err);
         return fail(400, body);
     }
 }
