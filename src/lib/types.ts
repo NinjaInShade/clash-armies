@@ -13,6 +13,8 @@ export type TroopData = Record<
 		laboratoryLevel: number;
 		housingSpace: number;
 		trainingTime: number; // In seconds
+		productionBuilding: 'Barrack' | 'Dark Elixir Barrack';
+		isSuper: boolean;
 	}
 >;
 export type Troops = Partial<Record<TroopName, TroopData>>;
@@ -25,6 +27,7 @@ export type SiegeData = Record<
 		laboratoryLevel: number;
 		housingSpace: number;
 		trainingTime: number; // In seconds
+		productionBuilding: 'Siege Workshop';
 	}
 >;
 export type Sieges = Partial<Record<SiegeName, SiegeData>>;
@@ -37,6 +40,7 @@ export type SpellData = Record<
 		laboratoryLevel: number;
 		housingSpace: number;
 		trainingTime: number; // In seconds
+		productionBuilding: 'Spell Factory' | 'Dark Spell Factory';
 	}
 >;
 export type Spells = Partial<Record<SpellName, SpellData>>;

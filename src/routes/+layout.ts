@@ -76,15 +76,28 @@ async function getTroops(ev: LayoutLoadEvent): Promise<{ troops: AppState['troop
 		}
 		const resultObject = isSiege ? sieges : troops;
 		resultObject[name] = Object.entries(data).reduce<TroopData | SiegeData>((prev, [level, levelData]) => {
-			const { BarrackLevel, LaboratoryLevel, HousingSpace, TrainingTime } = levelData;
+			const { BarrackLevel, LaboratoryLevel, HousingSpace, TrainingTime, ProductionBuilding, EnabledBySuperLicence = false } = levelData;
 			if (typeof BarrackLevel !== 'number' || typeof LaboratoryLevel !== 'number' || typeof HousingSpace !== 'number' || typeof TrainingTime !== 'number') {
 				throw new Error('Expected number value from static JSON');
 			}
+			if (ProductionBuilding !== 'Barrack' && ProductionBuilding !== 'Dark Elixir Barrack' && ProductionBuilding !== 'Siege Workshop') {
+				throw new Error(`Expected valid production building, got "${ProductionBuilding}" for troop "${name}"`);
+			}
+			if (typeof EnabledBySuperLicence !== 'boolean') {
+				throw new Error(`Can't determine if troop "${name}" is super or not`);
+			}
+			const id = ids[NAME_TO_OBJECT_ID_NAME[name] ?? name];
+			if (!id) {
+				throw new Error(`Cannot find ID for troop "${name}"`);
+			}
+			const parsedId = +id.slice(String(OBJECT_ID_PREFIXES.Characters).length);
 			prev[+level] = {
 				barrackLevel: BarrackLevel,
 				laboratoryLevel: LaboratoryLevel,
 				housingSpace: HousingSpace,
-				trainingTime: TrainingTime
+				trainingTime: TrainingTime,
+				productionBuilding: ProductionBuilding,
+				isSuper: EnabledBySuperLicence
 			};
 			return prev;
 		}, {});
@@ -103,15 +116,24 @@ async function getSpells(ev: LayoutLoadEvent): Promise<AppState['spells']> {
 			return;
 		}
 		spells[truncatedName] = Object.entries(data).reduce<SpellData>((prev, [level, levelData]) => {
-			const { SpellForgeLevel, LaboratoryLevel, HousingSpace, TrainingTime } = levelData;
+			const { SpellForgeLevel, LaboratoryLevel, HousingSpace, TrainingTime, ProductionBuilding } = levelData;
 			if (typeof SpellForgeLevel !== 'number' || typeof LaboratoryLevel !== 'number' || typeof HousingSpace !== 'number' || typeof TrainingTime !== 'number') {
 				throw new Error('Expected number value for static JSON');
 			}
+			if (ProductionBuilding !== 'Spell Factory' && ProductionBuilding !== 'Dark Spell Factory') {
+				throw new Error(`Expected valid production building, got "${ProductionBuilding}"  for spell "${name}"`);
+			}
+			const id = ids[NAME_TO_OBJECT_ID_NAME[name] ?? name];
+			if (!id) {
+				throw new Error(`Cannot find ID for troop "${name}"`);
+			}
+			const parsedId = +id.slice(String(OBJECT_ID_PREFIXES.Spells).length);
 			prev[+level] = {
 				spellFactoryLevel: SpellForgeLevel,
 				laboratoryLevel: LaboratoryLevel,
 				housingSpace: HousingSpace,
-				trainingTime: TrainingTime
+				trainingTime: TrainingTime,
+				productionBuilding: ProductionBuilding
 			};
 			return prev;
 		}, {});

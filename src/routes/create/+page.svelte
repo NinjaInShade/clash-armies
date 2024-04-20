@@ -2,6 +2,7 @@
 	import { getContext } from 'svelte';
 	import type { AppState, TroopName, TroopData, SpellName, SpellData, SiegeName, SiegeData, Selected, HousingSpace, SelectedTotals } from '~/lib/types';
 	import { ARMY_CREATE_TROOP_FILLER, ARMY_CREATE_SPELL_FILLER } from '~/lib/constants';
+	import { getTroopLevel, getSiegeLevel, getSpellLevel } from '~/lib/army';
 	import Alert from '~/components/Alert.svelte';
 	import AssetDisplay from '~/components/AssetDisplay.svelte';
 	import Button from '~/components/Button.svelte';
@@ -103,7 +104,6 @@
 	}
 
 	// TODO: add warning somewhere that max limit reached (title on asset display/icon in capacity bar??)
-	// TODO: allow no more than two types of super troops
 </script>
 
 <svelte:head>
@@ -156,15 +156,17 @@
 			<!-- prettier-ignore -->
 			{#each (Object.entries(app.troops) as [TroopName, TroopData][]) as [name, data]}
 				{@const troop = { type: 'Troop', name, data } as const}
+				{@const level = getTroopLevel(name, app)}
 				{@const reachedMaxAmount = willOverflowHousingSpace(troop)}
+				{@const reachedMaxSupers = data[1].isSuper && selectedTroops.filter(t => t.type === 'Troop' && t.data[1].isSuper).length === 2}
 				{@const addTroop = () => add(troop)}
 				<li>
 					<button
 						class="picker-card"
 						onclick={addTroop}
-						disabled={reachedMaxAmount}
+						disabled={reachedMaxAmount || reachedMaxSupers || level === -1}
 					>
-						<AssetDisplay type="Troop" {name} {data} />
+						<AssetDisplay type="Troop" {name} {data} {level} />
 					</button>
 				</li>
 			{/each}
@@ -174,15 +176,16 @@
 			<!-- prettier-ignore -->
 			{#each (Object.entries(app.sieges) as [SiegeName, SiegeData][]) as [name, data]}
 				{@const siege = { type: 'Siege', name, data } as const}
+				{@const level = getSiegeLevel(name, app)}
 				{@const reachedMaxAmount = willOverflowHousingSpace(siege)}
 				{@const addSiege = () => add(siege)}
 				<li>
 					<button
 						class="picker-card"
 						onclick={addSiege}
-						disabled={reachedMaxAmount}
+						disabled={reachedMaxAmount || level === -1}
 					>
-						<AssetDisplay type="Siege" {name} {data} />
+						<AssetDisplay type="Siege" {name} {data} {level} />
 					</button>
 				</li>
 			{/each}
@@ -227,15 +230,16 @@
 			<!-- prettier-ignore -->
 			{#each (Object.entries(app.spells) as [SpellName, SpellData][]) as [name, data]}
 				{@const spell = { type: 'Spell', name, data } as const}
+				{@const level = getSpellLevel(name, app)}
 				{@const reachedMaxAmount = willOverflowHousingSpace(spell)}
 				{@const addSpell = () => add(spell)}
 				<li>
 					<button
 						class="picker-card"
 						onclick={addSpell}
-						disabled={reachedMaxAmount}
+						disabled={reachedMaxAmount || level === -1}
 					>
-						<AssetDisplay type="Spell" {name} {data} />
+						<AssetDisplay type="Spell" {name} {data} {level} />
 					</button>
 				</li>
 			{/each}

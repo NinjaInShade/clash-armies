@@ -1,3 +1,5 @@
+import type { TroopName } from './types';
+
 // TODO: see if these "CURRENT_" constants can be removed? Can we just infer what troops are active?
 // The static JSON file has *every* troop/siege/spell, including seasonal/deprecated ones, so we have to filter those out somehow
 export const CURRENT_TROOPS = [
@@ -61,6 +63,29 @@ export const CURRENT_SPELLS = [
 	'Skeleton',
 	'Bat'
 ] as const;
+
+/**
+ * A key:value of which regular troop corresponds to the super version.
+ * This is required as some don't just have "Super" prefixed, e.g. "Rocket Balloon" -> "Balloon".
+ */
+export const SUPER_TO_REGULAR: Partial<Record<TroopName, TroopName>> = {
+	'Super Barbarian': 'Barbarian',
+	'Super Archer': 'Archer',
+	'Sneaky Goblin': 'Goblin',
+	'Super Wall Breaker': 'Wall Breaker',
+	'Super Giant': 'Giant',
+	'Rocket Balloon': 'Balloon',
+	'Super Wizard': 'Wizard',
+	'Super Dragon': 'Dragon',
+	'Inferno Dragon': 'Baby Dragon',
+	'Super Minion': 'Minion',
+	'Super Valkyrie': 'Valkyrie',
+	'Super Witch': 'Witch',
+	'Ice Hound': 'Lava Hound',
+	'Super Bowler': 'Bowler',
+	'Super Miner': 'Miner',
+	'Super Hog Rider': 'Hog Rider'
+};
 
 /**
  * Used to prefix a group of clash of clans object IDs
