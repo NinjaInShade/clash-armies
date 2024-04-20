@@ -181,7 +181,9 @@ export async function saveArmy(data: Partial<Army>) {
 					banner = ?
 				WHERE id = ?
 			`, [army.name, army.townHall, army.banner, army.id])
-			await tx.query('DELETE FROM army_units WHERE armyId = ?', [army.id]);
+
+			// Remove deleted units
+			await tx.query('DELETE FROM army_units WHERE armyId = ? AND unitId NOT IN (?)', [army.id, army.units.map(u => u.unitId)]);
 
 			// Upsert units (TODO: move into @ninjalib/sql)
 			const args: (string | number | null)[] = []
