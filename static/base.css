@@ -147,6 +147,8 @@ html.hide-overflow {
 	--heading: 24px;
 	--heading-lg: 35px;
 
+	--error-400: hsl(0, 45%, 55%);
+
 	--primary-900: hsl(33, 78%, 10%);
 	--primary-800: hsl(33, 78%, 20%);
 	--primary-700: hsl(33, 78%, 30%);
