@@ -67,24 +67,28 @@
 <nav>
 	<div class="container">
 		<div class="left">
-			<a class="logo" href="/">
-				<img src="/clash/ui/swords.png" alt="Clash of clans overlapping swords" />
-				Clash <span>Armies</span>
-			</a>
-			<button class="version" onclick={openChangelog}><span>v</span>{version}</button>
+			<div class="logo-container">
+				<a class="logo" href="/">
+					<img src="/clash/ui/swords.png" alt="Clash of clans overlapping swords" />
+					Clash <span>Armies</span>
+				</a>
+				<button class="version" onclick={openChangelog}><span>v</span>{version}</button>
+			</div>
+			<ul class="links">
+				<li>
+					<a class="body" href="/armies">Armies</a>
+				</li>
+				<li>
+					<a class="body" href="/create">Create</a>
+				</li>
+			</ul>
 		</div>
 		<ul class="links">
 			<li>
-				<a class="body" href="/armies">Find</a>
-			</li>
-			<li>
-				<a class="body" href="/create">Create</a>
+				<a class="body" href="/admin">Admin</a>
 			</li>
 			<li>
 				<a class="body" href="/account">Account</a>
-			</li>
-			<li>
-				<a class="body" href="/admin">Admin</a>
 			</li>
 			<li class="control">
 				<C.Button>Log in</C.Button>
@@ -141,6 +145,12 @@
 	.left {
 		display: flex;
 		align-items: center;
+		gap: 24px;
+	}
+
+	.logo-container {
+		display: flex;
+		align-items: center;
 		gap: 0.3em;
 	}
 
@@ -150,11 +160,11 @@
 		background: none;
 		border: 1px dashed var(--primary-400);
 		color: var(--primary-400);
-		padding: 5px 10px 3px 10px;
+		padding: 4px 7px;
 		border-radius: 50px;
 		font-weight: 700;
-		font-size: 12px;
-		line-height: 12px;
+		font-size: 10px;
+		line-height: 10px;
 		transition:
 			background-color,
 			color 0.15s;
@@ -163,11 +173,6 @@
 	.version span {
 		display: inline-block;
 		font-size: 10px;
-	}
-
-	.version:hover {
-		background-color: var(--primary-400);
-		color: var(--grey-100);
 	}
 
 	.logo {
@@ -204,7 +209,7 @@
 	}
 
 	.links li:not(:last-child) {
-		margin-right: 24px;
+		margin-right: 16px;
 	}
 
 	.links li.control:not(:last-child) {
