@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { getContext } from 'svelte';
 	import type { AppState, TroopName, TroopData, SpellName, SpellData, SiegeName, SiegeData, Unit, Units, HousingSpace } from '~/lib/types';
-	import { ARMY_CREATE_TROOP_FILLER, ARMY_CREATE_SPELL_FILLER } from '~/lib/constants';
+	import { ARMY_CREATE_TROOP_FILLER, ARMY_CREATE_SPELL_FILLER, HOLD_ADD_SPEED, HOLD_REMOVE_SPEED, SECOND, MINUTE, HOUR } from '~/lib/constants';
 	import { getTroopLevel, getSiegeLevel, getSpellLevel, generateLink, openLink } from '~/lib/army';
 	import Alert from './Alert.svelte';
 	import AssetDisplay from './AssetDisplay.svelte';
@@ -15,9 +15,6 @@
 	};
 	type UnitWithoutAmount = Omit<Unit, 'amount'>;
 	type Totals = HousingSpace & { time: number };
-
-	const HOLD_ADD_SPEED = 200;
-	const HOLD_REMOVE_SPEED = 200;
 
 	const app = getContext<AppState>('app');
 
@@ -116,10 +113,6 @@
 	 * @returns formatted time string e.g. '1m 20s'
 	 */
 	function formatTime(time: number) {
-		const SECOND = 1000;
-		const MINUTE = SECOND * 60;
-		const HOUR = MINUTE * 60;
-
 		let parts: string[] = [];
 
 		if (time >= HOUR) {

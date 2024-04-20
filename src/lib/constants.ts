@@ -168,5 +168,12 @@ export const NAME_TO_OBJECT_ID_NAME = {
 	'Hog Rider': 'Boar Rider'
 } as const;
 
-export const ARMY_CREATE_TROOP_FILLER = 20;
+export const ARMY_CREATE_TROOP_FILLER = 10;
 export const ARMY_CREATE_SPELL_FILLER = 10;
+
+export const HOLD_ADD_SPEED = 200;
+export const HOLD_REMOVE_SPEED = 200;
+
+export const SECOND = 1000;
+export const MINUTE = SECOND * 60;
+export const HOUR = MINUTE * 60;
