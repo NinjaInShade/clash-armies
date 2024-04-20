@@ -66,11 +66,13 @@
 		position: fixed;
 		transform: translate(-50%, 50%);
 		box-shadow: 0 7px 100px 0 hsla(0, 0%, 0%, 0.9);
-		border-radius: 4px;
 		background-color: var(--grey-800);
-		max-width: var(--modal-width, 575px);
 		height: var(--modal-height, auto);
-		width: 100%;
+		width: var(--modal-width, 575px);
+		max-width: calc(100vw - 4em);
+		max-height: calc(100vh - 3em);
+		border-radius: 6px;
+		overflow: hidden;
 		bottom: 50%;
 		left: 50%;
 	}
@@ -110,7 +112,8 @@
 
 	.modal-content {
 		padding: 24px 24px;
-		flex: 1 0 0px;
+		overflow-y: auto;
+		height: 100%;
 	}
 
 	.modal-footer {
