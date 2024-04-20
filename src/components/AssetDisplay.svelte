@@ -6,8 +6,9 @@
 		name: TroopName | SiegeName | SpellName;
 		data: TroopData | SiegeData | SpellData;
 		amount?: number;
+		level?: number;
 	};
-	const { type, name, amount, data } = $props<Props>();
+	const { type, name, amount, level, data } = $props<Props>();
 
 	const types = {
 		Troop: {
@@ -25,11 +26,19 @@
 	};
 	const assetDir = types[type].assetDir;
 	const altSuffix = types[type].altSuffix;
+
+	function isMaxLevel() {
+		const dataKeys = Object.keys(data);
+		return level === +dataKeys[dataKeys.length - 1];
+	}
 </script>
 
 <div class="asset-bg" title={name}>
 	{#if amount}
 		<b class="asset-amount">{amount}</b>
+	{/if}
+	{#if level && level > 0}
+		<b class="asset-lvl" class:max-lvl={isMaxLevel()}>{level}</b>
 	{/if}
 	<img class="asset-img" src="/clash/{assetDir}/{name}.png" alt="{name} {altSuffix}" />
 </div>
@@ -46,6 +55,7 @@
 	}
 
 	.asset-img {
+		pointer-events: none;
 		display: block;
 		height: 100%;
 		width: 100%;
@@ -60,5 +70,24 @@
 		font-size: 2em;
 		left: 4px;
 		top: 4px;
+	}
+
+	.asset-lvl {
+		font-family: 'Clash', sans-serif;
+		-webkit-text-stroke: var(--txt-stroke-dark);
+		text-shadow: var(--txt-shadow-dark);
+		background-color: var(--grey-700);
+		color: var(--grey-100);
+		position: absolute;
+		border-radius: 4px;
+		font-size: 0.75em;
+		padding: 3px;
+		bottom: 4px;
+		left: 4px;
+	}
+
+	.asset-lvl.max-lvl {
+		text-shadow: var(--txt-shadow);
+		background-color: #f5ab3d;
 	}
 </style>
