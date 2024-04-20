@@ -1,12 +1,16 @@
 <script lang="ts">
 	import { getContext } from 'svelte';
-	import type { AppState, TroopName, TroopData, SpellName, SpellData, SiegeName, SiegeData, Unit, Units, HousingSpace } from '~/lib/types';
+	import type { AppState, Unit, Units, HousingSpace } from '~/lib/types';
 	import { ARMY_CREATE_TROOP_FILLER, ARMY_CREATE_SPELL_FILLER, HOLD_ADD_SPEED, HOLD_REMOVE_SPEED, SECOND, MINUTE, HOUR } from '~/lib/constants';
-	import { getTroopLevel, getSiegeLevel, getSpellLevel, generateLink, openLink } from '~/lib/army';
+	import { getLevel, generateLink, openLink } from '~/lib/army';
 	import Alert from './Alert.svelte';
 	import AssetDisplay from './AssetDisplay.svelte';
 	import Button from './Button.svelte';
 
+	type Entries<T> = {
+		[K in keyof T]: [K, T[K]];
+	}[keyof T][];
+	const getEntries = <T extends object>(obj: T) => Object.entries(obj) as Entries<T>;
 	type TitleOptions = {
 		level: number;
 		type: Unit['type'];
@@ -212,122 +216,37 @@
 <section class="troops">
 	<div class="container">
 		<h2 class="heading"><span>1</span> Troops</h2>
-		<ul class="grid">
-			{@render selectedUnits('Troops')}
-			{@render filler(ARMY_CREATE_TROOP_FILLER - troopUnits.length > 0 ? ARMY_CREATE_TROOP_FILLER - troopUnits.length : 0)}
-		</ul>
-		<h3>Select troops</h3>
-		<ul class="picker-grid">
-			<!-- prettier-ignore -->
-			{#each (Object.entries(app.troops) as [TroopName, TroopData][]) as [name, data]}
-				{@const type = 'Troop'}
-				{@const troop = { type, name, data } as const}
-				{@const level = getTroopLevel(name, app)}
-				{@const reachedMaxAmount = willOverflowHousingSpace(troop)}
-				<!-- Disable if reached max unique super limit of 2 and this troop isn't one of those -->
-				<!-- TOOD: fix data[1].isSuper, properties like isSuper that apply to all levels should not live in level data -->
-				{@const disableSuper = data[1].isSuper && !units.find(sel => sel.name === troop.name) && reachedSuperLimit}
-				{@const title = getCardTitle({ level, type, reachedMaxAmount, reachedSuperLimit: disableSuper })}
-				<li>
-					<button
-						class="picker-card"
-						disabled={reachedMaxAmount || disableSuper || level === -1}
-						onmousedown={() => initHoldAdd(troop)}
-						onkeypress={(ev) => {
-							if (ev.key !== 'Enter') {
-								return;
-							}
-							add(troop);
-						}}
-					>
-						<AssetDisplay {type} {name} {data} {level} {title} />
-					</button>
-				</li>
-			{/each}
-		</ul>
-		<h3>Select siege machine</h3>
-		<ul class="picker-grid">
-			<!-- prettier-ignore -->
-			{#each (Object.entries(app.sieges) as [SiegeName, SiegeData][]) as [name, data]}
-				{@const type = 'Siege'}
-				{@const siege = { type, name, data } as const}
-				{@const level = getSiegeLevel(name, app)}
-				{@const reachedMaxAmount = willOverflowHousingSpace(siege)}
-				{@const title = getCardTitle({ level, type, reachedMaxAmount })}
-				<li>
-					<button
-						class="picker-card"
-						disabled={reachedMaxAmount || level === -1}
-						onmousedown={() => initHoldAdd(siege)}
-						onkeypress={(ev) => {
-							if (ev.key !== 'Enter') {
-								return;
-							}
-							add(siege);
-						}}
-					>
-						<AssetDisplay {type} {name} {data} {level} {title} />
-					</button>
-				</li>
-			{/each}
-		</ul>
+		{@render unitsSelected('Troop')}
+		{@render unitsPicker('Troop')}
+		{@render unitsPicker('Siege')}
 	</div>
 </section>
 
 <section class="spells">
 	<div class="container">
 		<h2 class="heading"><span>2</span> Spells</h2>
-		<ul class="grid">
-			{@render selectedUnits('Spells')}
-			{@render filler(ARMY_CREATE_SPELL_FILLER - spellUnits.length > 0 ? ARMY_CREATE_SPELL_FILLER - spellUnits.length : 0)}
-		</ul>
-		<h3>Select Spells</h3>
-		<ul class="picker-grid">
-			<!-- prettier-ignore -->
-			{#each (Object.entries(app.spells) as [SpellName, SpellData][]) as [name, data]}
-				{@const type = 'Spell'}
-				{@const spell = { type, name, data } as const}
-				{@const level = getSpellLevel(name, app)}
-				{@const reachedMaxAmount = willOverflowHousingSpace(spell)}
-				{@const title = getCardTitle({ level, type, reachedMaxAmount })}
-				<li>
-					<button
-						class="picker-card"
-						disabled={reachedMaxAmount || level === -1}
-						onmousedown={() => initHoldAdd(spell)}
-						onkeypress={(ev) => {
-							if (ev.key !== 'Enter') {
-								return;
-							}
-							add(spell);
-						}}
-					>
-						<AssetDisplay {type} {name} {data} {level} {title} />
-					</button>
-				</li>
-			{/each}
-		</ul>
+		{@render unitsSelected('Spell')}
+		{@render unitsPicker('Spell')}
 	</div>
 </section>
 
 <section class="actions">
 	<div class="container">
 		<div class="left">
-			<!-- TOOO: make totals components -->
-			<small class="capacity">
-				<img src="/clash/ui/troops.png" alt="Clash of clans troop capacity image" />
+			<small class="total">
+				<img src="/clash/ui/troops.png" alt="Clash of clans troop capacity" />
 				{housingSpaceUsed.troops} / {maxHousingSpace.troops}
 			</small>
-			<small class="capacity">
-				<img src="/clash/ui/spells.png" alt="Clash of clans spell capacity image" />
+			<small class="total">
+				<img src="/clash/ui/spells.png" alt="Clash of clans spell capacity" />
 				{housingSpaceUsed.spells} / {maxHousingSpace.spells}
 			</small>
-			<small class="capacity">
-				<img src="/clash/ui/sieges.png" alt="Clash of clans siege machine capacity image" />
+			<small class="total">
+				<img src="/clash/ui/sieges.png" alt="Clash of clans siege machine capacity" />
 				{housingSpaceUsed.sieges} / {maxHousingSpace.sieges}
 			</small>
-			<small class="capacity">
-				<img src="/clash/ui/clock.png" alt="Clash of clans clock (time to train army) image" />
+			<small class="total">
+				<img src="/clash/ui/clock.png" alt="Clash of clans clock (time to train army)" />
 				{formatTime(housingSpaceUsed.time * 1000)}
 			</small>
 		</div>
@@ -350,40 +269,78 @@
 			>
 				Open in-game
 			</Button>
-			<Button>Save</Button>
+			<Button onclick={openSave} disabled={!units.length}>Create</Button>
 		</div>
 	</div>
 </section>
 
-{#snippet selectedUnits(type: 'Troops' | 'Spells')}
-	{@const unitsArr = type === 'Troops' ? troopUnits : spellUnits}
-	{#each unitsArr as unit}
-		<li>
-			<button
-				class="object-card"
-				onmousedown={() => initHoldRemove(unit.name)}
-				onkeypress={(ev) => {
-					if (ev.key !== 'Enter') {
-						return;
-					}
-					remove(unit.name);
-				}}
-			>
-				<AssetDisplay {...unit} />
-			</button>
-		</li>
-	{/each}
+{#snippet unitsSelected(type: 'Troop' | 'Spell')}
+	{@const unitsArr = type === 'Troop' ? troopUnits : spellUnits}
+	<ul class="grid">
+		{#each unitsArr as unit}
+			<li>
+				<button
+					class="object-card"
+					onmousedown={() => initHoldRemove(unit.name)}
+					onkeypress={(ev) => {
+						if (ev.key !== 'Enter') {
+							return;
+						}
+						remove(unit.name);
+					}}
+				>
+					<AssetDisplay {...unit} />
+				</button>
+			</li>
+		{/each}
+		{@render filler(type)}
+	</ul>
 {/snippet}
 
-{#snippet filler(amount: number)}
-	{#each Array.from({ length: amount }) as filler}
+{#snippet unitsPicker(type: 'Troop' | 'Siege' | 'Spell')}
+	<!-- I have to admit, messing around with the type param like this isn't the prettiest thing, but I'm more comfortable with the logic being defined in one place :^ -->
+	{@const entries = type === 'Troop' ? getEntries(app.troops) : type === 'Siege' ? getEntries(app.sieges) : getEntries(app.spells)}
+	{@const heading = `Select ${type === 'Troop' ? 'troops' : type === 'Siege' ? 'siege machine' : 'spells'}`}
+	<h3>{heading}</h3>
+	<ul class="picker-grid">
+		{#each entries as [name, data]}
+			{@const unit = { type, name, data }}
+			{@const level = getLevel(unit, app)}
+			{@const reachedMaxAmount = willOverflowHousingSpace(unit)}
+			<!-- Disable if reached max unique super limit of 2 and this troop isn't one already selected -->
+			<!-- TOOD: fix data[1].isSuper, properties like isSuper that apply to all levels should not live in level data -->
+			{@const disableSuper = type === 'Troop' && data[1].isSuper && !units.find((item) => item.name === unit.name) && reachedSuperLimit}
+			{@const title = getCardTitle({ level, type, reachedMaxAmount, reachedSuperLimit: disableSuper })}
+			<li>
+				<button
+					class="picker-card"
+					disabled={reachedMaxAmount || level === -1 || disableSuper}
+					onmousedown={() => initHoldAdd(unit)}
+					onkeypress={(ev) => {
+						if (ev.key !== 'Enter') {
+							return;
+						}
+						add(unit);
+					}}
+				>
+					<AssetDisplay {...unit} {level} {title} />
+				</button>
+			</li>
+		{/each}
+	</ul>
+{/snippet}
+
+{#snippet filler(type: 'Troop' | 'Spell')}
+	{@const amount = type === 'Troop' ? ARMY_CREATE_TROOP_FILLER : ARMY_CREATE_SPELL_FILLER}
+	{@const unitsArr = type === 'Troop' ? troopUnits : spellUnits}
+	{@const length = amount - unitsArr.length > 0 ? amount - unitsArr.length : 0}
+	{#each Array.from({ length }) as _}
 		<li class="object-card" />
 	{/each}
 {/snippet}
 
 <style>
-	/* TODO: move capacity styles to component */
-	.capacity {
+	.total {
 		display: flex;
 		align-items: center;
 		background-color: var(--grey-900);
@@ -394,14 +351,13 @@
 		font-size: 0.85em;
 		height: 26px;
 	}
-	.capacity img {
+	.total img {
 		max-height: 32px;
 		margin-left: -12px;
 		margin-right: 16px;
 		height: 100%;
 		width: auto;
 	}
-	/* TODO: move capacity styles to component */
 
 	.alert {
 		padding: 50px var(--side-padding) 0 var(--side-padding);

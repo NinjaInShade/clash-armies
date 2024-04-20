@@ -1,4 +1,4 @@
-import type { Units, TroopName, SiegeName, SpellName, AppState, Level } from './types';
+import type { Unit, Units, TroopName, SiegeName, SpellName, AppState, Level } from './types';
 import { SUPER_TO_REGULAR } from './constants';
 
 /**
@@ -138,6 +138,23 @@ export function getSpellLevel(name: SpellName, app: AppState): Level {
 	}
 
 	return maxLevel;
+}
+
+/**
+ * For the unit given, this calculates the highest level the user has access to
+ * based on the users building levels (town hall, barracks, lab, etc...)
+ *
+ * @returns highest unit level or -1 if player hasn't unlocked it at all
+ */
+export function getLevel(unit: { type: Unit['type']; name: Unit['name'] }, app: AppState): Level {
+	const { type, name } = unit;
+	if (type === 'Troop') {
+		return getTroopLevel(name as TroopName, app);
+	}
+	if (type === 'Siege') {
+		return getSiegeLevel(name as SiegeName, app);
+	}
+	return getSpellLevel(name as SpellName, app);
 }
 
 /**
