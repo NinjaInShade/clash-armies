@@ -52,7 +52,8 @@
 		display: flex;
 		align-items: flex-end;
 		background-color: #60a7d8;
-		border-radius: 6px;
+		border-radius: 10px;
+		overflow: hidden;
 		height: 100%;
 		width: 100%;
 	}
