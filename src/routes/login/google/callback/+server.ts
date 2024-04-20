@@ -1,5 +1,6 @@
 import type { RequestEvent } from "@sveltejs/kit";
 import { OAuth2RequestError } from "arctic";
+import type { User } from "~/lib/shared/types";
 import { google, lucia } from "~/lib/server/auth/lucia";
 import { db } from "~/lib/server/db";
 
@@ -31,7 +32,7 @@ export async function GET(event: RequestEvent): Promise<Response> {
         const googleUser: GoogleUser = await response.json();
         const googleId = googleUser.sub;
 
-        const existingUser = await db.getRow('users', { googleId })
+        const existingUser = await db.getRow<User>('users', { googleId })
 		if (existingUser) {
 			const session = await lucia.createSession(existingUser.id, {});
 			const sessionCookie = lucia.createSessionCookie(session.id);
@@ -42,13 +43,13 @@ export async function GET(event: RequestEvent): Promise<Response> {
             return new Response(null, {
                 status: 302,
                 headers: {
-                    Location: "/"
+                    Location: `/users/${existingUser.username}`
                 }
             });
 		} else {
             // default username, user will be able to change this after (TODO: in the future allow user to set username on creation)
             const maxId = (await db.query<{ maxId: number }>('SELECT MAX(id) AS maxId FROM users'))[0].maxId;
-            const username = `Warrior ${maxId + 1}`;
+            const username = `Warrior-${maxId + 1}`;
 
             let userId: number | null = null;
             await db.transaction(async (tx) => {

@@ -20,8 +20,8 @@
 
 	let errors = $state<FetchErrors | null>(null);
 
-	let createdBy = $state<number>(1);
-	let username = $state<string>('NinjaInShade');
+	let createdBy = $state<number | null>(app.user?.id ?? null);
+	let username = $state<string | null>(app.user?.username ?? null);
 	let banner = $state<Banner>('dark-ages');
 	let name = $state<string | null>(null);
 	let units = $state<ArmyUnit[]>([]);
@@ -151,7 +151,9 @@
 		const result = deserialize(await response.text());
 		if (result.type === 'failure') {
 			errors = result.data?.errors as FetchErrors;
-		} else if (result.type === 'redirect') {
+			return;
+		}
+		if (result.type === 'redirect') {
 			goto(result.location);
 		} else {
 			errors = null;
@@ -174,7 +176,9 @@
 		const result = deserialize(await response.text());
 		if (result.type === 'failure') {
 			errors = result.data?.errors as FetchErrors;
-		} else if (result.type === 'redirect') {
+			return;
+		}
+		if (result.type === 'redirect') {
 			goto(result.location);
 		} else {
 			errors = null;

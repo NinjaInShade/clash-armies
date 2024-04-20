@@ -64,10 +64,10 @@
 		const result = deserialize(await response.text());
 		if (result.type === 'failure') {
 			errors = result.data?.errors as FetchErrors;
-		} else {
-			await invalidateAll();
-			close();
+			return;
 		}
+		await invalidateAll();
+		close();
 	}
 
 	async function deleteTownHall() {
@@ -78,10 +78,10 @@
 		const result = deserialize(await response.text());
 		if (result.type === 'failure') {
 			errors = result.data?.errors as FetchErrors;
-		} else {
-			await invalidateAll();
-			close();
+			return;
 		}
+		await invalidateAll();
+		close();
 	}
 </script>
 
