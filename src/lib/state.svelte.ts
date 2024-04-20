@@ -8,7 +8,7 @@ export function requireHTML() {
 	return html;
 }
 
-export function createAppState(initial: AppState) {
+export function createAppState(initial: Omit<AppState, 'openModal'>) {
 	const troops = $state<AppState['troops']>(initial.troops);
 	const sieges = $state<AppState['sieges']>(initial.sieges);
 	const spells = $state<AppState['spells']>(initial.spells);
