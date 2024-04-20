@@ -286,7 +286,7 @@
 		flex-flow: column nowrap;
 		border-spacing: 0;
 		min-width: 100%;
-		height: 100%;
+		height: auto;
 	}
 
 	thead,

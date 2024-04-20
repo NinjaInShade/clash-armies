@@ -55,18 +55,18 @@
 	.input {
 		outline: none;
 		background-color: var(--grey-700);
-		border: 1px dashed var(--grey-500);
+		border: 1px solid var(--grey-500);
 		font-size: var(--fs);
 		line-height: var(--fs-lh);
 		color: var(--grey-100);
 		border-radius: 6px;
-		padding: 8px 16px;
+		padding: 7px 16px;
 		width: 100%;
 	}
 
 	/* Input states */
 	.input::placeholder {
-		color: var(--grey-600);
+		color: var(--grey-500);
 	}
 
 	.input:active,
