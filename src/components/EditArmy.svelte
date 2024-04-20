@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { getContext } from 'svelte';
 	import type { AppState, Unit, Units, HousingSpace } from '~/lib/types';
-	import { ARMY_CREATE_TROOP_FILLER, ARMY_CREATE_SPELL_FILLER, HOLD_ADD_SPEED, HOLD_REMOVE_SPEED, SECOND, MINUTE, HOUR } from '~/lib/constants';
+	import { ARMY_EDIT_FILLER, HOLD_ADD_SPEED, HOLD_REMOVE_SPEED, SECOND, MINUTE, HOUR } from '~/lib/constants';
 	import { getLevel, generateLink, openLink } from '~/lib/army';
 	import Alert from './Alert.svelte';
 	import UnitDisplay from './UnitDisplay.svelte';
@@ -23,10 +23,14 @@
 	const app = getContext<AppState>('app');
 
 	let units = $state<Units>([]);
-	let troopUnits = $derived(units.filter((item) => item.type === 'Troop' || item.type === 'Siege'));
+	let troopUnits = $derived(units.filter((item) => item.type === 'Troop'));
+	let siegeUnits = $derived(units.filter((item) => item.type === 'Siege'));
 	let spellUnits = $derived(units.filter((item) => item.type === 'Spell'));
 
-	let reachedSuperLimit = $derived(troopUnits.filter((t) => t.type === 'Troop' && t.data[1].isSuper).length === 2);
+	/** Army units but in guaranteed order of troops, siege and spells */
+	let orderedUnits = $derived([...troopUnits, ...siegeUnits, ...spellUnits]);
+
+	let reachedSuperLimit = $derived(troopUnits.filter((t) => t.data[1].isSuper).length === 2);
 
 	let maxHousingSpace: HousingSpace = { troops: 320, spells: 11, sieges: 1 }; // TODO: calculate dynamically
 	let housingSpaceUsed = $derived.call(getSelectedTotals);
@@ -212,19 +216,12 @@
 	</div>
 </div> -->
 
-<section class="troops">
+<section class="units">
 	<div class="container">
-		<h2 class="heading"><span>1</span> Troops</h2>
-		{@render unitsSelected('Troop')}
+		<h2 class="heading"><span>1</span> Units</h2>
+		{@render unitsSelected()}
 		{@render unitsPicker('Troop')}
 		{@render unitsPicker('Siege')}
-	</div>
-</section>
-
-<section class="spells">
-	<div class="container">
-		<h2 class="heading"><span>2</span> Spells</h2>
-		{@render unitsSelected('Spell')}
 		{@render unitsPicker('Spell')}
 	</div>
 </section>
@@ -273,10 +270,9 @@
 	</div>
 </section>
 
-{#snippet unitsSelected(type: 'Troop' | 'Spell')}
-	{@const unitsArr = type === 'Troop' ? troopUnits : spellUnits}
+{#snippet unitsSelected()}
 	<ul class="grid">
-		{#each unitsArr as unit}
+		{#each orderedUnits as unit}
 			<li>
 				<button
 					class="object-card"
@@ -293,7 +289,7 @@
 				</button>
 			</li>
 		{/each}
-		{@render filler(type)}
+		{@render filler()}
 	</ul>
 {/snippet}
 
@@ -331,10 +327,9 @@
 	</ul>
 {/snippet}
 
-{#snippet filler(type: 'Troop' | 'Spell')}
-	{@const amount = type === 'Troop' ? ARMY_CREATE_TROOP_FILLER : ARMY_CREATE_SPELL_FILLER}
-	{@const unitsArr = type === 'Troop' ? troopUnits : spellUnits}
-	{@const length = amount - unitsArr.length > 0 ? amount - unitsArr.length : 0}
+{#snippet filler()}
+	{@const amount = ARMY_EDIT_FILLER}
+	{@const length = amount - units.length > 0 ? amount - units.length : 0}
 	{#each Array.from({ length }) as _}
 		<li class="object-card" />
 	{/each}
@@ -364,12 +359,8 @@
 		padding: 50px var(--side-padding) 0 var(--side-padding);
 	}
 
-	.troops {
+	.units {
 		padding: 50px var(--side-padding);
-	}
-
-	.spells {
-		padding: 0 var(--side-padding) 50px var(--side-padding);
 	}
 
 	.extras .container {

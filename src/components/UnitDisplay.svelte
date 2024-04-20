@@ -29,8 +29,6 @@
 			altSuffix: 'spell'
 		}
 	};
-	const assetDir = types[type].assetDir;
-	const altSuffix = types[type].altSuffix;
 
 	function isMaxLevel() {
 		const dataKeys = Object.keys(data);
@@ -45,7 +43,7 @@
 	{#if level && level > 0}
 		<b class="asset-lvl" class:max-lvl={isMaxLevel()}>{level}</b>
 	{/if}
-	<img class="asset-img" src="/clash/{assetDir}/{name}.png" alt="{name} {altSuffix}" />
+	<img class="asset-img" src="/clash/{types[type].assetDir}/{name}.png" alt="{name} {types[type].altSuffix}" />
 </div>
 
 <style>
