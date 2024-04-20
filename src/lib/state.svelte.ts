@@ -1,5 +1,13 @@
 import type { AppState, Modal } from './types';
 
+export function requireHTML() {
+	const html = document.querySelector('html');
+	if (!html) {
+		throw new Error('Expected HTML tag');
+	}
+	return html;
+}
+
 export function createAppState(initial: AppState) {
 	const troops = $state<AppState['troops']>(initial.troops);
 	const sieges = $state<AppState['sieges']>(initial.sieges);
@@ -77,10 +85,14 @@ export function createAppState(initial: AppState) {
 					...props,
 					close: () => {
 						modals = modals.filter((m) => m.id !== id);
+						if (modals.length === 0) {
+							requireHTML().classList.remove('hide-overflow');
+						}
 					}
 				}
 			};
 			modals.push(modalSpec);
+			requireHTML().classList.add('hide-overflow');
 		}
 	};
 }

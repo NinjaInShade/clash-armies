@@ -3,7 +3,7 @@
 	import { sineInOut } from 'svelte/easing';
 	import { onMount, setContext, type Snippet } from 'svelte';
 	import type { LayoutData } from './$types';
-	import { createAppState } from '~/lib/state.svelte';
+	import { createAppState, requireHTML } from '~/lib/state.svelte';
 	import TownHall from '~/components/TownHall.svelte';
 	import TownHallSelector from '~/components/TownHallSelector.svelte';
 	import Button from '~/components/Button.svelte';
@@ -55,6 +55,11 @@
 	function toggleDevDebug() {
 		devDebugOpen = !devDebugOpen;
 	}
+
+	function popModal() {
+		appState.modals.pop();
+		requireHTML().classList.remove('hide-overflow');
+	}
 </script>
 
 <nav>
@@ -87,7 +92,7 @@
 
 {#if appState.modals.length}
 	<div transition:fade={{ duration: 150, easing: sineInOut }}>
-		<button class="modal-backdrop" on:click={appState.modals.pop} />
+		<button class="modal-backdrop" on:click={popModal} />
 		{#each appState.modals as modal}
 			<svelte:component this={modal.component} {...modal.props} />
 		{/each}
