@@ -171,8 +171,8 @@ export const NAME_TO_OBJECT_ID_NAME = {
 export const ARMY_CREATE_TROOP_FILLER = 10;
 export const ARMY_CREATE_SPELL_FILLER = 10;
 
-export const HOLD_ADD_SPEED = 200;
-export const HOLD_REMOVE_SPEED = 200;
+export const HOLD_ADD_SPEED = 100;
+export const HOLD_REMOVE_SPEED = 100;
 
 export const SECOND = 1000;
 export const MINUTE = SECOND * 60;
