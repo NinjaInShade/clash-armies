@@ -3,6 +3,8 @@
 	import { sineInOut } from 'svelte/easing';
 	import { onMount, setContext } from 'svelte';
 	import { createAppState } from '~/lib/state.svelte';
+	import TownHall from '~/components/TownHall.svelte';
+	import TownHallSelector from '~/components/TownHallSelector.svelte';
 
 	/**
 	 * Due to first render being SSR, any state that will be overridden by localStorage onMount
@@ -18,11 +20,18 @@
 		const savedTownHall = +(localStorage.getItem('townHall') ?? '??');
 		appState.townHall = !Number.isNaN(savedTownHall) ? savedTownHall : 16;
 	});
+
+	function openTownHallSelector() {
+		if (appState.townHall === null) {
+			return;
+		}
+		appState.openModal(TownHallSelector, { appState });
+	}
 </script>
 
 <nav>
 	<div class="container">
-		<a href="/">Clash <span>Armies</span></a>
+		<a class="logo" href="/">Clash <span>Armies</span></a>
 		<ul class="links">
 			<li>
 				<a class="body" href="/armies">Find</a>
@@ -33,8 +42,11 @@
 			<li>
 				<a class="body" href="/account">Account</a>
 			</li>
-			<li>
+			<li class="control">
 				<button class="btn">Log in</button>
+			</li>
+			<li class="control">
+				<TownHall level={appState.townHall} onclick={openTownHallSelector} --width="80px" />
 			</li>
 		</ul>
 	</div>
@@ -63,30 +75,37 @@
 		justify-content: space-between;
 	}
 
-	nav ul {
-		display: flex;
-		align-items: center;
-		gap: 24px;
-	}
-
-	nav .container > a,
-	nav .container > a span {
+	.logo,
+	.logo span {
 		color: var(--grey-100);
 		font-family: 'Clash', sans-serif;
 		font-weight: 700;
 		font-size: 20px;
 	}
 
-	nav .container > a span {
+	.logo span {
 		color: var(--primary-300);
 	}
 
-	nav li a {
+	.links {
+		display: flex;
+		align-items: center;
+	}
+
+	.links li:not(:last-child) {
+		margin-right: 24px;
+	}
+
+	.links li.control:not(:last-child) {
+		margin-right: 8px;
+	}
+
+	.links li a {
 		transition: color 0.15s ease-in-out;
 		color: var(--grey-400);
 	}
 
-	nav li a:hover {
+	.links li a:hover {
 		color: var(--grey-300);
 	}
 
