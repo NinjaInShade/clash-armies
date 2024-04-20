@@ -6,10 +6,6 @@ type GetUsersParams = {
 	username?: string;
 };
 
-type GetUserParams = {
-	username: string;
-}
-
 export async function getUsers(opts: GetUsersParams = {}) {
 	const { username } = opts;
 
@@ -17,6 +13,7 @@ export async function getUsers(opts: GetUsersParams = {}) {
 	let query = `
         SELECT
 			u.id,
+			u.googleId,
             u.username,
             u.playerTag
 		FROM users u
@@ -29,12 +26,14 @@ export async function getUsers(opts: GetUsersParams = {}) {
 		args.push(username);
 	}
 
+	// TODO: fetch player level (and other stats if added) from clash of clans API if player tag is defined
+
 	return db.query<User>(query, args);
 }
 
-export async function getUser(opts: GetUserParams) {
-	z.object({ username: z.string() }).parse({ username: opts.username });
-	const users = await getUsers(opts);
+export async function getUser(username: string) {
+	z.object({ username: z.string() }).parse({ username });
+	const users = await getUsers({ username });
 	if (!users.length) {
 		return null;
 	}

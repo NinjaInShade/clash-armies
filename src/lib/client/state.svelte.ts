@@ -11,6 +11,7 @@ export function requireHTML() {
 export function createAppState(initial: Omit<AppState, 'openModal'>) {
 	const units = $state<AppState['units']>(initial.units);
 	const townHalls = $state<AppState['townHalls']>(initial.townHalls);
+	const user = $state<AppState['user']>(initial.user);
 	let townHall = $state<AppState['townHall']>(initial.townHall);
 	let barrack = $state<AppState['barrack']>(initial.barrack);
 	let darkBarrack = $state<AppState['darkBarrack']>(initial.barrack);
@@ -90,6 +91,9 @@ export function createAppState(initial: Omit<AppState, 'openModal'>) {
 			};
 			modals.push(modalSpec);
 			requireHTML().classList.add('hide-overflow');
+		},
+		get user() {
+			return user;
 		}
 	};
 }

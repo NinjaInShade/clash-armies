@@ -1,5 +1,6 @@
 import type { PageServerLoad } from './$types';
 import { getTownHalls, getUnits } from "~/lib/server/army";
+import { redirect } from '@sveltejs/kit';
 import type { Unit } from "~/lib/shared/types";
 import { actionWrap } from "~/lib/server/utils";
 import { db } from "~/lib/server/db";
@@ -76,7 +77,9 @@ const unitSchemaCreating = unitSchema.extend({
         .refine((file) => file?.type === 'image/png', { message: 'only .png file type is accepted.' })
 })
 
-export const load: PageServerLoad = async () => {
+export const load: PageServerLoad = async (event) => {
+    event.locals.requireAuth();
+
 	return {
         units: await getUnits(),
         townHalls: await getTownHalls()
@@ -85,6 +88,8 @@ export const load: PageServerLoad = async () => {
 
 export const actions = {
     saveTownHall: async (event) => {
+        event.locals.requireAuth();
+
         return actionWrap(async function() {
             const formData = await event.request.formData();
             const townHallData = formData.get('townHall') ?? '';
@@ -141,6 +146,8 @@ export const actions = {
         })
     },
     deleteTownHall: async (event) => {
+        event.locals.requireAuth();
+
         return actionWrap(async function() {
             const formData = await event.request.formData();
             const data = formData.get('level') ?? '';
@@ -153,6 +160,8 @@ export const actions = {
         })
     },
     saveUnit: async (event) => {
+        event.locals.requireAuth();
+
         return actionWrap(async function() {
             const formData = await event.request.formData();
             const unitData = formData.get('unit') ?? '';
@@ -223,6 +232,8 @@ export const actions = {
         })
     },
     deleteUnit: async (event) => {
+        event.locals.requireAuth();
+
         return actionWrap(async function() {
             const formData = await event.request.formData();
             const data = formData.get('id') ?? '';

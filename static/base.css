@@ -90,6 +90,16 @@
 		url('/fonts/Clash_Regular.otf') format('opentype');
 }
 
+/* roboto medium */
+@font-face {
+	font-family: 'Roboto';
+	font-style: normal;
+	font-weight: 500;
+	src:
+		local(''),
+		url('/fonts/Roboto-Medium.ttf') format('truetype');
+}
+
 * {
 	font-family: 'Poppins', sans-serif;
 	box-sizing: border-box;

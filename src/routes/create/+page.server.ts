@@ -1,10 +1,17 @@
 import type { Actions } from './$types';
 import { redirect } from '@sveltejs/kit';
+import type { PageServerLoad } from './$types';
 import { saveArmy, deleteArmy } from "~/lib/server/army";
 import { actionWrap } from "~/lib/server/utils";
 
+export const load: PageServerLoad = async (event) => {
+	event.locals.requireAuth();
+}
+
 export const actions = {
 	saveArmy: async (event) => {
+		event.locals.requireAuth();
+
 		return actionWrap(async function() {
 			const army = await event.request.json();
 			const id = await saveArmy(army);
@@ -15,6 +22,8 @@ export const actions = {
 		});
 	},
 	deleteArmy: async (event) => {
+		event.locals.requireAuth();
+
 		return actionWrap(async function() {
 			const id = await event.request.json();
 			await deleteArmy(id);

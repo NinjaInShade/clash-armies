@@ -17,9 +17,16 @@ export type Modal = {
 
 export type User = {
 	id: number;
+	googleId: string;
 	username: string;
 	playerTag: string | null;
 	level: number | null;
+}
+
+export type Session = {
+	id: string;
+	userId: number;
+	expiresAt: Date;
 }
 
 export type TownHall = {
@@ -110,6 +117,7 @@ export type AppState = {
 	// general app state
 	modals: Modal[];
 	openModal(component: Modal['component'], props?: Modal['props']): void;
+	user: User | null;
 };
 
 export type Banner = typeof BANNERS[number];

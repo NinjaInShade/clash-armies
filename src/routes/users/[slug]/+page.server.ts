@@ -7,7 +7,7 @@ import z from 'zod';
 export const load: PageServerLoad = async (ev) => {
 	const { username } = z.object({ username: z.string() }).parse({ username: ev.params.slug });
 	const armies = await getArmies({ username });
-	const user = await getUser({ username });
+	const user = await getUser(username);
 	if (!user) {
 		return error(404, `Could not find user "${username}"`)
 	}

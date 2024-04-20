@@ -8,10 +8,6 @@ type GetArmiesParams = {
 	username?: string;
 };
 
-type GetArmyParams = {
-	id: number;
-}
-
 type GetUnitsParams = {
 	type?: UnitType;
 }
@@ -79,9 +75,9 @@ export async function getArmies(opts: GetArmiesParams = {}) {
 	return armies;
 }
 
-export async function getArmy(opts: GetArmyParams) {
-	z.object({ id: z.number() }).parse({ id: opts.id });
-	const armies = await getArmies(opts);
+export async function getArmy(id: number) {
+	z.object({ id: z.number() }).parse({ id });
+	const armies = await getArmies({ id });
 	if (!armies.length) {
 		return null;
 	}

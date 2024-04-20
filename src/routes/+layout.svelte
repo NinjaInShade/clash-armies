@@ -15,8 +15,6 @@
 
 	let devDebugOpen: boolean = $state(false);
 
-	const username = 'NinjaInShade';
-
 	/**
 	 * Due to first render being SSR, any state that will be overridden by localStorage onMount
 	 * should start as null and consumers should show loading animations until the values are set.
@@ -35,7 +33,8 @@
 		workshop: null,
 		armyCapacity: { troop: 0, spell: 0, siege: 0 },
 		// general app state
-		modals: []
+		modals: [],
+		user: data.user
 	});
 	setContext('app', appState);
 
@@ -80,24 +79,36 @@
 				<li>
 					<a class="body" href="/armies">Armies</a>
 				</li>
-				<li>
-					<a class="body" href="/create">Create</a>
-				</li>
+				{#if appState.user}
+					<li>
+						<a class="body" href="/create">Create</a>
+					</li>
+				{/if}
 			</ul>
 		</div>
 		<ul class="links">
-			<li>
-				<a class="body" href="/admin">Admin</a>
-			</li>
-			<li>
-				<a class="body" href="/users/{username}">Account</a>
-			</li>
+			{#if appState.user}
+				<li>
+					<a class="body" href="/admin">Admin</a>
+				</li>
+			{/if}
+			{#if appState.user}
+				<li>
+					<a class="body" href="/users/{appState.user.username}">Account</a>
+				</li>
+			{/if}
 			<li class="control">
-				<C.Button>Log in</C.Button>
+				{#if appState.user}
+					<C.Link href="/logout">Log out</C.Link>
+				{:else}
+					<C.Link href="/login">Log in</C.Link>
+				{/if}
 			</li>
-			<li class="control">
-				<C.TownHall level={appState.townHall} onclick={openTownHallSelector} --width="80px" />
-			</li>
+			{#if appState.user}
+				<li class="control">
+					<C.TownHall level={appState.townHall} onclick={openTownHallSelector} --width="80px" />
+				</li>
+			{/if}
 		</ul>
 	</div>
 </nav>
