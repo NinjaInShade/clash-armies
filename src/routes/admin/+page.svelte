@@ -1,20 +1,24 @@
 <script lang="ts">
+	import { getContext } from 'svelte';
 	import type { PageData } from './$types';
-	import THTableDisplay from './THTableDisplay.svelte';
+	import THWidgetDisplay from './THWidgetDisplay.svelte';
 	import UnitTableDisplay from './UnitTableDisplay.svelte';
+	import EditTownHall from './EditTownHall.svelte';
 	import { formatTime } from '~/lib/client/army';
-	import type { Unit, TownHall } from '~/lib/shared/types';
+	import type { Unit, TownHall, AppState } from '~/lib/shared/types';
 	import C from '~/components';
 
 	const { data } = $props<{ data: PageData }>();
 	const { units, townHalls } = $derived(data);
+
+	const app = getContext<AppState>('app');
 
 	let selectedTHs = $state<number[]>([]);
 	const thColumns = [
 		{
 			key: '',
 			component: (row: TownHall) => {
-				return [THTableDisplay, { level: row.level }];
+				return [THWidgetDisplay, { level: row.level }];
 			},
 			width: '65px',
 			cellStyle: 'justify-content: center; overflow-y: hidden'
@@ -47,6 +51,16 @@
 		{ key: 'trainingTime', label: 'Training time', render: (row: Unit) => formatTime(row.trainingTime * 1000), width: '165px' },
 		{ key: 'housingSpace', label: 'Housing space', width: '165px' }
 	];
+
+	function addTownHall() {
+		app.openModal(EditTownHall);
+	}
+
+	function editTownHall() {
+		const selected = selectedTHs[0];
+		if (!selected) return;
+		app.openModal(EditTownHall, { townHall: townHalls.find((th) => th.level === selected) });
+	}
 </script>
 
 <header>
@@ -72,8 +86,8 @@
 				<p class="body">Add & edit town hall data</p>
 			</div>
 			<div class="actions">
-				<C.Button class="btn btn-sm">Add</C.Button>
-				<C.Button class="btn btn-sm" disabled={!selectedTHs.length}>Edit</C.Button>
+				<C.Button class="btn btn-sm" onclick={addTownHall}>Add</C.Button>
+				<C.Button class="btn btn-sm" onclick={editTownHall} disabled={!selectedTHs.length}>Edit</C.Button>
 			</div>
 		</div>
 		<C.Table data={townHalls} columns={thColumns} bind:selectedKeys={selectedTHs} defaultSortKey="level" selectable />

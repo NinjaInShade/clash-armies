@@ -70,6 +70,7 @@ export function migration(runStep: MigrationFn) {
             createdTime TIMESTAMP DEFAULT NOW(),
             updatedTime TIMESTAMP DEFAULT NOW() ON UPDATE NOW(),
             CONSTRAINT fk_armies_created_by FOREIGN KEY (createdBy) REFERENCES users (id) ON DELETE CASCADE
+            CONSTRAINT fk_armies_town_hall FOREIGN KEY (townHall) REFERENCES town_halls (level)
         )
     `);
     runStep(8, `

@@ -100,7 +100,7 @@
 
 {#if appState.modals.length}
 	<div transition:fade={{ duration: 150, easing: sineInOut }}>
-		<button class="modal-backdrop" on:click={popModal} />
+		<button class="modal-backdrop" type="button" on:click={popModal} />
 		{#each appState.modals as modal}
 			<svelte:component this={modal.component} {...modal.props} />
 		{/each}
