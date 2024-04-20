@@ -213,22 +213,7 @@
 	<div class="container">
 		<h2 class="heading"><span>1</span> Troops</h2>
 		<ul class="grid">
-			{#each troopUnits as troop}
-				<li>
-					<button
-						class="object-card"
-						onmousedown={() => initHoldRemove(troop.name)}
-						onkeypress={(ev) => {
-							if (ev.key !== 'Enter') {
-								return;
-							}
-							remove(troop.name);
-						}}
-					>
-						<AssetDisplay {...troop} />
-					</button>
-				</li>
-			{/each}
+			{@render selectedUnits('Troops')}
 			{@render filler(ARMY_CREATE_TROOP_FILLER - troopUnits.length > 0 ? ARMY_CREATE_TROOP_FILLER - troopUnits.length : 0)}
 		</ul>
 		<h3>Select troops</h3>
@@ -293,22 +278,7 @@
 	<div class="container">
 		<h2 class="heading"><span>2</span> Spells</h2>
 		<ul class="grid">
-			{#each spellUnits as spell}
-				<li>
-					<button
-						class="object-card"
-						onmousedown={() => initHoldRemove(spell.name)}
-						onkeypress={(ev) => {
-							if (ev.key !== 'Enter') {
-								return;
-							}
-							remove(spell.name);
-						}}
-					>
-						<AssetDisplay {...spell} />
-					</button>
-				</li>
-			{/each}
+			{@render selectedUnits('Spells')}
 			{@render filler(ARMY_CREATE_SPELL_FILLER - spellUnits.length > 0 ? ARMY_CREATE_SPELL_FILLER - spellUnits.length : 0)}
 		</ul>
 		<h3>Select Spells</h3>
@@ -384,6 +354,26 @@
 		</div>
 	</div>
 </section>
+
+{#snippet selectedUnits(type: 'Troops' | 'Spells')}
+	{@const unitsArr = type === 'Troops' ? troopUnits : spellUnits}
+	{#each unitsArr as unit}
+		<li>
+			<button
+				class="object-card"
+				onmousedown={() => initHoldRemove(unit.name)}
+				onkeypress={(ev) => {
+					if (ev.key !== 'Enter') {
+						return;
+					}
+					remove(unit.name);
+				}}
+			>
+				<AssetDisplay {...unit} />
+			</button>
+		</li>
+	{/each}
+{/snippet}
 
 {#snippet filler(amount: number)}
 	{#each Array.from({ length: amount }) as filler}
