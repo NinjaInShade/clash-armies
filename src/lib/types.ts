@@ -1,5 +1,6 @@
 import type { SvelteComponent } from 'svelte';
 import { CURRENT_TROOPS, CURRENT_SIEGES, CURRENT_SPELLS } from './constants';
+import { BANNERS } from "~/lib/shared";
 
 export type SvelteComponentGeneric = typeof SvelteComponent<Record<string, unknown>>;
 
@@ -105,7 +106,8 @@ export type Unit = {
 	data: TroopData | SiegeData | SpellData;
 	amount: number;
 };
-export type Units = Unit[];
+
+export type Banner = typeof BANNERS[number];
 
 /**
  * A complete saved army
@@ -113,8 +115,14 @@ export type Units = Unit[];
 export type Army = {
 	id: number;
 	name: string;
-	units: Units;
-}
+	townHall: number;
+	banner: Banner;
+	units: Unit[];
+	username: string;
+	createdBy: number;
+	createdTime: string;
+	updatedTime: string;
+};
 
 export type HousingSpace = {
 	troops: number;

@@ -1,28 +1,21 @@
-import type { LayoutLoad, LayoutLoadEvent } from './$types';
+import type { ServerLoadEvent } from '@sveltejs/kit';
+
 import type { AppState, TroopData, SpellData, SiegeData, BuildingName, BuildingData } from '~/lib/types';
 import { CURRENT_TROOPS, CURRENT_SPELLS, CURRENT_SIEGES, OBJECT_ID_PREFIXES, NAME_TO_OBJECT_ID_NAME, TROOP_CAPACITY_BY_TH } from '~/lib/constants';
 
 type BuildingsJSON = Record<BuildingName, BuildingData>;
 type TroopsJSON = Record<string, Record<string, Record<string, string | number | boolean>>>;
 type SpellsJSON = Record<string, Record<string, Record<string, string | number | boolean>>>;
-type ObjectIdsJSON = Record<string, string>;
-type ObjectKey = string | number;
+export type ObjectIds = Record<string, string>;
 
-function swapKeysAndValues(obj: Record<ObjectKey, ObjectKey>) {
-	return Object.entries(obj).reduce((prev, [id, name]) => {
-		prev[name] = id;
-		return prev;
-	}, {});
-}
-
-async function fetchJSON<T>(ev: LayoutLoadEvent, url: string): Promise<T> {
+export async function fetchJSON<T>(ev: ServerLoadEvent, url: string): Promise<T> {
 	// TODO: add error handling
 	const request = await ev.fetch(url);
 	const parsed: T = await request.json();
 	return parsed;
 }
 
-async function getTownHalls(ev: LayoutLoadEvent) {
+export async function getTownHalls(ev: ServerLoadEvent) {
 	const buildingData = await fetchJSON<BuildingsJSON>(ev, '/clash/buildings/buildings.json');
 	const townHallLevels = Object.keys(buildingData['Town Hall']).map((lvl) => +lvl);
 	return townHallLevels.map((thLevel) => {
@@ -78,8 +71,7 @@ async function getTownHalls(ev: LayoutLoadEvent) {
 		};
 	});
 }
-
-async function getTroops(ev: LayoutLoadEvent, ids: ObjectIdsJSON) {
+export async function getTroops(ev: ServerLoadEvent, ids: ObjectIds) {
 	// TODO: improve name typing & type check error message
 	const data = await fetchJSON<TroopsJSON>(ev, '/clash/troops/troops.json');
 	const troops = {} as AppState['troops'];
@@ -123,7 +115,7 @@ async function getTroops(ev: LayoutLoadEvent, ids: ObjectIdsJSON) {
 	return { troops, sieges };
 }
 
-async function getSpells(ev: LayoutLoadEvent, ids: ObjectIdsJSON) {
+export async function getSpells(ev: ServerLoadEvent, ids: ObjectIds) {
 	// TODO: improve name typing & type check error message
 	const data = await fetchJSON<SpellsJSON>(ev, '/clash/spells/spells.json');
 	const spells = {} as AppState['spells'];
@@ -159,16 +151,3 @@ async function getSpells(ev: LayoutLoadEvent, ids: ObjectIdsJSON) {
 	});
 	return spells;
 }
-
-export const load: LayoutLoad = async (ev: LayoutLoadEvent) => {
-	const idsToObject = await fetchJSON<ObjectIdsJSON>(ev, '/clash/objectIds.json');
-	const objectsToId = swapKeysAndValues(idsToObject); // makes it easier to lookup by object name
-	const { troops, sieges } = await getTroops(ev, objectsToId);
-
-	return {
-		townHalls: await getTownHalls(ev),
-		spells: await getSpells(ev, objectsToId),
-		troops,
-		sieges
-	};
-};
