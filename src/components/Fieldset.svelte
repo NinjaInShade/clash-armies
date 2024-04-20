@@ -1,21 +1,24 @@
 <script lang="ts">
+	import type { HTMLFieldsetAttributes } from 'svelte/elements';
 	import { setContext, type Snippet } from 'svelte';
 
 	type Props = {
 		/** Sets the label */
 		label: string;
+		/** Sets the labels direction @default column */
+		labelDir?: 'row' | 'row-reverse' | 'column';
 		/** Sets the label's "for" attribute */
 		htmlName: string;
 		/** Input to render inside fieldset */
 		children: Snippet;
-	};
-	let { label, htmlName, children } = $props<Props>();
+	} & HTMLFieldsetAttributes;
+	let { label, labelDir = 'column', htmlName, children, ...rest } = $props<Props>();
 
 	// Sets the context for children form elements to use
 	setContext('htmlName', htmlName);
 </script>
 
-<fieldset>
+<fieldset {...rest} style="--label-dir: {labelDir}; {rest.style ?? ''}" class:row={labelDir === 'row' || labelDir === 'row-reverse'}>
 	<label for={htmlName}>{label}</label>
 	{@render children()}
 </fieldset>
@@ -24,8 +27,8 @@
 	fieldset {
 		border: none;
 		display: flex;
+		flex-direction: var(--label-dir, column);
 		position: relative;
-		flex-direction: column;
 		align-items: flex-start;
 		user-select: none;
 		white-space: nowrap;
@@ -37,5 +40,9 @@
 		font-size: var(--fs);
 		line-height: var(--fs-lh);
 		font-weight: 500;
+	}
+
+	fieldset.row {
+		align-items: center;
 	}
 </style>

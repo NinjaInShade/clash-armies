@@ -4,6 +4,7 @@
 	import THWidgetDisplay from './THWidgetDisplay.svelte';
 	import UnitTableDisplay from './UnitTableDisplay.svelte';
 	import EditTownHall from './EditTownHall.svelte';
+	import EditUnit from './EditUnit.svelte';
 	import { formatTime } from '~/lib/client/army';
 	import type { Unit, TownHall, AppState } from '~/lib/shared/types';
 	import C from '~/components';
@@ -61,6 +62,16 @@
 		if (!selected) return;
 		app.openModal(EditTownHall, { townHall: townHalls.find((th) => th.level === selected) });
 	}
+
+	function addUnit() {
+		app.openModal(EditUnit);
+	}
+
+	function editUnit() {
+		const selected = selectedUnits[0];
+		if (!selected) return;
+		app.openModal(EditUnit, { unit: units.find((th) => th.id === selected) });
+	}
 </script>
 
 <header>
@@ -102,8 +113,8 @@
 				<p class="body">Add & edit unit data</p>
 			</div>
 			<div class="actions">
-				<C.Button class="btn btn-sm">Add</C.Button>
-				<C.Button class="btn btn-sm" disabled={!selectedUnits.length}>Edit</C.Button>
+				<C.Button class="btn btn-sm" onclick={addUnit}>Add</C.Button>
+				<C.Button class="btn btn-sm" onclick={editUnit} disabled={!selectedUnits.length}>Edit</C.Button>
 			</div>
 		</div>
 		<C.Table data={units} columns={unitColumns} bind:selectedKeys={selectedUnits} defaultSortKey="type" selectable />

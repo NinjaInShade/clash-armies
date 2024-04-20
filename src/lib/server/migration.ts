@@ -35,7 +35,7 @@ export function migration(runStep: MigrationFn) {
             spellFactoryLevel SMALLINT DEFAULT NULL,
             barrackLevel SMALLINT DEFAULT NULL,
             laboratoryLevel SMALLINT DEFAULT NULL,
-            CONSTRAINT fk_unit_levels_unit_id FOREIGN KEY (unitId) REFERENCES units (id)
+            CONSTRAINT fk_unit_levels_unit_id FOREIGN KEY (unitId) REFERENCES units (id) ON DELETE CASCADE
         )
     `);
     runStep(4, `
