@@ -56,7 +56,7 @@
 				<a class="body" href="/armies">Find</a>
 			</li>
 			<li>
-				<a class="body" href="/create-army">Create</a>
+				<a class="body" href="/create">Create</a>
 			</li>
 			<li>
 				<a class="body" href="/account">Account</a>

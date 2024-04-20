@@ -23,11 +23,11 @@ async function getTownHalls(ev: LayoutLoadEvent): Promise<AppState['townHallLeve
     return Array.from({ length: data.length }, (_, i) => i + 1);
 }
 
-async function getTroops(ev: LayoutLoadEvent): Promise<{ troops: Troops, sieges: Sieges }> {
+async function getTroops(ev: LayoutLoadEvent): Promise<{ troops: AppState['troops'], sieges: AppState['sieges'] }> {
     // TODO: improve name typing & type check error message
     const data = await fetchJSON<RawTroopData>(ev, '/clash/troops/troops.json');
-    const troops: Troops = {};
-    const sieges: Sieges = {};
+    const troops = {} as AppState['troops'];
+    const sieges = {} as AppState['sieges'];
 
     Object.entries(data).forEach(([name, data]) => {
         const isTroop = CURRENT_TROOPS.includes(name);
@@ -53,10 +53,10 @@ async function getTroops(ev: LayoutLoadEvent): Promise<{ troops: Troops, sieges:
     return { troops, sieges };
 }
 
-async function getSpells(ev: LayoutLoadEvent): Promise<Spells> {
+async function getSpells(ev: LayoutLoadEvent): Promise<AppState['spells']> {
     // TODO: improve name typing & type check error message
     const data = await fetchJSON<RawSpellData>(ev, '/clash/spells/spells.json');
-    const spells: Spells = {};
+    const spells = {} as AppState['spells'];
 
     Object.entries(data).forEach(([name, data]) => {
         const truncatedName = name.replace(' Spell', '');

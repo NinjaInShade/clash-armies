@@ -111,9 +111,9 @@ export type Modal = {
 
 export type AppState = {
     // frequently used data (cache)
-    troops: Troops;
-    sieges: Sieges;
-    spells: Spells;
+    troops: Required<Troops>;
+    sieges: Required<Sieges>;
+    spells: Required<Spells>;
     townHallLevels: number[];
     // user state
     townHall: number | null;
