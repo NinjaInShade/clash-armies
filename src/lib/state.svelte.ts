@@ -10,18 +10,26 @@ export type Modal = {
 
 export type AppState = {
     modals: Modal[];
+    townHallLevels: number[];
     townHall: number | null;
 }
 
-export function createAppState(initial: Partial<AppState>) {
-    let modals = $state<AppState['modals']>(initial.modals ?? []);
-    let townHall = $state<AppState['townHall']>(initial.townHall ?? null);
+export function createAppState(initial: AppState) {
+    const townHallLevels = $state<AppState['townHallLevels']>(initial.townHallLevels);
+    let townHall = $state<AppState['townHall']>(initial.townHall);
+    let modals = $state<AppState['modals']>([]);
 
     return {
+        get townHallLevels() {
+            return townHallLevels;
+        },
         get townHall() {
             return townHall;
         },
         set townHall(value: number | null) {
+            if (typeof value === 'number' && (value < 1 || value > townHallLevels.length)) {
+                throw new Error(`Town hall ${value} doesn't exist`);
+            }
             townHall = value;
         },
         get modals() {

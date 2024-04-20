@@ -2,23 +2,34 @@
 	import { fade } from 'svelte/transition';
 	import { sineInOut } from 'svelte/easing';
 	import { onMount, setContext } from 'svelte';
+	import type { LayoutData } from './$types';
 	import { createAppState } from '~/lib/state.svelte';
 	import TownHall from '~/components/TownHall.svelte';
 	import TownHallSelector from '~/components/TownHallSelector.svelte';
+
+	type Props = {
+		data: LayoutData;
+	};
+	let { data } = $props<Props>();
 
 	/**
 	 * Due to first render being SSR, any state that will be overridden by localStorage onMount
 	 * should start as null and consumers should show loading animations until the values are set.
 	 */
 	const appState = createAppState({
-		townHall: null
+		townHallLevels: data.townHalls,
+		townHall: null,
+		modals: []
 	});
 	setContext('townHall', appState);
 
-	onMount(() => {
-		// TODO: validate town hall level from localStorage and don't hardcode default
+	onMount(async () => {
 		const savedTownHall = +(localStorage.getItem('townHall') ?? '??');
-		appState.townHall = !Number.isNaN(savedTownHall) ? savedTownHall : 16;
+		if (!Number.isNaN(savedTownHall)) {
+			appState.townHall = savedTownHall;
+		} else {
+			appState.townHall = data.townHalls[data.townHalls.length - 1];
+		}
 	});
 
 	function openTownHallSelector() {

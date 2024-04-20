@@ -11,9 +11,6 @@
 	};
 	let { appState, close } = $props<Props>();
 
-	// TODO: don't hardcode levels
-	const townHalls = new Array(16).fill('').map((v, i) => i + 1);
-
 	function setTownHall(level: number) {
 		appState.townHall = level;
 		localStorage.setItem('townHall', `${level}`);
@@ -23,7 +20,7 @@
 
 <Modal title="Select your town hall" {close}>
 	<div class="flex">
-		{#each townHalls as level}
+		{#each appState.townHallLevels as level}
 			{@const isSelected = appState.townHall === level}
 			{@const btnAttributes = { title: isSelected ? `Town hall ${level} is already selected` : `Town hall ${level}`, disabled: isSelected }}
 			<TownHall onclick={setTownHall} {level} {...btnAttributes} />
