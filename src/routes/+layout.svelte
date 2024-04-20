@@ -51,7 +51,10 @@
 
 <nav>
 	<div class="container">
-		<a class="logo" href="/">Clash <span>Armies</span></a>
+		<a class="logo" href="/">
+			<img src="/clash/ui/swords.png" alt="Clash of clans overlapping swords" />
+			Clash <span>Armies</span>
+		</a>
 		<ul class="links">
 			<li>
 				<a class="body" href="/armies">Find</a>
@@ -95,6 +98,11 @@
 		justify-content: space-between;
 	}
 
+	.logo {
+		display: flex;
+		align-items: center;
+	}
+
 	.logo,
 	.logo span {
 		color: var(--grey-100);
@@ -105,6 +113,17 @@
 
 	.logo span {
 		color: var(--primary-400);
+	}
+
+	.logo img {
+		/** Optical alignment */
+		position: relative;
+		bottom: 1.5px;
+		/* Rest */
+		margin-right: 0.25em;
+		max-height: 32px;
+		height: 100%;
+		width: auto;
 	}
 
 	.links {
