@@ -147,7 +147,15 @@ html.hide-overflow {
 	--heading: 24px;
 	--heading-lg: 35px;
 
-	--error-400: hsl(0, 45%, 55%);
+	--downvote: hsl(0, 100%, 70%);
+	--upvote: hsl(123, 69%, 60%);
+
+	--error-500: hsl(0, 45%, 36%);
+	--error-400: hsl(0, 45%, 57%);
+
+	--danger-600: hsl(0, 78%, 40%);
+	--danger-500: hsl(0, 78%, 47%);
+	--danger-400: hsl(0, 78%, 57%);
 
 	--primary-900: hsl(33, 78%, 10%);
 	--primary-800: hsl(33, 78%, 20%);
@@ -165,6 +173,7 @@ html.hide-overflow {
 	--grey-700: hsl(0, 0%, 18%);
 	--grey-600: hsl(0, 0%, 20%);
 	--grey-500: hsl(0, 0%, 36%);
+	--grey-550: hsl(0, 0%, 42%);
 	--grey-400: hsl(0, 0%, 58%);
 	--grey-300: hsl(0, 0%, 77%);
 	--grey-100: hsl(0, 0%, 94%);
@@ -233,7 +242,7 @@ a {
 
 button:focus,
 a:focus {
-	outline: var(--grey-100) dotted 2px;
+	outline: var(--primary-400) dotted 2px;
 }
 
 button:disabled {
