@@ -2,7 +2,7 @@
 	import { getContext } from 'svelte';
 	import type { AppState, TroopName, TroopData, SpellName, SpellData, SiegeName, SiegeData, Selected, HousingSpace, SelectedTotals } from '~/lib/types';
 	import { ARMY_CREATE_TROOP_FILLER, ARMY_CREATE_SPELL_FILLER } from '~/lib/constants';
-	import { getTroopLevel, getSiegeLevel, getSpellLevel } from '~/lib/army';
+	import { getTroopLevel, getSiegeLevel, getSpellLevel, generateLink, openLink } from '~/lib/army';
 	import Alert from '~/components/Alert.svelte';
 	import AssetDisplay from '~/components/AssetDisplay.svelte';
 	import Button from '~/components/Button.svelte';
@@ -33,6 +33,18 @@
 		} else {
 			selected[existingIndex].amount -= 1;
 		}
+	}
+
+	async function copyLink() {
+		const link = generateLink(selected);
+		await navigator.clipboard.writeText(link);
+		alert(`Successfully copied "${link}" to clipboard!`);
+		// TODO: change to a toast notification
+	}
+
+	function openInGame() {
+		const link = generateLink(selected);
+		openLink(link);
 	}
 
 	/**
@@ -269,6 +281,24 @@
 			</small>
 		</div>
 		<div class="right">
+			<Button
+				onclick={copyLink}
+				disabled={!selected.length}
+				title={!selected.length
+					? 'Army cannot be shared when empty'
+					: "Copies an army link to your clipboard for sharing.\nNote: may not work if the army isn't at full capacity"}
+			>
+				Share
+			</Button>
+			<Button
+				onclick={openInGame}
+				disabled={!selected.length}
+				title={!selected.length
+					? 'Army cannot be opened in-game when empty'
+					: "Opens clash of clans and allows you to paste your army in one of your slots.\nNote: may not work if the army isn't at full capacity"}
+			>
+				Open in-game
+			</Button>
 			<Button>Save</Button>
 		</div>
 	</div>

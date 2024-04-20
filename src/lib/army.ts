@@ -1,4 +1,4 @@
-import type { TroopName, SiegeName, SpellName, AppState, Level } from './types';
+import type { Selected, TroopName, SiegeName, SpellName, AppState, Level } from './types';
 import { SUPER_TO_REGULAR } from './constants';
 
 /**
@@ -138,4 +138,64 @@ export function getSpellLevel(name: SpellName, app: AppState): Level {
 	}
 
 	return maxLevel;
+}
+
+/**
+ * Generates URL link to copy army into clash of clans.
+ *
+ * Example: https://link.clashofclans.com/en?action=CopyArmy&army=u10x0-2x3s1x9-3x2
+ *
+ * First are troops, prefixed with the "u" character):
+ * - First item is 10 troops with id 0, which are Barbarians.
+ * - Next item is 2 troops with id 3, which are Giants.
+ *
+ * Then come the spells (starting with the s character):
+ * - First is 1 spell with id 9, which is a Poison Spell.
+ * - Second is 3 spells with id 2, which is a Rage Spell.
+ */
+export function generateLink(selected: Selected[]): string {
+	let url = 'https://link.clashofclans.com/?action=CopyArmy&army=';
+
+	const selectedTroops = selected.filter((item) => item.type === 'Troop' || item.type === 'Siege');
+	const selectedSpells = selected.filter((item) => item.type === 'Spell');
+
+	// generate troops
+	if (selectedTroops.length) {
+		url += 'u';
+		url += selectedTroops
+			.reduce<string[]>((prev, troop) => {
+				const troopString = `${troop.amount}x${Object.values(troop.data)[0].id}`;
+				prev.push(troopString);
+				return prev;
+			}, [])
+			.join('-');
+	}
+
+	// generate spells
+	if (selectedSpells.length) {
+		url += 's';
+		url += selectedSpells
+			.reduce<string[]>((prev, spell) => {
+				const spellString = `${spell.amount}x${Object.values(spell.data)[0].id}`;
+				prev.push(spellString);
+				return prev;
+			}, [])
+			.join('-');
+	}
+
+	return url;
+}
+
+/**
+ * Takes in a clash of clans army link and parses it into an array of selected items
+ *
+ * The army=querystring value can be parsed with regex into two groups (troops and spells):
+ * - u([\d+x-]+)s([\d+x-]+)
+ */
+export function parseLink(link: string): Selected[] {
+	// TODO: implement when adding "Load from link" input
+}
+
+export function openLink(href: string, openInNewTab = true) {
+	window.open(href, openInNewTab ? '_blank' : undefined, 'rel="noreferrer"');
 }

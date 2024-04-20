@@ -1,6 +1,6 @@
 import type { LayoutLoad, LayoutLoadEvent } from './$types';
 import type { AppState, TroopData, SpellData, SiegeData } from '~/lib/types';
-import { CURRENT_TROOPS, CURRENT_SPELLS, CURRENT_SIEGES } from '~/lib/constants';
+import { CURRENT_TROOPS, CURRENT_SPELLS, CURRENT_SIEGES, OBJECT_ID_PREFIXES, NAME_TO_OBJECT_ID_NAME } from '~/lib/constants';
 
 // TODO: disable troops not available at town hall level
 // TODO: display troop level in Troop.svelte
@@ -11,6 +11,8 @@ type RawBuildingData = Record<string, Record<string, Record<string, string | num
 type RawTownHallData = Record<string, number>[];
 type RawTroopData = Record<string, Record<string, Record<string, string | number | boolean>>>;
 type RawSpellData = Record<string, Record<string, Record<string, string | number | boolean>>>;
+type RawObjectIdsData = Record<string, string>;
+type ObjectsToId = Record<string, string>;
 
 async function fetchJSON<T>(ev: LayoutLoadEvent, url: string): Promise<T> {
 	// TODO: add error handling
@@ -62,7 +64,7 @@ async function getTownHalls(ev: LayoutLoadEvent): Promise<AppState['townHalls']>
 	});
 }
 
-async function getTroops(ev: LayoutLoadEvent): Promise<{ troops: AppState['troops']; sieges: AppState['sieges'] }> {
+async function getTroops(ev: LayoutLoadEvent, ids: ObjectsToId): Promise<{ troops: AppState['troops']; sieges: AppState['sieges'] }> {
 	// TODO: improve name typing & type check error message
 	const data = await fetchJSON<RawTroopData>(ev, '/clash/troops/troops.json');
 	const troops = {} as AppState['troops'];
@@ -92,6 +94,7 @@ async function getTroops(ev: LayoutLoadEvent): Promise<{ troops: AppState['troop
 			}
 			const parsedId = +id.slice(String(OBJECT_ID_PREFIXES.Characters).length);
 			prev[+level] = {
+				id: parsedId,
 				barrackLevel: BarrackLevel,
 				laboratoryLevel: LaboratoryLevel,
 				housingSpace: HousingSpace,
@@ -105,7 +108,7 @@ async function getTroops(ev: LayoutLoadEvent): Promise<{ troops: AppState['troop
 	return { troops, sieges };
 }
 
-async function getSpells(ev: LayoutLoadEvent): Promise<AppState['spells']> {
+async function getSpells(ev: LayoutLoadEvent, ids: ObjectsToId): Promise<AppState['spells']> {
 	// TODO: improve name typing & type check error message
 	const data = await fetchJSON<RawSpellData>(ev, '/clash/spells/spells.json');
 	const spells = {} as AppState['spells'];
@@ -129,6 +132,7 @@ async function getSpells(ev: LayoutLoadEvent): Promise<AppState['spells']> {
 			}
 			const parsedId = +id.slice(String(OBJECT_ID_PREFIXES.Spells).length);
 			prev[+level] = {
+				id: parsedId,
 				spellFactoryLevel: SpellForgeLevel,
 				laboratoryLevel: LaboratoryLevel,
 				housingSpace: HousingSpace,
@@ -142,11 +146,17 @@ async function getSpells(ev: LayoutLoadEvent): Promise<AppState['spells']> {
 }
 
 export const load: LayoutLoad = async (ev: LayoutLoadEvent) => {
-	const { troops, sieges } = await getTroops(ev);
+	const idData = await fetchJSON<RawObjectIdsData>(ev, '/clash/objectIds.json');
+	const objectsToId = Object.entries(idData).reduce<Record<string, string>>((prev, [id, name]) => {
+		prev[name] = id;
+		return prev;
+	}, {});
+
+	const { troops, sieges } = await getTroops(ev, objectsToId);
 
 	return {
 		townHalls: await getTownHalls(ev),
-		spells: await getSpells(ev),
+		spells: await getSpells(ev, objectsToId),
 		troops,
 		sieges
 	};

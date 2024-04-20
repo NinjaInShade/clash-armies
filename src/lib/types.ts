@@ -9,6 +9,7 @@ export type TroopName = (typeof CURRENT_TROOPS)[number];
 export type TroopData = Record<
 	Level,
 	{
+		id: number; // Used for army link
 		barrackLevel: number;
 		laboratoryLevel: number;
 		housingSpace: number;
@@ -23,6 +24,7 @@ export type SiegeName = (typeof CURRENT_SIEGES)[number];
 export type SiegeData = Record<
 	Level,
 	{
+		id: number; // Used for army link
 		barrackLevel: number;
 		laboratoryLevel: number;
 		housingSpace: number;
@@ -36,6 +38,7 @@ export type SpellName = (typeof CURRENT_SPELLS)[number];
 export type SpellData = Record<
 	Level,
 	{
+		id: number; // Used for army link
 		spellFactoryLevel: number;
 		laboratoryLevel: number;
 		housingSpace: number;
