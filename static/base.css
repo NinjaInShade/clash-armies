@@ -1,0 +1,277 @@
+/* poppins-regular - latin */
+@font-face {
+    font-family: "Poppins";
+    font-style: normal;
+    font-weight: 400;
+    src:
+        local(""),
+        url("/fonts/poppins-v19-latin-regular.woff2") format("woff2"),
+        /* Chrome 26+, Opera 23+, Firefox 39+ */
+        url("/fonts/poppins-v19-latin-regular.woff") format("woff");
+        /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
+}
+
+/* poppins-500 - latin */
+@font-face {
+    font-family: "Poppins";
+    font-style: normal;
+    font-weight: 500;
+    src:
+        local(""),
+        url("/fonts/poppins-v19-latin-500.woff2") format("woff2"),
+        /* Chrome 26+, Opera 23+, Firefox 39+ */
+        url("/fonts/poppins-v19-latin-500.woff") format("woff");
+        /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
+}
+
+/* poppins-500italic - latin */
+@font-face {
+    font-family: "Poppins";
+    font-style: italic;
+    font-weight: 500;
+    src:
+        local(""),
+        url("/fonts/poppins-v19-latin-500italic.woff2") format("woff2"),
+        /* Chrome 26+, Opera 23+, Firefox 39+ */
+        url("/fonts/poppins-v19-latin-500italic.woff") format("woff");
+        /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
+}
+
+/* poppins-600 - latin */
+@font-face {
+    font-family: "Poppins";
+    font-style: normal;
+    font-weight: 600;
+    src:
+        local(""),
+        url("/fonts/poppins-v19-latin-600.woff2") format("woff2"),
+        /* Chrome 26+, Opera 23+, Firefox 39+ */
+        url("/fonts/poppins-v19-latin-600.woff") format("woff");
+        /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
+}
+
+/* poppins-700 - latin */
+@font-face {
+    font-family: "Poppins";
+    font-style: normal;
+    font-weight: 700;
+    src:
+        local(""),
+        url("/fonts/poppins-v19-latin-700.woff2") format("woff2"),
+        /* Chrome 26+, Opera 23+, Firefox 39+ */
+        url("/fonts/poppins-v19-latin-700.woff") format("woff");
+        /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
+}
+
+/* poppins-900 - latin */
+@font-face {
+    font-family: "Poppins";
+    font-style: normal;
+    font-weight: 900;
+    src:
+        local(""),
+        url("/fonts/poppins-v19-latin-900.woff2") format("woff2"),
+        /* Chrome 26+, Opera 23+, Firefox 39+ */
+        url("/fonts/poppins-v19-latin-900.woff") format("woff");
+        /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
+}
+
+/* clash bold */
+@font-face {
+    font-family: "Clash";
+    font-style: normal;
+    font-weight: 700;
+    src:
+        local(""),
+        url("/fonts/Clash_Bold.otf") format("opentype"),
+}
+
+/* clash regular */
+@font-face {
+    font-family: "Clash";
+    font-style: normal;
+    font-weight: 400;
+    src:
+        local(""),
+        url("/fonts/Clash_Regular.otf") format("opentype"),
+}
+
+
+* {
+    font-family: 'Poppins', sans-serif;
+    box-sizing: border-box;
+    text-decoration: none;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+html,
+body {
+    width: 100%;
+    overflow-x: hidden;
+}
+
+html {
+    background-color: var(--grey-600);
+}
+
+:root {
+    scroll-behavior: smooth;
+    font-size: 16px;
+
+    --container: 1200px;
+
+    --side-padding: 40px;
+
+    /* --fs-sm: 14px;
+    --fs-sm-lh: 21px; */
+
+    --fs: 16px;
+    --fs-lh: 24px;
+
+    /* --fs-lg: 18px;
+    --fs-lg-lh: 26px; */
+
+    --h1: 56px;
+    --h1-lh: 68px;
+
+    /* --h2: 38px;
+    --h2-lh: 42px; */
+
+    /* --h3: 30px;
+    --h3-lh: 36px; */
+
+    --primary-500: #D5821B;
+    --primary-300: #E79C3E;
+
+    --grey-800: #282828;
+    --grey-600: #333333;
+    --grey-400: #949494;
+    --grey-300: #C4C4C4;
+    --grey-100: #EFEFEF;
+}
+
+h1,
+h2,
+h3 {
+    font-family: 'Clash', sans-serif;
+    font-weight: 700;
+    color: var(--grey-100);
+}
+
+h1 span,
+h2 span,
+h3 span {
+    font-family: 'Clash', sans-serif;
+    font-weight: 700;
+    color: var(--primary-300);
+}
+
+h1,
+.h2 {
+    font-size: var(--h1);
+    line-height: var(--h1-lh);
+}
+
+/* h2,
+.h2 {
+    font-size: var(--h2);
+    line-height: var(--h2-lh);
+}
+
+h3,
+.h3 {
+    font-size: var(--h3);
+    line-height: var(--h3-lh);
+    font-weight: 600;
+} */
+
+*::before,
+*::after {
+    content: '';
+    position: absolute;
+}
+
+.container {
+    margin: 0 auto;
+    width: 100%;
+}
+
+.container {
+    max-width: var(--container);
+}
+
+img,
+picture {
+    object-fit: cover;
+    min-width: 0;
+}
+
+.body {
+    color: var(--grey-300);
+    font-size: var(--fs);
+    line-height: var(--fs-lh);
+}
+
+/* .body-sm {
+    font-size: var(--fs-sm);
+    line-height: var(--fs-sm-lh);
+}
+
+.body-lg {
+    font-size: var(--fs-lg);
+    line-height: var(--fs-lg-lh);
+} */
+
+/* button */
+
+.btn svg path {
+    transition: 0.15s ease-in-out;
+}
+
+.btn {
+    font-family: 'Clash', sans-serif;
+    font-weight: 700;
+    transition: 0.15s ease-in-out;
+    position: relative;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    background: none;
+    outline: none;
+    border: none;
+    cursor: pointer;
+    font-size: var(--fs);
+    line-height: var(--fs-lh);
+    padding: 10px 18px;
+    background-color: var(--primary-500);
+    color: var(--grey-100);
+    border-radius: 8px;
+    gap: 10px;
+}
+
+.btn:hover,
+.btn:focus-visible {
+    background-color: var(--primary-300);
+}
+
+@media (max-width: 1100px) {
+    :root {
+        /* --h1: 45px;
+        --h1-lh: 49px;
+
+        --h2: 34px;
+        --h2-lh: 38px;
+
+        --h3: 27px;
+        --h3-lh: 34px; */
+    }
+}
+
+@media (max-width: 850px) {
+    :root {
+        /* --h1: 38px;
+        --h1-lh: 44px; */
+    }
+}
