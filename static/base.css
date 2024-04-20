@@ -145,11 +145,16 @@ html {
     --primary-500: #D5821B;
     --primary-300: #E79C3E;
 
+    --grey-900: #1a1a1a;
+    --grey-850: #242424;
     --grey-800: #282828;
     --grey-600: #333333;
+    --grey-500: #5d5d5d;
     --grey-400: #949494;
     --grey-300: #C4C4C4;
     --grey-100: #EFEFEF;
+
+    --grey-800-shimmer: hsla(0, 0%, 16%, 0.5);
 }
 
 h1,
@@ -187,12 +192,6 @@ h3,
     font-weight: 600;
 } */
 
-*::before,
-*::after {
-    content: '';
-    position: absolute;
-}
-
 .container {
     margin: 0 auto;
     width: 100%;
@@ -206,6 +205,23 @@ img,
 picture {
     object-fit: cover;
     min-width: 0;
+}
+
+button, a {
+    transition: all 0.15s ease-in-out;
+    cursor: pointer;
+    background: none;
+    outline: none;
+    border: none;
+}
+
+button:focus, a:focus {
+    outline: var(--grey-100) dotted 2px;
+}
+
+button:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
 }
 
 .body {
@@ -238,9 +254,6 @@ picture {
     display: inline-flex;
     justify-content: center;
     align-items: center;
-    background: none;
-    outline: none;
-    border: none;
     cursor: pointer;
     font-size: var(--fs);
     line-height: var(--fs-lh);
@@ -251,9 +264,13 @@ picture {
     gap: 10px;
 }
 
-.btn:hover,
+.btn:hover:not(:disabled),
 .btn:focus-visible {
     background-color: var(--primary-300);
+}
+
+.btn:focus-visible {
+    outline: var(--grey-100) dotted 2px;
 }
 
 @media (max-width: 1100px) {
