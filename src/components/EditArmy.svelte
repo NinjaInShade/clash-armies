@@ -26,7 +26,7 @@
 	let name = $state<string | null>(null);
 	let units = $state<ArmyUnit[]>([]);
 
-	let saveDisabled = $derived(!name || name.length < 5 || name.length > 25 || !units.length);
+	let saveDisabled = $derived(!name || name.length < 2 || name.length > 25 || !units.length);
 
 	let troopUnits = $derived(units.filter((item) => item.type === 'Troop'));
 	let siegeUnits = $derived(units.filter((item) => item.type === 'Siege'));

@@ -143,7 +143,7 @@ const unitSchemaCreating = z.object({
 })
 const armySchemaCreating = z.object({
 	id: z.number().positive().optional(),
-	name: z.string().min(5).max(25),
+	name: z.string().min(2).max(25),
 	townHall: z.number().positive(),
 	banner: z.enum(BANNERS),
 	units: z.array(unitSchemaCreating).min(1)
