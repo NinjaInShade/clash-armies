@@ -1,5 +1,5 @@
 import type { Army, TownHall, Unit, UnitType } from '~/lib/shared/types';
-import { db } from "~/lib/server/db";
+import { db } from '~/lib/server/db';
 import { BANNERS } from '~/lib/shared/utils';
 import z from 'zod';
 import type { RequestEvent } from '@sveltejs/kit';
@@ -40,12 +40,18 @@ export async function getArmies(opts: GetArmiesParams = {}) {
             )) AS units,
 			th.troopCapacity,
 			th.siegeCapacity,
-			th.spellCapacity
+			th.spellCapacity,
+			av.votes
 		FROM armies a
 		LEFT JOIN users u ON u.id = a.createdBy
         LEFT JOIN army_units au ON au.armyId = a.id
 		LEFT JOIN units un ON un.id = au.unitId
 		LEFT JOIN town_halls th ON th.level = a.townHall
+		LEFT JOIN (
+			SELECT armyId, COALESCE(SUM(vote), 0) AS votes
+			FROM army_votes
+			GROUP BY armyId
+		) av ON av.armyId = a.id
     `;
 
 	if (id) {
@@ -71,6 +77,7 @@ export async function getArmies(opts: GetArmiesParams = {}) {
 	for (const army of armies) {
 		// Parse JSON units
 		army.units = JSON.parse(army.units);
+		army.votes = +army.votes;
 	}
 
 	return armies;
@@ -86,10 +93,13 @@ export async function getArmy(id: number) {
 }
 
 export async function getTownHalls() {
-	return db.query<TownHall>(`
+	return db.query<TownHall>(
+		`
 		SELECT *, level AS id
 		FROM town_halls
-	`, []);
+	`,
+		[]
+	);
 }
 
 export async function getUnits(opts: GetUnitsParams = {}) {
@@ -132,7 +142,7 @@ export async function getUnits(opts: GetUnitsParams = {}) {
 
 	query += `
 		GROUP BY u.id
-	`
+	`;
 
 	const units = await db.query<Unit>(query, args);
 
@@ -148,14 +158,14 @@ const unitSchemaCreating = z.object({
 	id: z.number().positive().optional(),
 	unitId: z.number().positive(),
 	amount: z.number().positive()
-})
+});
 const armySchemaCreating = z.object({
 	id: z.number().positive().optional(),
 	name: z.string().min(2).max(25),
 	townHall: z.number().positive(),
 	banner: z.enum(BANNERS),
 	units: z.array(unitSchemaCreating).min(1)
-})
+});
 
 const armySchemaSaving = armySchemaCreating.required({ id: true });
 
@@ -172,13 +182,16 @@ export async function saveArmy(event: RequestEvent, data: Partial<Army>) {
 				banner: army.banner,
 				createdBy: user.id
 			});
-			await tx.insertMany('army_units', army.units.map((unit) => {
-				return {
-					armyId,
-					unitId: unit.unitId,
-					amount: unit.amount
-				}
-			}));
+			await tx.insertMany(
+				'army_units',
+				army.units.map((unit) => {
+					return {
+						armyId,
+						unitId: unit.unitId,
+						amount: unit.amount
+					};
+				})
+			);
 			return armyId;
 		});
 	} else {
@@ -196,19 +209,22 @@ export async function saveArmy(event: RequestEvent, data: Partial<Army>) {
 		}
 		return db.transaction(async (tx) => {
 			// Update army
-			await tx.query(`
+			await tx.query(
+				`
 				UPDATE armies SET
 					name = ?,
 					townHall = ?,
 					banner = ?
 				WHERE id = ?
-			`, [army.name, army.townHall, army.banner, army.id])
+			`,
+				[army.name, army.townHall, army.banner, army.id]
+			);
 
 			// Remove deleted units
-			await tx.query('DELETE FROM army_units WHERE armyId = ? AND unitId NOT IN (?)', [army.id, army.units.map(u => u.unitId)]);
+			await tx.query('DELETE FROM army_units WHERE armyId = ? AND unitId NOT IN (?)', [army.id, army.units.map((u) => u.unitId)]);
 
 			// Upsert units
-			const unitsData = army.units.map(u => ({ ...u, armyId: army.id, id: u.id ?? null }));
+			const unitsData = army.units.map((u) => ({ ...u, armyId: army.id, id: u.id ?? null }));
 			await tx.upsert('army_units', unitsData);
 
 			return army.id;
@@ -230,4 +246,31 @@ export async function deleteArmy(event: RequestEvent, armyId: number) {
 		event.locals.requireRoles('admin');
 	}
 	await db.query('DELETE FROM armies WHERE id = ?', [id]);
+}
+
+type SaveVoteParams = {
+	armyId: number;
+	vote: number | null;
+};
+
+export async function saveVote(event: RequestEvent, data: SaveVoteParams) {
+	const user = event.locals.requireAuth();
+	const { armyId, vote } = z
+		.object({
+			armyId: z.number(),
+			vote: z.number(),
+		})
+		.parse(data);
+	if (![-1, 0, 1].includes(vote)) {
+		throw new Error('Invalid vote');
+	}
+	const army = await getArmy(armyId);
+	if (!army) {
+		throw new Error('Could not find army');
+	}
+	if (vote === 0) {
+		await db.query('DELETE FROM army_votes WHERE votedBy = ?', [user.id]);
+	} else {
+		await db.upsert('army_votes', [{ armyId, votedBy: user.id, vote }]);
+	}
 }

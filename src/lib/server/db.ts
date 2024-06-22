@@ -8,7 +8,16 @@ export const db = new MySQL({
 	database: 'clash-armies',
 	typeCast: function(field, next) {
 		if (field.type === 'TINY' && field.length === 1) {
-			return field.string() === '1'; // 1 = true, 0 = false
+			const str = field.string();
+			if (str === null) {
+				return null;
+			} else if (str === '0') {
+				return false;
+			} else if (str === '1') {
+				return true;
+			} else {
+				return +str;
+			}
 		}
 		return next();
 	}

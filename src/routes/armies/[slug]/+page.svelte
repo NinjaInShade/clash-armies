@@ -7,7 +7,7 @@
 	import C from '~/components';
 
 	const { data } = $props<{ data: PageData }>();
-	const { army } = $derived(data);
+	const { army, userVote } = $derived(data);
 
 	const app = getContext<AppState>('app');
 
@@ -34,13 +34,13 @@
 	</div>
 
 	{#if !editing}
-		<C.ViewArmy {army} />
+		<C.ViewArmy {army} {userVote} />
 	{:else}
 		<C.EditArmy {army} />
 	{/if}
 {:else}
 	<div class="outer">
-		<C.ViewArmy {army} />
+		<C.ViewArmy {army} {userVote} />
 	</div>
 {/if}
 

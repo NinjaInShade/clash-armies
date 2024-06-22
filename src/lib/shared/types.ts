@@ -100,6 +100,7 @@ export type Army = {
 	troopCapacity: number;
 	siegeCapacity: number;
 	spellCapacity: number;
+	votes: number;
 };
 
 type UserUtils = {
@@ -107,7 +108,7 @@ type UserUtils = {
 	 * Returns true if user has every role specified.
 	 */
 	hasRoles: (...roles: string[]) => boolean;
- }
+}
 
 export type AppState = {
 	// frequently used data (cache)

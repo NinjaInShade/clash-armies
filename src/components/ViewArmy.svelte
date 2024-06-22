@@ -4,8 +4,8 @@
 	import type { Army, AppState } from '~/lib/shared/types';
 	import C from '~/components';
 
-	type Props = { army: Army };
-	const { army } = $props<Props>();
+	type Props = { army: Army; userVote: number };
+	const { army, userVote } = $props<Props>();
 	const { units } = $derived(army);
 
 	const app = getContext<AppState>('app');
@@ -14,8 +14,8 @@
 	let siegeUnits = $derived(units.filter((item) => item.type === 'Siege'));
 	let spellUnits = $derived(units.filter((item) => item.type === 'Spell'));
 
-	let votes = $state<number>(0);
-	let userVote = $state<'upvoted' | 'downvoted' | null>(null);
+	let votes = $state<number>(army.votes);
+	let _userVote = $state<number>(userVote);
 
 	const housingSpaceUsed = $derived.call(() => getTotals(units));
 </script>
@@ -85,9 +85,7 @@
 			<C.Button onclick={() => openInGame(units)} disabled={!units.length} title={getOpenBtnTitle(units)}>Open in-game</C.Button>
 		</div>
 		<div class="right">
-			{#if app.user && app.user.id !== army.createdBy}
-				<C.Votes bind:votes bind:userVote />
-			{/if}
+			<C.Votes bind:votes bind:userVote={_userVote} armyId={army.id} allowEdit={Boolean(app.user)} />
 		</div>
 	</div>
 </section>
