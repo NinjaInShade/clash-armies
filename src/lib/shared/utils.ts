@@ -87,3 +87,5 @@ export const BANNERS = [
 	'summer',
 	'valentines'
 ] as const;
+
+export const USER_MAX_ARMIES = 20;

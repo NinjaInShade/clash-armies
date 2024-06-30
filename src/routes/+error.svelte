@@ -37,7 +37,7 @@
 	<div class="container">
 		<h1>{$page.status}!</h1>
 		<p class="body">{getMessage($page)}</p>
-		<C.Link href="/">Go to home</C.Link>
+		<C.Button asLink href="/">Go to home</C.Button>
 	</div>
 </header>
 

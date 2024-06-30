@@ -189,8 +189,25 @@ export function openInGame(units: ArmyUnit[]) {
 export function getTags(army: Army) {
 	const tags: string[] = [];
 	tags.push(`TH${army.townHall}`);
-	tags.push(`Air`);
-	tags.push(`Has guide`);
+	const typeData = army.units.reduce(
+		(prev, curr) => {
+			if (curr.type === 'Spell') {
+				return prev;
+			}
+			if (curr.isFlying) {
+				prev.air += curr.amount;
+			} else {
+				prev.ground += curr.amount;
+			}
+			return prev;
+		},
+		{ air: 0, ground: 0 }
+	);
+	tags.push(typeData.ground > typeData.air ? 'Ground' : 'Air');
+	if (army.guideId) {
+		//  TODO: guide system
+		tags.push(`Has guide`);
+	}
 	return tags;
 }
 

@@ -1,32 +1,33 @@
 <script lang="ts">
-	import { onMount, getContext } from 'svelte';
+    import { getContext, onMount } from 'svelte';
+    import { invalidateAll, goto } from '$app/navigation';
+    import { deserialize } from '$app/forms';
+    import { page } from '$app/stores';
+	import { getTotals, formatTime, getUnitLevel, copyLink, openInGame, getTags, getCopyBtnTitle, getOpenBtnTitle } from '~/lib/client/army';
+    import { HOLD_ADD_SPEED, HOLD_REMOVE_SPEED } from '~/lib/shared/utils';
 	import type { AppState, Army, Unit, ArmyUnit, Banner, UnitType, FetchErrors } from '~/lib/shared/types';
-	import { getTotals, getUnitLevel, formatTime, copyLink, openInGame, getCopyBtnTitle, getOpenBtnTitle } from '~/lib/client/army';
-	import { ARMY_EDIT_FILLER, HOLD_ADD_SPEED, HOLD_REMOVE_SPEED } from '~/lib/shared/utils';
-	import { deserialize } from '$app/forms';
-	import { invalidateAll, goto } from '$app/navigation';
 	import C from '~/components';
 
-	type TitleOptions = {
+    type TitleOptions = {
 		level: number;
 		type: Unit['type'];
 		reachedMaxAmount: boolean;
 		reachedSuperLimit?: boolean;
 	};
-	type Props = { army?: Army };
+	type Props = { army?: Army; };
 
-	const { army } = $props<Props>();
+	const { army }: Props = $props();
 	const app = getContext<AppState>('app');
 
-	let errors = $state<FetchErrors | null>(null);
+    let errors = $state<FetchErrors | null>(null);
 
-	let createdBy = $state<number | null>(app.user?.id ?? null);
+    let createdBy = $state<number | null>(app.user?.id ?? null);
 	let username = $state<string | null>(app.user?.username ?? null);
 	let banner = $state<Banner>('dark-ages');
 	let name = $state<string | null>(null);
 	let units = $state<ArmyUnit[]>([]);
 
-	let saveDisabled = $derived(!name || name.length < 2 || name.length > 25 || !units.length);
+    let saveDisabled = $derived(!name || name.length < 2 || name.length > 25 || !units.length);
 
 	let troopUnits = $derived(units.filter((item) => item.type === 'Troop'));
 	let siegeUnits = $derived(units.filter((item) => item.type === 'Siege'));
@@ -35,7 +36,7 @@
 
 	let holdInterval: ReturnType<typeof setInterval> | null = null;
 
-	onMount(() => {
+    onMount(() => {
 		if (!army) return;
 		createdBy = army.createdBy;
 		username = army.username;
@@ -45,14 +46,23 @@
 		app.townHall = army.townHall;
 	});
 
-	const capacity = $derived.call(() => {
+    function getViewArmyURL() {
+        if (!army) {
+            return '/armies';
+        }
+        $page.url.searchParams.delete('editing');
+        const params = $page.url.searchParams;
+		return `?${params.toString()}`;
+    }
+
+    const capacity = $derived.by(() => {
 		return {
 			troop: army?.troopCapacity ?? app.armyCapacity.troop,
 			spell: army?.spellCapacity ?? app.armyCapacity.spell,
 			siege: army?.siegeCapacity ?? app.armyCapacity.siege
 		};
 	});
-	const housingSpaceUsed = $derived.call(() => getTotals(units));
+	const housingSpaceUsed = $derived.by(() => getTotals(units));
 
 	function add(unit: ArmyUnit, arr = units) {
 		const existing = arr.find((item) => item.name === unit.name);
@@ -161,153 +171,109 @@
 		}
 		if (army) {
 			// TODO: display toast "Army successfully saved"
-		}
-	}
 
-	async function deleteArmy() {
-		if (!army) return;
-
-		const confirmed = window.confirm('Are you sure you want to delete this army warrior? This cannot be undone!');
-		if (!confirmed) {
-			return;
-		}
-
-		const response = await fetch('/create?/deleteArmy', { method: 'POST', body: JSON.stringify(army.id) });
-		const result = deserialize(await response.text());
-		if (result.type === 'failure') {
-			errors = result.data?.errors as FetchErrors;
-			return;
-		}
-		if (result.type === 'redirect') {
-			goto(result.location);
-		} else {
-			errors = null;
-			await invalidateAll();
+            goto(`/armies/${army.id}`);
 		}
 	}
 </script>
+
 
 <svelte:head>
 	<title>ClashArmies • {army ? 'Edit' : 'Create'} Army</title>
 </svelte:head>
 
-<svelte:window
-	onmouseup={() => {
-		// handle this on window in case user mouses cursor from the card then does mouseup
-		stopHold();
-	}}
-/>
+<!-- Handle mouseup on window in case user mouses cursor from the card then does mouseup -->
+<svelte:window onmouseup={stopHold} />
 
-<section class="errors" class:creating={!army}>
-	<div class="container">
-		<C.Errors {errors} />
-	</div>
+
+<section class="banner">
+	<img class="banner-img" src="/clash/banners/{banner}.png" alt="Clash of clans banner artwork" />
+    <button class="banner-select-btn" type="button" onclick={editBanner}>
+        <svg width="27" height="27" viewBox="0 0 27 27" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path
+                d="M3 27C2.175 27 1.469 26.7065 0.882 26.1195C0.295 25.5325 0.001 24.826 0 24V3C0 2.175 0.294 1.469 0.882 0.882C1.47 0.295 2.176 0.001 3 0H24C24.825 0 25.5315 0.294 26.1195 0.882C26.7075 1.47 27.001 2.176 27 3V24C27 24.825 26.7065 25.5315 26.1195 26.1195C25.5325 26.7075 24.826 27.001 24 27H3ZM4.5 21H22.5L16.875 13.5L12.375 19.5L9 15L4.5 21Z"
+                fill="white"
+            />
+        </svg>
+    </button>
 </section>
 
-<section class="banner" class:creating={!army}>
-	<div class="container">
-		<img src="/clash/banners/{banner}.png" alt="Clash of clans banner artwork" class="banner-img" />
-		<div class="banner-overlay">
-			<div>
-				<C.Fieldset label="Army name:" htmlName="name">
-					<C.Input bind:value={name} maxlength={25} --input-width="250px" />
-				</C.Fieldset>
-				<b>Assembled by <a href="/users/{createdBy}">@{username}</a></b>
-			</div>
-			<div>
-				<small class="total">
-					<img src="/clash/ui/clock.png" alt="Clash of clans clock (time to train army)" />
-					{formatTime(housingSpaceUsed.time * 1000)}
-				</small>
-				<div class="totals">
-					<small class="total">
-						<img src="/clash/ui/troops.png" alt="Clash of clans troop capacity" />
-						{housingSpaceUsed.troops}/{capacity.troop}
-					</small>
-					{#if capacity.spell > 0}
-						<small class="total">
-							<img src="/clash/ui/spells.png" alt="Clash of clans spell capacity" />
-							{housingSpaceUsed.spells}/{capacity.spell}
-						</small>
-					{/if}
-					{#if capacity.siege > 0}
-						<small class="total">
-							<img src="/clash/ui/sieges.png" alt="Clash of clans siege machine capacity" />
-							{housingSpaceUsed.sieges}/{capacity.siege}
-						</small>
-					{/if}
-				</div>
-			</div>
-		</div>
-		<button class="select-banner-btn" type="button" onclick={editBanner}>
-			<svg width="27" height="27" viewBox="0 0 27 27" fill="none" xmlns="http://www.w3.org/2000/svg">
-				<path
-					d="M3 27C2.175 27 1.469 26.7065 0.882 26.1195C0.295 25.5325 0.001 24.826 0 24V3C0 2.175 0.294 1.469 0.882 0.882C1.47 0.295 2.176 0.001 3 0H24C24.825 0 25.5315 0.294 26.1195 0.882C26.7075 1.47 27.001 2.176 27 3V24C27 24.825 26.7065 25.5315 26.1195 26.1195C25.5325 26.7075 24.826 27.001 24 27H3ZM4.5 21H22.5L16.875 13.5L12.375 19.5L9 15L4.5 21Z"
-					fill="white"
-				/>
-			</svg>
-		</button>
-	</div>
+<section class="dashed details">
+    <div>
+        <h2>Army details</h2>
+        <C.Fieldset label="Army name:" htmlName="name" style='padding: 0 8px' --input-width="250px">
+            <C.Input bind:value={name} maxlength={25} />
+        </C.Fieldset>
+    </div>
 </section>
 
-<section class="units">
-	<div class="container">
-		<h2>Units</h2>
-		{@render unitsSelected()}
-		{@render unitsPicker('Troop')}
+<section class="dashed units">
+    <div>
+        <div class="title">
+            <h2>Unit selector</h2>
+            <div class="dashed totals">
+                <small class="total">
+                    <img src="/clash/ui/troops.png" alt="Clash of clans troop capacity" />
+                    {housingSpaceUsed.troops}/{capacity.troop}
+                </small>
+                {#if capacity.spell > 0}
+                    <small class="total">
+                        <img src="/clash/ui/spells.png" alt="Clash of clans spell capacity" />
+                        {housingSpaceUsed.spells}/{capacity.spell}
+                    </small>
+                {/if}
+                {#if capacity.siege > 0}
+                    <small class="total">
+                        <img src="/clash/ui/sieges.png" alt="Clash of clans siege machine capacity" />
+                        {housingSpaceUsed.sieges}/{capacity.siege}
+                    </small>
+                {/if}
+                <small class="total">
+                    <img src="/clash/ui/clock.png" alt="Clash of clans clock (time to train army)" />
+                    {formatTime(housingSpaceUsed.time * 1000)}
+                </small>
+            </div>
+        </div>
+        <ul class="units-list">
+            {#each [...troopUnits, ...spellUnits, ...siegeUnits] as unit}
+                <li>
+                    <button
+                        type="button"
+                        onmousedown={() => initHoldRemove(unit.name)}
+                        onmouseleave={() => stopHold()}
+                        onkeypress={(ev) => {
+                            if (ev.key !== 'Enter') {
+                                return;
+                            }
+                            remove(unit.name);
+                        }}
+                    >
+                        <C.UnitDisplay {...unit} />
+                    </button>
+                </li>
+            {/each}
+        </ul>
+        <div class="picker-container">
+            {@render unitsPicker('Troop')}
+        </div>
 		{#if app.armyCapacity.spell > 0}
-			{@render unitsPicker('Spell')}
+            <div class="picker-container">
+                {@render unitsPicker('Spell')}
+            </div>
 		{/if}
 		{#if app.armyCapacity.siege > 0}
-			{@render unitsPicker('Siege')}
+            <div class="picker-container">
+                {@render unitsPicker('Siege')}
+            </div>
 		{/if}
-	</div>
+    </div>
 </section>
-
-<section class="actions">
-	<div class="container">
-		<div class="left">
-			<C.Button onclick={async () => copyLink(units)} disabled={!units.length} title={getCopyBtnTitle(units)}>Copy link</C.Button>
-			<C.Button onclick={() => openInGame(units)} disabled={!units.length} title={getOpenBtnTitle(units)}>Open in-game</C.Button>
-		</div>
-		<div class="right">
-			{#if army}
-				<C.Button onclick={deleteArmy} theme="danger">Delete</C.Button>
-			{/if}
-			<C.Button onclick={saveArmy} disabled={saveDisabled}>{army ? 'Save' : 'Create'}</C.Button>
-		</div>
-	</div>
-</section>
-
-{#snippet unitsSelected()}
-	<ul class="selected-grid">
-		{#each [...troopUnits, ...spellUnits, ...siegeUnits] as unit}
-			<li>
-				<button
-					class="selected-card"
-					type="button"
-					onmousedown={() => initHoldRemove(unit.name)}
-					onmouseleave={() => stopHold()}
-					onkeypress={(ev) => {
-						if (ev.key !== 'Enter') {
-							return;
-						}
-						remove(unit.name);
-					}}
-				>
-					<C.UnitDisplay {...unit} />
-				</button>
-			</li>
-		{/each}
-		{@render filler()}
-	</ul>
-{/snippet}
 
 {#snippet unitsPicker(type: UnitType)}
 	{@const appUnits = app.units.filter((x) => x.type === type)}
 	{@const heading = `Select ${type === 'Troop' ? 'troops' : type === 'Siege' ? 'siege machine' : 'spells'}`}
 	<h3>{heading}</h3>
-	<ul class="picker-grid">
+	<ul class="picker-list">
 		{#each appUnits as unit}
 			<!-- Disable if reached max unique super limit of 2 and this troop isn't one already selected -->
 			{@const disableSuper = unit.isSuper && !units.find((item) => item.name === unit.name) && reachedSuperLimit}
@@ -316,7 +282,6 @@
 			{@const title = getCardTitle({ level, type, reachedMaxAmount, reachedSuperLimit: disableSuper })}
 			<li>
 				<button
-					class="picker-card"
 					type="button"
 					disabled={reachedMaxAmount || level === -1 || disableSuper}
 					onmousedown={() => initHoldAdd(unit)}
@@ -335,40 +300,23 @@
 	</ul>
 {/snippet}
 
-{#snippet filler()}
-	{@const amount = ARMY_EDIT_FILLER}
-	{@const length = amount - units.length > 0 ? amount - units.length : 0}
-	{#each Array.from({ length }) as _}
-		<li class="selected-card filler" />
-	{/each}
-{/snippet}
+{#if errors}
+    <div class="errors">
+        <C.Errors {errors} />
+    </div>
+{/if}
+
+<div class="army-controls">
+    <C.Button asLink href={getViewArmyURL()}>Cancel</C.Button>
+    <C.Button onclick={saveArmy} disabled={saveDisabled}>{army ? 'Save' : 'Create'}</C.Button>
+</div>
 
 <style>
-	.errors {
-		padding: 0 var(--side-padding);
-	}
-	.errors.creating {
-		padding-top: 50px;
-	}
-
+    	/* BANNER */
 	.banner {
-		padding: 0 var(--side-padding);
-	}
-	.banner.creating {
-		padding-top: 50px;
-	}
-	.errors + .banner {
-		padding-top: 24px;
-	}
-
-	.units {
-		padding: 64px var(--side-padding) 50px var(--side-padding);
-	}
-
-	.banner .container {
-		border-radius: 0.5em;
 		overflow: hidden;
 		position: relative;
+		border-radius: 8px;
 		width: 100%;
 	}
 
@@ -376,44 +324,16 @@
 		display: block;
 		object-fit: cover;
 		aspect-ratio: 1920 / 800;
-		max-height: 400px;
+		max-height: 350px;
+        min-height: 175px;
 		height: 100%;
 		width: 100%;
 	}
 
-	.banner-overlay {
-		display: flex;
-		flex-flow: column nowrap;
-		justify-content: space-between;
-		position: absolute;
-		background-color: hsla(0, 0%, 0%, 0.6);
-		padding: 40px 40px 32px 40px;
-		max-width: 400px;
-		height: 100%;
-		left: 0;
-		top: 0;
-	}
-
-	.banner-overlay h1 {
-		color: var(--primary-400);
-	}
-
-	.banner-overlay b,
-	.banner-overlay b a {
-		font-size: var(--fs);
-		line-height: var(--fs-lh);
-		color: var(--grey-100);
-		font-weight: 500;
-	}
-
-	.banner-overlay b {
-		display: block;
-		margin-top: 8px;
-	}
-
-	.select-banner-btn {
-		border: 1px dotted var(--grey-100);
+    .banner-select-btn {
+        border: 1px dotted var(--grey-100);
 		background-color: var(--grey-600);
+        box-shadow: rgba(0, 0, 0, 1) 0px 10px 50px 4px;
 		transition: background-color 0.2s ease-in-out;
 		display: flex;
 		justify-content: center;
@@ -423,132 +343,191 @@
 		padding: 0.75em;
 		bottom: 1em;
 		right: 1em;
-	}
+    }
+    .banner-select-btn:hover {
+        background-color: var(--grey-500);
+    }
 
-	.select-banner-btn:hover {
-		background-color: var(--grey-500);
-	}
+    /* DETAILS */
+    .details {
+        margin-top: 48px;
+    }
+    .details > div {
+        padding: 0 24px 24px 24px;
+    }
 
-	.totals {
+
+    /* DASHED STUFF */
+    .dashed, .dashed h2 {
+        background-color: var(--grey-800);
+        border: 1px dashed var(--grey-500);
+        border-radius: 8px;
+    }
+    .dashed > div {
+        margin-top: -12px;
+    }
+    .dashed h2 {
+        font-family: 'Poppins', sans-serif;
+        font-size: var(--fs);
+        line-height: var(--fs-lh);
+        color: var(--grey-100);
+        font-weight: bold;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+    }
+    .dashed h2, .units .totals {
+        display: inline-block;
+        border-radius: 4px;
+        margin-bottom: 16px;
+        padding: 6px 8px;
+    }
+
+    /* ARMY CONTROLS */
+    .army-controls {
+        display: flex;
+        justify-content: flex-end;
+        gap: 8px;
+    }
+    .army-controls:not(:empty) {
+        margin-top: 24px;
+    }
+
+    /* ERRORS */
+    .errors {
+        margin-top: 24px;
+    }
+
+    /* UNITS */
+    .units {
+        margin-top: 32px;
+    }
+    .units .title {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0 24px;
+    }
+    .units-list {
+        display: flex;
+        flex-flow: row wrap;
+        border-bottom: 1px dashed var(--grey-500);
+        margin-bottom: 24px;
+        padding: 0 32px 16px 32px;
+        gap: 6px;
+	}
+    .units-list li , .picker-list li {
+        --unit-border-radius: 6px;
+        --amount-size: 16px;
+        --lvl-size: 13px;
+        max-width: 64px;
+        width: 100%;
+        height: auto;
+    }
+    .units-list li button, .picker-list li button {
+        width: 100%;
+        height: 100%;
+    }
+    .picker-container {
+        padding: 0 32px;
+    }
+    .picker-container:not(:last-child) {
+        padding-bottom: 16px;
+    }
+    .units > div {
+        padding-bottom: 24px;
+    }
+    .picker-list {
+        display: flex;
+        flex-flow: row wrap;
+        gap: 6px;
+    }
+    .picker-list li button:disabled {
+		filter: grayscale(1);
+	}
+    .units :global(h3) {
+        font-size: var(--fs);
+        line-height: var(--fs-lh);
+        margin-bottom: 8px;
+    }
+    .units .totals {
 		display: flex;
 		align-items: center;
-		margin-top: 12px;
 		gap: 12px;
 	}
-
-	.total {
+	.units .totals small {
 		display: flex;
 		align-items: center;
 		font-family: 'Clash', sans-serif;
 		color: var(--grey-100);
-		font-size: 1em;
+		font-size: 15px;
+		gap: 4px;
 	}
-
-	.total img {
+	.units .totals img {
 		display: block;
-		max-height: 24px;
-		margin-right: 8px;
+		max-height: 22px;
 		height: 100%;
 		width: auto;
 	}
 
-	.tags {
-		display: flex;
-		align-items: flex-start;
-		margin-top: 16px;
-		gap: 6px;
-	}
+    @media(max-width: 850px) {
+        .details {
+            margin-top: 36px;
+        }
+        .units-list li, .picker-list li {
+            --amount-size: 14px;
+            --lvl-size: 11px;
+            max-width: 54px;
+        }
+        .errors {
+            margin-top: 16px;
+        }
+        .army-controls {
+            margin-top: 16px;
+        }
+    }
 
-	.tags p {
-		display: flex;
-		align-items: center;
-		background-color: var(--grey-500);
-		color: var(--grey-100);
-		font-size: var(--fs);
-		font-weight: 700;
-		padding: 8px 12px;
-		border-radius: 50px;
-		height: 32px;
-		gap: 4px;
-	}
+    @media(max-width: 600px) {
+        .units .title {
+            flex-flow: column nowrap;
+            margin-bottom: 16px;
+            gap: 0px;
+        }
+        .units .title > * {
+            margin: 0;
+            width: 100%;
+        }
+        .units h2 {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+        .units .totals {
+            border-top: none;
+        }
+    }
 
-	.actions {
-		position: fixed;
-		box-shadow: hsla(0, 0%, 30%, 0.4) 0px -20px 30px -10px;
-		background-color: var(--grey-800);
-		padding: 16px var(--side-padding);
-		width: 100%;
-		bottom: 0;
-		left: 0;
-	}
+    @media(max-width: 475px) {
+        .units .totals {
+            flex-flow: row wrap;
+        }
+        .details > div {
+            padding: 0 16px 24px 16px;
+        }
+        .units .title {
+            padding: 0 16px;
+        }
+        .picker-container {
+            padding: 0 24px;
+        }
+        .units-list {
+            padding: 0 24px 16px 24px;
+        }
+    }
 
-	.actions .container,
-	.actions .left,
-	.actions .right {
-		display: flex;
-		align-items: center;
-		gap: 0.5em;
-	}
-
-	.actions .container {
-		justify-content: space-between;
-	}
-
-	.selected-grid {
-		display: grid;
-		grid-template-rows: auto;
-		grid-template-columns: repeat(14, 1fr);
-		margin-top: 8px;
-		gap: 6px;
-	}
-
-	.picker-grid {
-		display: grid;
-		grid-template-rows: auto;
-		grid-template-columns: repeat(18, 1fr);
-		gap: 6px;
-	}
-
-	.selected-card {
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		overflow: hidden;
-		border-radius: 10px;
-		font-size: 0.6em;
-		height: 80px;
-		width: 100%;
-	}
-
-	.selected-card.filler {
-		border: 1px dashed var(--grey-500);
-	}
-
-	.picker-card {
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		overflow: hidden;
-		border-radius: 10px;
-		transition: none;
-		max-height: 60px;
-		height: 100%;
-		width: 100%;
-	}
-
-	.picker-card:disabled {
-		cursor: not-allowed;
-		filter: grayscale(1);
-		opacity: 0.5;
-	}
-
-	h3 {
-		margin: 1em 0 0.5em 0;
-		font-weight: 400;
-	}
-
-	:global(body) {
-		/* Must match .actions height */
-		padding-bottom: 76px;
-	}
+    @media(max-width: 400px) {
+        .units-list li, .picker-list li {
+            --amount-size: 12px;
+            --lvl-size: 10px;
+        }
+    }
 </style>
+

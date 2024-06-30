@@ -75,4 +75,24 @@
 			background-position: -200% 0;
 		}
 	}
+
+	@media (max-width: 425px) {
+		.loading,
+		.town-hall {
+			height: 36px;
+		}
+
+		.town-hall {
+			--width: calc(var(--width) / 2);
+		}
+
+		.loading {
+			width: 36px;
+		}
+
+		.town-hall .body {
+			font-size: var(--fs-sm);
+			line-height: var(--fs-sm-lh);
+		}
+	}
 </style>

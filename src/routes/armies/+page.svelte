@@ -22,10 +22,19 @@
 		{ value: 'Ground', label: 'Ground' },
 		{ value: 'Air', label: 'Air' }
 	];
+	const sortSelectData = [
+		{ value: null, label: 'Default (a-z)' },
+		{ value: 'new', label: 'Newest' },
+		{ value: 'votes', label: 'Votes' }
+	];
+
+	const ENTRIES_PER_PAGE = 25;
+	let page = $state<number>(1);
 
 	let search = $state<string | null>(null);
 	let townHall = $state<number | null>(null);
 	let attackType = $state<string | null>(null);
+	let sortOrder = $state<'votes' | 'new' | null>(null);
 
 	let displayArmies = $derived.by(() => {
 		const filtered = armies.filter((a) => {
@@ -36,17 +45,32 @@
 			if (attackType !== null && !tags.includes(attackType)) {
 				return false;
 			}
-			if (search && !a.name.includes(search)) {
+			if (search && !a.name.toLowerCase().includes(search.toLowerCase())) {
 				return false;
 			}
 			return true;
 		});
+		filtered.sort((a, b) => {
+			if (sortOrder === 'new') {
+				return +b.createdTime - +a.createdTime;
+			}
+			if (sortOrder === 'votes') {
+				return b.votes - a.votes;
+			}
+			// Default sorting (a-z|A-Z )
+			return a.name.localeCompare(b.name);
+		});
+		return filtered.slice(0, page * ENTRIES_PER_PAGE);
 	});
 
 	function resetFilters() {
 		search = null;
 		townHall = null;
 		attackType = null;
+	}
+
+	function loadMore() {
+		page += 1;
 	}
 </script>
 
@@ -57,25 +81,31 @@
 <section class="armies">
 	<div class="container">
 		<div class="filters">
-			<C.Fieldset label="Search" htmlName="search">
+			<C.Fieldset label="Search" htmlName="search" --input-width="250px">
 				<C.Input bind:value={search} placeholder="Electro zap..." />
 			</C.Fieldset>
 			<div class="right">
-				<C.Fieldset label="Town Hall" htmlName="townhall" style="max-width: 150px; width: 100%;">
+				<C.Fieldset label="Town Hall" htmlName="townhall" --input-width="100px">
 					<C.Select bind:value={townHall} data={thSelectData} />
 				</C.Fieldset>
-				<C.Fieldset label="Attack Type" htmlName="type" style="max-width: 150px; width: 100%;">
+				<C.Fieldset label="Attack Type" htmlName="type" --input-width="115px">
 					<C.Select bind:value={attackType} data={attackTypeSelectData} />
+				</C.Fieldset>
+				<C.Fieldset label="Sort by" htmlName="sort" --input-width="170px">
+					<C.Select bind:value={sortOrder} data={sortSelectData} />
 				</C.Fieldset>
 			</div>
 		</div>
 		<ul class="armies-grid">
-			{#each filteredArmies as army}
+			{#each displayArmies as army (army.id)}
 				<C.ArmyCard {army} />
 			{/each}
 		</ul>
+		{#if displayArmies.length && displayArmies.length < armies.length}
+			<C.Button onclick={loadMore} style="display: block; margin: 24px auto 0 auto;">Load more...</C.Button>
+		{/if}
 
-		{#if !filteredArmies.length}
+		{#if !displayArmies.length}
 			<div class="no-data">
 				<img src="/clash/ui/pekka.png" alt="PEKKA" />
 				<h2>There are no armies matching this criteria warrior!</h2>
@@ -151,5 +181,40 @@
 	.no-data img {
 		max-width: 550px;
 		width: 100%;
+	}
+
+	:global(.filter-control) {
+		/* max-width: 150px; */
+		max-width: 150px;
+		width: 100%;
+	}
+
+	@media (max-width: 600px) {
+		.filters {
+			flex-flow: column nowrap;
+			align-items: flex-start;
+		}
+	}
+
+	@media (max-width: 550px) {
+		.no-data img {
+			max-width: 100%;
+		}
+	}
+
+	@media (max-width: 425px) {
+		.armies {
+			padding-top: 32px;
+		}
+
+		.right {
+			flex-flow: column nowrap;
+			width: 100%;
+		}
+
+		:global(.filter-control) {
+			max-width: none;
+			width: 100%;
+		}
 	}
 </style>

@@ -158,7 +158,7 @@ body {
 	--txt-shadow-dark: 2px 2px 0px hsla(0, 0%, 10%, 1);
 
 	--fs-sm: 14px;
-    --fs-sm-lh: 21px;
+	--fs-sm-lh: 21px;
 
 	--fs: 16px;
 	--fs-lh: 24px;
@@ -169,11 +169,11 @@ body {
 	--h1: 56px;
 	--h1-lh: 68px;
 
-	--h2: 38px;
-    --h2-lh: 42px;
+	--h2: 24px;
+	--h2-lh: 29px;
 
-	/* --h3: 30px;
-    --h3-lh: 36px; */
+	--h3: 18.75px;
+	--h3-lh: 22px;
 
 	--heading: 24px;
 	--heading-lg: 35px;
@@ -214,6 +214,12 @@ body {
 	--grey-800-shimmer: hsla(0, 0%, 16%, 0.4);
 }
 
+p,
+span {
+	font-size: var(--fs);
+	line-height: var(--fs-lh);
+}
+
 h1,
 h2,
 h3 {
@@ -236,18 +242,17 @@ h1,
 	line-height: var(--h1-lh);
 }
 
-/* h2,
+h2,
 .h2 {
-    font-size: var(--h2);
-    line-height: var(--h2-lh);
+	font-size: var(--h2);
+	line-height: var(--h2-lh);
 }
 
 h3,
 .h3 {
-    font-size: var(--h3);
-    line-height: var(--h3-lh);
-    font-weight: 600;
-} */
+	font-size: var(--h3);
+	line-height: var(--h3-lh);
+}
 
 .container {
 	margin: 0 auto;
@@ -307,83 +312,6 @@ button span {
     line-height: var(--fs-lg-lh);
 } */
 
-.btn svg path {
-	transition: 0.15s ease-in-out;
-}
-
-.btn {
-	transition: 0.15s ease-in-out;
-	display: inline-flex;
-	justify-content: center;
-	align-items: center;
-	cursor: pointer;
-	padding: 10px 18px;
-	background-color: var(--primary-500);
-	border-radius: 8px;
-	gap: 10px;
-}
-
-.btn,
-.btn span {
-	text-shadow: var(--txt-shadow);
-	-webkit-text-stroke: var(--txt-stroke);
-	font-family: 'Clash', sans-serif;
-	font-weight: 700;
-	font-size: var(--fs);
-	line-height: var(--fs-lh);
-	color: var(--grey-100);
-	position: relative;
-}
-
-.btn-sm {
-	padding: 7.5px 16px;
-	gap: 6px;
-}
-
-.btn-sm, .btn-sm span {
-	font-size: var(--fs-sm);
-	line-height: var(--fs-sm-lh);
-}
-
-.btn::before {
-	transition: 0.15s ease-in-out;
-	background-color: var(--primary-400);
-	border-radius: 8px 8px 4px 4px;
-	width: calc(100% - 8px);
-	height: calc(50% - 4px);
-	position: absolute;
-	content: '';
-	left: 4px;
-	top: 4px;
-}
-
-.btn:hover:not(:disabled),
-.btn:focus-visible {
-	background-color: var(--primary-600);
-}
-
-.btn:hover:not(:disabled)::before {
-	background-color: var(--primary-500);
-}
-
-.btn:focus-visible {
-	outline: var(--grey-100) dotted 2px;
-}
-
-.btn.danger {
-	background-color: var(--danger-500);
-}
-.btn.danger::before {
-	background-color: var(--danger-400);
-}
-.btn.danger:hover:not(:disabled)::before {
-	background-color: var(--danger-500);
-}
-.btn.danger:hover:not(:disabled),
-.btn.danger:focus-visible {
-	background-color: var(--danger-600);
-}
-
 @media (max-width: 1100px) {
 	:root {
 		--side-padding: 32px;
@@ -400,13 +328,30 @@ button span {
 
 @media (max-width: 850px) {
 	:root {
-		/* --h1: 38px;
-        --h1-lh: 44px; */
+		--h1: 42px;
+		--h1-lh: 49px;
+
+		--fs: 15px;
+		--fs-lh: 22px;
+
+		--h2: 19px;
+		--h2-lh: 25px;
+
+		--h3: 15px;
+		--h3-lh: 22px;
+	}
+
+	.btn {
+		padding: 8px 15px;
+		gap: 7px;
 	}
 }
 
 @media (max-width: 500px) {
 	:root {
+		--h1: 38px;
+		--h1-lh: 43px;
+
 		--side-padding: 24px;
 	}
 }

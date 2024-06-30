@@ -2,6 +2,7 @@
 	import C from '~/components';
 	import { getContext } from 'svelte';
 	import type { AppState } from '~/lib/shared/types';
+	import { USER_MAX_ARMIES } from '~/lib/shared/utils';
 	import type { PageData } from './$types';
 	import EditUser from './EditUser.svelte';
 	import { page } from '$app/stores';
@@ -48,11 +49,11 @@
 
 <section class="armies">
 	<div class="container">
-		<h2 class="armies-title">Armies</h2>
+		<h2 class="armies-title">Armies {currentUser === username ? `(${armies.length} / ${USER_MAX_ARMIES})` : ''}</h2>
 		{#if armies.length}
 			<ul class="armies-list">
-				{#each armies as army}
-					<C.ArmyCard {army} hideUsername />
+				{#each armies as army (army.id)}
+					<C.ArmyCard {army} />
 				{/each}
 			</ul>
 		{:else}
@@ -66,7 +67,7 @@
 					{/if}
 				</h2>
 				{#if currentUser === username}
-					<C.Link href="/create">Create army</C.Link>
+					<C.Button asLink href="/create">Create army</C.Button>
 				{/if}
 			</div>
 		{/if}
@@ -146,6 +147,7 @@
 
 	.armies {
 		padding: 50px var(--side-padding);
+		flex: 1 0 0px;
 	}
 
 	.armies-title {
@@ -184,5 +186,9 @@
 		max-width: 400px;
 		width: 100%;
 		position: relative;
+	}
+
+	.right {
+		padding-bottom: 0.5em;
 	}
 </style>

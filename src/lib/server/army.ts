@@ -1,22 +1,26 @@
 import type { Army, TownHall, Unit, UnitType } from '~/lib/shared/types';
 import { db } from '~/lib/server/db';
-import { BANNERS } from '~/lib/shared/utils';
+import { BANNERS, USER_MAX_ARMIES } from '~/lib/shared/utils';
 import z from 'zod';
 import type { RequestEvent } from '@sveltejs/kit';
+import type { Request } from '~/app';
 
 type GetArmiesParams = {
+	req: Request;
+	/** Returns the army with this ID */
 	id?: number;
+	/** Returns the armies for the user with this username */
 	username?: string;
 };
 
 type GetUnitsParams = {
 	type?: UnitType;
-}
+};
 
-export async function getArmies(opts: GetArmiesParams = {}) {
-	const { id, username } = opts;
+export async function getArmies(opts: GetArmiesParams) {
+	const { req, id, username } = opts;
 
-	const args: (number | string)[] = [];
+	const args: (number | string | null)[] = [req.user?.id ?? null];
 	let query = `
         SELECT
 			a.*,
@@ -41,7 +45,8 @@ export async function getArmies(opts: GetArmiesParams = {}) {
 			th.troopCapacity,
 			th.siegeCapacity,
 			th.spellCapacity,
-			av.votes
+			av.votes,
+			COALESCE(uv.vote, 0) AS userVote
 		FROM armies a
 		LEFT JOIN users u ON u.id = a.createdBy
         LEFT JOIN army_units au ON au.armyId = a.id
@@ -52,7 +57,8 @@ export async function getArmies(opts: GetArmiesParams = {}) {
 			FROM army_votes
 			GROUP BY armyId
 		) av ON av.armyId = a.id
-    `;
+		LEFT JOIN army_votes uv ON uv.armyId = a.id AND uv.votedBy = ?
+	`;
 
 	if (id) {
 		query += `
@@ -83,9 +89,9 @@ export async function getArmies(opts: GetArmiesParams = {}) {
 	return armies;
 }
 
-export async function getArmy(id: number) {
+export async function getArmy(req: Request, id: number) {
 	z.object({ id: z.number() }).parse({ id });
-	const armies = await getArmies({ id });
+	const armies = await getArmies({ req, id });
 	if (!armies.length) {
 		return null;
 	}
@@ -173,6 +179,11 @@ export async function saveArmy(event: RequestEvent, data: Partial<Army>) {
 	const user = event.locals.requireAuth();
 
 	if (!data.id) {
+		const userArmies = await db.getRows('armies', { createdBy: user.id });
+		if (userArmies.length === USER_MAX_ARMIES) {
+			throw new Error(`Maximum armies reached (${USER_MAX_ARMIES}/${USER_MAX_ARMIES})`);
+		}
+
 		// Creating army
 		const army = armySchemaCreating.parse(data);
 		return db.transaction(async (tx) => {
@@ -258,13 +269,13 @@ export async function saveVote(event: RequestEvent, data: SaveVoteParams) {
 	const { armyId, vote } = z
 		.object({
 			armyId: z.number(),
-			vote: z.number(),
+			vote: z.number()
 		})
 		.parse(data);
 	if (![-1, 0, 1].includes(vote)) {
 		throw new Error('Invalid vote');
 	}
-	const army = await getArmy(armyId);
+	const army = await getArmy(event.locals, armyId);
 	if (!army) {
 		throw new Error('Could not find army');
 	}

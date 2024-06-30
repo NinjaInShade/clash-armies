@@ -186,19 +186,19 @@
 	</div>
 
 	<div class="row">
-		<C.Fieldset label="Is super?" htmlName="isSuper" labelDir="row-reverse" --input-width="100%">
+		<C.Fieldset label="Is super?" htmlName="isSuper" labelDir="row-reverse" style="flex: 0 1 0px" --input-width="100%">
 			<C.Checkbox bind:value={isSuper} />
 		</C.Fieldset>
-		<C.Fieldset label="Can fly?" htmlName="isFlying" labelDir="row-reverse" --input-width="100%">
+		<C.Fieldset label="Can fly?" htmlName="isFlying" labelDir="row-reverse" style="flex: 0 1 0px" --input-width="100%">
 			<C.Checkbox bind:value={isFlying} />
 		</C.Fieldset>
-		<C.Fieldset label="Can jump?" htmlName="isJumper" labelDir="row-reverse" --input-width="100%">
+		<C.Fieldset label="Can jump?" htmlName="isJumper" labelDir="row-reverse" style="flex: 0 1 0px" --input-width="100%">
 			<C.Checkbox bind:value={isJumper} />
 		</C.Fieldset>
-		<C.Fieldset label="Targets air?" htmlName="airTargets" labelDir="row-reverse" --input-width="100%">
+		<C.Fieldset label="Targets air?" htmlName="airTargets" labelDir="row-reverse" style="flex: 0 1 0px" --input-width="100%">
 			<C.Checkbox bind:value={airTargets} />
 		</C.Fieldset>
-		<C.Fieldset label="Targets ground?" htmlName="groundTargets" labelDir="row-reverse" --input-width="100%">
+		<C.Fieldset label="Targets ground?" htmlName="groundTargets" labelDir="row-reverse" style="flex: 0 1 0px" --input-width="100%">
 			<C.Checkbox bind:value={groundTargets} />
 		</C.Fieldset>
 	</div>

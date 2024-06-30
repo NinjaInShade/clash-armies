@@ -1,188 +1,214 @@
 <script lang="ts">
 	import { getContext } from 'svelte';
 	import type { Army, AppState } from '~/lib/shared/types';
-	import { copyLink, openInGame } from '~/lib/client/army';
+	import { getTotals, formatTime, copyLink, openInGame, getCopyBtnTitle, getOpenBtnTitle } from '~/lib/client/army';
 	import C from '~/components';
 
 	type Props = {
 		army: Army;
-		hideUsername?: boolean;
 	};
-	const { army, hideUsername } = $props<Props>();
+	const { army }: Props = $props();
+	const { units } = $derived(army);
 
 	const app = getContext<AppState>('app');
+	const housingSpaceUsed = $derived.by(() => getTotals(units));
+
+	let troopUnits = $derived(units.filter((item) => item.type === 'Troop'));
+	let siegeUnits = $derived(units.filter((item) => item.type === 'Siege'));
+	let spellUnits = $derived(units.filter((item) => item.type === 'Spell'));
+
+	let votes = $state<number>(army.votes);
+	let userVote = $state<number>(army.userVote ?? 0);
 </script>
 
 <li class="army-card">
 	<div class="header">
-		<h3>{army.name}</h3>
-		<div class="actions">
-			<a class="action" href="/armies/{army.id}">
-				<svg width="24" height="17" viewBox="0 0 24 17" fill="none" xmlns="http://www.w3.org/2000/svg">
-					<path
-						d="M23.1351 8.23727C22.2263 5.88636 20.6485 3.85329 18.5967 2.38934C16.545 0.925384 14.1093 0.0947154 11.5906 0C9.07189 0.0947154 6.63615 0.925384 4.58442 2.38934C2.53268 3.85329 0.954886 5.88636 0.0460349 8.23727C-0.015345 8.40705 -0.015345 8.59295 0.0460349 8.76273C0.954886 11.1136 2.53268 13.1467 4.58442 14.6107C6.63615 16.0746 9.07189 16.9053 11.5906 17C14.1093 16.9053 16.545 16.0746 18.5967 14.6107C20.6485 13.1467 22.2263 11.1136 23.1351 8.76273C23.1965 8.59295 23.1965 8.40705 23.1351 8.23727ZM11.5906 15.4545C7.49513 15.4545 3.16785 12.4177 1.59922 8.5C3.16785 4.58227 7.49513 1.54545 11.5906 1.54545C15.686 1.54545 20.0133 4.58227 21.5819 8.5C20.0133 12.4177 15.686 15.4545 11.5906 15.4545Z"
-						class="fill"
-					/>
-					<path
-						d="M11.5905 3.86365C10.6735 3.86365 9.77709 4.13557 9.01464 4.64502C8.25219 5.15447 7.65794 5.87857 7.30703 6.72575C6.95611 7.57294 6.86429 8.50515 7.04319 9.40452C7.22209 10.3039 7.66366 11.13 8.31206 11.7784C8.96047 12.4268 9.78659 12.8684 10.686 13.0473C11.5853 13.2262 12.5175 13.1344 13.3647 12.7835C14.2119 12.4325 14.936 11.8383 15.4455 11.0758C15.9549 10.3134 16.2268 9.417 16.2268 8.50001C16.2268 7.27037 15.7384 6.09109 14.8689 5.22161C13.9994 4.35212 12.8201 3.86365 11.5905 3.86365ZM11.5905 11.5909C10.9791 11.5909 10.3815 11.4096 9.87325 11.07C9.36495 10.7304 8.96878 10.2476 8.73484 9.68285C8.5009 9.11806 8.43969 8.49658 8.55895 7.897C8.67821 7.29743 8.97259 6.74668 9.40486 6.31441C9.83714 5.88214 10.3879 5.58776 10.9875 5.46849C11.587 5.34923 12.2085 5.41044 12.7733 5.64438C13.3381 5.87833 13.8208 6.2745 14.1605 6.78279C14.5001 7.29109 14.6814 7.88869 14.6814 8.50001C14.6814 9.31977 14.3557 10.106 13.7761 10.6856C13.1964 11.2653 12.4102 11.5909 11.5905 11.5909Z"
-						class="fill"
-					/>
-				</svg>
-				View army
-			</a>
-			{#if app.user && app.user.id === army.createdBy}
-				<a class="action" href="/armies/{army.id}?editing=true">
-					<svg width="19" height="19" viewBox="0 0 19 19" fill="none" xmlns="http://www.w3.org/2000/svg">
-						<path
-							d="M15.7653 11.4932V15.5732C15.7651 16.1505 15.5357 16.7041 15.1275 17.1123C14.7193 17.5205 14.1657 17.7499 13.5884 17.7501H2.92794C2.64101 17.75 2.35693 17.6932 2.09202 17.583C1.82712 17.4727 1.58661 17.3112 1.38432 17.1077C1.18202 16.9042 1.02194 16.6628 0.913251 16.3972C0.804566 16.1317 0.749426 15.8473 0.751 15.5603V4.91183C0.749292 4.62535 0.804459 4.34138 0.913301 4.07638C1.02214 3.81138 1.1825 3.57062 1.38507 3.36804C1.58765 3.16547 1.82841 3.00512 2.09341 2.89627C2.35841 2.78743 2.64238 2.73226 2.92885 2.73397H7.00797"
-							stroke="black"
-							stroke-width="1.5"
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							class="stroke"
-						/>
-						<path
-							d="M15.7653 6.48871L12.0115 2.73398M4.5039 12.7448V10.7553C4.50574 10.4272 4.63622 10.112 4.86687 9.87954L13.6261 1.12034C13.7424 1.00304 13.8809 0.909933 14.0334 0.846395C14.1859 0.782857 14.3495 0.750145 14.5147 0.750145C14.6799 0.750145 14.8435 0.782857 14.996 0.846395C15.1485 0.909933 15.2869 1.00304 15.4033 1.12034L17.3799 3.09695C17.4974 3.21318 17.5907 3.35156 17.6544 3.50409C17.7181 3.65662 17.7509 3.82026 17.7509 3.98555C17.7509 4.15084 17.7181 4.31449 17.6544 4.46702C17.5907 4.61955 17.4974 4.75793 17.3799 4.87415L8.62069 13.6334C8.38772 13.8646 8.07319 13.9949 7.74495 13.9963H5.75548C5.42354 13.9963 5.10519 13.8645 4.87048 13.6298C4.63576 13.395 4.5039 13.0767 4.5039 12.7448Z"
-							stroke="black"
-							stroke-width="1.5"
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							class="stroke"
-						/>
-					</svg>
-					Edit army
-				</a>
-			{/if}
-			<button class="action" onclick={() => copyLink(army.units)}>
-				<svg width="16" height="17" viewBox="0 0 16 17" fill="none" xmlns="http://www.w3.org/2000/svg">
-					<path
-						d="M3.4 3.4V0.849999C3.4 0.624565 3.48955 0.408365 3.64896 0.248959C3.80836 0.0895532 4.02456 0 4.25 0H14.45C14.6754 0 14.8916 0.0895532 15.051 0.248959C15.2104 0.408365 15.3 0.624565 15.3 0.849999V12.75C15.3 12.9754 15.2104 13.1916 15.051 13.351C14.8916 13.5104 14.6754 13.6 14.45 13.6H11.9V16.15C11.9 16.6192 11.5175 17 11.044 17H0.855949C0.743857 17.0007 0.632737 16.9792 0.528974 16.9368C0.42521 16.8944 0.330848 16.8319 0.25131 16.7529C0.171771 16.6739 0.108624 16.58 0.0654961 16.4765C0.0223682 16.373 0.000109968 16.2621 0 16.15L0.00255002 4.25C0.00255002 3.7808 0.38505 3.4 0.857649 3.4H3.4ZM1.7017 5.1L1.7 15.3H10.2V5.1H1.7017ZM5.1 3.4H11.9V11.9H13.6V1.7H5.1V3.4ZM3.4 7.64999H8.49999V9.34999H3.4V7.64999ZM3.4 11.05H8.49999V12.75H3.4V11.05Z"
-						class="fill"
-					/>
-				</svg>
-				Copy link
-			</button>
-			<button class="action" onclick={() => openInGame(army.units)}>
-				<svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg">
-					<path
-						d="M3.75 1.875C3.25272 1.875 2.77581 2.07254 2.42417 2.42417C2.07254 2.77581 1.875 3.25272 1.875 3.75V11.25C1.875 11.7473 2.07254 12.2242 2.42417 12.5758C2.77581 12.9275 3.25272 13.125 3.75 13.125H11.25C11.7473 13.125 12.2242 12.9275 12.5758 12.5758C12.9275 12.2242 13.125 11.7473 13.125 11.25V9.375C13.125 9.12636 13.2238 8.8879 13.3996 8.71209C13.5754 8.53627 13.8139 8.4375 14.0625 8.4375C14.3111 8.4375 14.5496 8.53627 14.7254 8.71209C14.9012 8.8879 15 9.12636 15 9.375V11.25C15 12.2446 14.6049 13.1984 13.9016 13.9016C13.1984 14.6049 12.2446 15 11.25 15H3.75C2.75544 15 1.80161 14.6049 1.09835 13.9016C0.395088 13.1984 0 12.2446 0 11.25V3.75C0 2.75544 0.395088 1.80161 1.09835 1.09835C1.80161 0.395088 2.75544 0 3.75 0H5.625C5.87364 0 6.1121 0.0987722 6.28791 0.274588C6.46373 0.450403 6.5625 0.68886 6.5625 0.9375C6.5625 1.18614 6.46373 1.4246 6.28791 1.60041C6.1121 1.77623 5.87364 1.875 5.625 1.875H3.75ZM9.375 1.875C9.12636 1.875 8.8879 1.77623 8.71209 1.60041C8.53627 1.4246 8.4375 1.18614 8.4375 0.9375C8.4375 0.68886 8.53627 0.450403 8.71209 0.274588C8.8879 0.0987722 9.12636 0 9.375 0H14.0625C14.3111 0 14.5496 0.0987722 14.7254 0.274588C14.9012 0.450403 15 0.68886 15 0.9375V5.625C15 5.87364 14.9012 6.1121 14.7254 6.28791C14.5496 6.46373 14.3111 6.5625 14.0625 6.5625C13.8139 6.5625 13.5754 6.46373 13.3996 6.28791C13.2238 6.1121 13.125 5.87364 13.125 5.625V3.20063L10.0388 6.28875C9.95159 6.37592 9.84811 6.44506 9.73422 6.49223C9.62033 6.5394 9.49827 6.56368 9.375 6.56368C9.25173 6.56368 9.12967 6.5394 9.01578 6.49223C8.90189 6.44506 8.79841 6.37592 8.71125 6.28875C8.62408 6.20159 8.55494 6.09811 8.50777 5.98422C8.4606 5.87033 8.43632 5.74827 8.43632 5.625C8.43632 5.50173 8.4606 5.37967 8.50777 5.26578C8.55494 5.15189 8.62408 5.04841 8.71125 4.96125L11.7994 1.875H9.375Z"
-						class="fill"
-					/>
-				</svg>
-				Open in-game
-			</button>
-			{#if !hideUsername}
-				<a class="action" href="/users/{army.username}">
-					<svg width="17" height="17" viewBox="0 0 17 17" fill="none" xmlns="http://www.w3.org/2000/svg">
-						<path
-							fill-rule="evenodd"
-							clip-rule="evenodd"
-							d="M8.50001 0C13.1946 0 17 3.80545 17 8.5C17.003 10.4617 16.3246 12.3636 15.0807 13.8805L15.0977 13.8992L14.9855 13.9944C14.1884 14.9372 13.1951 15.6947 12.0749 16.2138C10.9547 16.733 9.73464 17.0013 8.50001 17C5.99251 17 3.74001 15.9145 2.18451 14.189L2.01451 13.9935L1.90231 13.9L1.91931 13.8796C0.675553 12.363 -0.00286231 10.4614 9.07751e-06 8.5C9.07751e-06 3.80545 3.80546 0 8.50001 0ZM8.50001 12.75C6.91901 12.75 5.49016 13.2532 4.42596 13.9451C5.60101 14.8268 7.03096 15.3023 8.50001 15.3C9.96905 15.3023 11.399 14.8268 12.5741 13.9451C11.358 13.1659 9.94428 12.7512 8.50001 12.75ZM8.50001 1.7C7.22035 1.69996 5.96666 2.06101 4.88302 2.74163C3.79939 3.42226 2.92979 4.39484 2.37419 5.54758C1.8186 6.70033 1.59954 7.98646 1.74221 9.25813C1.88488 10.5298 2.38348 11.7354 3.18071 12.7364C4.55856 11.7478 6.43876 11.05 8.50001 11.05C10.5613 11.05 12.4415 11.7478 13.8193 12.7364C14.6165 11.7354 15.1151 10.5298 15.2578 9.25813C15.4005 7.98646 15.1814 6.70033 14.6258 5.54758C14.0702 4.39484 13.2006 3.42226 12.117 2.74163C11.0334 2.06101 9.77966 1.69996 8.50001 1.7ZM8.50001 3.4C9.40174 3.4 10.2665 3.75821 10.9042 4.39584C11.5418 5.03346 11.9 5.89826 11.9 6.8C11.9 7.70173 11.5418 8.56654 10.9042 9.20416C10.2665 9.84178 9.40174 10.2 8.50001 10.2C7.59827 10.2 6.73347 9.84178 6.09584 9.20416C5.45822 8.56654 5.10001 7.70173 5.10001 6.8C5.10001 5.89826 5.45822 5.03346 6.09584 4.39584C6.73347 3.75821 7.59827 3.4 8.50001 3.4ZM8.50001 5.1C8.04914 5.1 7.61674 5.27911 7.29793 5.59792C6.97911 5.91673 6.80001 6.34913 6.80001 6.8C6.80001 7.25087 6.97911 7.68327 7.29793 8.00208C7.61674 8.32089 8.04914 8.5 8.50001 8.5C8.95087 8.5 9.38328 8.32089 9.70209 8.00208C10.0209 7.68327 10.2 7.25087 10.2 6.8C10.2 6.34913 10.0209 5.91673 9.70209 5.59792C9.38328 5.27911 8.95087 5.1 8.50001 5.1Z"
-							class="fill"
-						/>
-					</svg>
-					{army.username}
-				</a>
-			{/if}
+		<div class="title-container">
+			<img src="/clash/town-halls/{army.townHall}.png" alt="Town hall {army.townHall}" class="town-hall" />
+			<h3>{army.name}</h3>
+		</div>
+		<div class="right">
+			<div class="totals">
+				<small class="total">
+					<img src="/clash/ui/troops.png" alt="Clash of clans troop capacity" />
+					{housingSpaceUsed.troops}/{army.troopCapacity}
+				</small>
+				{#if army.spellCapacity > 0}
+					<small class="total">
+						<img src="/clash/ui/spells.png" alt="Clash of clans spell capacity" />
+						{housingSpaceUsed.spells}/{army.spellCapacity}
+					</small>
+				{/if}
+				{#if army.siegeCapacity > 0}
+					<small class="total">
+						<img src="/clash/ui/sieges.png" alt="Clash of clans siege machine capacity" />
+						{housingSpaceUsed.sieges}/{army.siegeCapacity}
+					</small>
+				{/if}
+				<small class="total">
+					<img src="/clash/ui/clock.png" alt="Clash of clans clock (time to train army)" />
+					{formatTime(housingSpaceUsed.time * 1000)}
+				</small>
+			</div>
+			<div class="separator"></div>
+			<C.Votes bind:votes bind:userVote armyId={army.id} allowEdit={app.user !== null} class="card-votes" />
 		</div>
 	</div>
-	<ul class="units-container">
-		{#each army.units as unit}
-			<li class="unit-container">
+	<ul class="units-list">
+		{#each [...troopUnits, ...spellUnits, ...siegeUnits] as unit}
+			<li>
 				<C.UnitDisplay {...unit} display="block" />
 			</li>
 		{/each}
 	</ul>
+	<div class="controls">
+		<C.ActionButton theme="success" ghost onclick={() => copyLink(units)} disabled={!units.length} title={getCopyBtnTitle(units)}>
+			<svg width="16" height="17" viewBox="0 0 16 17" fill="none" xmlns="http://www.w3.org/2000/svg">
+				<path
+					d="M3.4 3.4V0.849999C3.4 0.624565 3.48955 0.408365 3.64896 0.248959C3.80836 0.0895532 4.02456 0 4.25 0H14.45C14.6754 0 14.8916 0.0895532 15.051 0.248959C15.2104 0.408365 15.3 0.624565 15.3 0.849999V12.75C15.3 12.9754 15.2104 13.1916 15.051 13.351C14.8916 13.5104 14.6754 13.6 14.45 13.6H11.9V16.15C11.9 16.6192 11.5175 17 11.044 17H0.855949C0.743857 17.0007 0.632737 16.9792 0.528974 16.9368C0.42521 16.8944 0.330848 16.8319 0.25131 16.7529C0.171771 16.6739 0.108624 16.58 0.0654961 16.4765C0.0223682 16.373 0.000109968 16.2621 0 16.15L0.00255002 4.25C0.00255002 3.7808 0.38505 3.4 0.857649 3.4H3.4ZM1.7017 5.1L1.7 15.3H10.2V5.1H1.7017ZM5.1 3.4H11.9V11.9H13.6V1.7H5.1V3.4ZM3.4 7.64999H8.49999V9.34999H3.4V7.64999ZM3.4 11.05H8.49999V12.75H3.4V11.05Z"
+					fill="black"
+				/>
+			</svg>
+			Copy link
+		</C.ActionButton>
+		<C.ActionButton theme="success" ghost onclick={() => openInGame(units)} disabled={!units.length} title={getOpenBtnTitle(units)}>
+			<svg width="18" height="12" viewBox="0 0 18 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+				<path
+					fill-rule="evenodd"
+					clip-rule="evenodd"
+					d="M16.6241 5.45391C15.87 1.24228 14.184 0 13.2871 0C11.8875 0 11.5284 1.04051 8.54967 1.07556C5.57093 1.04051 5.21184 0 3.81224 0C2.91537 0 1.22849 1.24228 0.474403 5.45391C0.0443491 7.85811 -0.422469 11.4473 0.689858 11.8782C2.07407 12.4143 2.54345 11.0737 4.0636 9.94084C5.60684 8.7926 6.34725 8.52243 8.54967 8.52243C10.7521 8.52243 11.4925 8.7926 13.0357 9.94084C14.5559 11.0728 15.0253 12.4143 16.4095 11.8782C17.5218 11.4473 17.055 7.85896 16.6241 5.45391ZM5.12976 6.00024C4.67625 6.00024 4.24132 5.82008 3.92064 5.4994C3.59996 5.17872 3.4198 4.74379 3.4198 4.29028C3.4198 3.83677 3.59996 3.40184 3.92064 3.08116C4.24132 2.76048 4.67625 2.58033 5.12976 2.58033C5.58327 2.58033 6.0182 2.76048 6.33888 3.08116C6.65956 3.40184 6.83972 3.83677 6.83972 4.29028C6.83972 4.74379 6.65956 5.17872 6.33888 5.4994C6.0182 5.82008 5.58327 6.00024 5.12976 6.00024ZM11.1146 6.00024C10.8879 6.00024 10.6704 5.91016 10.51 5.74982C10.3497 5.58948 10.2596 5.37202 10.2596 5.14526C10.2596 4.91851 10.3497 4.70104 10.51 4.5407C10.6704 4.38036 10.8879 4.29028 11.1146 4.29028C11.3414 4.29028 11.5588 4.38036 11.7192 4.5407C11.8795 4.70104 11.9696 4.91851 11.9696 5.14526C11.9696 5.37202 11.8795 5.58948 11.7192 5.74982C11.5588 5.91016 11.3414 6.00024 11.1146 6.00024ZM12.8246 4.29028C12.5978 4.29028 12.3803 4.2002 12.22 4.03986C12.0597 3.87952 11.9696 3.66206 11.9696 3.4353C11.9696 3.20855 12.0597 2.99108 12.22 2.83074C12.3803 2.6704 12.5978 2.58033 12.8246 2.58033C13.0513 2.58033 13.2688 2.6704 13.4291 2.83074C13.5895 2.99108 13.6795 3.20855 13.6795 3.4353C13.6795 3.66206 13.5895 3.87952 13.4291 4.03986C13.2688 4.2002 13.0513 4.29028 12.8246 4.29028Z"
+					fill="#53E059"
+				/>
+			</svg>
+			Open in-game
+		</C.ActionButton>
+		<C.ActionButton theme="success" asLink href="/armies/{army.id}">
+			<svg width="18" height="12" viewBox="0 0 18 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+				<path
+					d="M8.8 3.6C8.16348 3.6 7.55303 3.85286 7.10294 4.30294C6.65286 4.75303 6.4 5.36348 6.4 6C6.4 6.63652 6.65286 7.24697 7.10294 7.69706C7.55303 8.14714 8.16348 8.4 8.8 8.4C9.43652 8.4 10.047 8.14714 10.4971 7.69706C10.9471 7.24697 11.2 6.63652 11.2 6C11.2 5.36348 10.9471 4.75303 10.4971 4.30294C10.047 3.85286 9.43652 3.6 8.8 3.6ZM8.8 10C7.73913 10 6.72172 9.57857 5.97157 8.82843C5.22143 8.07828 4.8 7.06087 4.8 6C4.8 4.93913 5.22143 3.92172 5.97157 3.17157C6.72172 2.42143 7.73913 2 8.8 2C9.86087 2 10.8783 2.42143 11.6284 3.17157C12.3786 3.92172 12.8 4.93913 12.8 6C12.8 7.06087 12.3786 8.07828 11.6284 8.82843C10.8783 9.57857 9.86087 10 8.8 10ZM8.8 0C4.8 0 1.384 2.488 0 6C1.384 9.512 4.8 12 8.8 12C12.8 12 16.216 9.512 17.6 6C16.216 2.488 12.8 0 8.8 0Z"
+					fill="#53E059"
+				/>
+			</svg>
+			View army
+		</C.ActionButton>
+	</div>
 </li>
 
 <style>
 	.army-card {
 		background-color: var(--grey-800);
+		border: 1px dashed var(--grey-500);
+		border-radius: 8px;
 		overflow: hidden;
-		border-radius: 6px;
-		height: 100%;
 		width: 100%;
 	}
 
-	.army-card h3 {
+	.header {
 		display: flex;
-		align-items: center;
-		color: var(--grey-100);
-		font-family: 'Poppins';
-		text-align: left;
-		font-size: 1em;
-	}
-
-	.army-card .header {
-		display: flex;
-		align-items: center;
 		justify-content: space-between;
-		border-bottom: 1px solid var(--grey-600);
-		padding: 0.75em 1.4em 0.6em 1.4em;
-		margin-bottom: 1em;
-		gap: 1.25em;
+		align-items: center;
+		padding: 10px 16px;
+		gap: 0.5em;
 	}
-
-	.army-card .actions {
+	.header .title-container {
 		display: flex;
 		align-items: center;
-		gap: 0.75em;
+		gap: 4px;
 	}
-
-	.army-card .action {
-		display: flex;
-		align-items: center;
-		font-size: 0.8em;
-		color: var(--grey-400);
-		transition: color 0.15s ease-in-out;
-		gap: 0.4em;
-	}
-
-	.army-card .action path {
-		transition:
-			fill 0.15s ease-in-out,
-			stroke 0.15s ease-in-out;
-	}
-
-	.army-card .action .fill {
-		fill: var(--grey-400);
-	}
-	.army-card .action .stroke {
-		stroke: var(--grey-400);
-	}
-
-	.army-card .action:focus,
-	.army-card .action:active {
-		outline: var(--primary-400) dotted 1px;
-	}
-
-	.army-card .action:hover .fill {
-		fill: var(--primary-400);
-	}
-	.army-card .action:hover .stroke {
-		stroke: var(--primary-400);
-	}
-
-	.army-card .action:hover {
+	.header h3 {
 		color: var(--primary-400);
+		word-break: break-all;
+		font-size: 18px;
+		line-height: 18px;
 	}
-
-	.army-card .action svg {
-		max-height: 12px;
+	.header .town-hall {
+		flex-shrink: 0;
+		max-height: 26px;
+		width: auto;
+	}
+	.header .right,
+	.header .right .totals {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+	}
+	.header .right .totals small {
+		display: flex;
+		align-items: center;
+		font-family: 'Clash', sans-serif;
+		color: var(--grey-100);
+		font-size: 14px;
+		line-height: 14px;
+		gap: 4px;
+	}
+	.header .right .totals img {
+		display: block;
+		max-height: 16px;
 		height: 100%;
 		width: auto;
 	}
-
-	.units-container {
-		display: flex;
-		flex-flow: row wrap;
-		padding: 0 1.4em 1em 1.4em;
-		gap: 0.3em;
+	.header .right .separator {
+		background-color: var(--grey-500);
+		height: 22px;
+		width: 1px;
+	}
+	.header .right :global(.card-votes b) {
+		font-size: 14px;
+		line-height: 14px;
+	}
+	.header .right :global(.card-votes svg) {
+		max-height: 14px;
+		width: auto;
 	}
 
-	.unit-container {
-		font-size: 0.4em;
-		height: 70px;
-		width: 54px;
+	.units-list {
+		display: flex;
+		flex-flow: row wrap;
+		border: 1px dashed var(--grey-500);
+		border-left: none;
+		border-right: none;
+		padding: 16px;
+		gap: 6px;
+	}
+	.units-list li {
+		--unit-border-radius: 6px;
+		--amount-size: 14px;
+		max-width: 56px;
+		width: 100%;
+		height: auto;
+	}
+
+	.controls {
+		display: flex;
+		justify-content: flex-end;
+		padding: 14px 16px;
+		gap: 0.5em;
+	}
+
+	@media (max-width: 775px) {
+		.header {
+			flex-flow: column nowrap;
+			align-items: flex-start;
+		}
+	}
+
+	@media (max-width: 550px) {
+		.controls {
+			flex-flow: column nowrap;
+		}
+		.controls :global(.action-btn) {
+			justify-content: center;
+			width: 100%;
+		}
+	}
+
+	@media (max-width: 450px) {
+		.header .right,
+		.header .right .totals {
+			flex-flow: row wrap;
+		}
+		.header .right .separator {
+			display: none;
+		}
 	}
 </style>

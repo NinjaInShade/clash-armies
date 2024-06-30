@@ -5,30 +5,32 @@ import type { User, Session } from 'lucia';
 declare global {
 	namespace App {
 		// interface Error {}
-		interface Locals {
-			/**
-			 * Returns true if user is authenticated.
-			 */
-			hasAuth: () => boolean;
-			/**
-			 * Ensures user is authenticated and returns their user object. Redirects to `login` if un-authenticated.
-			 */
-			requireAuth: () => User;
-			/**
-			 * Returns true if user is authenticated and has every role specified.
-			 */
-			hasRoles: (...roles: string[]) => boolean;
-			/**
-			 * Ensures user is authenticated and has all roles specified. Throws `403` if user doesn't any of the role/s .
-			 */
-			requireRoles: (...roles: string[]) => User;
-			user: User | null;
-			session: Session | null;
-		}
+		interface Locals extends Request {}
 		// interface PageData {}
 		// interface PageState {}
 		// interface Platform {}
 	}
+}
+
+export interface Request {
+	/**
+	 * Returns true if user is authenticated.
+	 */
+	hasAuth: () => boolean;
+	/**
+	 * Ensures user is authenticated and returns their user object. Redirects to `login` if un-authenticated.
+	 */
+	requireAuth: () => User;
+	/**
+	 * Returns true if user is authenticated and has every role specified.
+	 */
+	hasRoles: (...roles: string[]) => boolean;
+	/**
+	 * Ensures user is authenticated and has all roles specified. Throws `403` if user doesn't any of the role/s .
+	 */
+	requireRoles: (...roles: string[]) => User;
+	user: User | null;
+	session: Session | null;
 }
 
 export {};

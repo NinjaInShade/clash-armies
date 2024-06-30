@@ -15,7 +15,7 @@
 		/** Sets the on change handler */
 		onChange?: (value: boolean) => Promise<void> | void;
 	};
-	let { value, disabled, title, class: _class, style, onChange }: Props = $props();
+	let { value = $bindable(), disabled, title, class: _class, style, onChange }: Props = $props();
 
 	// Passed down from context in parent <Fieldset />
 	const htmlName = getContext<string>('htmlName');

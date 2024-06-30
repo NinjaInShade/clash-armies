@@ -17,7 +17,8 @@ export type Modal = {
 
 export type User = {
 	id: number;
-	googleId: string;
+	// Only included if user is requesting his own data
+	googleId?: string;
 	username: string;
 	roles: string[];
 	playerTag: string | null;
@@ -101,6 +102,7 @@ export type Army = {
 	siegeCapacity: number;
 	spellCapacity: number;
 	votes: number;
+	userVote?: number;
 };
 
 type UserUtils = {

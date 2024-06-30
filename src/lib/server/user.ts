@@ -1,18 +1,21 @@
 import type { User } from '~/lib/shared/types';
-import { db } from "~/lib/server/db";
+import { db } from '~/lib/server/db';
 import z from 'zod';
 import type { RequestEvent } from '@sveltejs/kit';
+import type { Request } from '~/app';
 
 type GetUsersParams = {
+	req: Request;
 	username?: string;
 };
 
-export async function getUsers(opts: GetUsersParams = {}) {
-	const { username } = opts;
+export async function getUsers(opts: GetUsersParams) {
+	const { req, username } = opts;
 
 	const args: (number | string)[] = [];
 	let query = `
         SELECT
+			u.googleId,
 			u.id,
 			u.googleId,
 			JSON_ARRAYAGG(ur.role) AS roles,
@@ -33,20 +36,23 @@ export async function getUsers(opts: GetUsersParams = {}) {
 		GROUP BY u.id
 	`;
 
-
 	const users = await db.query<User>(query, args);
 	for (const user of users) {
 		user.roles = JSON.parse(user.roles);
 
 		// TODO: fetch player level (and other stats if added) from clash of clans API if player tag is defined
 		user.level = null;
+
+		if (!req.hasRoles('admin') || req.user?.id !== user.id) {
+			delete user.googleId;
+		}
 	}
 	return users;
 }
 
-export async function getUser(username: string) {
+export async function getUser(req: Request, username: string) {
 	z.object({ username: z.string() }).parse({ username });
-	const users = await getUsers({ username });
+	const users = await getUsers({ req, username });
 	if (!users.length) {
 		return null;
 	}
