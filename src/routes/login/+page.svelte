@@ -22,7 +22,10 @@
 
 <style>
 	section {
+		display: flex;
+		align-items: center;
 		padding: 50px var(--side-padding);
+		flex: 1 0 0px;
 	}
 
 	section .container {
@@ -91,5 +94,15 @@
 		display: block;
 		max-height: 20px;
 		height: 100%;
+	}
+
+	@media (max-width: 425px) {
+		.logo {
+			max-width: 50px;
+		}
+
+		h2 {
+			margin: 0.6em 0 0.4em 0;
+		}
 	}
 </style>

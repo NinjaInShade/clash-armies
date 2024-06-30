@@ -36,7 +36,7 @@
 <C.FocusTrap>
 	<div class="modal">
 		<div class="modal-header">
-			<p class="modal-title">{title ?? ''}</p>
+			<h2 class="modal-title">{title ?? ''}</h2>
 			<button type="button" class="close-btn" onclick={close}>
 				<img src="/clash/ui/close.png" alt="Close icon" />
 			</button>
@@ -68,8 +68,8 @@
 		background-color: var(--grey-800);
 		height: var(--modal-height, auto);
 		width: var(--modal-width, 575px);
-		max-width: calc(100vw - 4em);
-		max-height: calc(100vh - 3em);
+		max-width: calc(100dvw - 4em);
+		max-height: calc(100dvh - 3em);
 		border-radius: 6px;
 		overflow: hidden;
 		bottom: 50%;
@@ -83,13 +83,6 @@
 		background-color: var(--grey-900);
 		padding: 14px 24px;
 		height: 70px;
-	}
-
-	.modal-title {
-		font-family: 'Clash', sans-serif;
-		color: var(--grey-100);
-		line-height: 1.35em;
-		font-size: 1.35em;
 	}
 
 	.close-btn {

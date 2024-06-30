@@ -2,7 +2,6 @@
 	import { fade } from 'svelte/transition';
 	import { sineInOut } from 'svelte/easing';
 	import { onMount, setContext, type Snippet } from 'svelte';
-	import { version } from '$app/environment';
 	import type { LayoutData } from './$types';
 	import { createAppState, requireHTML } from '~/lib/client/state.svelte';
 	import type { AppState } from '~/lib/shared/types';
@@ -13,6 +12,8 @@
 		children: Snippet;
 	};
 	let { data, children }: Props = $props();
+
+	const alerts = [];
 
 	let devDebugOpen: boolean = $state(false);
 
@@ -58,13 +59,6 @@
 		appState.townHall = !Number.isNaN(savedTownHall) ? savedTownHall : data.townHalls.length;
 	});
 
-	function openTownHallSelector() {
-		if (appState.townHall === null) {
-			return;
-		}
-		appState.openModal(C.TownHallSelector, { appState });
-	}
-
 	function toggleDevDebug() {
 		devDebugOpen = !devDebugOpen;
 	}
@@ -73,61 +67,21 @@
 		appState.modals.pop();
 		requireHTML().classList.remove('hide-overflow');
 	}
-
-	function openChangelog() {
-		// TODO: add changelog modal
-	}
 </script>
 
-<nav>
-	<div class="container">
-		<div class="left">
-			<div class="logo-container">
-				<a class="logo" href="/">
-					<img src="/clash/ui/swords.png" alt="Clash of clans overlapping swords" />
-					Clash <span>Armies</span>
-				</a>
-				<button class="version" onclick={openChangelog}><span>v</span>{version}</button>
-			</div>
-			<ul class="links">
-				<li>
-					<a class="body" href="/armies">Armies</a>
-				</li>
-				{#if appState.user}
-					<li>
-						<a class="body" href="/create">Create</a>
-					</li>
-				{/if}
-			</ul>
+<C.Nav />
+
+{#if alerts.length}
+	<div class="alerts">
+		<div class="container">
+			<!-- TODO -->
 		</div>
-		<ul class="links">
-			{#if appState.user && appState.user.hasRoles('admin')}
-				<li>
-					<a class="body" href="/admin">Admin</a>
-				</li>
-			{/if}
-			{#if appState.user}
-				<li>
-					<a class="body" href="/users/{appState.user.username}">Account</a>
-				</li>
-			{/if}
-			<li class="control">
-				{#if appState.user}
-					<C.Link href="/logout">Log out</C.Link>
-				{:else}
-					<C.Link href="/login">Log in</C.Link>
-				{/if}
-			</li>
-			{#if appState.user}
-				<li class="control">
-					<C.TownHall level={appState.townHall} onclick={openTownHallSelector} --width="80px" />
-				</li>
-			{/if}
-		</ul>
 	</div>
-</nav>
+{/if}
 
 {@render children()}
+
+<C.Footer />
 
 {#if appState.modals.length}
 	<div class="modals-container" transition:fade={{ duration: 150, easing: sineInOut }}>
@@ -157,99 +111,8 @@
 {/if}
 
 <style>
-	nav {
-		background-color: var(--grey-800);
-		padding: 16px var(--side-padding);
-	}
-
-	nav .container {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		gap: 1em;
-	}
-
-	.left {
-		display: flex;
-		align-items: center;
-		gap: 24px;
-	}
-
-	.logo-container {
-		display: flex;
-		align-items: center;
-		gap: 0.3em;
-	}
-
-	.version {
-		display: block;
-		outline: none;
-		background: none;
-		border: 1px dashed var(--primary-400);
-		color: var(--primary-400);
-		padding: 4px 7px;
-		border-radius: 50px;
-		font-weight: 700;
-		font-size: 10px;
-		line-height: 10px;
-		transition:
-			background-color,
-			color 0.15s;
-	}
-
-	.version span {
-		display: inline-block;
-		font-size: 10px;
-	}
-
-	.logo {
-		display: flex;
-		align-items: center;
-	}
-
-	.logo,
-	.logo span {
-		color: var(--grey-100);
-		font-family: 'Clash', sans-serif;
-		font-weight: 700;
-		font-size: 20px;
-	}
-
-	.logo span {
-		color: var(--primary-400);
-	}
-
-	.logo img {
-		/** Optical alignment */
-		position: relative;
-		bottom: 1.5px;
-		/* Rest */
-		margin-right: 0.25em;
-		max-height: 32px;
-		height: 100%;
-		width: auto;
-	}
-
-	.links {
-		display: flex;
-		align-items: center;
-	}
-
-	.links li:not(:last-child) {
-		margin-right: 16px;
-	}
-
-	.links li.control:not(:last-child) {
-		margin-right: 8px;
-	}
-
-	.links li a {
-		transition: color 0.15s ease-in-out;
-		color: var(--grey-400);
-	}
-
-	.links li a:hover {
-		color: var(--grey-300);
+	.modals-container {
+		z-index: 4;
 	}
 
 	.modal-backdrop {
@@ -315,5 +178,9 @@
 
 	.dev-debug p:not(:last-child) {
 		margin-bottom: 0.5em;
+	}
+
+	.alerts {
+		padding: 24px var(--side-padding);
 	}
 </style>

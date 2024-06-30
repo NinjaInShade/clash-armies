@@ -44,6 +44,7 @@
 <style>
 	header {
 		padding: 100px var(--side-padding);
+		flex: 1 0 0px;
 	}
 
 	header .container {

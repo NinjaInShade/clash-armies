@@ -111,8 +111,8 @@
 				<input class="image-input" type="file" name="image" accept=".png" bind:files={image} />
 			</div>
 		</C.Fieldset>
-		<C.Fieldset label="Level" htmlName="level" style="margin-bottom: 1em">
-			<C.Input bind:value={level} type="number" name="level" --input-width="100%" />
+		<C.Fieldset label="Level" htmlName="level" style="margin-bottom: 1em" --input-width="100%">
+			<C.Input bind:value={level} type="number" name="level" />
 		</C.Fieldset>
 		<div class="row">
 			<C.Fieldset label="Max barracks" htmlName="maxBarracks">
@@ -130,11 +130,11 @@
 				<C.Input bind:value={maxDarkSpellFactory} type="number" name="maxDarkSpellFactory" --input-width="100%" />
 			</C.Fieldset>
 		</div>
-		<C.Fieldset label="Max laboratory" htmlName="maxLaboratory" style="margin-bottom: 1em">
-			<C.Input bind:value={maxLaboratory} type="number" name="maxLaboratory" --input-width="100%" />
+		<C.Fieldset label="Max laboratory" htmlName="maxLaboratory" style="margin-bottom: 1em" --input-width="100%">
+			<C.Input bind:value={maxLaboratory} type="number" name="maxLaboratory" />
 		</C.Fieldset>
-		<C.Fieldset label="Max workshop" htmlName="maxWorkshop" style="margin-bottom: 1em">
-			<C.Input bind:value={maxWorkshop} type="number" name="maxWorkshop" --input-width="100%" />
+		<C.Fieldset label="Max workshop" htmlName="maxWorkshop" style="margin-bottom: 1em" --input-width="100%">
+			<C.Input bind:value={maxWorkshop} type="number" name="maxWorkshop" />
 		</C.Fieldset>
 		<div class="row">
 			<C.Fieldset label="Troop capacity" htmlName="troopCapacity">

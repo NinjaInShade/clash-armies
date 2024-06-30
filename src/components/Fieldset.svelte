@@ -32,6 +32,8 @@
 		align-items: flex-start;
 		user-select: none;
 		white-space: nowrap;
+		flex: 1 0 0px;
+		max-width: var(--input-width, 250px);
 		gap: 6px;
 	}
 

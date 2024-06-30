@@ -139,13 +139,13 @@
 		display: flex;
 		align-items: center;
 		color: var(--grey-100);
-		font-size: 3em;
-		line-height: 1;
+		line-height: var(--h1);
 		font-weight: 400;
 		gap: 0.3em;
 	}
 
 	.title svg {
+		flex-shrink: 0;
 		position: relative;
 		bottom: 4px;
 	}

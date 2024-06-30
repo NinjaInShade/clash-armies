@@ -50,8 +50,8 @@
 		</div>
 	{/if}
 
-	<C.Fieldset label="Username" htmlName="username" style="margin-bottom: 1em">
-		<C.Input bind:value={username} name="username" --input-width="100%" />
+	<C.Fieldset label="Username" htmlName="username" style="margin-bottom: 1em" --input-width="100%">
+		<C.Input bind:value={username} name="username" />
 	</C.Fieldset>
 </C.Modal>
 

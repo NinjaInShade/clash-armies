@@ -159,47 +159,47 @@
 	</C.Fieldset>
 
 	<div class="row">
-		<C.Fieldset label="Name" htmlName="name" style="flex: 1 0 0px;">
-			<C.Input bind:value={name} --input-width="100%" />
+		<C.Fieldset label="Name" htmlName="name" style="flex: 1 0 0px;" --input-width="100%">
+			<C.Input bind:value={name} />
 		</C.Fieldset>
-		<C.Fieldset label="Type" htmlName="type" style="flex: 1 0 0px;">
-			<C.Select data={UNIT_TYPES} bind:value={type} --input-width="100%" />
-		</C.Fieldset>
-	</div>
-
-	<div class="row">
-		<C.Fieldset label="Production building" htmlName="productionBuilding" style="flex: 1 0 0px;">
-			<C.Select data={PROD_BUILDINGS} bind:value={productionBuilding} --input-width="100%" />
-		</C.Fieldset>
-		<C.Fieldset label="Object ID" htmlName="objectId" style="flex: 1 0 0px;">
-			<C.Input bind:value={objectId} type="number" --input-width="100%" />
+		<C.Fieldset label="Type" htmlName="type" style="flex: 1 0 0px;" --input-width="100%">
+			<C.Select data={UNIT_TYPES} bind:value={type} />
 		</C.Fieldset>
 	</div>
 
 	<div class="row">
-		<C.Fieldset label="Housing space" htmlName="housingSpace" style="flex: 1 0 0px;">
-			<C.Input bind:value={housingSpace} type="number" --input-width="100%" />
+		<C.Fieldset label="Production building" htmlName="productionBuilding" style="flex: 1 0 0px;" --input-width="100%">
+			<C.Select data={PROD_BUILDINGS} bind:value={productionBuilding} />
 		</C.Fieldset>
-		<C.Fieldset label="Training time" htmlName="trainingTime" style="flex: 1 0 0px;">
-			<C.Input bind:value={trainingTime} type="number" --input-width="100%" />
+		<C.Fieldset label="Object ID" htmlName="objectId" style="flex: 1 0 0px;" --input-width="100%">
+			<C.Input bind:value={objectId} type="number" />
 		</C.Fieldset>
 	</div>
 
 	<div class="row">
-		<C.Fieldset label="Is super?" htmlName="isSuper" labelDir="row-reverse">
-			<C.Checkbox bind:value={isSuper} --input-width="100%" />
+		<C.Fieldset label="Housing space" htmlName="housingSpace" style="flex: 1 0 0px;" --input-width="100%">
+			<C.Input bind:value={housingSpace} type="number" />
 		</C.Fieldset>
-		<C.Fieldset label="Can fly?" htmlName="isFlying" labelDir="row-reverse">
-			<C.Checkbox bind:value={isFlying} --input-width="100%" />
+		<C.Fieldset label="Training time" htmlName="trainingTime" style="flex: 1 0 0px;" --input-width="100%">
+			<C.Input bind:value={trainingTime} type="number" />
 		</C.Fieldset>
-		<C.Fieldset label="Can jump?" htmlName="isJumper" labelDir="row-reverse">
-			<C.Checkbox bind:value={isJumper} --input-width="100%" />
+	</div>
+
+	<div class="row">
+		<C.Fieldset label="Is super?" htmlName="isSuper" labelDir="row-reverse" --input-width="100%">
+			<C.Checkbox bind:value={isSuper} />
 		</C.Fieldset>
-		<C.Fieldset label="Targets air?" htmlName="airTargets" labelDir="row-reverse">
-			<C.Checkbox bind:value={airTargets} --input-width="100%" />
+		<C.Fieldset label="Can fly?" htmlName="isFlying" labelDir="row-reverse" --input-width="100%">
+			<C.Checkbox bind:value={isFlying} />
 		</C.Fieldset>
-		<C.Fieldset label="Targets ground?" htmlName="groundTargets" labelDir="row-reverse">
-			<C.Checkbox bind:value={groundTargets} --input-width="100%" />
+		<C.Fieldset label="Can jump?" htmlName="isJumper" labelDir="row-reverse" --input-width="100%">
+			<C.Checkbox bind:value={isJumper} />
+		</C.Fieldset>
+		<C.Fieldset label="Targets air?" htmlName="airTargets" labelDir="row-reverse" --input-width="100%">
+			<C.Checkbox bind:value={airTargets} />
+		</C.Fieldset>
+		<C.Fieldset label="Targets ground?" htmlName="groundTargets" labelDir="row-reverse" --input-width="100%">
+			<C.Checkbox bind:value={groundTargets} />
 		</C.Fieldset>
 	</div>
 
@@ -210,17 +210,17 @@
 		</div>
 		{#each levels as level}
 			<div class="row levels">
-				<C.Fieldset label="Level" htmlName="level-{level.level}-level" style="flex: 1 0 0px;">
-					<C.Input bind:value={level.level} type="number" --input-width="100%" />
+				<C.Fieldset label="Level" htmlName="level-{level.level}-level" style="flex: 1 0 0px;" --input-width="100%">
+					<C.Input bind:value={level.level} type="number" />
 				</C.Fieldset>
-				<C.Fieldset label="Spell factory" htmlName="level-{level.level}-spellFactoryLevel" style="flex: 1 0 0px;">
-					<C.Input bind:value={level.spellFactoryLevel} type="number" --input-width="100%" />
+				<C.Fieldset label="Spell factory" htmlName="level-{level.level}-spellFactoryLevel" style="flex: 1 0 0px;" --input-width="100%">
+					<C.Input bind:value={level.spellFactoryLevel} type="number" />
 				</C.Fieldset>
-				<C.Fieldset label="Barrack" htmlName="level-{level.level}-barrackLevel" style="flex: 1 0 0px;">
-					<C.Input bind:value={level.barrackLevel} type="number" --input-width="100%" />
+				<C.Fieldset label="Barrack" htmlName="level-{level.level}-barrackLevel" style="flex: 1 0 0px;" --input-width="100%">
+					<C.Input bind:value={level.barrackLevel} type="number" />
 				</C.Fieldset>
-				<C.Fieldset label="Laboratory" htmlName="level-{level.level}-laboratoryLevel" style="flex: 1 0 0px;">
-					<C.Input bind:value={level.laboratoryLevel} type="number" --input-width="100%" />
+				<C.Fieldset label="Laboratory" htmlName="level-{level.level}-laboratoryLevel" style="flex: 1 0 0px;" --input-width="100%">
+					<C.Input bind:value={level.laboratoryLevel} type="number" />
 				</C.Fieldset>
 				<C.Button
 					theme="danger"

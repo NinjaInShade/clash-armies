@@ -42,7 +42,7 @@
 		display: flex;
 		flex-flow: column nowrap;
 		align-items: center;
-		border-radius: 10px;
+		border-radius: var(--unit-border-radius, 10px);
 		overflow: hidden;
 		height: 100%;
 		width: 100%;
@@ -78,7 +78,7 @@
 		text-shadow: var(--txt-shadow-dark);
 		color: var(--grey-100);
 		position: absolute;
-		font-size: 2em;
+		font-size: var(--amount-size, 2em);
 		left: 4px;
 		top: 4px;
 	}
@@ -115,7 +115,7 @@
 		color: var(--grey-100);
 		position: absolute;
 		border-radius: 4px;
-		font-size: 0.75em;
+		font-size: var(--lvl-size, 0.75em);
 		padding: 3px;
 		bottom: 4px;
 		left: 4px;

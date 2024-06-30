@@ -18,7 +18,7 @@
 </script>
 
 <C.Modal title="Select your town hall" {close}>
-	<div class="flex">
+	<div class="grid">
 		{#each appState.townHalls as th}
 			{@const isSelected = appState.townHall === th.level}
 			{@const btnAttributes = { title: isSelected ? `Town hall ${th.level} is already selected` : `Town hall ${th.level}`, disabled: isSelected }}
@@ -28,10 +28,22 @@
 </C.Modal>
 
 <style>
-	.flex {
+	.grid {
 		display: grid;
 		grid-template-columns: repeat(6, 1fr);
 		grid-template-rows: auto;
 		gap: 8px;
+	}
+
+	@media (max-width: 575px) {
+		.grid {
+			grid-template-columns: repeat(4, 1fr);
+		}
+	}
+
+	@media (max-width: 375px) {
+		.grid {
+			grid-template-columns: repeat(3, 1fr);
+		}
 	}
 </style>
