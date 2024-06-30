@@ -46,7 +46,7 @@
 		/** Function that fires of upon selection of a row */
 		onSelect?: (row: Row, e: KeyboardEvent | MouseEvent) => Promise<void> | void;
 	};
-	let { columns, data, defaultSortKey, defaultSortDir = 'desc', selectedKeys, selectable = true, sortable = true, onSelect } = $props<Props>();
+	let { columns, data, defaultSortKey, defaultSortDir = 'desc', selectedKeys = $bindable(), selectable = true, sortable = true, onSelect }: Props = $props();
 
 	const minColWidth = 50;
 	const yPadding = 12;
@@ -56,7 +56,7 @@
 	let sortDir = $state(defaultSortDir);
 
 	// the final, processed data that is displayed in the table
-	let tableData: Row[] = $derived.call(() => {
+	let tableData: Row[] = $derived.by(() => {
 		const originalData = [...data];
 		if (!sortKey || !sortable) {
 			return originalData;
@@ -214,7 +214,7 @@
 				{#each columns as col}
 					{@const style = getCellStyle(col)}
 					<th {style} class="th-cell">
-						<button style="cursor: {sortable ? 'pointer' : 'unset'}" on:click={() => setSort(col.key)}>
+						<button style="cursor: {sortable ? 'pointer' : 'unset'}" onclick={() => setSort(col.key)}>
 							{col.label ?? col.key}
 							{#if sortable && sortKey && sortKey === col.key}
 								<svg

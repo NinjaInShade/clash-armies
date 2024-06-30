@@ -11,7 +11,7 @@
 		/** Existing town hall */
 		user: User;
 	};
-	const { close, user } = $props<Props>();
+	const { close, user }: Props = $props();
 	const app = getContext<AppState>('app');
 
 	let username = $state<string>(user.username);

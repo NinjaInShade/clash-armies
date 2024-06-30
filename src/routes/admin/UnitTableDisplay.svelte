@@ -2,7 +2,7 @@
 	type Props = {
 		name: string;
 	};
-	let { name } = $props<Props>();
+	let { name }: Props = $props();
 </script>
 
 <img src="/clash/units/{name}.png" alt="Unit: {name}" />

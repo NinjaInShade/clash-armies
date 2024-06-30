@@ -12,7 +12,7 @@
 		/** Function that closes the modal */
 		close: () => void;
 	};
-	let { close, banner, onSave } = $props<Props>();
+	let { close, banner, onSave }: Props = $props();
 
 	let grid = $state<Element | null>(null);
 

@@ -19,7 +19,7 @@
 		display?: 'inline' | 'block';
 		level?: number;
 	};
-	const { type, name, isSuper, amount, display, level, title, levels } = $props<Props>();
+	const { type, name, isSuper, amount, display, level, title, levels }: Props = $props();
 
 	function isMaxLevel() {
 		return level === Math.max(...levels.map((x) => x.level));

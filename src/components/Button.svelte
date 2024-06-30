@@ -8,7 +8,7 @@
 		theme?: 'primary' | 'danger';
 	} & HTMLButtonAttributes;
 
-	let { children, theme, ...rest } = $props<Props>();
+	let { children, theme, ...rest }: Props = $props();
 </script>
 
 <button class="btn {theme}" type="button" {...rest}>

@@ -4,7 +4,7 @@
 	type Props = {
 		errors: FetchErrors | null;
 	};
-	const { errors } = $props<Props>();
+	const { errors }: Props = $props();
 </script>
 
 {#if errors}

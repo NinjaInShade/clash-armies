@@ -15,7 +15,7 @@
 		/** Sets the on change handler */
 		onChange?: (value: boolean) => Promise<void> | void;
 	};
-	let { value, disabled, title, class: _class, style, onChange } = $props<Props>();
+	let { value, disabled, title, class: _class, style, onChange }: Props = $props();
 
 	// Passed down from context in parent <Fieldset />
 	const htmlName = getContext<string>('htmlName');
@@ -30,7 +30,7 @@
 
 <div class="outer-container">
 	<button type="button" class="inner-container {_class || ''}" tabindex="-1" {style} {title}>
-		<input bind:checked={value} on:change={_onChange} class="checkbox" {disabled} name={htmlName} id={htmlName} type="checkbox" />
+		<input bind:checked={value} onchange={_onChange} class="checkbox" {disabled} name={htmlName} id={htmlName} type="checkbox" />
 		{#if value}
 			<svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
 				<path

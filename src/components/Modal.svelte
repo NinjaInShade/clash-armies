@@ -22,7 +22,7 @@
 		controls?: Snippet;
 	} & (ComponentRendering | ChildrenRendering);
 
-	let { title, component, close, children, controls, ...componentProps } = $props<Props>();
+	let { title, component, close, children, controls, ...componentProps }: Props = $props();
 
 	function onKeyDown(e: KeyboardEvent) {
 		if (e.key === 'Escape') {
@@ -31,13 +31,13 @@
 	}
 </script>
 
-<svelte:window on:keydown={onKeyDown} />
+<svelte:window onkeydown={onKeyDown} />
 
 <C.FocusTrap>
 	<div class="modal">
 		<div class="modal-header">
 			<p class="modal-title">{title ?? ''}</p>
-			<button type="button" class="close-btn" on:click={close}>
+			<button type="button" class="close-btn" onclick={close}>
 				<img src="/clash/ui/close.png" alt="Close icon" />
 			</button>
 		</div>

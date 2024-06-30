@@ -14,7 +14,7 @@
 		/** Existing unit */
 		unit?: Unit;
 	};
-	let { close, unit } = $props<Props>();
+	let { close, unit }: Props = $props();
 
 	let image = $state<FileList | null>(null);
 

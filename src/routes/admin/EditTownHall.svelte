@@ -11,7 +11,7 @@
 		/** Existing town hall */
 		townHall?: TownHall;
 	};
-	let { close, townHall } = $props<Props>();
+	let { close, townHall }: Props = $props();
 
 	let image = $state<FileList | null>(null);
 	let level = $state<number | null>(null);

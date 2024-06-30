@@ -16,7 +16,7 @@
 		onToggle?: (checked: boolean) => Promise<void> | void;
 	} & HTMLInputAttributes;
 
-	let { value, offText, onText, onToggle, htmlName, labelStyle = '', ...rest } = $props<Props>();
+	let { value, offText, onText, onToggle, htmlName, labelStyle = '', ...rest }: Props = $props();
 
 	let checkbox: HTMLInputElement;
 
@@ -46,7 +46,7 @@
 
 <fieldset>
 	<label for={htmlName} style={labelStyle} class="label-off" onclick={toggleOff}>{offText}</label>
-	<input bind:this={checkbox} bind:checked={value} on:keydown={toggle} onchange={onChange} name={htmlName} id={htmlName} type="checkbox" {...rest} />
+	<input bind:this={checkbox} bind:checked={value} onkeydown={toggle} onchange={onChange} name={htmlName} id={htmlName} type="checkbox" {...rest} />
 	<label for={htmlName} style={labelStyle} class="label-on" onclick={toggleOn}>{onText}</label>
 </fieldset>
 

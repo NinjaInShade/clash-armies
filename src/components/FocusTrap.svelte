@@ -13,7 +13,7 @@
 		/** The container which the focus will be trapped in */
 		children: Snippet;
 	};
-	let { returnFocus = true, children } = $props<Props>();
+	let { returnFocus = true, children }: Props = $props();
 
 	let trapContainer: HTMLElement | null = $state(null);
 
@@ -109,7 +109,7 @@
 	}
 </script>
 
-<svelte:window on:keydown={onKeyDown} />
+<svelte:window onkeydown={onKeyDown} />
 
 <div bind:this={trapContainer}>
 	{@render children()}

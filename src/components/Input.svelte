@@ -14,7 +14,7 @@
 		/** Sets the placeholder display */
 		placeholder?: string;
 	} & HTMLInputAttributes;
-	let { value, onChange, disabled, error, placeholder, ...rest } = $props<Props>();
+	let { value = $bindable(), onChange, disabled, error, placeholder, ...rest }: Props = $props();
 
 	// Passed down from context in parent <Fieldset />
 	const htmlName = getContext<string>('htmlName');

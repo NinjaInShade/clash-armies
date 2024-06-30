@@ -12,7 +12,7 @@
 		/** Input to render inside fieldset */
 		children: Snippet;
 	} & HTMLFieldsetAttributes;
-	let { label, labelDir = 'column', htmlName, children, ...rest } = $props<Props>();
+	let { label, labelDir = 'column', htmlName, children, ...rest }: Props = $props();
 
 	// Sets the context for children form elements to use
 	setContext('htmlName', htmlName);

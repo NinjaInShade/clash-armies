@@ -4,8 +4,9 @@
 		votes: number;
 		userVote: number;
 		allowEdit: boolean;
+		class?: string;
 	};
-	let { armyId, votes, userVote, allowEdit } = $props<Props>();
+	let { votes = $bindable(), userVote = $bindable(), armyId, allowEdit, class: _class }: Props = $props();
 
 	let saving = $state<boolean>(false);
 

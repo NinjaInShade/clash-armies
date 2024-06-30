@@ -8,7 +8,7 @@
 		/** Function that closes the modal */
 		close: () => void;
 	};
-	let { appState, close } = $props<Props>();
+	let { appState, close }: Props = $props();
 
 	function setTownHall(level: number) {
 		appState.townHall = level;

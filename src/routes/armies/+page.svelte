@@ -4,10 +4,10 @@
 	import THWidgetDisplay from '../admin/THWidgetDisplay.svelte';
 	import C from '~/components';
 
-	const { data } = $props<{ data: PageData }>();
+	const { data }: { data: PageData } = $props();
 	const { armies, townHalls } = $derived(data);
 
-	const thSelectData = $derived.call(() => {
+	const thSelectData = $derived.by(() => {
 		const data = [];
 		data.push({ value: null, label: 'All' });
 		data.push(
@@ -27,8 +27,8 @@
 	let townHall = $state<number | null>(null);
 	let attackType = $state<string | null>(null);
 
-	let filteredArmies = $derived.call(() => {
-		return armies.filter((a) => {
+	let displayArmies = $derived.by(() => {
+		const filtered = armies.filter((a) => {
 			const tags = getTags(a);
 			if (townHall !== null && a.townHall !== townHall) {
 				return false;

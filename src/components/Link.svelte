@@ -7,7 +7,7 @@
 		href: string;
 	} & HTMLAnchorAttributes;
 
-	let { children, href, ...rest } = $props<Props>();
+	let { children, href, ...rest }: Props = $props();
 </script>
 
 <a class="btn" {href} {...rest}>

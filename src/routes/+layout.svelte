@@ -12,7 +12,7 @@
 		data: LayoutData;
 		children: Snippet;
 	};
-	let { data, children } = $props<Props>();
+	let { data, children }: Props = $props();
 
 	let devDebugOpen: boolean = $state(false);
 
@@ -130,8 +130,8 @@
 {@render children()}
 
 {#if appState.modals.length}
-	<div transition:fade={{ duration: 150, easing: sineInOut }}>
-		<button class="modal-backdrop" type="button" on:click={popModal} />
+	<div class="modals-container" transition:fade={{ duration: 150, easing: sineInOut }}>
+		<button class="modal-backdrop" type="button" onclick={popModal} />
 		{#each appState.modals as modal}
 			<svelte:component this={modal.component} {...modal.props} />
 		{/each}

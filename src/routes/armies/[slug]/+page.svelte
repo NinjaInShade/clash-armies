@@ -6,7 +6,7 @@
 	import type { AppState } from '~/lib/shared/types';
 	import C from '~/components';
 
-	const { data } = $props<{ data: PageData }>();
+	const { data }: { data: PageData } = $props();
 	const { army, userVote } = $derived(data);
 
 	const app = getContext<AppState>('app');

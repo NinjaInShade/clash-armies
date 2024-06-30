@@ -4,7 +4,7 @@
 		height?: number;
 		displayLevel?: boolean;
 	};
-	let { level, height, displayLevel } = $props<Props>();
+	let { level, height, displayLevel }: Props = $props();
 </script>
 
 <img src="/clash/town-halls/{level}.png" alt="Town hall {level}" style="--height: {height ?? 38}px" />

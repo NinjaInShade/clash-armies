@@ -26,7 +26,7 @@
 		/** Sets the style */
 		style?: string;
 	};
-	let { value, data, onSelect, disabled, title, class: _class, style } = $props<Props>();
+	let { value = $bindable(), data, onSelect, disabled, title, class: _class, style }: Props = $props();
 
 	// Passed down from context in parent <Fieldset />
 	const htmlName = getContext<string>('htmlName');
@@ -75,7 +75,8 @@
 		open = false;
 	};
 
-	const handleSelect = async (newValue: any) => {
+	const handleSelect = async (ev: MouseEvent | KeyboardEvent, newValue: any) => {
+		ev.stopPropagation();
 		if (!newValue) {
 			value = null;
 		} else {
@@ -88,11 +89,11 @@
 	};
 </script>
 
-<svelte:body on:click={handleOutsideClick} />
+<svelte:body onclick={handleOutsideClick} />
 
 <div class="outer-container">
 	<!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions -->
-	<div class="inner-container" on:click|stopPropagation bind:this={selectContainer}>
+	<div class="inner-container" onclick={ev => ev.stopPropagation()} bind:this={selectContainer}>
 		<input hidden {value} name={htmlName} id={htmlName} />
 
 		<!-- Select button -->
@@ -105,7 +106,7 @@
 			{style}
 			name={htmlName}
 			id={htmlName}
-			on:click={handleOpen}
+			onclick={handleOpen}
 			bind:this={selectButton}
 		>
 			<span class="select-label">
@@ -130,7 +131,7 @@
 						type="button"
 						class="select-menu-item"
 						class:active={isActive(item.value)}
-						on:click|stopPropagation={() => handleSelect(item.value)}
+						onclick={(ev) => handleSelect(ev, item.value)}
 						tabindex={open ? 0 : -1}
 					>
 						{#if item.label}
@@ -206,6 +207,9 @@
 		background-color: var(--grey-850);
 		border-radius: 0 6px 6px 0;
 		padding: 0 0.4em;
+	}
+	.select.open .dropdown-icon-container {
+		border-bottom-right-radius: 0px;
 	}
 
 	/* Menu */

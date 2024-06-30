@@ -7,7 +7,7 @@
 		/** The click handler that is fired upon click of the town hall */
 		onclick: (level: number) => void;
 	};
-	let { level, onclick, ...rest } = $props<Props>();
+	let { level, onclick, ...rest }: Props = $props();
 
 	function handleSelect() {
 		if (level === null) {
