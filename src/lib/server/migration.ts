@@ -106,6 +106,8 @@ export function migration(runStep: MigrationFn) {
             armyId INT NOT NULL,
             votedBy INT NOT NULL,
             vote TINYINT NOT NULL,
+            createdTime TIMESTAMP DEFAULT NOW(),
+            updatedTime TIMESTAMP DEFAULT NOW() ON UPDATE NOW(),
             PRIMARY KEY (armyId, votedBy),
             CONSTRAINT fk_army_votes_army_id FOREIGN KEY (armyId) REFERENCES armies (id) ON DELETE CASCADE,
             CONSTRAINT fk_army_votes_voted_by FOREIGN KEY (votedBy) REFERENCES users (id) ON DELETE CASCADE,
