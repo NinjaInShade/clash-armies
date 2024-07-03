@@ -15,6 +15,11 @@ const serverInit = (async () => {
 	await db.migrate(migration);
 })();
 
+const serverDispose = async () => {
+	hourlyTask.stop();
+	await db.dispose();
+};
+
 export const handle: Handle = async ({ event, resolve }) => {
 	// One-time setup upon starting the server
 	await serverInit;
@@ -53,7 +58,8 @@ export const handle: Handle = async ({ event, resolve }) => {
 	return resolve(event);
 };
 
-process.on('exit', async () => {
-	hourlyTask.stop();
-	await db.dispose();
+process.on('sveltekit:shutdown', async (reason: 'SIGINT' | 'SIGTERM' | 'IDLE') => {
+	console.warn(`Server will be shutting down for reason "${reason}"...`);
+	await serverDispose();
+	console.warn('Server disposed, shutting down now...');
 });

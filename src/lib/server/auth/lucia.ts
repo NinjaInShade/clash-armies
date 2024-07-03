@@ -3,9 +3,9 @@ import { Google } from 'arctic';
 import { db } from "~/lib/server/db";
 import { sqlAdapter } from "./adapter";
 import { dev, building } from "$app/environment";
-import { GOOGLE_AUTH_CLIENT_ID, GOOGLE_AUTH_SECRET } from '$env/static/private';
+import { env } from '$env/dynamic/private';
 
-const BASE_APP_URL = dev ? 'http://localhost:5173' : process.env.BASE_APP_URL;
+const { GOOGLE_AUTH_CLIENT_ID, GOOGLE_AUTH_SECRET, BASE_APP_URL } = env;
 
 if (typeof GOOGLE_AUTH_CLIENT_ID !== 'string') {
     throw new Error('Expected google auth client id to be defined');

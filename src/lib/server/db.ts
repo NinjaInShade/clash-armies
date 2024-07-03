@@ -1,5 +1,17 @@
-import { DB_USER, DB_PASSWORD, DB_PORT } from '$env/static/private';
+import { env } from '$env/dynamic/private';
 import { MySQL } from '@ninjalib/sql';
+
+const { DB_USER, DB_PASSWORD, DB_PORT } = env;
+
+if (typeof DB_USER !== 'string') {
+	throw new Error('Expected database user to be defined');
+}
+if (typeof DB_PASSWORD !== 'string') {
+	throw new Error('Expected database password to be defined');
+}
+if (!DB_PORT || Number.isNaN(+DB_PORT)) {
+	throw new Error('Expected database port to be defined and a valid number');
+}
 
 export const db = new MySQL({
 	user: DB_USER,
