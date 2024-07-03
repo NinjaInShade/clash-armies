@@ -94,7 +94,7 @@
 	button path {
 		transition: fill 0.1s ease-in-out;
 	}
-	button:not(.selected):hover path {
+	button:not(.selected):not(:disabled):hover path {
 		fill: var(--grey-100);
 	}
 	button:not(:last-child) {

@@ -27,19 +27,20 @@
 		padding: 4px 7px;
 		border-radius: 50px;
 		font-weight: 700;
-		transition:
-			background-color,
-			color 0.15s;
+		transition: all 0.15s;
 	}
-
 	.version span {
 		display: inline-block;
 	}
-
 	.version,
 	.version span {
 		font-size: 10px;
 		line-height: 10px;
+	}
+	.version:hover,
+	.version:focus {
+		border-color: transparent;
+		background-color: var(--grey-100);
 	}
 
 	.logo {
