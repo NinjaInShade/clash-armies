@@ -34,11 +34,11 @@ export type Session = {
 export type TownHall = {
 	level: number;
 	maxBarracks: number;
-	maxDarkBarracks: number;
-	maxLaboratory: number;
-	maxSpellFactory: number;
-	maxDarkSpellFactory: number;
-	maxWorkshop: number;
+	maxDarkBarracks: number | null;
+	maxLaboratory: number | null;
+	maxSpellFactory: number | null;
+	maxDarkSpellFactory: number | null;
+	maxWorkshop: number | null;
 	troopCapacity: number;
 	spellCapacity: number;
 	siegeCapacity: number;

@@ -3,7 +3,8 @@
 	import { invalidateAll, goto } from '$app/navigation';
 	import { deserialize } from '$app/forms';
 	import { page } from '$app/stores';
-	import { getTotals, formatTime, copyLink, openInGame, getTags, getCopyBtnTitle, getOpenBtnTitle } from '~/lib/client/army';
+	import { getTotals } from '~/lib/shared/utils';
+	import { formatTime, copyLink, openInGame, getTags, getCopyBtnTitle, getOpenBtnTitle } from '~/lib/client/army';
 	import type { Army, AppState, FetchErrors } from '~/lib/shared/types';
 	import C from '~/components';
 

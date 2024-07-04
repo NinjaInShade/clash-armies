@@ -1,6 +1,6 @@
 import type { Army, TownHall, Unit, UnitType } from '~/lib/shared/types';
 import { db } from '~/lib/server/db';
-import { BANNERS, USER_MAX_ARMIES } from '~/lib/shared/utils';
+import { BANNERS, USER_MAX_ARMIES, validateArmy } from '~/lib/shared/utils';
 import z from 'zod';
 import type { RequestEvent } from '@sveltejs/kit';
 import type { Request } from '~/app';
@@ -177,15 +177,29 @@ const armySchemaSaving = armySchemaCreating.required({ id: true });
 
 export async function saveArmy(event: RequestEvent, data: Partial<Army>) {
 	const user = event.locals.requireAuth();
+	const ctx = { units: await getUnits(), townHalls: await getTownHalls() };
+
+	function attachUnitData(army: ReturnType<typeof armySchemaCreating.parse>) {
+		return {
+			...army,
+			units: army.units.map(u => {
+				const found = ctx.units.find(u2 => u2.id === u.id);
+				if (!found) {
+					throw new Error('Invalid troop');
+				}
+				return { ...u, ...found };
+			})
+		}
+	}
 
 	if (!data.id) {
+		// Creating army
 		const userArmies = await db.getRows('armies', { createdBy: user.id });
 		if (userArmies.length === USER_MAX_ARMIES) {
 			throw new Error(`Maximum armies reached (${USER_MAX_ARMIES}/${USER_MAX_ARMIES})`);
 		}
-
-		// Creating army
 		const army = armySchemaCreating.parse(data);
+		validateArmy(attachUnitData(army), ctx);
 		return db.transaction(async (tx) => {
 			const armyId = await tx.insertOne('armies', {
 				name: army.name,
@@ -208,6 +222,7 @@ export async function saveArmy(event: RequestEvent, data: Partial<Army>) {
 	} else {
 		// Updating existing army
 		const army = armySchemaSaving.parse(data);
+		validateArmy(attachUnitData(army), ctx);
 		const existing = await db.getRow<Army, null>('armies', { id: army.id });
 		if (!existing) {
 			throw new Error("This army doesn't exist");

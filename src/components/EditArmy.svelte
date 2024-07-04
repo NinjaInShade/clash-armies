@@ -3,8 +3,8 @@
     import { invalidateAll, goto } from '$app/navigation';
     import { deserialize } from '$app/forms';
     import { page } from '$app/stores';
-	import { getTotals, formatTime, getUnitLevel, copyLink, openInGame, getTags, getCopyBtnTitle, getOpenBtnTitle } from '~/lib/client/army';
-    import { HOLD_ADD_SPEED, HOLD_REMOVE_SPEED } from '~/lib/shared/utils';
+	import { formatTime } from '~/lib/client/army';
+	import { HOLD_ADD_SPEED, HOLD_REMOVE_SPEED, getTotals, getUnitLevel } from '~/lib/shared/utils';
 	import type { AppState, Army, Unit, ArmyUnit, Banner, UnitType, FetchErrors } from '~/lib/shared/types';
 	import C from '~/components';
 
@@ -277,7 +277,8 @@
 		{#each appUnits as unit}
 			<!-- Disable if reached max unique super limit of 2 and this troop isn't one already selected -->
 			{@const disableSuper = unit.isSuper && !units.find((item) => item.name === unit.name) && reachedSuperLimit}
-			{@const level = getUnitLevel(unit, app)}
+            {@const thData = app.townHalls.find(t => t.level === app.townHall)}
+			{@const level = thData ? getUnitLevel(unit, { th: thData, units: app.units }) : -1}
 			{@const reachedMaxAmount = willOverflowHousingSpace(unit)}
 			{@const title = getCardTitle({ level, type, reachedMaxAmount, reachedSuperLimit: disableSuper })}
 			<li>

@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { getContext } from 'svelte';
 	import type { Army, AppState } from '~/lib/shared/types';
-	import { getTotals, formatTime, copyLink, openInGame, getCopyBtnTitle, getOpenBtnTitle } from '~/lib/client/army';
+	import { getTotals } from '~/lib/shared/utils';
+	import { formatTime, copyLink, openInGame, getCopyBtnTitle, getOpenBtnTitle } from '~/lib/client/army';
 	import C from '~/components';
 
 	type Props = {
