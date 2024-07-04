@@ -64,4 +64,10 @@
     .action-btn.success.ghost:hover {
         background-color: #20211e;
     }
+
+    @media(max-width: 850px) {
+        .action-btn {
+            padding: 8px;
+        }
+    }
 </style>

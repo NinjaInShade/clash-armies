@@ -204,9 +204,13 @@
 	}
 
 	@media (max-width: 450px) {
-		.header .right,
 		.header .right .totals {
 			flex-flow: row wrap;
+		}
+		.header .right {
+			flex-flow: column;
+			align-items: flex-start;
+			gap: 0.75em;
 		}
 		.header .right .separator {
 			display: none;

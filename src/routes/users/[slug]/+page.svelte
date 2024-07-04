@@ -157,7 +157,7 @@
 	.armies-list {
 		display: flex;
 		flex-flow: column nowrap;
-		gap: 0.5em;
+		gap: 1em;
 	}
 
 	.no-armies {

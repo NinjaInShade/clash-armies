@@ -361,10 +361,6 @@
 		.units .controls {
 			flex-flow: column nowrap;
 		}
-		.units .controls .action-btn {
-			width: 100%;
-			justify-content: center;
-		}
 		.units-list li {
 			--amount-size: 12px;
 		}

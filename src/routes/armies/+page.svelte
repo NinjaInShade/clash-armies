@@ -116,10 +116,6 @@
 </section>
 
 <style>
-	header {
-		padding: 50px var(--side-padding);
-	}
-
 	.armies {
 		padding: 50px var(--side-padding);
 		flex: 1 0 0px;
@@ -129,10 +125,6 @@
 		display: flex;
 		flex-flow: column nowrap;
 		height: 100%;
-	}
-
-	.title {
-		font-size: 3em;
 	}
 
 	.filters {
@@ -183,12 +175,6 @@
 		width: 100%;
 	}
 
-	:global(.filter-control) {
-		/* max-width: 150px; */
-		max-width: 150px;
-		width: 100%;
-	}
-
 	@media (max-width: 600px) {
 		.filters {
 			flex-flow: column nowrap;
@@ -212,8 +198,8 @@
 			width: 100%;
 		}
 
-		:global(.filter-control) {
-			max-width: none;
+		:global(.filters fieldset) {
+			--input-width: 100%;
 			width: 100%;
 		}
 	}

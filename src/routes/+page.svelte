@@ -113,7 +113,7 @@
 	.armies-list {
 		display: flex;
 		flex-flow: column nowrap;
-		gap: 0.5em;
+		gap: 1em;
 	}
 
 	@media (max-width: 1000px) {
