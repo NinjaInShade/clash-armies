@@ -7,13 +7,6 @@
 
 	let sidebarOpen = $state<boolean>(false);
 
-	function openTownHallSelector() {
-		if (app.townHall === null) {
-			return;
-		}
-		app.openModal(C.TownHallSelector, { appState: app });
-	}
-
 	function toggleSidebar() {
 		sidebarOpen = !sidebarOpen;
 		document.body.classList.toggle('sidebar-active');
@@ -53,16 +46,8 @@
 					<C.Button asLink href="/login">Log in</C.Button>
 				{/if}
 			</li>
-			{#if app.user}
-				<li class="control">
-					<C.TownHall level={app.townHall} onclick={openTownHallSelector} --width="80px" />
-				</li>
-			{/if}
 		</ul>
 		<div class="mobile-nav">
-			{#if app.user}
-				<C.TownHall level={app.townHall} onclick={openTownHallSelector} --width="80px" />
-			{/if}
 			<button class="navbar-hamburger" type="button" aria-label="Sidebar toggle" onclick={toggleSidebar}>
 				<svg class="ham hamRotate ham4" class:active={sidebarOpen} viewBox="0 0 100 100" width="45">
 					<path class="line top" d="m 70,33 h -40 c 0,0 -8.5,-0.149796 -8.5,8.5 0,8.649796 8.5,8.5 8.5,8.5 h 20 v -20" />

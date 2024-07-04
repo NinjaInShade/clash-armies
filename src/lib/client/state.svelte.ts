@@ -12,66 +12,20 @@ export function createAppState(initial: Omit<AppState, 'openModal'>) {
 	const units = $state<AppState['units']>(initial.units);
 	const townHalls = $state<AppState['townHalls']>(initial.townHalls);
 	const user = $state<AppState['user']>(initial.user);
-	let townHall = $state<AppState['townHall']>(initial.townHall);
-	let barrack = $state<AppState['barrack']>(initial.barrack);
-	let darkBarrack = $state<AppState['darkBarrack']>(initial.barrack);
-	let laboratory = $state<AppState['laboratory']>(initial.laboratory);
-	let spellFactory = $state<AppState['spellFactory']>(initial.spellFactory);
-	let darkSpellFactory = $state<AppState['darkSpellFactory']>(initial.darkSpellFactory);
-	let workshop = $state<AppState['workshop']>(initial.workshop);
-	let armyCapacity = $state<AppState['armyCapacity']>(initial.armyCapacity);
 	let modals = $state<AppState['modals']>([]);
 
 	return {
 		get townHalls() {
 			return townHalls;
 		},
-		get townHall() {
-			return townHall;
-		},
-		set townHall(value: number | null) {
-			if (typeof value === 'number' && (value < 1 || value > townHalls.length)) {
-				throw new Error(`Town hall ${value} doesn't exist`);
-			}
-			const thData = townHalls.find((th) => th.level === value);
-			if (!thData) {
-				throw new Error('Expected data');
-			}
-			townHall = value;
-			barrack = thData.maxBarracks;
-			darkBarrack = thData.maxDarkBarracks;
-			laboratory = thData.maxLaboratory;
-			spellFactory = thData.maxSpellFactory;
-			darkSpellFactory = thData.maxDarkSpellFactory;
-			workshop = thData.maxWorkshop;
-			armyCapacity = { troop: thData.troopCapacity, spell: thData.spellCapacity, siege: thData.siegeCapacity };
-		},
-		get barrack() {
-			return barrack;
-		},
-		get darkBarrack() {
-			return darkBarrack;
-		},
-		get laboratory() {
-			return laboratory;
-		},
-		get spellFactory() {
-			return spellFactory;
-		},
-		get darkSpellFactory() {
-			return darkSpellFactory;
-		},
-		get workshop() {
-			return workshop;
-		},
 		get units() {
 			return units;
 		},
-		get armyCapacity() {
-			return armyCapacity;
-		},
 		get modals() {
 			return modals;
+		},
+		get user() {
+			return user;
 		},
 		openModal(component: Modal['component'], props: Modal['props'] = {}) {
 			// should be fine in practice
@@ -92,8 +46,5 @@ export function createAppState(initial: Omit<AppState, 'openModal'>) {
 			modals.push(modalSpec);
 			requireHTML().classList.add('hide-overflow');
 		},
-		get user() {
-			return user;
-		}
 	};
 }

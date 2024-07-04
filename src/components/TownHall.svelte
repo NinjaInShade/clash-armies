@@ -1,13 +1,13 @@
 <script lang="ts">
-	import type { AppState } from '~/lib/shared/types';
-
 	type Props = {
 		/** Town hall level */
-		level: AppState['townHall'];
+		level: number;
 		/** The click handler that is fired upon click of the town hall */
 		onclick: (level: number) => void;
+		/** Styling theme @default 'bordered' */
+		theme?: 'regular' | 'bordered';
 	};
-	let { level, onclick, ...rest }: Props = $props();
+	let { level, onclick, theme = 'regular', ...rest }: Props = $props();
 
 	function handleSelect() {
 		if (level === null) {
@@ -17,39 +17,30 @@
 	}
 </script>
 
-{#if level === null}
-	<div class="loading" />
-{:else}
-	<button class="town-hall" onclick={handleSelect} title="Town hall {level}" {...rest}>
-		<img src="/clash/town-halls/{level}.png" alt="Town hall {level}" />
-		<p class="body">{level}</p>
-	</button>
-{/if}
+<button class="town-hall {theme}" onclick={handleSelect} title="Town hall {level}" {...rest}>
+	<img src="/clash/town-halls/{level}.png" alt="Town hall {level}" />
+	<p class="body">{level}</p>
+</button>
 
 <style>
-	.loading,
 	.town-hall {
 		transition: background-color 0.15s ease-in-out;
-		border: 1.5px solid var(--grey-600);
-		border-radius: 8px;
-		height: 44px;
-	}
-
-	.loading {
-		width: 80px;
-		animation: shimmer 1.5s linear infinite;
-		background: linear-gradient(to right, transparent 0%, var(--grey-800-shimmer) 25%, transparent 50%), var(--grey-600);
-		background-size: 200% 100%;
-	}
-
-	.town-hall {
+		border-radius: 6px;
+		height: 40px;
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		background: var(--grey-600);
 		width: var(--width, auto);
 		padding: 4px 8px;
 		gap: 4px;
+	}
+	.town-hall.regular {
+		background: var(--grey-600);
+		border: 1.5px solid var(--grey-600);
+	}
+	.town-hall.bordered {
+		background: var(--grey-700);
+		border: 1px solid var(--grey-500);
 	}
 
 	.town-hall:hover:not(:disabled) {
@@ -76,23 +67,9 @@
 		}
 	}
 
-	@media (max-width: 425px) {
-		.loading,
+	@media (max-width: 850px) {
 		.town-hall {
-			height: 36px;
-		}
-
-		.town-hall {
-			--width: calc(var(--width) / 2);
-		}
-
-		.loading {
-			width: 36px;
-		}
-
-		.town-hall .body {
-			font-size: var(--fs-sm);
-			line-height: var(--fs-sm-lh);
+			height: 38px;
 		}
 	}
 </style>

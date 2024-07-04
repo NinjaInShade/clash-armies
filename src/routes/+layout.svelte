@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { fade } from 'svelte/transition';
 	import { sineInOut } from 'svelte/easing';
-	import { onMount, setContext, type Snippet } from 'svelte';
+	import { setContext, type Snippet } from 'svelte';
 	import type { LayoutData } from './$types';
 	import { createAppState, requireHTML } from '~/lib/client/state.svelte';
 	import type { AppState } from '~/lib/shared/types';
@@ -38,26 +38,11 @@
 		// frequently used data (cache)
 		units: data.units,
 		townHalls: data.townHalls,
-		// user state
-		townHall: null,
-		barrack: null,
-		darkBarrack: null,
-		laboratory: null,
-		spellFactory: null,
-		darkSpellFactory: null,
-		workshop: null,
-		armyCapacity: { troop: 0, spell: 0, siege: 0 },
+		user: extendUser(data.user),
 		// general app state
 		modals: [],
-		user: extendUser(data.user)
 	});
 	setContext('app', appState);
-
-	onMount(async () => {
-		// Use local storage is present & valid, otherwise default to max TH
-		const savedTownHall = +(localStorage.getItem('townHall') ?? '??');
-		appState.townHall = !Number.isNaN(savedTownHall) ? savedTownHall : data.townHalls.length;
-	});
 
 	function toggleDevDebug() {
 		devDebugOpen = !devDebugOpen;
@@ -96,13 +81,7 @@
 	<div class="dev-debug-container" class:open={devDebugOpen}>
 		<div class="dev-debug">
 			<b>DEBUG</b>
-			<p>• Town hall <span>{appState.townHall}</span></p>
-			<p>• Barrack <span>{appState.barrack}</span></p>
-			<p>• Dark barrack <span>{appState.darkBarrack}</span></p>
-			<p>• Laboratory <span>{appState.laboratory}</span></p>
-			<p>• Spell factory <span>{appState.spellFactory}</span></p>
-			<p>• Dark spell factory <span>{appState.darkSpellFactory}</span></p>
-			<p>• Workshop <span>{appState.workshop}</span></p>
+			<p>• TODO <span>...</span></p>
 		</div>
 		<button class="toggle-open" onclick={toggleDevDebug}>
 			{'>'}

@@ -116,19 +116,10 @@ export type AppState = {
 	// frequently used data (cache)
 	units: Unit[];
 	townHalls: TownHall[];
-	// user state
-	townHall: number | null;
-	barrack: number | null;
-	darkBarrack: number | null;
-	laboratory: number | null;
-	spellFactory: number | null;
-	darkSpellFactory: number | null;
-	workshop: number | null;
-	armyCapacity: { troop: number; spell: number; siege: number };
+	user: (User & UserUtils) | null;
 	// general app state
 	modals: Modal[];
 	openModal(component: Modal['component'], props?: Modal['props']): void;
-	user: (User & UserUtils) | null;
 };
 
 export type Banner = typeof BANNERS[number];

@@ -183,7 +183,7 @@ export async function saveArmy(event: RequestEvent, data: Partial<Army>) {
 		return {
 			...army,
 			units: army.units.map(u => {
-				const found = ctx.units.find(u2 => u2.id === u.id);
+				const found = ctx.units.find(u2 => u2.id === u.unitId);
 				if (!found) {
 					throw new Error('Invalid troop');
 				}

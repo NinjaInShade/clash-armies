@@ -15,7 +15,6 @@ export { default as Nav } from './Nav.svelte';
 export { default as Footer } from './Footer.svelte';
 export { default as Logo } from './Logo.svelte';
 export { default as TownHall } from './TownHall.svelte';
-export { default as TownHallSelector } from './TownHallSelector.svelte';
 export { default as UnitDisplay } from './UnitDisplay.svelte';
 export { default as ViewArmy } from './ViewArmy.svelte';
 export { default as EditArmy } from './EditArmy.svelte';
