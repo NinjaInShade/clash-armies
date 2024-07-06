@@ -1,6 +1,5 @@
 // Generic svelte widgets/components
 export { default as Button } from './Button.svelte';
-export { default as Switch } from './Switch.svelte';
 export { default as Fieldset } from './Fieldset.svelte';
 export { default as Input } from './Input.svelte';
 export { default as Modal } from './Modal.svelte';

@@ -92,8 +92,7 @@
 <svelte:body onclick={handleOutsideClick} />
 
 <div class="outer-container">
-	<!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions -->
-	<div class="inner-container" onclick={ev => ev.stopPropagation()} bind:this={selectContainer}>
+	<div class="inner-container" bind:this={selectContainer}>
 		<input hidden {value} name={htmlName} id={htmlName} />
 
 		<!-- Select button -->

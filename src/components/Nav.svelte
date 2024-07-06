@@ -95,7 +95,7 @@
 		</ul>
 	</div>
 </nav>
-<div class="sidebar-overlay" class:sidebar-overlay-active={sidebarOpen} onclick={toggleSidebar}></div>
+<button class="sidebar-overlay" class:sidebar-overlay-active={sidebarOpen} onclick={toggleSidebar}></button>
 
 <style>
 	nav {
@@ -265,8 +265,7 @@
 		opacity: 0.5;
 	}
 
-	.sidebar-link-active a,
-	.sidebar-link:hover a {
+	.sidebar-link a:hover {
 		opacity: 1;
 	}
 

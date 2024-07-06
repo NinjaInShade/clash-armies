@@ -562,10 +562,6 @@
 		.units-list {
 			padding: 0 24px 16px 24px;
 		}
-		.detail-fields {
-			flex-flow: column nowrap;
-			gap: 12px;
-		}
 	}
 
 	@media (max-width: 400px) {
