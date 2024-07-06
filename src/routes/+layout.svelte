@@ -35,12 +35,10 @@
 	 * should start as null and consumers should show loading animations until the values are set.
 	 */
 	const appState = createAppState({
-		// frequently used data (cache)
+		// Frequently used data (cache)
 		units: data.units,
 		townHalls: data.townHalls,
-		user: extendUser(data.user),
-		// general app state
-		modals: [],
+		user: extendUser(data.user)
 	});
 	setContext('app', appState);
 
@@ -77,6 +75,12 @@
 	</div>
 {/if}
 
+<div class="toasts-container">
+	{#each appState.notifications as notification (notification.id)}
+		<C.Toast {...notification.opts} dismiss={notification.dismiss} />
+	{/each}
+</div>
+
 {#if import.meta.env.DEV}
 	<div class="dev-debug-container" class:open={devDebugOpen}>
 		<div class="dev-debug">
@@ -96,12 +100,42 @@
 
 	.modal-backdrop {
 		background-color: hsla(0, 0%, 0%, 0.7);
+		/** Use svelte blur transition? */ 
 		backdrop-filter: blur(10px);
 		position: fixed;
 		height: 100%;
 		width: 100%;
 		bottom: 0;
 		left: 0;
+	}
+
+	.toasts-container {
+		position: fixed;
+		display: flex;
+		flex-flow: column nowrap;
+		align-items: flex-end;
+		justify-content: flex-end;
+		padding: 12px;
+		bottom: 0;
+		right: 0;
+		z-index: 4;
+		gap: 0.5em;
+		overflow-y: hidden;
+		max-height: 85vh;
+		max-width: 475px;
+		height: 100%;
+		width: 100%;
+		pointer-events: none;
+		--mask: linear-gradient(to top, 
+		    rgba(0,0,0, 1) 0,   
+		    rgba(0,0,0, 1) 85%, 
+		    rgba(0,0,0, 0) 95%, 
+		    rgba(0,0,0, 0) 0
+		) 100% 50% / 100% 100% repeat-x;
+		-webkit-mask: var(--mask); 
+		mask: var(--mask);
+		/** So padding-right isn't less when there's a scrollbar */
+		scrollbar-gutter: stable;
 	}
 
 	.dev-debug-container {
@@ -161,5 +195,11 @@
 
 	.alerts {
 		padding: 24px var(--side-padding);
+	}
+
+	@media(max-width: 450px) {
+		.toasts-container {
+			padding: 8px;
+		}
 	}
 </style>

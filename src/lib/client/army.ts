@@ -1,4 +1,4 @@
-import type { Army, ArmyUnit } from '~/lib/shared/types';
+import type { AppState, Army, ArmyUnit } from '~/lib/shared/types';
 import { SECOND, MINUTE, HOUR, OBJECT_ID_PREFIXES } from '~/lib/shared/utils';
 
 /**
@@ -64,10 +64,10 @@ export function openLink(href: string, openInNewTab = true) {
 	window.open(href, openInNewTab ? '_blank' : undefined, 'rel="noreferrer"');
 }
 
-export async function copyLink(units: ArmyUnit[]) {
+export async function copyLink(units: ArmyUnit[], app: AppState) {
 	const link = generateLink(units);
 	await navigator.clipboard.writeText(link);
-	alert(`Successfully copied "${link}" to clipboard!`); // TODO: change to a toast notification
+	app.notify({ title: 'Copied army!', description: 'Successfully copied army link to clipboard', theme: 'success' })
 }
 
 export function openInGame(units: ArmyUnit[]) {
