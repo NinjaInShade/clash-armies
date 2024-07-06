@@ -14,7 +14,8 @@
 	const app = getContext<AppState>('app');
 	const housingSpaceUsed = $derived.by(() => getTotals(units));
 
-	let troopUnits = $derived(units.filter((item) => item.type === 'Troop'));
+	let _troopUnits = $derived(units.filter((item) => item.type === 'Troop'));
+	let troopUnits = $derived([..._troopUnits.filter(x => !x.isSuper), ..._troopUnits.filter(x => x.isSuper)]);
 	let siegeUnits = $derived(units.filter((item) => item.type === 'Siege'));
 	let spellUnits = $derived(units.filter((item) => item.type === 'Spell'));
 

@@ -29,7 +29,8 @@
 
 	let saveDisabled = $derived(!name || name.length < 2 || name.length > 25 || !units.length);
 
-	let troopUnits = $derived(units.filter((item) => item.type === 'Troop'));
+	let _troopUnits = $derived(units.filter((item) => item.type === 'Troop'));
+	let troopUnits = $derived([..._troopUnits.filter(x => !x.isSuper), ..._troopUnits.filter(x => x.isSuper)]);
 	let siegeUnits = $derived(units.filter((item) => item.type === 'Siege'));
 	let spellUnits = $derived(units.filter((item) => item.type === 'Spell'));
 	let reachedSuperLimit = $derived(troopUnits.filter((t) => Boolean(app.units.find((x) => x.type === t.type && x.name === t.name)?.isSuper)).length === 2);
@@ -287,7 +288,8 @@
 </section>
 
 {#snippet unitsPicker(type: UnitType)}
-	{@const appUnits = app.units.filter((x) => x.type === type)}
+	{@const _appUnits = app.units.filter((x) => x.type === type)}
+	{@const appUnits = [..._appUnits.filter(x => !x.isSuper), ..._appUnits.filter(x => x.isSuper)]}
 	{@const heading = `Select ${type === 'Troop' ? 'troops' : type === 'Siege' ? 'siege machine' : 'spells'}`}
 	<h3>{heading}</h3>
 	<ul class="picker-list">
