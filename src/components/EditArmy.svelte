@@ -193,7 +193,7 @@
 </svelte:head>
 
 <!-- Handle mouseup on window in case user mouses cursor from the card then does mouseup -->
-<svelte:window onmouseup={stopHold} />
+<svelte:window onpointerup={stopHold} />
 
 <section class="banner">
 	<img class="banner-img" src="/clash/banners/{banner}.png" alt="Clash of clans banner artwork" />
@@ -257,8 +257,8 @@
 				<li>
 					<button
 						type="button"
-						onmousedown={() => initHoldRemove(unit.name)}
-						onmouseleave={() => stopHold()}
+						onpointerdown={() => initHoldRemove(unit.name)}
+						onpointerleave={() => stopHold()}
 						onkeypress={(ev) => {
 							if (ev.key !== 'Enter') {
 								return;
@@ -304,8 +304,8 @@
 				<button
 					type="button"
 					disabled={reachedMaxAmount || level === -1 || disableSuper}
-					onmousedown={() => initHoldAdd(unit)}
-					onmouseleave={() => stopHold()}
+					onpointerdown={() => initHoldAdd(unit)}
+					onpointerleave={() => stopHold()}
 					onkeypress={(ev) => {
 						if (ev.key !== 'Enter') {
 							return;
