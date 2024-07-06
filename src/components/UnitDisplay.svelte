@@ -58,7 +58,7 @@
 	}
 
 	.unit-display.Super {
-		background-color: #aa0c29;
+		background-color: #a2283f;
 	}
 
 	.unit-display.block {
@@ -103,8 +103,8 @@
 	}
 
 	.Super .unit-amount.block {
-		background: rgb(128, 5, 15);
-		background: linear-gradient(0deg, rgba(128, 5, 15, 1) 0%, rgba(133, 13, 19, 1) 100%);
+		background: rgb(114 48 53);
+		background: linear-gradient(0deg, rgb(114 48 53) 0%, rgba(133, 13, 19, 1) 100%);
 	}
 
 	.unit-lvl {
