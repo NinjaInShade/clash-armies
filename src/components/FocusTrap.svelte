@@ -19,8 +19,6 @@
 
 	/** List of all focusable elements within the focus trap */
 	let focusableEls: HTMLElement[];
-	/** The currently focused element within the focus trap */
-	let currentFocusedEl: HTMLElement | null = null;
 	/** The element (if any) that had focus before we trapped focus */
 	let originallyFocusedEl: HTMLElement | null = null;
 
@@ -34,8 +32,8 @@
 
 		if (!focusableEls.length || !trapContainer) return;
 
-		currentFocusedEl = focusableEls[0];
-		currentFocusedEl.focus();
+		// Focus first element in the trap
+		focusableEls[0].focus();
 
 		observer.observe(trapContainer, { attributes: true, childList: true, subtree: true });
 
@@ -52,7 +50,7 @@
 	}
 
 	/**
-	 * Stops the focus trap, returning focus to the originally focused element if any and `returnFocus` is not disabled
+	 * Stops the focus trap, returning focus to the originally focused element (if any). Only if `returnFocus` is not disabled
 	 */
 	export function deactivate() {
 		return dispose();
@@ -84,26 +82,23 @@
 
 		e.preventDefault();
 
-		const currentFocusedIndex = focusableEls.findIndex((el) => el === currentFocusedEl);
+		const currentFocusedIndex = focusableEls.findIndex((el) => el === document.activeElement);
 
 		if (shift) {
 			if (currentFocusedIndex === 0) {
-				// first item, loop to end
-				currentFocusedEl = focusableEls[focusableEls.length - 1];
-				currentFocusedEl.focus();
+				// First item, loop to end and focus last element
+				focusableEls[focusableEls.length - 1].focus();
 			} else {
-				currentFocusedEl = focusableEls[currentFocusedIndex - 1];
-				currentFocusedEl.focus();
+				// Focus previous element
+				focusableEls[currentFocusedIndex - 1].focus();
 			}
 		} else {
 			if (currentFocusedIndex === focusableEls.length - 1) {
-				// last item, loop back round
-				currentFocusedEl = focusableEls[0];
-				currentFocusedEl.focus();
+				// Last item, loop back round and focus first element
+				focusableEls[0].focus();
 			} else {
-				// focus next element
-				currentFocusedEl = focusableEls[currentFocusedIndex + 1];
-				currentFocusedEl.focus();
+				// Focus next element
+				focusableEls[currentFocusedIndex + 1].focus();
 			}
 		}
 	}
