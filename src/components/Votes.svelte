@@ -14,7 +14,20 @@
 		saving = true;
 		try {
 			const data = { armyId: armyId, vote: userVote };
-			await fetch('/create?/saveVote', { method: 'POST', body: JSON.stringify(data) });
+			const response = await fetch('/armies/votes', {
+				method: 'POST',
+				body: JSON.stringify(data),
+				headers: { 'Content-Type': 'application/json' }
+			});
+			const result = await response.json();
+			if (result.errors) {
+				console.error(`Error:`, result.errors);
+				return;
+			}
+			if (response.status !== 200) {
+				console.error(`${response.status} error`);
+				return;
+			}
 		} finally {
 			saving = false;
 		}

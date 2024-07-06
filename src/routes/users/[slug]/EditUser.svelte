@@ -2,7 +2,6 @@
 	import { getContext } from 'svelte';
 	import type { AppState, User, FetchErrors } from '~/lib/shared/types';
 	import { invalidateAll, goto } from '$app/navigation';
-	import { deserialize } from '$app/forms';
 	import C from '~/components';
 
 	type Props = {
@@ -20,17 +19,23 @@
 
 	async function saveUser() {
 		const data = { id: user.id, username };
-		const response = await fetch('/users?/saveUser', { method: 'POST', body: JSON.stringify(data) });
-		const result = deserialize(await response.text());
-		if (result.type === 'failure') {
-			errors = result.data?.errors as FetchErrors;
+		const response = await fetch('/users', {
+			method: 'POST',
+			body: JSON.stringify(data),
+			headers: { 'Content-Type': 'application/json' }
+		});
+		const result = await response.json();
+		if (result.errors) {
+			errors = result.errors as FetchErrors;
 			return;
 		}
-		if (result.type === 'redirect') {
-			goto(result.location);
-		} else {
-			errors = null;
+		if (response.status === 200) {
+			// Navigate in case username has changed
 			await invalidateAll();
+			goto(`/users/${username}`);
+		} else {
+			errors = `${response.status} error`;
+			return;
 		}
 		close();
 	}

@@ -1,11 +1,10 @@
 <script lang="ts">
 	import { getContext, onMount } from 'svelte';
 	import { invalidateAll, goto } from '$app/navigation';
-	import { deserialize } from '$app/forms';
 	import { page } from '$app/stores';
 	import { formatTime } from '~/lib/client/army';
 	import { HOLD_ADD_SPEED, HOLD_REMOVE_SPEED, getTotals, getUnitLevel } from '~/lib/shared/utils';
-	import type { AppState, TownHall, Army, Unit, ArmyUnit, Banner, UnitType, FetchErrors } from '~/lib/shared/types';
+	import type { AppState, Army, Unit, ArmyUnit, Banner, UnitType, FetchErrors } from '~/lib/shared/types';
 	import C from '~/components';
 
 	type TitleOptions = {
@@ -154,7 +153,7 @@
 		};
 		app.openModal(C.EditBanner, { banner, onSave });
 	}
-	
+
 	function setTownHall(value: number) {
 		if (typeof value !== 'number' || value < 1 || value > app.townHalls.length) {
 			throw new Error(`Town hall ${value} doesn't exist`);
@@ -172,22 +171,27 @@
 
 	async function saveArmy() {
 		const data = { id: army?.id, name, units, banner, townHall };
-		const response = await fetch('/create?/saveArmy', { method: 'POST', body: JSON.stringify(data) });
-		const result = deserialize(await response.text());
-		if (result.type === 'failure') {
-			errors = result.data?.errors as FetchErrors;
+		const response = await fetch('/armies', {
+			method: 'POST',
+			body: JSON.stringify(data),
+			headers: { 'Content-Type': 'application/json' }
+		});
+		const result = await response.json();
+		if (result.errors) {
+			errors = result.errors as FetchErrors;
 			return;
 		}
-		if (result.type === 'redirect') {
-			goto(result.location);
+		if (response.status === 200) {
+			if (!army) {
+				// Redirect to created army
+				goto(`/armies/${result.id}`);
+			} else {
+				// Back out of editing mode
+				await invalidateAll();
+				goto(`/armies/${army.id}`);
+			}
 		} else {
-			errors = null;
-			await invalidateAll();
-		}
-		if (army) {
-			// TODO: display toast "Army successfully saved"
-
-			goto(`/armies/${army.id}`);
+			errors = `${response.status} error`;
 		}
 	}
 </script>
@@ -214,7 +218,7 @@
 <section class="dashed details">
 	<div>
 		<h2>Army details</h2>
-		<C.Fieldset label="Town hall:" htmlName="town-all" style='padding: 0 8px; margin-bottom: 16px;' --input-width="100%">	
+		<C.Fieldset label="Town hall:" htmlName="town-all" style="padding: 0 8px; margin-bottom: 16px;" --input-width="100%">
 			<div class="town-halls-grid">
 				{#each app.townHalls as th}
 					{@const isSelected = townHall === th.level}
@@ -223,7 +227,7 @@
 				{/each}
 			</div>
 		</C.Fieldset>
-		<C.Fieldset label="Army name:" htmlName="name" style='padding: 0 8px' --input-width="250px">
+		<C.Fieldset label="Army name:" htmlName="name" style="padding: 0 8px" --input-width="250px">
 			<C.Input bind:value={name} maxlength={25} />
 		</C.Fieldset>
 	</div>
@@ -380,13 +384,13 @@
 	}
 	.town-halls-grid {
 		display: grid;
-  		grid-template-columns: repeat(auto-fit, minmax(70px, 1fr));
-  		width: 100%;
-    	gap: 8px;
+		grid-template-columns: repeat(auto-fit, minmax(70px, 1fr));
+		width: 100%;
+		gap: 8px;
 	}
 	.town-halls-grid :global(.town-hall:disabled) {
 		filter: grayscale(1);
-    	border: 1px dashed var(--primary-400);
+		border: 1px dashed var(--primary-400);
 	}
 
 	/* DASHED STUFF */

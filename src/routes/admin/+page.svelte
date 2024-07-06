@@ -1,10 +1,10 @@
 <script lang="ts">
 	import { getContext } from 'svelte';
 	import type { PageData } from './$types';
-	import THWidgetDisplay from './THWidgetDisplay.svelte';
-	import UnitTableDisplay from './UnitTableDisplay.svelte';
-	import EditTownHall from './EditTownHall.svelte';
-	import EditUnit from './EditUnit.svelte';
+	import THWidgetDisplay from './townhalls/THWidgetDisplay.svelte';
+	import UnitTableDisplay from './units/UnitTableDisplay.svelte';
+	import EditTownHall from './townhalls/EditTownHall.svelte';
+	import EditUnit from './units/EditUnit.svelte';
 	import { formatTime } from '~/lib/client/army';
 	import type { Unit, TownHall, AppState } from '~/lib/shared/types';
 	import C from '~/components';

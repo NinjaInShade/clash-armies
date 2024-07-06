@@ -2,7 +2,6 @@
 	import { onMount } from 'svelte';
 	import type { Unit, UnitType, UnitLevel, FetchErrors } from '~/lib/shared/types';
 	import { invalidateAll } from '$app/navigation';
-	import { deserialize } from '$app/forms';
 	import C from '~/components';
 
 	// TODO: fix this type, id/unitId should be optional as we may be creating and don't have that info yet
@@ -107,28 +106,38 @@
 		if (image && image[0]) {
 			body.append('image', image[0]);
 		}
-		const response = await fetch('?/saveUnit', { method: 'POST', body });
-		const result = deserialize(await response.text());
-		if (result.type === 'failure') {
-			errors = result.data?.errors as FetchErrors;
-		} else {
-			await invalidateAll();
-			close();
+		const response = await fetch('/admin/units', { method: 'POST', body });
+		const result = await response.json();
+		if (result.errors) {
+			errors = result.errors as FetchErrors;
+			return;
 		}
+		if (response.status === 200) {
+			await invalidateAll();
+		} else {
+			errors = `${response.status} error`;
+			return;
+		}
+		close();
 	}
 
 	async function deleteUnit() {
 		if (!unit) return;
 		const body = new FormData();
 		body.append('id', JSON.stringify(unit.id));
-		const response = await fetch('?/deleteUnit', { method: 'POST', body });
-		const result = deserialize(await response.text());
-		if (result.type === 'failure') {
-			errors = result.data?.errors as FetchErrors;
-		} else {
-			await invalidateAll();
-			close();
+		const response = await fetch('/admin/units', { method: 'DELETE', body });
+		const result = await response.json();
+		if (result.errors) {
+			errors = result.errors as FetchErrors;
+			return;
 		}
+		if (response.status === 200) {
+			await invalidateAll();
+		} else {
+			errors = `${response.status} error`;
+			return;
+		}
+		close();
 	}
 </script>
 

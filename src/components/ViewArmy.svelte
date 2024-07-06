@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { getContext } from 'svelte';
-	import { invalidateAll, goto } from '$app/navigation';
-	import { deserialize } from '$app/forms';
+	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
 	import { getTotals } from '~/lib/shared/utils';
 	import { formatTime, copyLink, openInGame, getTags, getCopyBtnTitle, getOpenBtnTitle } from '~/lib/client/army';
@@ -31,17 +30,20 @@
 		if (!confirmed) {
 			return;
 		}
-		const response = await fetch('/create?/deleteArmy', { method: 'POST', body: JSON.stringify(army.id) });
-		const result = deserialize(await response.text());
-		if (result.type === 'failure') {
-			errors = result.data?.errors as FetchErrors;
+		const response = await fetch('/armies', {
+			method: 'DELETE',
+			body: JSON.stringify(army.id),
+			headers: { 'Content-Type': 'application/json' }
+		});
+		const result = await response.json();
+		if (result.errors) {
+			errors = result.errors as FetchErrors;
 			return;
 		}
-		if (result.type === 'redirect') {
-			goto(result.location);
+		if (response.status === 200) {
+			goto(`/armies`);
 		} else {
-			errors = null;
-			await invalidateAll();
+			errors = `${response.status} error`;
 		}
 	}
 

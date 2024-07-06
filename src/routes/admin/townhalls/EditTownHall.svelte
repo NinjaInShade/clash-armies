@@ -60,13 +60,18 @@
 		if (image && image[0]) {
 			body.append('image', image[0]);
 		}
-		const response = await fetch('?/saveTownHall', { method: 'POST', body });
-		const result = deserialize(await response.text());
-		if (result.type === 'failure') {
-			errors = result.data?.errors as FetchErrors;
+		const response = await fetch('/admin/townhalls', { method: 'POST', body });
+		const result = await response.json();
+		if (result.errors) {
+			errors = result.errors as FetchErrors;
 			return;
 		}
-		await invalidateAll();
+		if (response.status === 200) {
+			await invalidateAll();
+		} else {
+			errors = `${response.status} error`;
+			return;
+		}
 		close();
 	}
 
@@ -74,13 +79,18 @@
 		if (!townHall) return;
 		const body = new FormData();
 		body.append('level', JSON.stringify(townHall.level));
-		const response = await fetch('?/deleteTownHall', { method: 'POST', body });
-		const result = deserialize(await response.text());
-		if (result.type === 'failure') {
-			errors = result.data?.errors as FetchErrors;
+		const response = await fetch('/admin/townhalls', { method: 'DELETE', body });
+		const result = await response.json();
+		if (result.errors) {
+			errors = result.errors as FetchErrors;
 			return;
 		}
-		await invalidateAll();
+		if (response.status === 200) {
+			await invalidateAll();
+		} else {
+			errors = `${response.status} error`;
+			return;
+		}
 		close();
 	}
 </script>

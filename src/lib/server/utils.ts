@@ -1,20 +1,15 @@
 import type { FetchErrors } from "~/lib/shared/types";
 import z from 'zod';
-import { fail } from '@sveltejs/kit';
+import { json } from '@sveltejs/kit';
 
 /**
- * Wrapper function for actions that makes sure errors come back to the client in a familiar, expected format
+ * Wrapper function for API endpoints to ensure errors come back to the client in an expected format
  */
-export async function actionWrap(fn: () => Promise<Response | void>) {
+export async function errCatcher(fn: () => Promise<Response>) {
     try {
         const result = await fn();
         return result;
     } catch (err) {
-        // Redirects
-        if (err?.location) {
-            throw err;
-        }
-
         let body: { errors: FetchErrors };
         if (err instanceof z.ZodError) {
             body = { errors: err.flatten().fieldErrors };
@@ -24,6 +19,6 @@ export async function actionWrap(fn: () => Promise<Response | void>) {
             body = { errors: 'Invalid error' };
         }
         console.error('Error:', err);
-        return fail(400, body);
+        return json(body, { status: 400 });
     }
 }

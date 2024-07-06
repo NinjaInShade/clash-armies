@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { PageData } from './$types';
 	import { getTags } from '~/lib/client/army';
-	import THWidgetDisplay from '../admin/THWidgetDisplay.svelte';
+	import THWidgetDisplay from '~/routes/admin/townhalls/THWidgetDisplay.svelte';
 	import C from '~/components';
 
 	const { data }: { data: PageData } = $props();
@@ -88,10 +88,10 @@
 				<C.Fieldset label="Town Hall" htmlName="townhall" --input-width="100px">
 					<C.Select bind:value={townHall} data={thSelectData} />
 				</C.Fieldset>
-				<C.Fieldset label="Attack Type" htmlName="type" --input-width="115px">
+				<C.Fieldset label="Attack Type" htmlName="type" --input-width="130px">
 					<C.Select bind:value={attackType} data={attackTypeSelectData} />
 				</C.Fieldset>
-				<C.Fieldset label="Sort by" htmlName="sort" --input-width="170px">
+				<C.Fieldset label="Sort by" htmlName="sort" --input-width="175px">
 					<C.Select bind:value={sortOrder} data={sortSelectData} />
 				</C.Fieldset>
 			</div>
