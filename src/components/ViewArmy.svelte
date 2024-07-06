@@ -46,12 +46,6 @@
 			errors = `${response.status} error`;
 		}
 	}
-
-	function getEditArmyURL() {
-		$page.url.searchParams.set('editing', 'true');
-		const params = $page.url.searchParams;
-		return `?${params.toString()}`;
-	}
 </script>
 
 <svelte:head>
@@ -144,7 +138,7 @@
 <div class="army-controls">
 	{#if app.user && (app.user.id === army.createdBy || app.user.hasRoles('admin'))}
 		<C.Button onclick={deleteArmy} theme="danger">Delete</C.Button>
-		<C.Button asLink href={getEditArmyURL()}>Edit</C.Button>
+		<C.Button asLink href="/armies/edit/{army.id}">Edit</C.Button>
 	{/if}
 </div>
 

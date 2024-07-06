@@ -5,14 +5,13 @@
 	import { USER_MAX_ARMIES } from '~/lib/shared/utils';
 	import type { PageData } from './$types';
 	import EditUser from './EditUser.svelte';
-	import { page } from '$app/stores';
 
-	const { data } = $props<{ data: PageData }>();
+	const { data }: { data: PageData } = $props();
 	const { armies, user } = $derived(data);
 
 	const app = getContext<AppState>('app');
 
-	const username = $derived($page.params.slug);
+	const username = $derived(user.username);
 	const currentUser = $derived(app.user ? app.user.username : null);
 
 	function editUser() {

@@ -1,14 +1,23 @@
 <script lang="ts">
 	import type { PageData } from './$types';
+	import type { AppState } from '~/lib/shared/types';
+	import { getContext } from 'svelte';
 	import C from '~/components';
 
 	const { data }: { data: PageData } = $props();
 	const { army } = $derived(data);
+
+	const app = getContext<AppState>('app');
 </script>
 
 <section class="army">
 	<div class="container">
-		<C.ViewArmy {army} />
+		{#if army.createdBy === app.user?.id || app.user?.hasRoles('admin')}
+			<C.EditArmy {army} />
+		{:else}
+			<!-- TODO: make this nicer -->
+			<h2 style="text-align: center;">You do not have permission to edit this army</h2>
+		{/if}
 	</div>
 </section>
 

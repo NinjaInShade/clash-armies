@@ -46,15 +46,6 @@
 		units = army.units;
 	});
 
-	function getViewArmyURL() {
-		if (!army) {
-			return '/armies';
-		}
-		$page.url.searchParams.delete('editing');
-		const params = $page.url.searchParams;
-		return `?${params.toString()}`;
-	}
-
 	const capacity = $derived.by(() => {
 		const thData = app.townHalls.find((th) => th.level === townHall);
 		// Should never happen...
@@ -334,7 +325,7 @@
 {/if}
 
 <div class="army-controls">
-	<C.Button asLink href={getViewArmyURL()}>Cancel</C.Button>
+	<C.Button asLink href='{army ? `/armies/${army.id}` : '/armies'}'>Cancel</C.Button>
 	<C.Button onclick={saveArmy} disabled={saveDisabled}>{army ? 'Save' : 'Create'}</C.Button>
 </div>
 
