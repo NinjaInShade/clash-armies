@@ -1,5 +1,9 @@
 <script lang="ts">
+	import { getContext } from 'svelte';
+	import type { AppState } from '~/lib/shared/types';
 	import C from '~/components';
+
+	const app = getContext<AppState>('app');
 </script>
 
 <footer>
@@ -46,7 +50,7 @@
 				</ul>
 				<p class="copyright">Copyright © {new Date().getFullYear()} | All Rights Reserved</p>
 			</div>
-			<div class="col">
+			<div class="col quick-links">
 				<h3>Quick Links</h3>
 				<ul>
 					<li>
@@ -55,6 +59,21 @@
 					<li>
 						<a href="/armies">Armies</a>
 					</li>
+					{#if app.user}
+						<li>
+							<a href="/create">Create</a>
+						</li>
+					{/if}
+					{#if app.user && app.user.hasRoles('admin')}
+						<li>
+							<a href="/admin">Admin</a>
+						</li>
+					{/if}
+					{#if app.user}
+						<li>
+							<a href="/users/{app.user.username}">Account</a>
+						</li>
+					{/if}
 				</ul>
 			</div>
 			<div class="col">
@@ -194,6 +213,10 @@
 	}
 	.col a:hover path {
 		fill: var(--grey-100);
+	}
+	.col.quick-links ul {
+		display: grid;
+		grid-template-columns: repeat(3, 1fr);
 	}
 
 	small .copyright {
