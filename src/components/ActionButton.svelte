@@ -46,6 +46,9 @@
         background-color: #424C38;
         color: #53E059;
     }
+    .action-btn.success:focus {
+        outline: #53E059 dotted 2px;
+    }
     .action-btn.success :global(svg path) {
         fill: #53E059;
     }
