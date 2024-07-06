@@ -3,7 +3,7 @@
 	import { invalidateAll, goto } from '$app/navigation';
 	import { page } from '$app/stores';
 	import { formatTime } from '~/lib/client/army';
-	import { HOLD_ADD_SPEED, HOLD_REMOVE_SPEED, getTotals, getUnitLevel } from '~/lib/shared/utils';
+	import { HOLD_ADD_SPEED, HOLD_REMOVE_SPEED, getTotals, getUnitLevel, BANNERS } from '~/lib/shared/utils';
 	import type { AppState, Army, Unit, ArmyUnit, Banner, UnitType, FetchErrors } from '~/lib/shared/types';
 	import C from '~/components';
 
@@ -23,7 +23,7 @@
 	let createdBy = $state<number | null>(app.user?.id ?? null);
 	let username = $state<string | null>(app.user?.username ?? null);
 	let townHall = $state<number>(16);
-	let banner = $state<Banner>('dark-ages');
+	let banner = $state<Banner>(BANNERS[Math.floor(Math.random() * BANNERS.length)]);
 	let name = $state<string | null>(null);
 	let units = $state<ArmyUnit[]>([]);
 
