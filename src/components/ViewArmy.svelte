@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { getContext } from 'svelte';
 	import { goto } from '$app/navigation';
-	import { page } from '$app/stores';
 	import { getTotals } from '~/lib/shared/utils';
 	import { formatTime, copyLink, openInGame, getTags, getCopyBtnTitle, getOpenBtnTitle } from '~/lib/client/army';
 	import type { Army, AppState, FetchErrors } from '~/lib/shared/types';
@@ -57,7 +56,10 @@
 	<div class="banner-overlay"></div>
 	<div class="banner-content">
 		<div class="left">
-			<h1>{army.name}</h1>
+			<div class="title-container">
+				<img src="/clash/town-halls/{army.townHall}.png" alt="Town hall {army.townHall}" class="town-hall" />
+				<h1>{army.name}</h1>
+			</div>
 			<p class="author">Assembled by <a href="/users/{army.username}">@{army.username}</a></p>
 			<div class="tags">
 				{#each getTags(army) as tag}
@@ -181,6 +183,19 @@
 		left: 0;
 	}
 
+	.banner-content .left .title-container {
+		display: flex;
+		align-items: flex-end;
+		gap: 0.5em;
+	}
+	.banner-content .left .town-hall {
+		flex-shrink: 0;
+		max-height: 60px;
+		width: auto;
+		/* Optical alignment */
+		position: relative;
+		bottom: 0.35em;
+	}
 	.banner-content .left h1 {
 		color: var(--grey-100);
 		max-width: 500px;
@@ -320,6 +335,9 @@
 		.army-controls {
 			margin-top: 16px;
 		}
+		.banner-content .left .town-hall {
+			max-height: 48px;
+		}
 	}
 
 	@media (max-width: 775px) {
@@ -334,6 +352,13 @@
 		.banner-img {
 			max-height: none;
 			height: 450px;
+		}
+	}
+
+	@media (max-width: 500px) {
+		.banner-content .left .town-hall {
+			max-height: 44px;
+			bottom: 0.25em;
 		}
 	}
 
