@@ -428,6 +428,7 @@
 
 	/* UNITS */
 	.units {
+		--unit-size: 70px;
 		margin-top: 32px;
 	}
 	.units .title {
@@ -437,21 +438,23 @@
 		padding: 0 24px;
 	}
 	.units-list {
+		--bottom-padding: 16px;
 		display: flex;
 		flex-flow: row wrap;
 		border-bottom: 1px dashed var(--grey-500);
 		margin-bottom: 24px;
-		padding: 0 32px 16px 32px;
+		padding: 0 32px var(--bottom-padding) 32px;
 		gap: 6px;
+		/* Prevent page shift when adding first unit */ 
+		min-height: calc(var(--unit-size) + var(--bottom-padding) + 1px);
 	}
 	.units-list li,
 	.picker-list li {
 		--unit-border-radius: 6px;
 		--amount-size: 16px;
 		--lvl-size: 13px;
-		max-width: 64px;
-		width: 100%;
-		height: auto;
+		width: var(--unit-size);
+		height: var(--unit-size);
 	}
 	.units-list li button,
 	.picker-list li button {
@@ -504,11 +507,13 @@
 		.details {
 			margin-top: 36px;
 		}
+		.units {
+			--unit-size: 60px;
+		}
 		.units-list li,
 		.picker-list li {
 			--amount-size: 14px;
 			--lvl-size: 11px;
-			max-width: 54px;
 		}
 		.errors {
 			margin-top: 16px;
@@ -551,7 +556,7 @@
 			padding: 0 24px;
 		}
 		.units-list {
-			padding: 0 24px 16px 24px;
+			padding: 0 24px var(--bottom-padding) 24px;
 		}
 	}
 
