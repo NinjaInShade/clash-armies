@@ -66,8 +66,37 @@ export function openLink(href: string, openInNewTab = true) {
 
 export async function copyLink(units: ArmyUnit[], app: AppState) {
 	const link = generateLink(units);
-	await navigator.clipboard.writeText(link);
+	await copy(link);
 	app.notify({ title: 'Copied army!', description: 'Successfully copied army link to clipboard', theme: 'success' })
+}
+
+async function copy(text: string) {
+	if ('navigator' in window && window.navigator.clipboard) {
+		try {
+			await navigator.clipboard.write(text);
+			return;
+		} catch (err) {
+			console.error('Failed to copy with navigator.clipboard', err);
+		}
+	}
+	// Fallback to `execCommand`
+	const textarea = document.createElement('textarea');
+	Object.assign(textarea.style, { position: 'fixed', top: '0', left: '0', opacity: '0' });
+	textarea.value = text;
+	document.body.appendChild(textarea);
+	textarea.focus();
+	textarea.select();
+	let success = false;
+	try {
+		success = document.execCommand('copy');
+	} catch (err) {
+		console.error('Failed to copy with execCommand.', err);
+	} finally {
+		document.body.removeChild(textarea);
+	}
+	if (!success) {
+		throw new Error('Failed to copy text');
+	}
 }
 
 export function openInGame(units: ArmyUnit[]) {
