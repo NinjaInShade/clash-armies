@@ -1,9 +1,16 @@
-import type { Handle } from '@sveltejs/kit';
+import type { Handle, RequestEvent } from '@sveltejs/kit';
 import { db } from '~/lib/server/db';
 import { migration } from '~/lib/server/migration';
 import { lucia } from "~/lib/server/auth/lucia";
 import { hasAuth, requireAuth, hasRoles, requireRoles } from "~/lib/server/auth/utils";
 import { CronJob } from 'cron';
+import { dev } from "$app/environment";
+import util from '@ninjalib/util';
+
+util.Logger.showTimestamp = true;
+util.Logger.showDate = !dev;
+
+export const log = util.logger('clash-armies:server');
 
 const hourlyTask = new CronJob('0 0 * * * *', async function() {
 	await lucia.deleteExpiredSessions();
@@ -20,6 +27,18 @@ const serverDispose = async () => {
 	await db.dispose();
 };
 
+export function getRequestInfo(event: RequestEvent) {
+	const { request, locals } = event;
+	const { user } = locals;
+	return {
+		method: request.method,
+		url: request.url,
+		userId: user?.id,
+		username: user?.username,
+		ip: event.getClientAddress()
+	};
+}
+
 export const handle: Handle = async ({ event, resolve }) => {
 	// One-time setup upon starting the server
 	await serverInit;
@@ -33,6 +52,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 	if (!sessionId) {
 		event.locals.user = null;
 		event.locals.session = null;
+		log.info('Incoming request:', getRequestInfo(event));
 		return resolve(event);
 	}
 
@@ -54,6 +74,8 @@ export const handle: Handle = async ({ event, resolve }) => {
 
 	event.locals.user = user;
 	event.locals.session = session;
+
+	log.info('Incoming request:', getRequestInfo(event));
 
 	return resolve(event);
 };

@@ -1,6 +1,6 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { errCatcher } from "~/lib/server/utils";
+import { middleware } from "~/lib/server/utils";
 import { db } from "~/lib/server/db";
 import fs from 'node:fs/promises';
 import z from 'zod';
@@ -35,7 +35,7 @@ const townHallSchemaCreating = townHallSchema.extend({
 export const POST: RequestHandler = async (event) => {
 	event.locals.requireRoles('admin')
 
-	return errCatcher(async function() {
+	return middleware(event, async function() {
 		const formData = await event.request.formData();
 		const townHallData = formData.get('townHall') ?? '';
 		if (townHallData instanceof File) throw new Error('Unexpected file for town hall');
@@ -95,7 +95,7 @@ export const POST: RequestHandler = async (event) => {
 export const DELETE: RequestHandler = async (event) => {
 	event.locals.requireRoles('admin');
 
-	return errCatcher(async function() {
+	return middleware(event, async function() {
 		const formData = await event.request.formData();
 		const data = formData.get('level') ?? '';
 		if (data instanceof File) throw new Error('Unexpected file for level field');

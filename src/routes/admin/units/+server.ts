@@ -1,7 +1,7 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import type { Unit } from "~/lib/shared/types";
-import { errCatcher } from "~/lib/server/utils";
+import { middleware } from "~/lib/server/utils";
 import { db } from "~/lib/server/db";
 import fs from 'node:fs/promises';
 import z from 'zod';
@@ -50,69 +50,67 @@ const unitSchemaCreating = unitSchema.extend({
 });
 
 export const POST: RequestHandler = async (event) => {
-	return errCatcher(async function() {
+	return middleware(event, async function() {
         event.locals.requireRoles('admin');
 
-        return errCatcher(async function() {
-            const formData = await event.request.formData();
-            const unitData = formData.get('unit') ?? '';
-            if (unitData instanceof File) throw new Error('Unexpected file for unit');
+        const formData = await event.request.formData();
+        const unitData = formData.get('unit') ?? '';
+        if (unitData instanceof File) throw new Error('Unexpected file for unit');
 
-            const data = JSON.parse(unitData);
-            const image = formData.get('image');
-            data.image = image;
+        const data = JSON.parse(unitData);
+        const image = formData.get('image');
+        data.image = image;
 
-            if (!data.id) {
-                // Creating unit
-                const { type, name, objectId, housingSpace, trainingTime, productionBuilding, isSuper, isFlying, isJumper, airTargets, groundTargets, levels, image } = unitSchemaCreating.parse(data)
-                await db.transaction(async tx => {
-                    const insertId = await tx.insertOne('units', { type, name, objectId, housingSpace, trainingTime, productionBuilding, isSuper, isFlying, isJumper, airTargets, groundTargets })
-                    await tx.insertMany('unit_levels', levels.map(x => ({ unitId: insertId, level: x.level, spellFactoryLevel: x.spellFactoryLevel, barrackLevel: x.barrackLevel, laboratoryLevel: x.laboratoryLevel })))
+        if (!data.id) {
+            // Creating unit
+            const { type, name, objectId, housingSpace, trainingTime, productionBuilding, isSuper, isFlying, isJumper, airTargets, groundTargets, levels, image } = unitSchemaCreating.parse(data)
+            await db.transaction(async tx => {
+                const insertId = await tx.insertOne('units', { type, name, objectId, housingSpace, trainingTime, productionBuilding, isSuper, isFlying, isJumper, airTargets, groundTargets })
+                await tx.insertMany('unit_levels', levels.map(x => ({ unitId: insertId, level: x.level, spellFactoryLevel: x.spellFactoryLevel, barrackLevel: x.barrackLevel, laboratoryLevel: x.laboratoryLevel })))
+                await fs.writeFile(`static/clash/units/${name}.png`, Buffer.from(await image.arrayBuffer()));
+            })
+        } else {
+            // Updating existing unit
+            const { id, type, name, objectId, housingSpace, trainingTime, productionBuilding, isSuper, isFlying, isJumper, airTargets, groundTargets, levels, image } = unitSchema.parse(data)
+            await db.transaction(async tx => {
+                const existingUnit = await tx.getRow<Unit>('units', { id });
+                await tx.query(`
+                    UPDATE units SET
+                        type = ?,
+                        name = ?,
+                        objectId = ?,
+                        housingSpace = ?,
+                        trainingTime = ?,
+                        productionBuilding = ?,
+                        isSuper = ?,
+                        isFlying = ?,
+                        isJumper = ?,
+                        airTargets = ?,
+                        groundTargets = ?
+                    WHERE id = ?
+                `, [type, name, objectId, housingSpace, trainingTime, productionBuilding, isSuper, isFlying, isJumper, airTargets, groundTargets, id])
+                await fs.rename(`static/clash/units/${existingUnit.name}.png`, `static/clash/units/${name}.png`);
+
+                // Remove deleted unit levels
+                await tx.query('DELETE FROM unit_levels WHERE unitId = ? AND id NOT IN (?)', [id, levels.map(x => x.id)]);
+
+                // Upsert unit levels
+                const unitsData = levels.map(x => ({ ...x, id: x.id ?? null }));
+                await tx.upsert('unit_levels', unitsData);
+
+                if (image && image.size > 0) {
                     await fs.writeFile(`static/clash/units/${name}.png`, Buffer.from(await image.arrayBuffer()));
-                })
-            } else {
-                // Updating existing unit
-                const { id, type, name, objectId, housingSpace, trainingTime, productionBuilding, isSuper, isFlying, isJumper, airTargets, groundTargets, levels, image } = unitSchema.parse(data)
-                await db.transaction(async tx => {
-                    const existingUnit = await tx.getRow<Unit>('units', { id });
-                    await tx.query(`
-                        UPDATE units SET
-                            type = ?,
-                            name = ?,
-                            objectId = ?,
-                            housingSpace = ?,
-                            trainingTime = ?,
-                            productionBuilding = ?,
-                            isSuper = ?,
-                            isFlying = ?,
-                            isJumper = ?,
-                            airTargets = ?,
-                            groundTargets = ?
-                        WHERE id = ?
-                    `, [type, name, objectId, housingSpace, trainingTime, productionBuilding, isSuper, isFlying, isJumper, airTargets, groundTargets, id])
-                    await fs.rename(`static/clash/units/${existingUnit.name}.png`, `static/clash/units/${name}.png`);
-
-                    // Remove deleted unit levels
-                    await tx.query('DELETE FROM unit_levels WHERE unitId = ? AND id NOT IN (?)', [id, levels.map(x => x.id)]);
-
-                    // Upsert unit levels
-                    const unitsData = levels.map(x => ({ ...x, id: x.id ?? null }));
-                    await tx.upsert('unit_levels', unitsData);
-
-                    if (image && image.size > 0) {
-                        await fs.writeFile(`static/clash/units/${name}.png`, Buffer.from(await image.arrayBuffer()));
-                    };
-                })
-            }
-            return json({}, { status: 200 });
-        })
-	});
+                };
+            })
+        }
+        return json({}, { status: 200 });
+    })
 };
 
 export const DELETE: RequestHandler = async (event) => {
     event.locals.requireRoles('admin');
 
-    return errCatcher(async function() {
+    return middleware(event, async function() {
         const formData = await event.request.formData();
         const data = formData.get('id') ?? '';
         if (data instanceof File) throw new Error('Unexpected file for ID field');

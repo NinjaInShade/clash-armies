@@ -1,11 +1,12 @@
 import type { FetchErrors } from "~/lib/shared/types";
 import z from 'zod';
-import { json } from '@sveltejs/kit';
+import { json, type RequestEvent } from '@sveltejs/kit';
+import { log, getRequestInfo } from '~/lib/server/hooks.server';
 
 /**
  * Wrapper function for API endpoints to ensure errors come back to the client in an expected format
  */
-export async function errCatcher(fn: () => Promise<Response>) {
+export async function middleware(event: RequestEvent, fn: () => Promise<Response>) {
     try {
         const result = await fn();
         return result;
@@ -18,7 +19,7 @@ export async function errCatcher(fn: () => Promise<Response>) {
         } else {
             body = { errors: 'Invalid error' };
         }
-        console.error('Error:', err);
+        log.error('API error:', getRequestInfo(event), err)
         return json(body, { status: 400 });
     }
 }
