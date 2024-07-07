@@ -4142,5 +4142,35 @@
             "FreezeOuterTimeMS": 3000,
             "PreviewScenario": "SpellFrostmites"
         }
+    },
+    "Overgrowth": {
+        "1": {
+            "HousingSpace": 2,
+            "SpellForgeLevel": 6,
+            "ProductionBuilding": "Dark Spell Factory",
+            "TrainingTime": 360,
+            "LaboratoryLevel": null
+        },
+        "2": {
+            "HousingSpace": 2,
+            "SpellForgeLevel": 6,
+            "ProductionBuilding": "Dark Spell Factory",
+            "TrainingTime": 360,
+            "LaboratoryLevel": 10
+        },
+        "3": {
+            "HousingSpace": 2,
+            "SpellForgeLevel": 6,
+            "ProductionBuilding": "Dark Spell Factory",
+            "TrainingTime": 360,
+            "LaboratoryLevel": 12
+        },
+        "4": {
+            "HousingSpace": 2,
+            "SpellForgeLevel": 6,
+            "ProductionBuilding": "Dark Spell Factory",
+            "TrainingTime": 360,
+            "LaboratoryLevel": 14
+        }
     }
 }

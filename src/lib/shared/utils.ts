@@ -121,7 +121,7 @@ export function getTotals(units: ArmyUnit[]) {
  *
  * @returns highest available unit level or -1 if player hasn't unlocked it at all
  */
-export function getUnitLevel(unit: Unit | ArmyUnit, ctx: { th: TownHall, units: Unit[] }) {
+export function getUnitLevel(unit: Unit | ArmyUnit, ctx: { th: TownHall, units: Unit[] }): number {
 	const { name, type } = unit;
 	const appUnit = ctx.units.find(u => u.type === type && u.name === name);
 
@@ -194,7 +194,14 @@ export function getUnitLevel(unit: Unit | ArmyUnit, ctx: { th: TownHall, units: 
 			if (!regularTroopVersion) {
 				throw new Error(`Expected to find regular troop version for "${name}"`)
 			};
-			return getUnitLevel(regularTroopVersion, ctx);
+			const regularMaxLevel = getUnitLevel(regularTroopVersion, ctx);
+			if (level > regularMaxLevel) {
+				// Some super troop must have their regular troop unlocked to a certain level (e.g. super bowler requires level 4 bowler).
+				// Therefore, some super troop levels start from the base regular troop level.
+				// Some events now let you
+				return maxLevel;
+			}
+			return regularMaxLevel;
 		}
 
 		maxLevel = level;

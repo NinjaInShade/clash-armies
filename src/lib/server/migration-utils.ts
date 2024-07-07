@@ -76,7 +76,8 @@ const CURRENT_SPELLS: string[] = [
     'Earthquake',
     'Haste',
     'Skeleton',
-    'Bat'
+    'Bat',
+    'Overgrowth'
 ];
 
 /**
@@ -141,25 +142,26 @@ export async function insertInitialUnits(db: MySQL) {
 
         // Global attributes are duplicated on every level data, so we can just grab them from any level data index
         const ids = swapKeysAndValues(ObjectIdsSeedData);
+        const globalAttrs = Object.values(levels)[0];
         const unitId = await db.insertOne('units', {
             type: isTroop ? 'Troop' : 'Siege',
             name,
             objectId: ids[NAME_TO_OBJECT_ID_NAME[name] ?? name],
-            housingSpace: levels[1].HousingSpace,
-            trainingTime: levels[1].TrainingTime,
-            productionBuilding: levels[1].ProductionBuilding,
-            isSuper: levels[1].EnabledBySuperLicence ?? false,
-            isFlying: levels[1].IsFlying ?? false,
-            isJumper: levels[1].IsJumper ?? false,
-            airTargets: levels[1].AirTargets ?? false,
-            groundTargets: levels[1].GroundTargets ?? false,
+            housingSpace: globalAttrs.HousingSpace,
+            trainingTime: globalAttrs.TrainingTime,
+            productionBuilding: globalAttrs.ProductionBuilding,
+            isSuper: globalAttrs.EnabledBySuperLicence ?? false,
+            isFlying: globalAttrs.IsFlying ?? false,
+            isJumper: globalAttrs.IsJumper ?? false,
+            airTargets: globalAttrs.AirTargets ?? false,
+            groundTargets: globalAttrs.GroundTargets ?? false,
         })
 
         // Insert levels
         const unitLevels = Object.entries(levels).map(([level, data]) => {
         	const { BarrackLevel, LaboratoryLevel, HousingSpace, TrainingTime, ProductionBuilding, EnabledBySuperLicence = false } = data;
-			if (typeof BarrackLevel !== 'number' || typeof LaboratoryLevel !== 'number' || typeof HousingSpace !== 'number' || typeof TrainingTime !== 'number') {
-				throw new Error('Expected number value from static JSON');
+			if (typeof HousingSpace !== 'number' || typeof TrainingTime !== 'number') {
+                throw new Error(`Expected number value for static JSON for troop "${name}" (barrackLvl=${BarrackLevel}, labLvl=${LaboratoryLevel}, housingSpace=${HousingSpace}, trainingTime=${TrainingTime})`);
 			}
 			if (ProductionBuilding !== 'Barrack' && ProductionBuilding !== 'Dark Elixir Barrack' && ProductionBuilding !== 'Siege Workshop') {
 				throw new Error(`Expected valid production building, got "${ProductionBuilding}" for troop "${name}"`);
@@ -186,20 +188,21 @@ export async function insertInitialUnits(db: MySQL) {
 
         // Global attributes are duplicated on every level data, so we can just grab them from any level data index
         const ids = swapKeysAndValues(ObjectIdsSeedData);
+        const globalAttrs = Object.values(levels)[0];
         const unitId = await db.insertOne('units', {
             type: 'Spell',
             name: truncatedName,
             objectId: ids[NAME_TO_OBJECT_ID_NAME[name] ?? name],
-            housingSpace: levels[1].HousingSpace,
-            trainingTime: levels[1].TrainingTime,
-            productionBuilding: levels[1].ProductionBuilding
+            housingSpace: globalAttrs.HousingSpace,
+            trainingTime: globalAttrs.TrainingTime,
+            productionBuilding: globalAttrs.ProductionBuilding
         })
 
         // Insert levels
         const unitLevels = Object.entries(levels).map(([level, data]) => {
             const { SpellForgeLevel, LaboratoryLevel, HousingSpace, TrainingTime, ProductionBuilding } = data;
-            if (typeof SpellForgeLevel !== 'number' || typeof LaboratoryLevel !== 'number' || typeof HousingSpace !== 'number' || typeof TrainingTime !== 'number') {
-                throw new Error('Expected number value for static JSON');
+            if (typeof HousingSpace !== 'number' || typeof TrainingTime !== 'number') {
+                throw new Error(`Expected number value for static JSON for spell "${name}" (spellForgeLvl=${SpellForgeLevel}, labLvl=${LaboratoryLevel}, housingSpace=${HousingSpace}, trainingTime=${TrainingTime})`);
             }
             if (ProductionBuilding !== 'Spell Factory' && ProductionBuilding !== 'Dark Spell Factory') {
                 throw new Error(`Expected valid production building, got "${ProductionBuilding}"  for spell "${name}"`);
