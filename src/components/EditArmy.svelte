@@ -210,7 +210,10 @@
 <section class="dashed details">
 	<div>
 		<h2>Army details</h2>
-		<C.Fieldset label="Town hall:" htmlName="town-all" style="padding: 0 8px; margin-bottom: 16px;" --input-width="100%">
+		<C.Fieldset label="Army name:" htmlName="name" style="padding: 0 8px" --input-width="250px">
+			<C.Input bind:value={name} maxlength={25} />
+		</C.Fieldset>
+		<C.Fieldset label="Town hall:" htmlName="town-all" style="padding: 0 8px; margin-top: 16px;" --input-width="100%">
 			<div class="town-halls-grid">
 				{#each app.townHalls as th}
 					{@const isSelected = townHall === th.level}
@@ -218,9 +221,6 @@
 					<C.TownHall onclick={() => setTownHall(th.level)} level={th.level} {...btnAttributes} --width="100%" />
 				{/each}
 			</div>
-		</C.Fieldset>
-		<C.Fieldset label="Army name:" htmlName="name" style="padding: 0 8px" --input-width="250px">
-			<C.Input bind:value={name} maxlength={25} />
 		</C.Fieldset>
 	</div>
 </section>
