@@ -61,7 +61,7 @@ export async function getUser(req: Request, username: string) {
 
 const userSchema = z.object({
 	id: z.number(),
-	username: z.string().min(3).max(45),
+	username: z.string().min(3).max(30),
 })
 
 export async function saveUser(event: RequestEvent, userData: Partial<User>) {

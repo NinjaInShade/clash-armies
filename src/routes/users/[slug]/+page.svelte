@@ -80,6 +80,7 @@
 
 	header .container {
 		display: flex;
+		flex-flow: row wrap;
 		justify-content: space-between;
 		align-items: flex-end;
 		border-bottom: 1px solid var(--grey-500);
@@ -94,6 +95,7 @@
 	}
 
 	.profile-pic {
+		flex-shrink: 0;
 		background-color: var(--grey-800);
 		border-radius: 8px;
 		max-width: 110px;
@@ -135,6 +137,7 @@
 	}
 
 	.username {
+		word-break: break-all;
 		color: var(--primary-400);
 		margin: 0.35em 0 0.4em 0;
 	}
