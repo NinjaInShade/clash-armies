@@ -42,6 +42,13 @@
 	});
 	setContext('app', appState);
 
+	$effect(() => {
+		// If layout data is invalidated, update app store
+		appState.units = data.units;
+		appState.townHalls = data.townHalls;
+		appState.user = extendUser(data.user);
+	});
+
 	function toggleDevDebug() {
 		devDebugOpen = !devDebugOpen;
 	}

@@ -11,9 +11,9 @@ export function requireHTML() {
 }
 
 export function createAppState(initial: Omit<AppState, 'modals' | 'notifications' | 'openModal' | 'notify'>) {
-	const units = $state<AppState['units']>(initial.units);
-	const townHalls = $state<AppState['townHalls']>(initial.townHalls);
-	const user = $state<AppState['user']>(initial.user);
+	let units = $state<AppState['units']>(initial.units);
+	let townHalls = $state<AppState['townHalls']>(initial.townHalls);
+	let user = $state<AppState['user']>(initial.user);
 	let modals = $state<AppState['modals']>([]);
 	let notifications = $state<AppState['notifications']>([]);
 
@@ -21,11 +21,20 @@ export function createAppState(initial: Omit<AppState, 'modals' | 'notifications
 		get townHalls() {
 			return townHalls;
 		},
+		set townHalls(newTownHalls: AppState['townHalls']) {
+			townHalls = newTownHalls;
+		},
 		get units() {
 			return units;
 		},
+		set units(newUnits: AppState['units']) {
+			units = newUnits;
+		},
 		get user() {
 			return user;
+		},
+		set user(newUser: AppState['user']) {
+			user = newUser;
 		},
 		get modals() {
 			return modals;
