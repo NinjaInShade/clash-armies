@@ -193,7 +193,7 @@
 </svelte:head>
 
 <!-- Handle mouseup on window in case user mouses cursor from the card then does mouseup -->
-<svelte:window onpointerup={stopHold} />
+<svelte:window onmouseup={stopHold} />
 
 <section class="banner">
 	<img class="banner-img" src="/clash/banners/{banner}.png" alt="Clash of clans banner artwork" />
@@ -257,8 +257,8 @@
 				<li>
 					<button
 						type="button"
-						onpointerdown={() => initHoldRemove(unit.name)}
-						onpointerleave={() => stopHold()}
+						onmousedown={() => initHoldRemove(unit.name)}
+						onmouseleave={() => stopHold()}
 						onkeypress={(ev) => {
 							if (ev.key !== 'Enter') {
 								return;
@@ -304,8 +304,8 @@
 				<button
 					type="button"
 					disabled={reachedMaxAmount || level === -1 || disableSuper}
-					onpointerdown={() => initHoldAdd(unit)}
-					onpointerleave={() => stopHold()}
+					onmousedown={() => initHoldAdd(unit)}
+					onmouseleave={() => stopHold()}
 					onkeypress={(ev) => {
 						if (ev.key !== 'Enter') {
 							return;
@@ -441,14 +441,17 @@
 	}
 	.units-list {
 		--bottom-padding: 16px;
-		display: flex;
-		flex-flow: row wrap;
 		border-bottom: 1px dashed var(--grey-500);
 		margin-bottom: 24px;
 		padding: 0 32px var(--bottom-padding) 32px;
-		gap: 6px;
 		/* Prevent page shift when adding first unit */ 
 		min-height: calc(var(--unit-size) + var(--bottom-padding) + 1px);
+	}
+	.units-list, .picker-list {
+		--gap: 6px;
+		display: flex;
+		flex-flow: row wrap;
+		gap: var(--gap);
 	}
 	.units-list li,
 	.picker-list li {
@@ -460,6 +463,7 @@
 	}
 	.units-list li button,
 	.picker-list li button {
+		display: block;
 		width: 100%;
 		height: 100%;
 	}
@@ -473,9 +477,11 @@
 		padding-bottom: 24px;
 	}
 	.picker-list {
-		display: flex;
-		flex-flow: row wrap;
-		gap: 6px;
+		--max-rows: 3;
+		padding-right: 12px;
+		/** Show max 3 rows of units (meant more for mobile so you can still see the unit you've selected at all times) */
+		max-height: calc((var(--unit-size) * var(--max-rows)) + (var(--gap) * (var(--max-rows) - 1)));
+		overflow-y: auto;
 	}
 	.picker-list li button:disabled {
 		filter: grayscale(1);
@@ -496,6 +502,8 @@
 		font-family: 'Clash', sans-serif;
 		color: var(--grey-100);
 		font-size: 15px;
+		min-width: 4ch;
+		white-space: nowrap;
 		gap: 4px;
 	}
 	.units .totals img {
@@ -546,7 +554,8 @@
 
 	@media (max-width: 475px) {
 		.units .totals {
-			flex-flow: row wrap;
+			display: grid;
+			grid-template-columns: repeat(2, min-content);
 		}
 		.details > div {
 			padding: 0 16px 24px 16px;
