@@ -15,7 +15,7 @@
 	let errors = $state<FetchErrors | null>(null);
 
 	let _troopUnits = $derived(units.filter((item) => item.type === 'Troop'));
-	let troopUnits = $derived([..._troopUnits.filter(x => !x.isSuper), ..._troopUnits.filter(x => x.isSuper)]);
+	let troopUnits = $derived([..._troopUnits.filter((x) => !x.isSuper), ..._troopUnits.filter((x) => x.isSuper)]);
 	let siegeUnits = $derived(units.filter((item) => item.type === 'Siege'));
 	let spellUnits = $derived(units.filter((item) => item.type === 'Spell'));
 
@@ -356,14 +356,17 @@
 		}
 	}
 
-	@media (max-width: 500px) {
+	@media (max-width: 600px) {
+		.banner-content .left .title-container {
+			flex-flow: column nowrap;
+			align-items: flex-start;
+		}
 		.banner-content .left .town-hall {
-			max-height: 44px;
-			bottom: 0.25em;
+			bottom: 0;
 		}
 	}
 
-	@media (max-width: 475px) {
+	@media (max-width: 550px) {
 		.banner-content .right,
 		.banner-content .right .totals {
 			flex-flow: row wrap;
@@ -376,6 +379,9 @@
 		}
 		.units .controls {
 			padding: 16px 24px;
+		}
+		.banner-img {
+			height: 550px;
 		}
 	}
 
