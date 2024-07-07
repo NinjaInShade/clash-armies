@@ -85,13 +85,13 @@
 				<C.Input bind:value={search} placeholder="Electro zap..." />
 			</C.Fieldset>
 			<div class="right">
-				<C.Fieldset label="Town Hall" htmlName="townhall" --input-width="100px">
+				<C.Fieldset label="Town Hall" htmlName="townhall" --input-width="110px">
 					<C.Select bind:value={townHall} data={thSelectData} />
 				</C.Fieldset>
 				<C.Fieldset label="Attack Type" htmlName="type" --input-width="130px">
 					<C.Select bind:value={attackType} data={attackTypeSelectData} />
 				</C.Fieldset>
-				<C.Fieldset label="Sort by" htmlName="sort" --input-width="175px">
+				<C.Fieldset label="Sort by" htmlName="sort" --input-width="175px" class="sort-control">
 					<C.Select bind:value={sortOrder} data={sortSelectData} />
 				</C.Fieldset>
 			</div>
@@ -188,19 +188,26 @@
 		}
 	}
 
-	@media (max-width: 425px) {
-		.armies {
-			padding-top: 32px;
-		}
-
-		.right {
-			flex-flow: column nowrap;
+	@media (max-width: 450px) {
+		.filters .right {
+			display: grid;
+			grid-template-columns: repeat(2, 1fr);
 			width: 100%;
 		}
 
 		:global(.filters fieldset) {
 			--input-width: 100%;
 			width: 100%;
+		}
+
+		:global(.filters .sort-control) {
+			grid-column: 1 / span 2;
+		}
+	}
+
+	@media (max-width: 425px) {
+		.armies {
+			padding-top: 32px;
 		}
 	}
 </style>

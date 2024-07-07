@@ -39,8 +39,8 @@
 	}
 	.version:hover,
 	.version:focus {
-		border-color: transparent;
-		background-color: var(--grey-100);
+		background-color: var(--primary-400);
+		color: var(--grey-100);
 	}
 
 	.logo {
