@@ -1,4 +1,5 @@
 import type { AppState, Modal, Notification } from '~/lib/shared/types';
+import C from '~/components';
 
 const TOAST_DEFAULT_DURATION = 1000;
 
@@ -10,7 +11,7 @@ export function requireHTML() {
 	return html;
 }
 
-export function createAppState(initial: Omit<AppState, 'modals' | 'notifications' | 'openModal' | 'notify'>) {
+export function createAppState(initial: Omit<AppState, 'modals' | 'notifications' | 'openModal' | 'openModalAsync' | 'notify' | 'confirm'>) {
 	let units = $state<AppState['units']>(initial.units);
 	let townHalls = $state<AppState['townHalls']>(initial.townHalls);
 	let user = $state<AppState['user']>(initial.user);
@@ -42,7 +43,7 @@ export function createAppState(initial: Omit<AppState, 'modals' | 'notifications
 		get notifications() {
 			return notifications;
 		},
-		openModal(component: Modal['component'], props: Modal['props'] = {}) {
+		openModal<T = unknown>(component: Modal['component'], props: Record<string, unknown> = {}, onClose?: (rtnValue?: T) => void) {
 			// Should be fine in practice
 			const id = Date.now();
 			const modalSpec: Modal = {
@@ -55,11 +56,20 @@ export function createAppState(initial: Omit<AppState, 'modals' | 'notifications
 						if (modals.length === 0) {
 							requireHTML().classList.remove('hide-overflow');
 						}
+						if (onClose) {
+							onClose();
+						}
 					}
-				}
+				},
 			};
 			modals.push(modalSpec);
 			requireHTML().classList.add('hide-overflow');
+		},
+		openModalAsync<T>(component: Modal['component'], props: Record<string, unknown> = {}): Promise<T | undefined> {
+			let _resolve: ((value: T | undefined) => void) | undefined;
+			const promise = new Promise<T | undefined>((resolve) => (_resolve = resolve));
+			this.openModal<T>(component, props, _resolve)
+			return promise;
 		},
 		notify(opts: Notification['opts']) {
 			// eslint-disable-next-line prefer-const
@@ -78,6 +88,10 @@ export function createAppState(initial: Omit<AppState, 'modals' | 'notifications
 			timeout = setTimeout(() => {
 				notificationSpec.dismiss();
 			}, opts.duration ?? TOAST_DEFAULT_DURATION)
+		},
+		async confirm(confirmText: string) {
+			const confirmed = await this.openModalAsync<boolean>(C.Confirm, { confirmText });
+			return Boolean(confirmed);
 		}
 	};
 }

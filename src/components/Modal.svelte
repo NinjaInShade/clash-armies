@@ -17,7 +17,7 @@
 		/** Sets the title of the modal */
 		title?: string;
 		/** Function that closes the modal */
-		close: () => void;
+		close: (rtn?: any) => void;
 		/** Optional controls snippet, rendered in the footer */
 		controls?: Snippet;
 	} & (ComponentRendering | ChildrenRendering);
@@ -68,7 +68,7 @@
 		background-color: var(--grey-800);
 		height: var(--modal-height, auto);
 		width: var(--modal-width, 575px);
-		max-width: calc(100dvw - 4em);
+		max-width: calc(100dvw - 3em);
 		max-height: calc(100dvh - 3em);
 		border-radius: 6px;
 		overflow: hidden;
@@ -110,5 +110,12 @@
 
 	.modal-footer {
 		padding: 14px 24px;
+	}
+
+	@media(max-width: 450px) {
+		.modal {
+			max-width: calc(100dvw - 2em);
+			max-height: calc(100dvh - 2em);
+		}
 	}
 </style>

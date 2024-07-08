@@ -146,12 +146,12 @@
 		app.openModal(C.EditBanner, { banner, onSave });
 	}
 
-	function setTownHall(value: number) {
+	async function setTownHall(value: number) {
 		if (typeof value !== 'number' || value < 1 || value > app.townHalls.length) {
 			throw new Error(`Town hall ${value} doesn't exist`);
 		}
 		if (value < townHall && units.length) {
-			const confirmed = confirm('You are selecting a lower town hall, units will be cleared. Select anyway?');
+			const confirmed = await app.confirm('You are selecting a lower town hall, units will be cleared. Select anyway?');
 			if (confirmed) {
 				units = [];
 			} else {

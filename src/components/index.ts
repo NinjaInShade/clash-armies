@@ -9,6 +9,7 @@ export { default as Table } from './Table.svelte';
 export { default as Select } from './Select.svelte';
 export { default as Checkbox } from './Checkbox.svelte';
 export { default as Toast } from './Toast.svelte';
+export { default as Confirm } from './Confirm.svelte';
 
 // App specific components
 export { default as Nav } from './Nav.svelte';

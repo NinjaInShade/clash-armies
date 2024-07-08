@@ -26,7 +26,7 @@
 
 	async function deleteArmy() {
 		if (!army) return;
-		const confirmed = window.confirm('Are you sure you want to delete this army warrior? This cannot be undone!');
+		const confirmed = await app.confirm('Are you sure you want to delete this army warrior? This cannot be undone!');
 		if (!confirmed) {
 			return;
 		}

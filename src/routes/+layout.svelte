@@ -54,8 +54,11 @@
 	}
 
 	function popModal() {
-		appState.modals.pop();
-		requireHTML().classList.remove('hide-overflow');
+		const lastModal = appState.modals.at(-1);
+		if (!lastModal) {
+			return;
+		}
+		lastModal.props.close();
 	}
 </script>
 
