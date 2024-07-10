@@ -23,6 +23,6 @@
 	p {
 		display: block;
 		font-weight: 500;
-		margin-left: 6px;
+		margin-left: 4px;
 	}
 </style>

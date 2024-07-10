@@ -37,11 +37,21 @@
         font-weight: 500;
         padding: 6px 8px;
         border-radius: 4px;
-        transition: background-color 0.15 ease-in-out;
+        transition: background 0.15 ease-in-out;
         white-space: nowrap;
     }
 
     /* Regular */
+    .action-btn.primary {
+        background-color: #806039;
+        color: #F3E7D8;
+    }
+    .action-btn.primary :global(svg path) {
+        fill: #F3E7D8;
+    }
+    .action-btn.primary:hover {
+        background-color: hsl(33, 38%, 32%);
+    }
     .action-btn.success {
         background-color: #424C38;
         color: #53E059;
@@ -56,6 +66,17 @@
         background-color: #384130;
     }
     /* Ghost */
+    .action-btn.primary.ghost {
+        background: none;
+        border: 1px dashed #CB995B;
+        color: #CB995B;
+    }
+    .action-btn.primary.ghost :global(svg path) {
+        fill: #CB995B;
+    }
+    .action-btn.primary.ghost:hover {
+        background-color: #463c2e;
+    }
     .action-btn.success.ghost {
         background: none;
         border: 1px dashed #759257;

@@ -172,7 +172,7 @@
 		color: var(--grey-100);
 		width: 100%;
 		height: 100%;
-		gap: 8px;
+		gap: 6px;
 	}
 
 	.select.open {
@@ -194,10 +194,13 @@
 	}
 
 	.select-label {
+		display: flex;
+		align-items: center;
 		color: var(--grey-100);
 		font-weight: 500;
-		padding: 7px 16px;
+		padding: 7px 12px;
 		flex: 1 0 0px;
+		gap: 0px;
 	}
 
 	.dropdown-icon-container {
@@ -217,7 +220,8 @@
 		display: none;
 		position: absolute;
 		border: 1px solid var(--grey-500);
-		overflow: hidden;
+		max-height: min(400px, 50vh);
+		overflow-y: auto;
 		min-width: 100%;
 		top: 100%;
 		left: 0;

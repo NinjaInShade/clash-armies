@@ -91,16 +91,16 @@
 	}
 
 	.btn.danger {
-		background-color: var(--danger-500);
+		background-color: hsl(0, 45%, 38%);
 	}
 	.btn.danger::before {
-		background-color: var(--danger-400);
+		background-color: hsl(0, 45%, 45%);
 	}
-.btn.danger:hover:not(:disabled)::before {
-	background-color: var(--danger-500);
-}
-.btn.danger:hover:not(:disabled),
-.btn.danger:focus-visible {
-	background-color: var(--danger-600);
-}
+	.btn.danger:hover:not(:disabled)::before {
+		background-color: hsl(0, 45%, 40%);
+	}
+	.btn.danger:hover:not(:disabled),
+	.btn.danger:focus-visible {
+		background-color: hsl(0, 45%, 33%);
+	}
 </style>

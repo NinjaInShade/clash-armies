@@ -21,7 +21,7 @@
 {#snippet controls()}
 	<div class="controls">
 		<C.Button onclick={cancel}>Cancel</C.Button>
-		<C.Button onclick={confirm}>Confirm</C.Button>
+		<C.Button onclick={confirm} theme="danger">Confirm</C.Button>
 	</div>
 {/snippet}
 

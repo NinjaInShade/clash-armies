@@ -12,7 +12,7 @@
 		data.push({ value: null, label: 'All' });
 		data.push(
 			...townHalls.map((x) => {
-				return { value: x.level, component: [THWidgetDisplay, { level: x.level, displayLevel: true, height: 24 }] };
+				return { value: x.level, component: [THWidgetDisplay, { level: x.level, displayLevel: true, height: 22 }] };
 			})
 		);
 		return data;
@@ -23,7 +23,7 @@
 		{ value: 'Air', label: 'Air' }
 	];
 	const sortSelectData = [
-		{ value: null, label: 'Default (a-z)' },
+		{ value: null, label: 'Alphabetical' },
 		{ value: 'new', label: 'Newest' },
 		{ value: 'votes', label: 'Votes' }
 	];
@@ -34,7 +34,7 @@
 	let search = $state<string | null>(null);
 	let townHall = $state<number | null>(null);
 	let attackType = $state<string | null>(null);
-	let sortOrder = $state<'votes' | 'new' | null>(null);
+	let sortOrder = $state<'votes' | 'new' | null>('new');
 
 	let displayArmies = $derived.by(() => {
 		const filtered = armies.filter((a) => {
@@ -85,7 +85,7 @@
 				<C.Input bind:value={search} placeholder="Electro zap..." />
 			</C.Fieldset>
 			<div class="right">
-				<C.Fieldset label="Town Hall" htmlName="townhall" --input-width="110px">
+				<C.Fieldset label="Town Hall" htmlName="townhall" --input-width="130px">
 					<C.Select bind:value={townHall} data={thSelectData} />
 				</C.Fieldset>
 				<C.Fieldset label="Attack Type" htmlName="type" --input-width="130px">
