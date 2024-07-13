@@ -36,8 +36,8 @@
 	let attackType = $state<string | null>(null);
 	let sortOrder = $state<'votes' | 'new' | null>('new');
 
-	let displayArmies = $derived.by(() => {
-		const filtered = armies.filter((a) => {
+	const filteredArmies = $derived.by(() => {
+		return armies.filter((a) => {
 			const tags = getTags(a);
 			if (townHall !== null && a.townHall !== townHall) {
 				return false;
@@ -50,7 +50,9 @@
 			}
 			return true;
 		});
-		filtered.sort((a, b) => {
+	});
+	let displayArmies = $derived.by(() => {
+		filteredArmies.sort((a, b) => {
 			if (sortOrder === 'new') {
 				return +b.createdTime - +a.createdTime;
 			}
@@ -60,7 +62,7 @@
 			// Default sorting (a-z|A-Z )
 			return a.name.localeCompare(b.name);
 		});
-		return filtered.slice(0, page * ENTRIES_PER_PAGE);
+		return filteredArmies.slice(0, page * ENTRIES_PER_PAGE);
 	});
 
 	function resetFilters() {
@@ -101,7 +103,7 @@
 				<C.ArmyCard {army} />
 			{/each}
 		</ul>
-		{#if displayArmies.length && displayArmies.length < armies.length}
+		{#if displayArmies.length && displayArmies.length < filteredArmies.length}
 			<C.Button onclick={loadMore} style="display: block; margin: 24px auto 0 auto;">Load more...</C.Button>
 		{/if}
 
