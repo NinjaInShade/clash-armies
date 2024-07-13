@@ -51,13 +51,13 @@ export function createAppState(initial: Omit<AppState, 'modals' | 'notifications
 				component,
 				props: {
 					...props,
-					close: () => {
+					close: (rtnValue?: T) => {
 						modals = modals.filter((m) => m.id !== id);
 						if (modals.length === 0) {
 							requireHTML().classList.remove('hide-overflow');
 						}
 						if (onClose) {
-							onClose();
+							onClose(rtnValue);
 						}
 					}
 				},
