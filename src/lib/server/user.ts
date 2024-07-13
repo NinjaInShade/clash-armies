@@ -61,19 +61,26 @@ export async function getUser(req: Request, username: string) {
 
 const userSchema = z.object({
 	id: z.number(),
-	username: z.string().min(3).max(30),
+	username: z.string().trim().min(3).max(30),
 })
 
 export async function saveUser(event: RequestEvent, userData: Partial<User>) {
 	const authUser = event.locals.requireAuth();
 	const user = userSchema.parse(userData);
+	const { username } = user;
+
+	const usernameRe = /^[a-zA-Z0-9_-]+$/
+	const validUsername = usernameRe.test(username);
+	if (!validUsername) {
+		throw new Error("Username can only contain english letters, numbers, underscores and hyphens");
+	}
 
 	const existing = await db.getRow<User, null>('users', { id: user.id });
 	if (!existing) {
 		throw new Error("This user doesn't exist");
 	}
 
-	const usernameExists = await db.getRows<User>('users', { username: user.username });
+	const usernameExists = await db.getRows<User>('users', { username });
 	if (usernameExists.find(u => u.id !== user.id)) {
 		throw new Error("This username is already taken");
 	}
@@ -90,6 +97,6 @@ export async function saveUser(event: RequestEvent, userData: Partial<User>) {
 			username = ?
 		WHERE id = ?
 	`;
-	await db.query(query, [user.username, user.id]);
+	await db.query(query, [username, user.id]);
 
 }

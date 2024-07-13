@@ -18,7 +18,8 @@
 	let errors = $state<FetchErrors | null>(null);
 
 	async function saveUser() {
-		const data = { id: user.id, username };
+		const trimmedUsername = username.trim();
+		const data = { id: user.id, username: trimmedUsername };
 		const response = await fetch('/users', {
 			method: 'POST',
 			body: JSON.stringify(data),
@@ -32,7 +33,7 @@
 		if (response.status === 200) {
 			// Navigate in case username has changed
 			await invalidateAll();
-			goto(`/users/${username}`);
+			goto(`/users/${trimmedUsername}`);
 		} else {
 			errors = `${response.status} error`;
 			return;
