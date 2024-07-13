@@ -53,7 +53,7 @@
 			{/each}
 		</ul>
 		{#if displayArmies.length && displayArmies.length < armies.length}
-			<C.Button onclick={loadMore} style="display: block; margin: 24px auto 0 auto;">Load more...</C.Button>
+			<C.Button onClick={loadMore} style="display: block; margin: 24px auto 0 auto;">Load more...</C.Button>
 		{/if}
 	</div>
 </section>

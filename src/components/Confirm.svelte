@@ -20,8 +20,8 @@
 
 {#snippet controls()}
 	<div class="controls">
-		<C.Button onclick={cancel}>Cancel</C.Button>
-		<C.Button onclick={confirm} theme="danger">Confirm</C.Button>
+		<C.Button onClick={cancel}>Cancel</C.Button>
+		<C.Button onClick={confirm} theme="danger">Confirm</C.Button>
 	</div>
 {/snippet}
 

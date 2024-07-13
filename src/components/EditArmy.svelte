@@ -328,7 +328,7 @@
 
 <div class="army-controls">
 	<C.Button asLink href='{army ? `/armies/${army.id}` : '/armies'}'>Cancel</C.Button>
-	<C.Button onclick={saveArmy} disabled={saveDisabled}>{army ? 'Save' : 'Create'}</C.Button>
+	<C.Button onClick={saveArmy} disabled={saveDisabled}>{army ? 'Save' : 'Create'}</C.Button>
 </div>
 
 <style>

@@ -87,9 +87,9 @@
 		<ul class="sidebar-links">
 			<li class="sidebar-link">
 				{#if app.user}
-					<C.Button asLink href="/logout" style="width: 100%;" onclick={toggleSidebar}>Log out</C.Button>
+					<C.Button asLink href="/logout" style="width: 100%;" onClick={toggleSidebar}>Log out</C.Button>
 				{:else}
-					<C.Button asLink href="/login" style="width: 100%;" onclick={toggleSidebar}>Log in</C.Button>
+					<C.Button asLink href="/login" style="width: 100%;" onClick={toggleSidebar}>Log in</C.Button>
 				{/if}
 			</li>
 		</ul>

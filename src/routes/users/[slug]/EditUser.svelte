@@ -44,8 +44,8 @@
 
 {#snippet controls()}
 	<div class="controls">
-		<C.Button onclick={close}>Cancel</C.Button>
-		<C.Button onclick={saveUser}>Save</C.Button>
+		<C.Button onClick={close}>Cancel</C.Button>
+		<C.Button onClick={saveUser}>Save</C.Button>
 	</div>
 {/snippet}
 

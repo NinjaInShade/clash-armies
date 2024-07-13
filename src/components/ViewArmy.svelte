@@ -140,7 +140,7 @@
 
 <div class="army-controls">
 	{#if app.user && (app.user.id === army.createdBy || app.user.hasRoles('admin'))}
-		<C.Button onclick={deleteArmy} theme="danger">Delete</C.Button>
+		<C.Button onClick={deleteArmy} theme="danger">Delete</C.Button>
 		<C.Button asLink href="/armies/edit/{army.id}">Edit</C.Button>
 	{/if}
 </div>

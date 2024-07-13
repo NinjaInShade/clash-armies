@@ -144,11 +144,11 @@
 {#snippet controls()}
 	<div class="controls">
 		{#if unit}
-			<C.Button onclick={deleteUnit} theme="danger">Delete</C.Button>
+			<C.Button onClick={deleteUnit} theme="danger">Delete</C.Button>
 		{/if}
 		<div class="right">
-			<C.Button onclick={close}>Cancel</C.Button>
-			<C.Button onclick={saveUnit}>Save</C.Button>
+			<C.Button onClick={close}>Cancel</C.Button>
+			<C.Button onClick={saveUnit}>Save</C.Button>
 		</div>
 	</div>
 {/snippet}
@@ -234,7 +234,7 @@
 				<C.Button
 					theme="danger"
 					style="height: 40px; width: 40px;"
-					onclick={() => {
+					onClick={() => {
 						levels = levels.filter((x) => x.level !== level.level);
 					}}
 				>

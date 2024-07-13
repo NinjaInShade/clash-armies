@@ -40,7 +40,7 @@
 		</div>
 		<div class="right">
 			{#if username === currentUser || app.user?.hasRoles('admin')}
-				<C.Button onclick={editUser}>Edit</C.Button>
+				<C.Button onClick={editUser}>Edit</C.Button>
 			{/if}
 		</div>
 	</div>

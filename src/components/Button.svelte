@@ -1,15 +1,33 @@
 <script lang="ts">
 	import type { HTMLButtonAttributes, HTMLAnchorAttributes } from 'svelte/elements';
-	import type { Snippet } from 'svelte';
+	import { type Snippet, tick } from 'svelte';
 
 	type Props = {
 		children: Snippet;
 		/** Sets the theme of the button @default primary */
 		theme?: 'primary' | 'danger';
 		asLink?: boolean;
+		onClick?: (ev: MouseEvent | KeyboardEvent) => Promise<void> | void;
 	} & (HTMLButtonAttributes | HTMLAnchorAttributes);
 
-	let { children, theme, asLink, ...rest }: Props = $props();
+	let { children, theme, asLink, onClick, ...rest }: Props = $props();
+
+	let ref = $state<HTMLButtonElement | undefined>(undefined);
+	let _loading = $state<boolean>(false);
+
+	async function _onClick(ev: MouseEvent | KeyboardEvent) {
+        if (!onClick || _loading) {
+			return;
+        }
+        _loading = true;
+        await onClick(ev);
+        _loading = false;
+		if (ref) {
+			// Prevents losing focus on keyboard enter
+			await tick();
+            ref.focus();
+		}
+	}
 </script>
 
 {#if asLink}
@@ -19,10 +37,15 @@
 		</span>
 	</a>
 {:else}
-	<button class="btn {theme}" type="button" {...rest}>
+	<button class="btn {theme}" type="button" bind:this={ref} disabled={rest.disabled || _loading} onclick={_onClick} {...rest}>
 		<span>
 			{@render children()}
 		</span>
+		{#if _loading}
+			<div class="spinner-container">
+				<span class="spinner"></span>
+			</div>
+		{/if}
 	</button>
 {/if}
 
@@ -103,4 +126,30 @@
 	.btn.danger:focus-visible {
 		background-color: hsl(0, 45%, 33%);
 	}
+
+	.spinner-container {
+        position: absolute;
+        transform: translate(-50%, -50%);
+        left: 50%;
+        top: 50%;
+    }
+	.spinner {
+		width: 12px;
+		height: 12px;
+		border: 5px solid #FFF;
+		border-bottom-color: transparent;
+		border-radius: 50%;
+		display: inline-block;
+		box-sizing: border-box;
+		animation: rotation 1s linear infinite;
+	}
+
+	@keyframes rotation {
+		0% {
+			transform: rotate(0deg);
+		}
+		100% {
+			transform: rotate(360deg);
+		}
+    }
 </style>

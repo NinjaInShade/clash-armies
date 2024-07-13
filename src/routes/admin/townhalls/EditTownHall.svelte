@@ -98,11 +98,11 @@
 {#snippet controls()}
 	<div class="controls">
 		{#if townHall}
-			<C.Button onclick={deleteTownHall} theme="danger">Delete</C.Button>
+			<C.Button onClick={deleteTownHall} theme="danger">Delete</C.Button>
 		{/if}
 		<div class="right">
-			<C.Button onclick={close}>Cancel</C.Button>
-			<C.Button onclick={saveTownHall}>Save</C.Button>
+			<C.Button onClick={close}>Cancel</C.Button>
+			<C.Button onClick={saveTownHall}>Save</C.Button>
 		</div>
 	</div>
 {/snippet}

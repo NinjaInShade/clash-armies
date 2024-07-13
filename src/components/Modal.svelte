@@ -52,7 +52,7 @@
 			{#if controls}
 				{@render controls()}
 			{:else}
-				<C.Button onclick={close}>Close</C.Button>
+				<C.Button onClick={close}>Close</C.Button>
 			{/if}
 		</div>
 	</div>

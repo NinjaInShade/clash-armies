@@ -101,8 +101,8 @@
 				<p class="body">Add & edit town hall data</p>
 			</div>
 			<div class="actions">
-				<C.Button class="btn btn-sm" onclick={addTownHall}>Add</C.Button>
-				<C.Button class="btn btn-sm" onclick={editTownHall} disabled={!selectedTHs.length}>Edit</C.Button>
+				<C.Button class="btn btn-sm" onClick={addTownHall}>Add</C.Button>
+				<C.Button class="btn btn-sm" onClick={editTownHall} disabled={!selectedTHs.length}>Edit</C.Button>
 			</div>
 		</div>
 		<C.Table data={townHalls} columns={thColumns} bind:selectedKeys={selectedTHs} defaultSortKey="level" selectable />
@@ -117,8 +117,8 @@
 				<p class="body">Add & edit unit data</p>
 			</div>
 			<div class="actions">
-				<C.Button class="btn btn-sm" onclick={addUnit}>Add</C.Button>
-				<C.Button class="btn btn-sm" onclick={editUnit} disabled={!selectedUnits.length}>Edit</C.Button>
+				<C.Button class="btn btn-sm" onClick={addUnit}>Add</C.Button>
+				<C.Button class="btn btn-sm" onClick={editUnit} disabled={!selectedUnits.length}>Edit</C.Button>
 			</div>
 		</div>
 		<C.Table data={units} columns={unitColumns} bind:selectedKeys={selectedUnits} defaultSortKey="type" selectable />
