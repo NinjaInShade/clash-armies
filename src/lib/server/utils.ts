@@ -2,6 +2,9 @@ import type { FetchErrors } from "~/lib/shared/types";
 import z from 'zod';
 import { json, type RequestEvent } from '@sveltejs/kit';
 import { log, getRequestInfo } from '~/lib/server/hooks.server';
+import { dev } from "$app/environment";
+
+export const STATIC_BASE_PATH = dev ? 'static' : 'client';
 
 /**
  * Wrapper function for API endpoints to ensure errors come back to the client in an expected format

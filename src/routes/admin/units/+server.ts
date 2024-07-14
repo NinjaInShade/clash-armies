@@ -1,7 +1,7 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import type { Unit } from "~/lib/shared/types";
-import { middleware } from "~/lib/server/utils";
+import { middleware, STATIC_BASE_PATH } from "~/lib/server/utils";
 import { db } from "~/lib/server/db";
 import fs from 'node:fs/promises';
 import z from 'zod';
@@ -89,7 +89,7 @@ export const POST: RequestHandler = async (event) => {
                         groundTargets = ?
                     WHERE id = ?
                 `, [type, name, objectId, housingSpace, trainingTime, productionBuilding, isSuper, isFlying, isJumper, airTargets, groundTargets, id])
-                await fs.rename(`static/clash/units/${existingUnit.name}.png`, `static/clash/units/${name}.png`);
+                await fs.rename(`${STATIC_BASE_PATH}/clash/units/${existingUnit.name}.png`, `${STATIC_BASE_PATH}/clash/units/${name}.png`);
 
                 // Remove deleted unit levels
                 await tx.query('DELETE FROM unit_levels WHERE unitId = ? AND id NOT IN (?)', [id, levels.map(x => x.id)]);
@@ -99,7 +99,7 @@ export const POST: RequestHandler = async (event) => {
                 await tx.upsert('unit_levels', unitsData);
 
                 if (image && image.size > 0) {
-                    await fs.writeFile(`static/clash/units/${name}.png`, Buffer.from(await image.arrayBuffer()));
+                    await fs.writeFile(`${STATIC_BASE_PATH}/clash/units/${name}.png`, Buffer.from(await image.arrayBuffer()));
                 };
             })
         }

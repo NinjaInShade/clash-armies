@@ -4,6 +4,7 @@
 - Fix "load more" button sometimes showing when filters have been applied but when there's no more armies to load
 - Fix certain usernames containing invalid characters which breaks the users account page (added stricter validation when editing username)
 - Fix being able to spam "Create" button to create duplicated armies by accident
+- Fix invalid static path when editing troop/townhall images from admin panel
 
 ## [0.0.1] - 2024-07-13
 

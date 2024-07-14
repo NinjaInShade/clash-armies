@@ -1,6 +1,6 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { middleware } from "~/lib/server/utils";
+import { middleware, STATIC_BASE_PATH } from "~/lib/server/utils";
 import { db } from "~/lib/server/db";
 import fs from 'node:fs/promises';
 import z from 'zod';
@@ -60,7 +60,7 @@ export const POST: RequestHandler = async (event) => {
 					siegeCapacity: th.siegeCapacity,
 					spellCapacity: th.spellCapacity
 				})
-				await fs.writeFile(`static/clash/town-halls/${th.level}.png`, Buffer.from(await th.image.arrayBuffer()));
+				await fs.writeFile(`${STATIC_BASE_PATH}/clash/town-halls/${th.level}.png`, Buffer.from(await th.image.arrayBuffer()));
 			})
 		} else {
 			// Updating existing town hall
@@ -81,10 +81,10 @@ export const POST: RequestHandler = async (event) => {
 					WHERE level = ?
 				`, [th.level, th.maxBarracks ?? null, th.maxDarkBarracks ?? null, th.maxSpellFactory ?? null, th.maxDarkSpellFactory ?? null, th.maxLaboratory ?? null, th.maxWorkshop ?? null, th.troopCapacity, th.siegeCapacity, th.spellCapacity, data.id])
 				if (th.image && th.image.size > 0) {
-					await fs.unlink(`static/clash/town-halls/${data.id}.png`)
-					await fs.writeFile(`static/clash/town-halls/${th.level}.png`, Buffer.from(await th.image.arrayBuffer()));
+					await fs.unlink(`${STATIC_BASE_PATH}/clash/town-halls/${data.id}.png`)
+					await fs.writeFile(`${STATIC_BASE_PATH}/clash/town-halls/${th.level}.png`, Buffer.from(await th.image.arrayBuffer()));
 				} else {
-					await fs.rename(`static/clash/town-halls/${data.id}.png`, `static/clash/town-halls/${th.level}.png`);
+					await fs.rename(`${STATIC_BASE_PATH}/clash/town-halls/${data.id}.png`, `${STATIC_BASE_PATH}/clash/town-halls/${th.level}.png`);
 				}
 			})
 		}
@@ -102,7 +102,7 @@ export const DELETE: RequestHandler = async (event) => {
 		const { level } = z.object({ level: z.number().positive() }).parse({ level: JSON.parse(data) });
 		await db.transaction(async (tx) => {
 			await tx.query('DELETE FROM town_halls WHERE level = ?', [level]);
-			await fs.unlink(`static/clash/town-halls/${level}.png`);
+			await fs.unlink(`${STATIC_BASE_PATH}/clash/town-halls/${level}.png`);
 		})
 		return json({}, { status: 200 });
 	})
