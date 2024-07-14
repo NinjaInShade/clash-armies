@@ -5,6 +5,7 @@
 - Fix certain usernames containing invalid characters which breaks the users account page (added stricter validation when editing username)
 - Fix being able to spam "Create" button to create duplicated armies by accident
 - Fix invalid static path when editing troop/townhall images from admin panel
+- Add new "druid" troop
 
 ## [0.0.1] - 2024-07-13
 

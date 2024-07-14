@@ -1,5 +1,6 @@
 import type { MigrationFn } from './migrator';
-import { insertInitialTownHalls, insertInitialUnits } from './migration-utils';
+import { insertInitialTownHalls, insertInitialUnits, v0_0_2_data_migrate } from './migration-utils';
+import type { MySQL } from '@ninjalib/sql';
 
 // prettier-ignore
 export function migration(runStep: MigrationFn) {
@@ -70,11 +71,11 @@ export function migration(runStep: MigrationFn) {
             siegeCapacity SMALLINT
         )
     `);
-    runStep(7, async (db) => {
+    runStep(7, async (db: MySQL) => {
         // Insert initial town hall seed data
         await insertInitialTownHalls(db);
     })
-    runStep(8, async (db) => {
+    runStep(8, async (db: MySQL) => {
         // Insert initial units seed data
         await insertInitialUnits(db);
     }),
@@ -113,5 +114,8 @@ export function migration(runStep: MigrationFn) {
             CONSTRAINT fk_army_votes_voted_by FOREIGN KEY (votedBy) REFERENCES users (id) ON DELETE CASCADE,
             CONSTRAINT army_votes_vote_value CHECK (vote = -1 OR vote = 1)
         )
-    `)
+    `);
+    runStep(12, async (db: MySQL) => {
+        await v0_0_2_data_migrate(db);
+    });
 }
