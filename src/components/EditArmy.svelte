@@ -30,7 +30,7 @@
 	let saveDisabled = $derived(!name || name.length < 2 || name.length > 25 || !units.length);
 
 	let _troopUnits = $derived(units.filter((item) => item.type === 'Troop'));
-	let troopUnits = $derived([..._troopUnits.filter(x => !x.isSuper), ..._troopUnits.filter(x => x.isSuper)]);
+	let troopUnits = $derived([..._troopUnits.filter((x) => !x.isSuper), ..._troopUnits.filter((x) => x.isSuper)]);
 	let siegeUnits = $derived(units.filter((item) => item.type === 'Siege'));
 	let spellUnits = $derived(units.filter((item) => item.type === 'Spell'));
 	let reachedSuperLimit = $derived(troopUnits.filter((t) => Boolean(app.units.find((x) => x.type === t.type && x.name === t.name)?.isSuper)).length === 2);
@@ -273,23 +273,23 @@
 		</ul>
 		<div class="picker-container">
 			{@render unitsPicker('Troop')}
-        </div>
+		</div>
 		{#if capacity.spell > 0}
 			<div class="picker-container">
 				{@render unitsPicker('Spell')}
-            </div>
-		{/if}
-		{#if capacity.siege > 0}
-            <div class="picker-container">
-                {@render unitsPicker('Siege')}
 			</div>
 		{/if}
-    </div>
+		{#if capacity.siege > 0}
+			<div class="picker-container">
+				{@render unitsPicker('Siege')}
+			</div>
+		{/if}
+	</div>
 </section>
 
 {#snippet unitsPicker(type: UnitType)}
 	{@const _appUnits = app.units.filter((x) => x.type === type)}
-	{@const appUnits = [..._appUnits.filter(x => !x.isSuper), ..._appUnits.filter(x => x.isSuper)]}
+	{@const appUnits = [..._appUnits.filter((x) => !x.isSuper), ..._appUnits.filter((x) => x.isSuper)]}
 	{@const heading = `Select ${type === 'Troop' ? 'troops' : type === 'Siege' ? 'siege machine' : 'spells'}`}
 	<h3>{heading}</h3>
 	<ul class="picker-list">
@@ -327,7 +327,7 @@
 {/if}
 
 <div class="army-controls">
-	<C.Button asLink href='{army ? `/armies/${army.id}` : '/armies'}'>Cancel</C.Button>
+	<C.Button asLink href={army ? `/armies/${army.id}` : '/armies'}>Cancel</C.Button>
 	<C.Button onClick={saveArmy} disabled={saveDisabled}>{army ? 'Save' : 'Create'}</C.Button>
 </div>
 
@@ -444,10 +444,11 @@
 		border-bottom: 1px dashed var(--grey-500);
 		margin-bottom: 24px;
 		padding: 0 32px var(--bottom-padding) 32px;
-		/* Prevent page shift when adding first unit */ 
+		/* Prevent page shift when adding first unit */
 		min-height: calc(var(--unit-size) + var(--bottom-padding) + 1px);
 	}
-	.units-list, .picker-list {
+	.units-list,
+	.picker-list {
 		--gap: 6px;
 		display: flex;
 		flex-flow: row wrap;
