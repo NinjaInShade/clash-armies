@@ -35,7 +35,8 @@ export function getRequestInfo(event: RequestEvent) {
 		url: request.url,
 		userId: user?.id,
 		username: user?.username,
-		ip: event.getClientAddress()
+		ip: event.getClientAddress(),
+		userAgent: request.headers.get('User-Agent'),
 	};
 }
 
