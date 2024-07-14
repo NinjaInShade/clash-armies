@@ -1,5 +1,7 @@
 ## [Unreleased]
 
+## [0.0.2] - 2024-07-14
+
 - Fix `openModalAsync` always resolving with undefined (fixes the bug with not being able to delete army since confirm modal always returns false)
 - Fix "load more" button sometimes showing when filters have been applied but when there's no more armies to load
 - Fix certain usernames containing invalid characters which breaks the users account page (added stricter validation when editing username)
