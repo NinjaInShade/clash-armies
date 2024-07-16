@@ -1,5 +1,6 @@
-import type { AppState, Army, ArmyUnit } from '~/lib/shared/types';
+import type { AppState, Army, ArmyUnit, SvelteComponentGeneric } from '~/lib/shared/types';
 import { SECOND, MINUTE, HOUR, OBJECT_ID_PREFIXES } from '~/lib/shared/utils';
+import IconTagsClanCastle from '~/components/IconTagsClanCastle.svelte';
 
 /**
  * Generates URL link to copy army into clash of clans.
@@ -105,8 +106,8 @@ export function openInGame(units: ArmyUnit[]) {
 }
 
 export function getTags(army: Army) {
-	const tags: string[] = [];
-	tags.push(`TH${army.townHall}`);
+	const tags: { label: string, icon?: SvelteComponentGeneric }[] = [];
+	tags.push({ label: `TH${army.townHall}` });
 	const typeData = army.units.reduce(
 		(prev, curr) => {
 			if (curr.type === 'Spell') {
@@ -121,10 +122,14 @@ export function getTags(army: Army) {
 		},
 		{ air: 0, ground: 0 }
 	);
-	tags.push(typeData.ground > typeData.air ? 'Ground' : 'Air');
+	tags.push({ label: typeData.ground > typeData.air ? 'Ground' : 'Air' });
+	const hasClanCastle = army.units.filter(unit => unit.home === 'clanCastle').length > 0;
+	if (hasClanCastle) {
+		tags.push({ label: 'Clan castle', icon: IconTagsClanCastle })
+	}
 	if (army.guideId) {
 		//  TODO: guide system
-		tags.push(`Has guide`);
+		tags.push({ label: 'Guide' });
 	}
 	return tags;
 }

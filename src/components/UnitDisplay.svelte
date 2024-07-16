@@ -42,7 +42,7 @@
 		display: flex;
 		flex-flow: column nowrap;
 		align-items: center;
-		border-radius: var(--unit-border-radius, 10px);
+		border-radius: 6px;
 		overflow: hidden;
 		height: 100%;
 		width: 100%;
@@ -69,8 +69,8 @@
 	.unit-img {
 		pointer-events: none;
 		display: block;
-		height: 100%;
-		width: 100%;
+		height: var(--unit-size, 100%);
+		width: var(--unit-size, 100%);
 	}
 
 	.unit-amount {
@@ -79,7 +79,7 @@
 		text-shadow: var(--txt-shadow-dark);
 		color: var(--grey-100);
 		position: absolute;
-		font-size: var(--amount-size, 2em);
+		font-size: var(--unit-amount-size, 2em);
 		left: 4px;
 		top: 4px;
 	}
@@ -116,7 +116,7 @@
 		color: var(--grey-100);
 		position: absolute;
 		border-radius: 4px;
-		font-size: var(--lvl-size, 0.75em);
+		font-size: var(--unit-lvl-size, 0.75em);
 		padding: 3px;
 		bottom: 4px;
 		left: 4px;

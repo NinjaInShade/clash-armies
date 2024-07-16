@@ -1,23 +1,21 @@
 <script lang="ts">
 	import { getContext } from 'svelte';
 	import type { Army, AppState } from '~/lib/shared/types';
-	import { getTotals } from '~/lib/shared/utils';
-	import { formatTime, copyLink, openInGame, getCopyBtnTitle, getOpenBtnTitle } from '~/lib/client/army';
+	import { getTotals, getCapacity } from '~/lib/shared/utils';
+	import { getTags, copyLink, openInGame, getCopyBtnTitle, getOpenBtnTitle } from '~/lib/client/army';
 	import C from '~/components';
 
 	type Props = {
 		army: Army;
 	};
 	const { army }: Props = $props();
-	const { units } = $derived(army);
-
 	const app = getContext<AppState>('app');
-	const housingSpaceUsed = $derived.by(() => getTotals(units));
 
-	let _troopUnits = $derived(units.filter((item) => item.type === 'Troop'));
-	let troopUnits = $derived([..._troopUnits.filter((x) => !x.isSuper), ..._troopUnits.filter((x) => x.isSuper)]);
-	let siegeUnits = $derived(units.filter((item) => item.type === 'Siege'));
-	let spellUnits = $derived(units.filter((item) => item.type === 'Spell'));
+	const thData = $derived(app.townHalls.find((th) => th.level === army.townHall));
+	const units = $derived(army.units.filter((unit) => unit.home === 'armyCamp'));
+	const ccUnits = $state(army.units.filter((unit) => unit.home === 'clanCastle'));
+	const housingSpaceUsed = $derived.by(() => getTotals(units));
+	const capacity = $derived.by(() => getCapacity(thData));
 
 	let votes = $state<number>(army.votes);
 	let userVote = $state<number>(army.userVote ?? 0);
@@ -25,44 +23,32 @@
 
 <li class="army-card">
 	<div class="header">
-		<a class="title-container" href="/armies/{army.id}">
-			<img src="/clash/town-halls/{army.townHall}.png" alt="Town hall {army.townHall}" class="town-hall" />
-			<h3>{army.name}</h3>
-		</a>
+		<div>
+			<a class="title-container" href="/armies/{army.id}">
+				<img src="/clash/town-halls/{army.townHall}.png" alt="Town hall {army.townHall}" class="town-hall" title="Town hall {army.townHall}" />
+				<!-- {#if ccUnits.length > 0}
+					<img src="/clash/ui/clan-castle.png" alt="Clash of clans clan castle" class="clan-castle" title="Has clan castle" />
+				{/if} -->
+				<h3>{army.name}</h3>
+			</a>
+			<ul class="tags">
+				{#each getTags(army) as tag}
+					<li>
+						{#if tag.icon}
+							<svelte:component this={tag.icon} />
+						{/if}
+						{tag.label}
+					</li>
+				{/each}
+			</ul>
+		</div>
 		<div class="right">
-			<div class="totals">
-				<small class="total">
-					<img src="/clash/ui/troops.png" alt="Clash of clans troop capacity" />
-					{housingSpaceUsed.troops}/{army.troopCapacity}
-				</small>
-				{#if army.spellCapacity > 0}
-					<small class="total">
-						<img src="/clash/ui/spells.png" alt="Clash of clans spell capacity" />
-						{housingSpaceUsed.spells}/{army.spellCapacity}
-					</small>
-				{/if}
-				{#if army.siegeCapacity > 0}
-					<small class="total">
-						<img src="/clash/ui/sieges.png" alt="Clash of clans siege machine capacity" />
-						{housingSpaceUsed.sieges}/{army.siegeCapacity}
-					</small>
-				{/if}
-				<small class="total">
-					<img src="/clash/ui/clock.png" alt="Clash of clans clock (time to train army)" />
-					{formatTime(housingSpaceUsed.time * 1000)}
-				</small>
-			</div>
+			<C.UnitTotals used={housingSpaceUsed} {capacity} />
 			<div class="separator"></div>
 			<C.Votes bind:votes bind:userVote armyId={army.id} allowEdit={app.user !== null} class="card-votes" />
 		</div>
 	</div>
-	<ul class="units-list">
-		{#each [...troopUnits, ...spellUnits, ...siegeUnits] as unit}
-			<li>
-				<C.UnitDisplay {...unit} display="block" />
-			</li>
-		{/each}
-	</ul>
+	<C.UnitsList selectedUnits={units} display="block" />
 	<div class="controls">
 		<C.ActionButton ghost onclick={() => copyLink(units, app)} disabled={!units.length} title={getCopyBtnTitle(units)}>
 			<svg width="16" height="17" viewBox="0 0 16 17" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -98,6 +84,10 @@
 
 <style>
 	.army-card {
+		--unit-size: 56px;
+		--unit-amount-size: 14px;
+		--unit-lvl-size: 13px;
+		--bottom-padding: 0;
 		background-color: var(--grey-800);
 		border: 1px dashed var(--grey-500);
 		border-radius: 8px;
@@ -108,7 +98,7 @@
 	.header {
 		display: flex;
 		justify-content: space-between;
-		align-items: center;
+		align-items: flex-end;
 		padding: 10px 16px;
 		gap: 0.5em;
 	}
@@ -122,28 +112,35 @@
 		word-break: break-all;
 		font-size: 18px;
 		line-height: 18px;
+		margin-left: 2px;
 	}
-	.header .town-hall {
+	.header .town-hall,
+	.header .clan-castle {
 		flex-shrink: 0;
-		max-height: 26px;
 		width: auto;
 	}
-	.header .right,
-	.header .right .totals {
+	.header .town-hall {
+		max-height: 26px;
+	}
+	.header .clan-castle {
+		max-height: 23px;
+	}
+	.header .right {
 		display: flex;
 		align-items: center;
 		gap: 8px;
 	}
-	.header .right .totals small {
-		display: flex;
-		align-items: center;
-		font-family: 'Clash', sans-serif;
-		color: var(--grey-100);
+	.header .right :global(.totals) {
+		background: none;
+		border-radius: 0;
+		padding: 0;
+		gap: 8px;
+	}
+	.header .right :global(.totals small) {
 		font-size: 14px;
 		line-height: 14px;
-		gap: 4px;
 	}
-	.header .right .totals img {
+	.header .right :global(.totals img) {
 		display: block;
 		max-height: 16px;
 		height: 100%;
@@ -162,22 +159,33 @@
 		max-height: 14px;
 		width: auto;
 	}
-
-	.units-list {
+	.header .tags {
+		margin-top: 6px;
 		display: flex;
-		flex-flow: row wrap;
+		gap: 4px;
+	}
+	.header .tags li {
+		display: flex;
+		align-items: center;
+		text-transform: uppercase;
+		background-color: #4c4538;
+		color: #e0a553;
+		font-size: 12px;
+		line-height: 14px;
+		font-weight: 700;
+		border-radius: 4px;
+		padding: 4px 6px;
+		gap: 4px;
+	}
+	.header .tags li :global(svg) {
+		flex-shrink: 0;
+	}
+
+	.army-card :global(.units-list) {
 		border: 1px dashed var(--grey-500);
 		border-left: none;
 		border-right: none;
 		padding: 16px;
-		gap: 6px;
-	}
-	.units-list li {
-		--unit-border-radius: 6px;
-		--amount-size: 14px;
-		max-width: 56px;
-		width: 100%;
-		height: auto;
 	}
 
 	.controls {
@@ -185,6 +193,13 @@
 		justify-content: flex-end;
 		padding: 14px 16px;
 		gap: 0.5em;
+	}
+
+	@media (max-width: 850px) {
+		.army-card {
+			--unit-amount-size: 14px;
+			--unit-lvl-size: 11px;
+		}
 	}
 
 	@media (max-width: 775px) {
@@ -204,8 +219,8 @@
 		}
 	}
 
-	@media (max-width: 450px) {
-		.header .right .totals {
+	@media (max-width: 475px) {
+		.header .right :global(.totals) {
 			flex-flow: row wrap;
 		}
 		.header .right {
@@ -215,6 +230,16 @@
 		}
 		.header .right .separator {
 			display: none;
+		}
+	}
+
+	@media (max-width: 400px) {
+		.army-card {
+			--unit-amount-size: 14px;
+			--unit-lvl-size: 13px;
+		}
+		.header .tags {
+			flex-flow: row wrap;
 		}
 	}
 </style>

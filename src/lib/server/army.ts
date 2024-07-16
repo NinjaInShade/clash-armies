@@ -27,6 +27,7 @@ export async function getArmies(opts: GetArmiesParams) {
 			u.username,
             JSON_ARRAYAGG(JSON_OBJECT(
                 'id', au.id,
+				'home', au.home,
 				'armyId', a.id,
 				'unitId', un.id,
                 'amount', au.amount,
@@ -42,9 +43,6 @@ export async function getArmies(opts: GetArmiesParams) {
 				'airTargets', un.airTargets,
 				'groundTargets', un.groundTargets
             )) AS units,
-			th.troopCapacity,
-			th.siegeCapacity,
-			th.spellCapacity,
 			av.votes,
 			COALESCE(uv.vote, 0) AS userVote
 		FROM armies a
@@ -162,9 +160,14 @@ export async function getUnits(opts: GetUnitsParams = {}) {
 
 const unitSchemaCreating = z.object({
 	id: z.number().positive().optional(),
+	home: z.enum(['armyCamp', 'clanCastle']),
 	unitId: z.number().positive(),
 	amount: z.number().positive()
 });
+const unitSchemaSaving = unitSchemaCreating.extend({
+	id: z.number().positive(),
+});
+
 const armySchemaCreating = z.object({
 	id: z.number().positive().optional(),
 	name: z.string().min(2).max(25),
@@ -172,14 +175,16 @@ const armySchemaCreating = z.object({
 	banner: z.enum(BANNERS),
 	units: z.array(unitSchemaCreating).min(1)
 });
-
-const armySchemaSaving = armySchemaCreating.required({ id: true });
+const armySchemaSaving = armySchemaCreating.extend({
+	id: z.number().positive(),
+	units: z.array(unitSchemaSaving).min(1),
+});
 
 export async function saveArmy(event: RequestEvent, data: Partial<Army>) {
 	const user = event.locals.requireAuth();
 	const ctx = { units: await getUnits(), townHalls: await getTownHalls() };
 
-	function attachUnitData(army: ReturnType<typeof armySchemaCreating.parse>) {
+	function attachUnitData(army: z.infer<typeof armySchemaCreating>) {
 		return {
 			...army,
 			units: army.units.map(u => {
@@ -212,6 +217,7 @@ export async function saveArmy(event: RequestEvent, data: Partial<Army>) {
 				army.units.map((unit) => {
 					return {
 						armyId,
+						home: unit.home,
 						unitId: unit.unitId,
 						amount: unit.amount
 					};
@@ -247,8 +253,7 @@ export async function saveArmy(event: RequestEvent, data: Partial<Army>) {
 			);
 
 			// Remove deleted units
-			await tx.query('DELETE FROM army_units WHERE armyId = ? AND unitId NOT IN (?)', [army.id, army.units.map((u) => u.unitId)]);
-
+			await tx.query('DELETE FROM army_units WHERE armyId = ? AND id NOT IN (?)', [army.id, army.units.map((u) => u.id)]);
 			// Upsert units
 			const unitsData = army.units.map((u) => ({ ...u, armyId: army.id, id: u.id ?? null }));
 			await tx.upsert('army_units', unitsData);

@@ -1,28 +1,28 @@
 <script lang="ts">
 	import { getContext } from 'svelte';
 	import { goto } from '$app/navigation';
-	import { getTotals } from '~/lib/shared/utils';
-	import { formatTime, copyLink, openInGame, getTags, getCopyBtnTitle, getOpenBtnTitle } from '~/lib/client/army';
+	import { getTotals, getCapacity, getCcCapacity } from '~/lib/shared/utils';
+	import { copyLink, openInGame, getTags, getCopyBtnTitle, getOpenBtnTitle } from '~/lib/client/army';
 	import type { Army, AppState, FetchErrors } from '~/lib/shared/types';
 	import C from '~/components';
 
 	type Props = { army: Army };
 	const { army }: Props = $props();
-	const { units } = $derived(army);
 
 	const app = getContext<AppState>('app');
 
+	const thData = $derived(app.townHalls.find((th) => th.level === army.townHall));
+	const units = $derived(army.units.filter((unit) => unit.home === 'armyCamp'));
+	const ccUnits = $state(army.units.filter((unit) => unit.home === 'clanCastle'));
+	const capacity = $derived.by(() => getCapacity(thData));
+	const ccCapacity = $derived.by(() => getCcCapacity(thData));
+	const housingSpaceUsed = $derived.by(() => getTotals(units));
+	const ccHousingSpaceUsed = $derived.by(() => getTotals(ccUnits));
+	const showClanCastle = $state<boolean>(ccUnits.length > 0);
+
 	let errors = $state<FetchErrors | null>(null);
-
-	let _troopUnits = $derived(units.filter((item) => item.type === 'Troop'));
-	let troopUnits = $derived([..._troopUnits.filter((x) => !x.isSuper), ..._troopUnits.filter((x) => x.isSuper)]);
-	let siegeUnits = $derived(units.filter((item) => item.type === 'Siege'));
-	let spellUnits = $derived(units.filter((item) => item.type === 'Spell'));
-
 	let votes = $state<number>(army.votes);
 	let userVote = $state<number>(army.userVote ?? 0);
-
-	const housingSpaceUsed = $derived.by(() => getTotals(units));
 
 	async function deleteArmy() {
 		if (!army) return;
@@ -62,35 +62,19 @@
 				<h1>{army.name}</h1>
 			</div>
 			<p class="author">Assembled by <a href="/users/{army.username}">@{army.username}</a></p>
-			<div class="tags">
+			<ul class="tags">
 				{#each getTags(army) as tag}
-					<p>{tag}</p>
+					<li>
+						{#if tag.icon}
+							<svelte:component this={tag.icon} />
+						{/if}
+						{tag.label}
+					</li>
 				{/each}
-			</div>
+			</ul>
 		</div>
 		<div class="right">
-			<div class="totals">
-				<small class="total">
-					<img src="/clash/ui/troops.png" alt="Clash of clans troop capacity" />
-					{housingSpaceUsed.troops}/{army.troopCapacity}
-				</small>
-				{#if army.spellCapacity > 0}
-					<small class="total">
-						<img src="/clash/ui/spells.png" alt="Clash of clans spell capacity" />
-						{housingSpaceUsed.spells}/{army.spellCapacity}
-					</small>
-				{/if}
-				{#if army.siegeCapacity > 0}
-					<small class="total">
-						<img src="/clash/ui/sieges.png" alt="Clash of clans siege machine capacity" />
-						{housingSpaceUsed.sieges}/{army.siegeCapacity}
-					</small>
-				{/if}
-				<small class="total">
-					<img src="/clash/ui/clock.png" alt="Clash of clans clock (time to train army)" />
-					{formatTime(housingSpaceUsed.time * 1000)}
-				</small>
-			</div>
+			<C.UnitTotals used={housingSpaceUsed} {capacity} />
 			<div class="separator"></div>
 			<C.Votes bind:votes bind:userVote armyId={army.id} allowEdit={app.user !== null} />
 		</div>
@@ -99,14 +83,11 @@
 
 <section class="dashed units">
 	<div class="top">
-		<h2 class="dashed">Army units</h2>
-		<ul class="units-list">
-			{#each [...troopUnits, ...spellUnits, ...siegeUnits] as unit}
-				<li>
-					<C.UnitDisplay {...unit} />
-				</li>
-			{/each}
-		</ul>
+		<h2 class="dashed">
+			<img src="/clash/ui/army-camp.png" alt="Clash of clans army camp" />
+			Army units
+		</h2>
+		<C.UnitsList selectedUnits={units} />
 	</div>
 	<div class="controls">
 		<C.ActionButton ghost onclick={() => copyLink(units, app)} disabled={!units.length} title={getCopyBtnTitle(units)}>
@@ -131,6 +112,21 @@
 		</C.ActionButton>
 	</div>
 </section>
+
+{#if showClanCastle}
+	<section class="dashed units cc">
+		<div class="top">
+			<div class="title">
+				<h2 class="dashed">
+					<img src="/clash/ui/clan-castle.png" alt="Clash of clans clan castle" />
+					Clan castle
+				</h2>
+				<C.UnitTotals used={ccHousingSpaceUsed} capacity={ccCapacity} showTime={false} />
+			</div>
+			<C.UnitsList selectedUnits={ccUnits} />
+		</div>
+	</section>
+{/if}
 
 {#if errors}
 	<div class="errors">
@@ -220,7 +216,9 @@
 		display: flex;
 		gap: 6px;
 	}
-	.banner-content .left .tags p {
+	.banner-content .left .tags li {
+		display: flex;
+		align-items: center;
 		text-transform: uppercase;
 		background-color: #4c4538;
 		color: #e0a553;
@@ -229,27 +227,18 @@
 		font-weight: 700;
 		border-radius: 4px;
 		padding: 6px;
+		gap: 4px;
 	}
 
-	.banner-content .right,
-	.banner-content .right .totals {
+	.banner-content .right :global(.totals) {
+		border-radius: 0;
+		background: none;
+		padding: 0;
+	}
+	.banner-content .right {
 		display: flex;
 		align-items: center;
 		gap: 12px;
-	}
-	.banner-content .right .totals small {
-		display: flex;
-		align-items: center;
-		font-family: 'Clash', sans-serif;
-		color: var(--grey-100);
-		font-size: 15px;
-		gap: 4px;
-	}
-	.banner-content .right .totals img {
-		display: block;
-		max-height: 22px;
-		height: 100%;
-		width: auto;
 	}
 	.banner-content .right .separator {
 		background-color: var(--grey-500);
@@ -258,23 +247,41 @@
 	}
 
 	/* DASHED SECTION */
-	.dashed {
+	.dashed,
+	.units :global(.totals) {
 		background-color: var(--grey-800);
 		border: 1px dashed var(--grey-500);
 		border-radius: 8px;
+	}
+	.units :global(.totals) {
+		margin-bottom: 16px;
+	}
+
+	.title {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
 	}
 
 	/* UNITS */
 	.units {
 		--unit-size: 70px;
+		--unit-amount-size: 16px;
+		--unit-lvl-size: 13px;
+		--bottom-padding: 0;
 		margin-top: 48px;
+	}
+	.units.cc {
+		margin-top: 32px;
 	}
 	.units .top {
 		padding: 0 24px 24px 24px;
 		margin-top: -12px;
 	}
 	.units .top h2 {
-		display: inline-block;
+		display: inline-flex;
+		align-items: center;
+		gap: 0.5em;
 		font-family: 'Poppins', sans-serif;
 		font-size: var(--fs);
 		line-height: var(--fs-lh);
@@ -286,18 +293,15 @@
 		margin-bottom: 16px;
 		padding: 6px 8px;
 	}
-
-	.units-list {
-		display: flex;
-		flex-flow: row wrap;
-		padding: 0 8px;
-		gap: 6px;
+	.units .top h2 img {
+		flex-shrink: 0;
+		max-height: 24px;
+		height: 100%;
+		width: auto;
 	}
-	.units-list li {
-		--unit-border-radius: 6px;
-		--amount-size: 16px;
-		width: var(--unit-size);
-		height: var(--unit-size);
+
+	.units :global(.units-list) {
+		padding: 0 8px;
 	}
 
 	.units .controls {
@@ -325,10 +329,9 @@
 	@media (max-width: 850px) {
 		.units {
 			--unit-size: 60px;
+			--unit-amount-size: 14px;
+			--unit-lvl-size: 11px;
 			margin-top: 36px;
-		}
-		.units-list li {
-			--amount-size: 14px;
 		}
 		.errors {
 			margin-top: 16px;
@@ -368,7 +371,7 @@
 
 	@media (max-width: 550px) {
 		.banner-content .right,
-		.banner-content .right .totals {
+		.banner-content .right :global(.totals) {
 			flex-flow: row wrap;
 		}
 		.banner-content .right .separator {
@@ -383,14 +386,38 @@
 		.banner-img {
 			height: 550px;
 		}
+		.controls :global(.action-btn) {
+			justify-content: center;
+			width: 100%;
+		}
+		.title {
+			flex-flow: column nowrap;
+			gap: 0;
+		}
+		.units .top .title > * {
+			margin: 0;
+			width: 100%;
+		}
+		.units .top .title h2 {
+			border-bottom: none;
+			padding-bottom: 0;
+			margin-bottom: 0;
+		}
+		.units :global(.totals) {
+			padding-top: 12px;
+			border-radius: 0;
+			border-top: none;
+			width: 100%;
+		}
 	}
 
 	@media (max-width: 400px) {
 		.units .controls {
 			flex-flow: column nowrap;
 		}
-		.units-list li {
-			--amount-size: 12px;
+		.units {
+			--unit-amount-size: 13px;
+			--unit-lvl-size: 10.5px;
 		}
 	}
 </style>

@@ -1,5 +1,5 @@
 import type { MigrationFn } from './migrator';
-import { insertInitialTownHalls, insertInitialUnits, v0_0_2_data_migrate } from './migration-utils';
+import { insertInitialTownHalls, insertInitialUnits, v0_0_2_data_migrate, v0_1_0_data_migrate } from './migration-utils';
 import type { MySQL } from '@ninjalib/sql';
 
 // prettier-ignore
@@ -117,5 +117,8 @@ export function migration(runStep: MigrationFn) {
     `);
     runStep(12, async (db: MySQL) => {
         await v0_0_2_data_migrate(db);
+    });
+    runStep(13, async (db: MySQL) => {
+        await v0_1_0_data_migrate(db);
     });
 }

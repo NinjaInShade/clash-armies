@@ -1,5 +1,7 @@
 ## [Unreleased]
 
+- Add clan castle support to armies
+
 ## [0.0.2] - 2024-07-14
 
 - Fix `openModalAsync` always resolving with undefined (fixes the bug with not being able to delete army since confirm modal always returns false)

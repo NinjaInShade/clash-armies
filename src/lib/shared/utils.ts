@@ -115,6 +115,22 @@ export function getTotals(units: ArmyUnit[]) {
 	);
 }
 
+export function getCapacity(th: TownHall | undefined) {
+	if (!th) {
+		// Should never happen...
+		return { troops: 0, spells: 0, sieges: 0 };
+	}
+	return { troops: th.troopCapacity, spells: th.spellCapacity, sieges: th.siegeCapacity };
+}
+
+export function getCcCapacity(th: TownHall | undefined) {
+	if (!th) {
+		// Should never happen...
+		return { troops: 0, spells: 0, sieges: 0 };
+	}
+	return { troops: th.ccTroopCapacity, spells: th.ccSpellCapacity, sieges: th.ccSiegeCapacity };
+}
+
 /**
  * For the unit given, this calculates the highest level the user has access to
  * based on the user's building levels (town hall, barracks, lab, etc...) and unit rules.
@@ -198,7 +214,6 @@ export function getUnitLevel(unit: Unit | ArmyUnit, ctx: { th: TownHall, units: 
 			if (level > regularMaxLevel) {
 				// Some super troop must have their regular troop unlocked to a certain level (e.g. super bowler requires level 4 bowler).
 				// Therefore, some super troop levels start from the base regular troop level.
-				// Some events now let you
 				return maxLevel;
 			}
 			return regularMaxLevel;
@@ -208,6 +223,70 @@ export function getUnitLevel(unit: Unit | ArmyUnit, ctx: { th: TownHall, units: 
 	}
 
 	return maxLevel;
+}
+
+/**
+ * For the unit given, this calculates the highest level the user can have in their clan castle
+ * based on the user's town hall, lab and unit rules.
+ *
+ * @returns highest available unit level or -1 if player doesn't have access to it at all
+ */
+export function getCcUnitLevel(unit: Unit | ArmyUnit, ctx: { th: TownHall, units: Unit[] }): number {
+	const { name, type } = unit;
+	const appUnit = ctx.units.find(u => u.type === type && u.name === name);
+
+	if (!appUnit) {
+		throw new Error(`Expected to find unit "${name}"`)
+	};
+	if (!ctx.th || ctx.th.maxCc === null || unit.name === 'Battle Drill' && ctx.th.maxCc < 9) {
+		return -1;
+	}
+
+	let maxLevel = -1;
+
+	for (const levelData of appUnit.levels) {
+		const { level } = levelData;
+
+		// Check if level can be used based on the laboratory level cap
+		const labLevel = ctx.th.ccLaboratoryCap ?? -1;
+		if (typeof levelData.laboratoryLevel === 'number' && levelData.laboratoryLevel > labLevel) {
+			return maxLevel;
+		}
+
+		if (type === 'Troop' && appUnit.isSuper) {
+			// Super troops are unlocked at town hall 11
+			if (ctx.th.level < 11) {
+				return maxLevel;
+			}
+			// If super troops unlocked, level matches the max level allowed for the regular troop version
+			const regularTroopVersion = ctx.units.find(x => x.type === 'Troop' && x.name === SUPER_TO_REGULAR[name]);
+			if (!regularTroopVersion) {
+				throw new Error(`Expected to find regular troop version for "${name}"`)
+			};
+
+			// For super troop to be donated, the laboratory must be at least high enough for the regular troop to be boosted
+			// See `getUnitLevel` for more info on how this check works
+			const regularMaxLevel = getUnitLevel(regularTroopVersion, ctx);
+			if (level > regularMaxLevel) return maxLevel;
+
+			// If the laboratory is high enough to boost the regular troop,
+			// use the max level of the regular troop in line with the `getCcUnitLevel` rules
+			return getCcUnitLevel(regularTroopVersion, ctx);
+		}
+
+		maxLevel = level;
+	}
+
+	return maxLevel;
+}
+
+export function hasReachedSuperLimit(units: ArmyUnit[], ctx: { units: Unit[] }) {
+	const troopUnits = units.filter((x) => x.type === 'Troop');
+	const superTroops = troopUnits.filter((troop) => {
+		const appUnit = ctx.units.find((x) => x.type === troop.type && x.name === troop.name);
+		return appUnit?.isSuper;
+	});
+	return superTroops.length >= 2;
 }
 
 /**
@@ -223,34 +302,51 @@ export function validateArmy(army: Partial<Army>, ctx: { townHalls: TownHall[], 
 		throw new Error('Expected units');
 	}
 
-	// Check capacity is under max town hall capacity
-	const totals = getTotals(army.units);
+	const units = army.units.filter(unit => unit.home === 'armyCamp');
+	const ccUnits = army.units.filter(unit => unit.home === 'clanCastle');
+
+	// Check totals don't overflow max town hall capacity
+	const totals = getTotals(units);
 	if (totals.troops > th.troopCapacity) {
-		throw new Error(`Town hall ${army.townHall} has a max troop capacity of ${th.troopCapacity}, but this army exceeded that with ${totals.troops}`);
+		throw new Error(`Town hall ${th.level} has a max troop capacity of ${th.troopCapacity}, but this army exceeded that with ${totals.troops}`);
 	}
 	if (totals.spells > th.spellCapacity) {
-		throw new Error(`Town hall ${army.townHall} has a max spell capacity of ${th.spellCapacity}, but this army exceeded that with ${totals.spells}`);
+		throw new Error(`Town hall ${th.level} has a max spell capacity of ${th.spellCapacity}, but this army exceeded that with ${totals.spells}`);
 	}
 	if (totals.sieges > th.siegeCapacity) {
-		throw new Error(`Town hall ${army.townHall} has a max siege machine capacity of ${th.siegeCapacity}, but this army exceeded that with ${totals.sieges}`);
+		throw new Error(`Town hall ${th.level} has a max siege machine capacity of ${th.siegeCapacity}, but this army exceeded that with ${totals.sieges}`);
+	}
+	// Check cc totals don't overflow max town hall cc capacity
+	const ccTotals = getTotals(ccUnits);
+	if (ccTotals.troops > th.ccTroopCapacity) {
+		throw new Error(`Town hall ${th.level} has a max clan castle troop capacity of ${th.ccTroopCapacity}, but this army exceeded that with ${ccTotals.troops}`);
+	}
+	if (ccTotals.spells > th.ccSpellCapacity) {
+		throw new Error(`Town hall ${th.level} has a max clan castle spell capacity of ${th.ccSpellCapacity}, but this army exceeded that with ${ccTotals.spells}`);
+	}
+	if (ccTotals.sieges > th.ccSiegeCapacity) {
+		throw new Error(`Town hall ${th.level} has a max clan castle siege machine capacity of ${th.ccSiegeCapacity}, but this army exceeded that with ${ccTotals.sieges}`);
 	}
 
-	const troopUnits = army.units.filter(item => item.type === 'Troop');
-
 	// Check we haven't exceeded the super limit (max 2 unique super troops per army)
-	const exceededSuperLimit = troopUnits.filter((t) => Boolean(ctx.units.find((x) => x.type === t.type && x.name === t.name)?.isSuper)).length > 2;
-	if (exceededSuperLimit) {
+	if (hasReachedSuperLimit(units, ctx)) {
 		throw new Error(`An army can have a maximum of two unique super troops`)
 	}
 
 	// Check units can all be selected
-	for (const unit of army.units) {
+	for (const unit of units) {
 		const level = getUnitLevel(unit, { ...ctx, th });
 		if (level === -1) {
 			throw new Error(`Unit "${unit.name}" isn't available at town hall ${army.townHall}`);
 		}
 	}
-
+	// Check cc units can all be selected
+	for (const unit of ccUnits) {
+		const level = getCcUnitLevel(unit, { ...ctx, th });
+		if (level === -1) {
+			throw new Error(`Clan castle unit "${unit.name}" isn't available at town hall ${army.townHall}`);
+		}
+	}
 
 	return army;
 }

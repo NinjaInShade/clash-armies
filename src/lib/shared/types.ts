@@ -62,9 +62,14 @@ export type TownHall = {
 	maxSpellFactory: number | null;
 	maxDarkSpellFactory: number | null;
 	maxWorkshop: number | null;
+	maxCc: number | null;
 	troopCapacity: number;
 	spellCapacity: number;
 	siegeCapacity: number;
+	ccLaboratoryCap: number;
+	ccTroopCapacity: number;
+	ccSpellCapacity: number;
+	ccSiegeCapacity: number;
 };
 
 export type UnitType = 'Troop' | 'Siege' | 'Spell';
@@ -101,6 +106,7 @@ export type Unit = {
 export type ArmyUnit = Unit & {
 	/** ID of the unit in the `army_units` table */
 	id: number;
+	home: 'armyCamp' | 'clanCastle';
 	armyId: number;
 	/** ID of the unit in the `units` table */
 	unitId: number;
@@ -121,11 +127,15 @@ export type Army = {
 	createdBy: number;
 	createdTime: string;
 	updatedTime: string;
-	troopCapacity: number;
-	siegeCapacity: number;
-	spellCapacity: number;
 	votes: number;
 	userVote?: number;
+};
+
+export type Totals = {
+	troops: number;
+	sieges: number;
+	spells: number;
+	time: number;
 };
 
 type UserUtils = {
