@@ -1,6 +1,7 @@
 ## [Unreleased]
 
 - Add clan castle support to armies
+- Add "Create army" button on home page to make it more clear that users can create armies
 
 ## [0.0.2] - 2024-07-14
 

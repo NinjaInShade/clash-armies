@@ -1,3 +1,9 @@
+<script lang="ts">
+	import { page } from '$app/stores';
+
+	const redirect = $derived($page.url.searchParams.get('r') ?? null);
+</script>
+
 <svelte:head>
 	<title>ClashArmies • Login</title>
 </svelte:head>
@@ -11,7 +17,7 @@
 				<p>By logging in, you will be able to start creating armies!</p>
 			</header>
 			<div class="btn-container">
-				<a href="/login/google" class="login-btn">
+				<a href="/login/google{redirect ? `?r=${redirect}` : ''}" class="login-btn">
 					<img src="/icons/google-logo.svg" alt="Google logo" />
 					Sign in with Google
 				</a>

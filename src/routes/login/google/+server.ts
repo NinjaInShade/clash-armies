@@ -1,16 +1,19 @@
 import type { RequestEvent } from "@sveltejs/kit";
 import { redirect } from "@sveltejs/kit";
-import { generateCodeVerifier, generateState } from "arctic";
+import { generateCodeVerifier } from "arctic";
 import { google } from "~/lib/server/auth/lucia";
 import { dev } from "$app/environment";
 
 export async function GET(event: RequestEvent): Promise<Response> {
+	const redirectQuery = event.url.searchParams.get("r");
+
 	if (event.locals.user) {
-		// already logged in, redirect to homepage
-		redirect(302, "/")
+		// already logged in
+		const redirectPath = redirectQuery || '/';
+		redirect(302, redirectPath)
 	};
 
-    const state = generateState();
+    const state = JSON.stringify({ r: redirectQuery });
     const codeVerifier = generateCodeVerifier();
 
 	const url = await google.createAuthorizationURL(state, codeVerifier);

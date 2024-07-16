@@ -1,11 +1,17 @@
 <script lang="ts">
 	import C from '~/components';
 	import type { PageData } from './$types';
+	import { getContext } from 'svelte';
+	import type { AppState } from '~/lib/shared/types';
+
+	const app = getContext<AppState>('app');
 
 	const { data }: { data: PageData } = $props();
 	const { armies } = $derived(data);
 
 	const ENTRIES_PER_PAGE = 10;
+	const createArmyHref = $derived(app.user ? '/create' : '/login?r=/create');
+
 	let page = $state<number>(1);
 
 	let displayArmies = $derived.by(() => {
@@ -29,7 +35,10 @@
 	<div class="container">
 		<h1>Find the best<br /> armies <span>EVER!</span></h1>
 		<p class="body">The number one tool to find, create, learn and share the best armies in the game</p>
-		<C.Button asLink href="/armies">Find armies</C.Button>
+		<div class="buttons">
+			<C.Button asLink href="/armies">Find armies</C.Button>
+			<C.Button asLink href={createArmyHref}>Create army</C.Button>
+		</div>
 
 		<img class="graphic" src="/header-barbarian.png" alt="Angry clash of clans barbarian" />
 		<img class="graphic-mobile" src="/clash/ui/league-king-1.png" alt="Clash of clans barbarian king with league skin" />
@@ -76,6 +85,10 @@
 	header .body {
 		margin: 16px 0 32px 0;
 		max-width: 365px;
+	}
+	header .buttons {
+		display: flex;
+		gap: 0.5em;
 	}
 
 	.graphic {
@@ -131,13 +144,13 @@
 		}
 	}
 
-	@media (max-width: 740px) {
+	@media (max-width: 825px) {
 		.graphic {
 			max-width: 550px;
 		}
 	}
 
-	@media (max-width: 600px) {
+	@media (max-width: 625px) {
 		header {
 			background: repeat-x 0 8.5% url('/stones-background.png');
 		}
@@ -147,7 +160,7 @@
 		}
 
 		.graphic-mobile {
-			margin: 16px 0 24px 0;
+			margin: 24px 0;
 			max-width: 100%;
 			height: auto;
 			display: block;
@@ -165,6 +178,9 @@
 	@media (max-width: 375px) {
 		header br {
 			display: none;
+		}
+		header .buttons {
+			flex-flow: column nowrap;
 		}
 	}
 </style>

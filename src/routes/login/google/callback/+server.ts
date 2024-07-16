@@ -9,6 +9,10 @@ type GoogleUser = {
 	picture: string;
 }
 
+function isObject(obj: unknown): obj is Record<string, unknown> {
+    return typeof obj === 'object' && !Array.isArray(obj) && obj !== null;
+}
+
 export async function GET(event: RequestEvent): Promise<Response> {
 	const code = event.url.searchParams.get("code");
 	const state = event.url.searchParams.get("state");
@@ -20,6 +24,19 @@ export async function GET(event: RequestEvent): Promise<Response> {
         return new Response(null, {
 			status: 400
 		});
+    }
+
+    let parsedState: unknown;
+    let redirect: string | null = null;
+
+    try {
+        parsedState = JSON.parse(state);
+    } catch (err) {
+        // Pass
+    }
+
+    if (isObject(parsedState) && parsedState.r && typeof parsedState.r === 'string') {
+        redirect = parsedState.r;
     }
 
 	try {
@@ -43,7 +60,7 @@ export async function GET(event: RequestEvent): Promise<Response> {
             return new Response(null, {
                 status: 302,
                 headers: {
-                    Location: `/users/${existingUser.username}`
+                    Location: redirect || `/users/${existingUser.username}`
                 }
             });
 		} else {
@@ -72,7 +89,7 @@ export async function GET(event: RequestEvent): Promise<Response> {
             return new Response(null, {
                 status: 302,
                 headers: {
-                    Location: `/users/${username}`
+                    Location: redirect || `/users/${username}`
                 }
             });
         }
