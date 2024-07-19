@@ -1,4 +1,7 @@
 <script lang="ts">
+	import { getContext } from 'svelte';
+	import type { AppState } from '~/lib/shared/types';
+
 	type Props = {
 		armyId: number;
 		votes: number;
@@ -7,6 +10,8 @@
 		class?: string;
 	};
 	let { votes = $bindable(), userVote = $bindable(), armyId, allowEdit, class: _class }: Props = $props();
+
+	const app = getContext<AppState>('app');
 
 	let saving = $state<boolean>(false);
 
@@ -20,6 +25,13 @@
 				headers: { 'Content-Type': 'application/json' }
 			});
 			const result = await response.json();
+			if (result.errors || response.status !== 200) {
+				app.notify({
+					title: 'Failed action',
+					description: `There was a problem saving your vote`,
+					theme: 'failure'
+				});
+			}
 			if (result.errors) {
 				console.error(`Error:`, result.errors);
 				return;

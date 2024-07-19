@@ -90,7 +90,7 @@ export const BANNERS = [
 	'valentines'
 ] as const;
 
-export const USER_MAX_ARMIES = 20;
+export const USER_MAX_ARMIES = 40;
 
 /**
  * Given the passed in units, calculates how much housing space

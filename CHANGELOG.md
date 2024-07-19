@@ -1,6 +1,7 @@
 ## [Unreleased]
 
 - Add clan castle support to armies
+- Add ability to save/bookmark armies
 - Add "Create army" button on home page to make it more clear that users can create armies
 - Display CHANGELOG.md on /changelog page
 

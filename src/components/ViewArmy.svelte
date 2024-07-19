@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { getContext } from 'svelte';
-	import { goto } from '$app/navigation';
+	import { goto, invalidate } from '$app/navigation';
 	import { getTotals, getCapacity, getCcCapacity } from '~/lib/shared/utils';
 	import { copyLink, openInGame, getTags, getCopyBtnTitle, getOpenBtnTitle } from '~/lib/client/army';
 	import type { Army, AppState, FetchErrors } from '~/lib/shared/types';
@@ -76,7 +76,13 @@
 		<div class="right">
 			<C.UnitTotals used={housingSpaceUsed} {capacity} />
 			<div class="separator"></div>
-			<C.Votes bind:votes bind:userVote armyId={army.id} allowEdit={app.user !== null} />
+			<div class="actions">
+				<C.Votes bind:votes bind:userVote armyId={army.id} allowEdit={app.user !== null} />
+				{#if app.user}
+					<div class="separator"></div>
+					<C.BookmarkButton {army} />
+				{/if}
+			</div>
 		</div>
 	</div>
 </section>
@@ -212,6 +218,9 @@
 		color: var(--primary-400);
 		font-weight: 700;
 	}
+	.banner-content .left .author a:hover {
+		text-decoration: underline;
+	}
 	.banner-content .left .tags {
 		display: flex;
 		gap: 6px;
@@ -235,7 +244,8 @@
 		background: none;
 		padding: 0;
 	}
-	.banner-content .right {
+	.banner-content .right,
+	.banner-content .actions {
 		display: flex;
 		align-items: center;
 		gap: 12px;
@@ -244,6 +254,11 @@
 		background-color: var(--grey-500);
 		height: 22px;
 		width: 1px;
+	}
+
+	:global(.bookmark svg) {
+		width: 13.2px;
+		height: 17px;
 	}
 
 	/* DASHED SECTION */
@@ -374,7 +389,7 @@
 		.banner-content .right :global(.totals) {
 			flex-flow: row wrap;
 		}
-		.banner-content .right .separator {
+		.banner-content .right > .separator {
 			display: none;
 		}
 		.units .top {

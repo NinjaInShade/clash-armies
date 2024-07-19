@@ -121,4 +121,14 @@ export function migration(runStep: MigrationFn) {
     runStep(13, async (db: MySQL) => {
         await v0_1_0_data_migrate(db);
     });
+    runStep(14, `
+        CREATE TABLE saved_armies (
+            id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+            armyId INT NOT NULL,
+            userId INT NOT NULL,
+            CONSTRAINT fk_saved_armies_army_id FOREIGN KEY (armyId) REFERENCES armies (id) ON DELETE CASCADE,
+            CONSTRAINT fk_saved_armies_voted_by FOREIGN KEY (userId) REFERENCES users (id) ON DELETE CASCADE,
+            CONSTRAINT unique_saved_armies_bookmark UNIQUE (armyId, userId)
+        )
+    `);
 }

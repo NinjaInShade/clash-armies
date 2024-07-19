@@ -1,16 +1,17 @@
 <script lang="ts">
 	import C from '~/components';
+	import { USER_MAX_ARMIES } from '~/lib/shared/utils';
 	import { getContext } from 'svelte';
 	import type { AppState } from '~/lib/shared/types';
-	import { USER_MAX_ARMIES } from '~/lib/shared/utils';
 	import type { PageData } from './$types';
 	import EditUser from './EditUser.svelte';
+	import CreatedArmiesTab from './CreatedArmiesTab.svelte';
+	import SavedArmiesTab from './SavedArmiesTab.svelte';
 
 	const { data }: { data: PageData } = $props();
-	const { armies, user } = $derived(data);
+	const { armies, savedArmies, user } = $derived(data);
 
 	const app = getContext<AppState>('app');
-
 	const username = $derived(user.username);
 	const currentUser = $derived(app.user ? app.user.username : null);
 
@@ -46,30 +47,14 @@
 	</div>
 </header>
 
-<section class="armies">
+<section class="tabs">
 	<div class="container">
-		<h2 class="armies-title">Armies {currentUser === username ? `(${armies.length} / ${USER_MAX_ARMIES})` : ''}</h2>
-		{#if armies.length}
-			<ul class="armies-list">
-				{#each armies as army (army.id)}
-					<C.ArmyCard {army} />
-				{/each}
-			</ul>
-		{:else}
-			<div class="no-armies">
-				<img src="/clash/ui/falling-barb.png" alt="Falling barbarian" />
-				<h2>
-					{#if currentUser === username}
-						You haven't created any armies warrior!
-					{:else}
-						This user hasn't created any armies
-					{/if}
-				</h2>
-				{#if currentUser === username}
-					<C.Button asLink href="/create">Create army</C.Button>
-				{/if}
-			</div>
-		{/if}
+		<C.TabStrip
+			tabs={[
+				{ name: 'created', label: `Created (${armies.length}/${USER_MAX_ARMIES})`, component: CreatedArmiesTab, componentProps: { armies, user } },
+				{ name: 'saved', label: `Saved (${savedArmies.length})`, component: SavedArmiesTab, componentProps: { savedArmies, user } }
+			]}
+		/>
 	</div>
 </section>
 
@@ -83,8 +68,7 @@
 		flex-flow: row wrap;
 		justify-content: space-between;
 		align-items: flex-end;
-		border-bottom: 1px solid var(--grey-500);
-		padding-bottom: 1.5em;
+		padding-bottom: 2.25em;
 		gap: 1em;
 	}
 
@@ -139,7 +123,7 @@
 	.username {
 		word-break: break-all;
 		color: var(--primary-400);
-		margin: 0.35em 0 0.4em 0;
+		margin: 0.35em 0 0.2em 0;
 	}
 
 	.player-tag {
@@ -147,47 +131,9 @@
 		font-weight: 400;
 	}
 
-	.armies {
-		padding: 50px var(--side-padding);
+	.tabs {
+		padding: 0 var(--side-padding) 50px var(--side-padding);
 		flex: 1 0 0px;
-	}
-
-	.armies-title {
-		margin-bottom: 0.75em;
-	}
-
-	.armies-list {
-		display: flex;
-		flex-flow: column nowrap;
-		gap: 1em;
-	}
-
-	.no-armies {
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		flex-flow: column nowrap;
-		background-color: var(--grey-800);
-		border-radius: 8px;
-		padding: 3em 1em;
-	}
-
-	.no-armies h2 {
-		max-width: 320px;
-		text-align: center;
-		line-height: 1.3;
-		font-weight: 400;
-		margin-top: 1em;
-	}
-
-	.no-armies h2:has(+ a) {
-		margin-bottom: 1em;
-	}
-
-	.no-armies img {
-		max-width: 400px;
-		width: 100%;
-		position: relative;
 	}
 
 	.right {

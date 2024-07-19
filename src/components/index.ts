@@ -10,6 +10,7 @@ export { default as Select } from './Select.svelte';
 export { default as Checkbox } from './Checkbox.svelte';
 export { default as Toast } from './Toast.svelte';
 export { default as Confirm } from './Confirm.svelte';
+export { default as TabStrip } from './TabStrip.svelte';
 
 // App specific components
 export { default as Nav } from './Nav.svelte';
@@ -27,5 +28,7 @@ export { default as Votes } from './Votes.svelte';
 export { default as Errors } from './Errors.svelte';
 export { default as ArmyCard } from './ArmyCard.svelte';
 export { default as ActionButton } from './ActionButton.svelte';
+export { default as BookmarkButton } from './BookmarkButton.svelte';
+export { default as IconTagsClanCastle } from './IconTagsClanCastle.svelte';
 
 export * as default from './index';

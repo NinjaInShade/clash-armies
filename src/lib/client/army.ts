@@ -1,6 +1,6 @@
 import type { AppState, Army, ArmyUnit, SvelteComponentGeneric } from '~/lib/shared/types';
 import { SECOND, MINUTE, HOUR, OBJECT_ID_PREFIXES } from '~/lib/shared/utils';
-import IconTagsClanCastle from '~/components/IconTagsClanCastle.svelte';
+import C from '~/components';
 
 /**
  * Generates URL link to copy army into clash of clans.
@@ -125,7 +125,7 @@ export function getTags(army: Army) {
 	tags.push({ label: typeData.ground > typeData.air ? 'Ground' : 'Air' });
 	const hasClanCastle = army.units.filter(unit => unit.home === 'clanCastle').length > 0;
 	if (hasClanCastle) {
-		tags.push({ label: 'Clan castle', icon: IconTagsClanCastle })
+		tags.push({ label: 'Clan castle', icon: C.IconTagsClanCastle })
 	}
 	if (army.guideId) {
 		//  TODO: guide system

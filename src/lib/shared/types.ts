@@ -128,7 +128,8 @@ export type Army = {
 	createdTime: string;
 	updatedTime: string;
 	votes: number;
-	userVote?: number;
+	userVote: number;
+	userBookmarked: boolean;
 };
 
 export type Totals = {

@@ -8,7 +8,7 @@ import type { Request } from '~/app';
 type GetArmiesParams = {
 	req: Request;
 	/** Returns the army with this ID */
-	id?: number;
+	id?: number | number[];
 	/** Returns the armies for the user with this username */
 	username?: string;
 };
@@ -19,8 +19,9 @@ type GetUnitsParams = {
 
 export async function getArmies(opts: GetArmiesParams) {
 	const { req, id, username } = opts;
+	const userId = req.user?.id ?? null;
 
-	const args: (number | string | null)[] = [req.user?.id ?? null];
+	const args: (number | number[] | string | null)[] = [userId, userId];
 	let query = `
         SELECT
 			a.*,
@@ -44,7 +45,8 @@ export async function getArmies(opts: GetArmiesParams) {
 				'groundTargets', un.groundTargets
             )) AS units,
 			av.votes,
-			COALESCE(uv.vote, 0) AS userVote
+			COALESCE(uv.vote, 0) AS userVote,
+			sa.id IS NOT NULL AS userBookmarked
 		FROM armies a
 		LEFT JOIN users u ON u.id = a.createdBy
         LEFT JOIN army_units au ON au.armyId = a.id
@@ -56,12 +58,18 @@ export async function getArmies(opts: GetArmiesParams) {
 			GROUP BY armyId
 		) av ON av.armyId = a.id
 		LEFT JOIN army_votes uv ON uv.armyId = a.id AND uv.votedBy = ?
+		LEFT JOIN saved_armies sa ON sa.armyId = a.id AND sa.userId = ?
 	`;
 
-	if (id) {
+	if (Array.isArray(id) && id.length > 0) {
 		query += `
-            WHERE a.id = ?
-        `;
+			WHERE a.id IN (?)
+		`;
+		args.push(id);
+	} else if (!Array.isArray(id) && id) {
+		query += `
+			WHERE a.id = ?
+		`;
 		args.push(id);
 	}
 
@@ -82,9 +90,30 @@ export async function getArmies(opts: GetArmiesParams) {
 		// Parse JSON units
 		army.units = JSON.parse(army.units);
 		army.votes = +army.votes;
+		army.userBookmarked = army.userBookmarked === 1 ? true : false;
 	}
 
 	return armies;
+}
+
+type GetSavedArmiesParams = {
+	req: Request,
+	/** Will return all saved armies for the user with this username */
+	username: string;
+}
+
+export async function getSavedArmies(opts: GetSavedArmiesParams) {
+	const { req, username } = opts;
+	const savedArmyIds = (await db.query(`
+		SELECT sa.armyId
+		FROM saved_armies sa
+		LEFT JOIN users u ON u.username = ?
+		WHERE sa.userId = u.id
+	`, [username])).map(row => row.armyId);
+	if (!savedArmyIds.length) {
+		return [];
+	}
+	return getArmies({ req, id: savedArmyIds });
 }
 
 export async function getArmy(req: Request, id: number) {
@@ -304,4 +333,20 @@ export async function saveVote(event: RequestEvent, data: SaveVoteParams) {
 	} else {
 		await db.upsert('army_votes', [{ armyId, votedBy: user.id, vote }]);
 	}
+}
+
+export async function bookmarkArmy(event: RequestEvent, data: { armyId: number }) {
+	const user = event.locals.requireAuth();
+	const { armyId } = z.object({ armyId: z.number() }).parse(data);
+	const army = await getArmy(event.locals, armyId);
+	if (!army) {
+		throw new Error('Could not find army');
+	}
+	await db.insertOne('saved_armies', { armyId, userId: user.id });
+}
+
+export async function removeBookmark(event: RequestEvent, data: { armyId: number }) {
+	const user = event.locals.requireAuth();
+	const { armyId } = z.object({ armyId: z.number() }).parse(data);
+	await db.query('DELETE FROM saved_armies WHERE armyId = ? AND userId = ?', [armyId, user.id]);
 }
