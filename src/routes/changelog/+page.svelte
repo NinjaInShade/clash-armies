@@ -1,12 +1,28 @@
+<script lang="ts">
+	const changelog = processMarkdown();
+
+	/**
+	 * Super basic markdown processor so that CHANGELOG can be styled nice
+	 */
+	function processMarkdown() {
+		const split = __CHANGELOG__.split('\n');
+		const mapped = split.map((line) => {
+			if (line.startsWith('##')) {
+				return `<h2>${line.substring(2).trimStart()}</h2>`;
+			}
+			return `<p>${line}</p>`;
+		});
+		return mapped.join('\n');
+	}
+</script>
+
 <svelte:head>
 	<title>ClashArmies • Changelog</title>
 </svelte:head>
 
 <section>
 	<div class="container">
-		<img src="/clash/ui/barb-gold.png" alt="Barbarian looking at a gold coin" />
-		<h1>Coming soon...</h1>
-		<p>If you would like to follow development check out the <a href="https://discord.gg/9wCmfXhZM6" target="_blank">discord server</a></p>
+		{@html changelog}
 	</div>
 </section>
 
@@ -17,6 +33,23 @@
 		align-items: center;
 		padding: 50px var(--side-padding);
 		flex: 1 0 0px;
+	}
+	section .container {
+		background-color: var(--grey-800);
+		color: var(--grey-100);
+		border-radius: 8px;
+		padding: 2em;
+		height: 100%;
+	}
+	section .container :global(h2) {
+		margin-bottom: 0.35em;
+	}
+	section .container :global(h2:not(:first-child)) {
+		margin-top: 1.5em;
+	}
+	section .container :global(p) {
+		font-family: 'monospace';
+		color: var(--grey-300);
 	}
 
 	img {
