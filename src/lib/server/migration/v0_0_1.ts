@@ -1,9 +1,8 @@
-import type { MigrationFn } from './migrator';
-import { insertInitialTownHalls, insertInitialUnits, v0_0_2_data_migrate, v0_1_0_data_migrate } from './migration-utils';
-import type { MySQL } from '@ninjalib/sql';
+import type { MigrationFn } from '@ninjalib/sql';
+import { insertInitialTownHalls, insertInitialUnits } from './util';
 
 // prettier-ignore
-export function migration(runStep: MigrationFn) {
+export default function migration(runStep: MigrationFn) {
     runStep(1, `
         CREATE TABLE users (
             id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
@@ -113,22 +112,6 @@ export function migration(runStep: MigrationFn) {
             CONSTRAINT fk_army_votes_army_id FOREIGN KEY (armyId) REFERENCES armies (id) ON DELETE CASCADE,
             CONSTRAINT fk_army_votes_voted_by FOREIGN KEY (votedBy) REFERENCES users (id) ON DELETE CASCADE,
             CONSTRAINT army_votes_vote_value CHECK (vote = -1 OR vote = 1)
-        )
-    `);
-    runStep(12, async (db: MySQL) => {
-        await v0_0_2_data_migrate(db);
-    });
-    runStep(13, async (db: MySQL) => {
-        await v0_1_0_data_migrate(db);
-    });
-    runStep(14, `
-        CREATE TABLE saved_armies (
-            id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-            armyId INT NOT NULL,
-            userId INT NOT NULL,
-            CONSTRAINT fk_saved_armies_army_id FOREIGN KEY (armyId) REFERENCES armies (id) ON DELETE CASCADE,
-            CONSTRAINT fk_saved_armies_voted_by FOREIGN KEY (userId) REFERENCES users (id) ON DELETE CASCADE,
-            CONSTRAINT unique_saved_armies_bookmark UNIQUE (armyId, userId)
         )
     `);
 }
