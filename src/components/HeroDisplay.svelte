@@ -10,19 +10,13 @@
 	const { name, level }: Props = $props();
 
 	const app = getContext<AppState>('app');
-
-	function getHeroLevels(hero: HeroType): number[] {
-		return app.townHalls.map((th) => getHeroLevel(hero, { th }));
-	}
-
-	function isMaxLevel(levels: number[]) {
-		return level === Math.max(...levels);
-	}
+	const levels = $derived(app.townHalls.map((th) => getHeroLevel(name, { th })));
+	const isMaxLevel = $derived(level === Math.max(...levels));
 </script>
 
 <div class="display {name.replaceAll(' ', '-').toLowerCase()}" title={name}>
 	{#if level && level > 0}
-		<b class="lvl" class:max={isMaxLevel(getHeroLevels(name))}>{level}</b>
+		<b class="lvl" class:max={isMaxLevel}>{level}</b>
 	{/if}
 	<img src="/clash/heroes/{name} Full Height.png" alt={`Clash of clans "${name}" hero`} />
 </div>

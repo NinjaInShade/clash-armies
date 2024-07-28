@@ -1,9 +1,9 @@
 <script lang="ts">
-	import type { EquipmentLevel } from '~/lib/shared/types';
+	import { getContext } from 'svelte';
+	import type { AppState } from '~/lib/shared/types';
 
 	type Props = {
 		name: string;
-		levels: EquipmentLevel[];
 		/**
 		 * Title to use for the card
 		 * @default props.name
@@ -13,11 +13,10 @@
 		level?: number;
 		epic?: boolean;
 	};
-	const { name, amount, level, title, levels, epic = false }: Props = $props();
-
-	function isMaxLevel() {
-		return level === Math.max(...levels.map((x) => x.level));
-	}
+	const { name, amount, level, title, epic = false }: Props = $props();
+	const app = getContext<AppState>('app');
+	const levels = $derived(app.equipment.find((eq) => eq.name === name)?.levels ?? []);
+	const isMaxLevel = $derived(level === Math.max(...levels.map((x) => x.level)));
 </script>
 
 <div class="display" class:epic title={title ?? name}>
@@ -25,7 +24,7 @@
 		<b class="amount">x{amount}</b>
 	{/if}
 	{#if level && level > 0}
-		<b class="lvl" class:max={isMaxLevel()}>{level}</b>
+		<b class="lvl" class:max={isMaxLevel}>{level}</b>
 	{/if}
 	<img src="/clash/heroes/equipment/{name}.png" alt={name} />
 </div>

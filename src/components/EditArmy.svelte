@@ -11,9 +11,9 @@
 		getCcUnitLevel,
 		getEquipmentLevel,
 		getPetLevel,
-		getHeroLevel
+		getHeroLevel,
 	} from '~/lib/shared/utils';
-	import type { AppState, Army, ArmyUnit, ArmyEquipment, ArmyPet, Banner, FetchErrors } from '~/lib/shared/types';
+	import type { Optional, AppState, Army, ArmyUnit, ArmyEquipment, ArmyPet, Banner, FetchErrors } from '~/lib/shared/types';
 	import AddClanCastle from './AddClanCastle.svelte';
 	import AddHeroes from './AddHeroes.svelte';
 	import C from '~/components';
@@ -27,10 +27,10 @@
 	let townHall = $state<number>(army?.townHall ?? 16);
 	let banner = $state<Banner>(army?.banner ?? BANNERS[Math.floor(Math.random() * BANNERS.length)]);
 	let name = $state<string | null>(army?.name ?? null);
-	let units = $state<ArmyUnit[]>(army?.units?.filter((unit) => unit.home === 'armyCamp') ?? []);
-	let ccUnits = $state<ArmyUnit[]>(army?.units?.filter((unit) => unit.home === 'clanCastle') ?? []);
-	let equipment = $state<ArmyEquipment[]>(army?.equipment ?? []);
-	let pets = $state<ArmyPet[]>(army?.pets ?? []);
+	let units = $state<Optional<ArmyUnit, 'id'>[]>(army?.units?.filter((unit) => unit.home === 'armyCamp') ?? []);
+	let ccUnits = $state<Optional<ArmyUnit, 'id'>[]>(army?.units?.filter((unit) => unit.home === 'clanCastle') ?? []);
+	let equipment = $state<Optional<ArmyEquipment, 'id'>[]>(army?.equipment ?? []);
+	let pets = $state<Optional<ArmyPet, 'id'>[]>(army?.pets ?? []);
 
 	// Other state
 	let errors = $state<FetchErrors | null>(null);
@@ -97,11 +97,25 @@
 	}
 
 	async function saveArmy() {
-		const data = { id: army?.id, name, units: [...units, ...ccUnits], equipment, pets, banner, townHall };
+		const data = {
+			id: army?.id,
+			name,
+			banner,
+			townHall,
+			units: [...units, ...ccUnits].map((u) => {
+				return { id: u.id, unitId: u.unitId, home: u.home, amount: u.amount };
+			}),
+			equipment: equipment.map((eq) => {
+				return { id: eq.id, equipmentId: eq.equipmentId };
+			}),
+			pets: pets.map((p) => {
+				return { id: p.id, petId: p.petId, hero: p.hero };
+			}),
+		};
 		const response = await fetch('/armies', {
 			method: 'POST',
 			body: JSON.stringify(data),
-			headers: { 'Content-Type': 'application/json' }
+			headers: { 'Content-Type': 'application/json' },
 		});
 		const result = await response.json();
 		if (result.errors) {

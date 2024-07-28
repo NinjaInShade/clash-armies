@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { getContext } from 'svelte';
-	import { getTotals, getSuperTroopCount, HOLD_ADD_SPEED } from '~/lib/shared/utils';
-	import type { AppState, Unit, ArmyUnit, UnitType, TownHall, Totals } from '~/lib/shared/types';
+	import { getTotals, HOLD_ADD_SPEED, requireUnit } from '~/lib/shared/utils';
+	import type { Optional, AppState, Unit, SaveUnit, ArmyUnit, UnitType, TownHall, Totals } from '~/lib/shared/types';
 	import C from '~/components';
 
 	type TitleOptions = {
@@ -13,8 +13,8 @@
 	type Props = {
 		type: UnitType;
 		capacity: Omit<Totals, 'time'>;
-		getUnitLevel(unit: Unit | ArmyUnit, ctx: { th: TownHall; units: Unit[] }): number;
-		selectedUnits: ArmyUnit[];
+		getUnitLevel(name: string, type: UnitType, ctx: { th: TownHall; units: Unit[] }): number;
+		selectedUnits: Optional<ArmyUnit, 'id'>[];
 		selectedTownHall: number;
 		housedIn: ArmyUnit['home'];
 	};
@@ -28,18 +28,23 @@
 
 	let holdInterval: ReturnType<typeof setInterval> | null = null;
 
-	function shouldDisableSuper(unit: Unit, selected: ArmyUnit[]) {
+	function shouldDisableSuper(unit: Unit, selected: SaveUnit[]) {
 		if (housedIn !== 'armyCamp') {
 			return;
 		}
 		// Disable if reached max unique super limit and this troop isn't one already selected
-		return unit.isSuper && !selected.find((u) => u.name === unit.name) && getSuperTroopCount(selected, { units: app.units }) >= 2;
+		const superTroops = selected.filter((u) => {
+			const appUnit = requireUnit(u.unitId, { units: app.units });
+			return appUnit.isSuper;
+		});
+		return unit.isSuper && !selected.find((u) => u.unitId === unit.id) && superTroops.length >= 2;
 	}
 
-	function willOverflowHousingSpace(unit: ArmyUnit) {
-		const selectedCopy: ArmyUnit[] = JSON.parse(JSON.stringify(selectedUnits));
-		const selectedPreview = add(unit, selectedCopy);
-		const { troops, sieges, spells } = getTotals(selectedPreview);
+	function willOverflowHousingSpace(unit: Unit) {
+		const copy: ArmyUnit[] = JSON.parse(JSON.stringify(selectedUnits));
+		const preview = add(unit, copy);
+		const previewFull = preview.map((u) => ({ ...requireUnit(u.unitId, { units: app.units }), amount: u.amount }));
+		const { troops, sieges, spells } = getTotals(previewFull);
 		return troops > capacity.troops || sieges > capacity.sieges || spells > capacity.spells;
 	}
 
@@ -57,7 +62,7 @@
 		return undefined;
 	}
 
-	function initHoldAdd(unit: ArmyUnit) {
+	function initHoldAdd(unit: Unit) {
 		if (willOverflowHousingSpace(unit)) {
 			return;
 		}
@@ -78,16 +83,12 @@
 		holdInterval = null;
 	}
 
-	function add(unit: ArmyUnit, arr = selectedUnits) {
-		const existing = arr.find((item) => item.name === unit.name);
+	function add(unit: Unit, arr = selectedUnits) {
+		const existing = arr.find((item) => item.unitId === unit.id);
 		if (existing) {
 			existing.amount += 1;
 		} else {
-			const _unit = app.units.find((x) => x.type === unit.type && x.name === unit.name);
-			if (!_unit) {
-				throw new Error(`Unknown unit: "${unit.name}"`);
-			}
-			arr.push({ ...unit, home: housedIn, unitId: _unit.id, amount: 1 });
+			arr.push({ unitId: unit.id, home: housedIn, amount: 1, ...unit, id: undefined });
 		}
 		return arr;
 	}
@@ -100,7 +101,7 @@
 <ul class="picker-list">
 	{#each sortedUnits as unit}
 		{@const disableSuper = shouldDisableSuper(unit, selectedUnits)}
-		{@const level = thData ? getUnitLevel(unit, { th: thData, units: app.units }) : -1}
+		{@const level = thData ? getUnitLevel(unit.name, unit.type, { th: thData, units: app.units }) : -1}
 		{@const reachedMaxAmount = willOverflowHousingSpace(unit)}
 		{@const title = getTitle({ level, type, reachedMaxAmount, reachedSuperLimit: disableSuper })}
 		<li>

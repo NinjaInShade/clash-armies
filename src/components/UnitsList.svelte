@@ -1,11 +1,11 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 	import { HOLD_REMOVE_SPEED } from '~/lib/shared/utils';
-	import type { Unit, ArmyUnit } from '~/lib/shared/types';
+	import type { Optional, Unit, ArmyUnit } from '~/lib/shared/types';
 	import C from '~/components';
 
 	type Props = {
-		selectedUnits: ArmyUnit[];
+		selectedUnits: Optional<ArmyUnit, 'id'>[];
 		unitsRemovable?: boolean;
 		extraUnits?: Snippet;
 	};

@@ -1,6 +1,7 @@
-import type { Army, TownHall, Unit, Equipment, Pet, UnitType, BlackSmithLevel } from '~/lib/shared/types';
+import type { SaveArmy, Army, TownHall, Unit, Equipment, Pet, UnitType, BlackSmithLevel } from '~/lib/shared/types';
 import { db } from '~/lib/server/db';
-import { BANNERS, USER_MAX_ARMIES, VALID_HEROES, validateArmy } from '~/lib/shared/utils';
+import { USER_MAX_ARMIES } from '~/lib/shared/utils';
+import { validateArmy, numberSchema } from '~/lib/shared/validation';
 import z from 'zod';
 import type { RequestEvent } from '@sveltejs/kit';
 import type { Request } from '~/app';
@@ -145,19 +146,24 @@ export async function getArmies(opts: GetArmiesParams) {
 }
 
 type GetSavedArmiesParams = {
-	req: Request,
+	req: Request;
 	/** Will return all saved armies for the user with this username */
 	username: string;
-}
+};
 
 export async function getSavedArmies(opts: GetSavedArmiesParams) {
 	const { req, username } = opts;
-	const savedArmyIds = (await db.query(`
+	const savedArmyIds = (
+		await db.query(
+			`
 		SELECT sa.armyId
 		FROM saved_armies sa
 		LEFT JOIN users u ON u.username = ?
 		WHERE sa.userId = u.id
-	`, [username])).map(row => row.armyId);
+	`,
+			[username]
+		)
+	).map((row) => row.armyId);
 	if (!savedArmyIds.length) {
 		return [];
 	}
@@ -237,13 +243,7 @@ export async function getUnits(opts: GetUnitsParams = {}) {
 }
 
 export async function getEquipment() {
-	const blacksmithLevels = await db.query<BlackSmithLevel>(`
-		SELECT *
-		FROM blacksmith_levels
-		ORDER BY level ASC
-	`);
-	const equipment = await db.query<Equipment>(
-		`
+	const query = `
 		SELECT
 			eq.id,
 			eq.hero,
@@ -251,29 +251,38 @@ export async function getEquipment() {
 			eq.epic
 		FROM equipment eq
 		GROUP BY eq.id
-	`,
-		[]
-	);
+	`;
+	const equipment = await db.query<Equipment>(query, []);
+
+	for (const eq of equipment) {
+		eq.levels = await getEqLevels(eq);
+	}
+
+	return equipment;
+}
+
+async function getEqLevels(eq: Equipment) {
+	const blacksmithLevels = await db.query<BlackSmithLevel>(`
+		SELECT *
+		FROM blacksmith_levels
+		ORDER BY level ASC
+	`);
 
 	// These equipment have a slightly different case than explained below as they don't require the blacksmith building to unlocked at all to use at all level 1
 	const unlockedByDefault = ['Barbarian Puppet', 'Rage Vial', 'Archer Puppet', 'Invisibility Vial', 'Eternal Tome', 'Life Gem', 'Royal Gem', 'Seeking Shield'];
 
-	for (const eq of equipment) {
-		// Attach equipment levels (these are determined by the blacksmith levels exclusively, unlike
-		// units where each unit could have a different level at the same building level as another)
-		eq.levels = new Array(eq.epic ? 27 : 18)
-			.fill(() => null)
-			.map((_, idx) => {
-				const level = idx + 1;
-				if (unlockedByDefault.includes(eq.name) && level === 1) {
-					return { equipmentId: eq.id, level, blacksmithLevel: null };
-				}
-				const blacksmithLevel = blacksmithLevels.find((bLevel) => (eq.epic ? bLevel.maxEpic : bLevel.maxCommon) >= level)?.level ?? null;
-				return { equipmentId: eq.id, level, blacksmithLevel };
-			});
-	}
-
-	return equipment;
+	// Attach equipment levels (these are determined by the blacksmith levels exclusively, unlike
+	// units where each unit could have a different level at the same building level as another)
+	return new Array(eq.epic ? 27 : 18)
+		.fill(() => null)
+		.map((_, idx) => {
+			const level = idx + 1;
+			if (unlockedByDefault.includes(eq.name) && level === 1) {
+				return { equipmentId: eq.id, level, blacksmithLevel: null };
+			}
+			const blacksmithLevel = blacksmithLevels.find((bLevel) => (eq.epic ? bLevel.maxEpic : bLevel.maxCommon) >= level)?.level ?? null;
+			return { equipmentId: eq.id, level, blacksmithLevel };
+		});
 }
 
 export async function getPets() {
@@ -304,97 +313,17 @@ export async function getPets() {
 	return pets;
 }
 
-const unitSchemaCreating = z.object({
-	id: z.number().positive().optional(),
-	home: z.enum(['armyCamp', 'clanCastle']),
-	unitId: z.number().positive(),
-	amount: z.number().positive()
-});
-const unitSchemaSaving = unitSchemaCreating.extend({
-	id: z.number().positive(),
-});
-
-const equipmentSchemaCreating = z.object({
-	id: z.number().positive().optional(),
-	equipmentId: z.number().positive()
-});
-const equipmentSchemaSaving = equipmentSchemaCreating.extend({
-	id: z.number().positive()
-});
-
-const petSchemaCreating = z.object({
-	id: z.number().positive().optional(),
-	hero: z.enum(VALID_HEROES),
-	petId: z.number().positive()
-});
-const petSchemaSaving = petSchemaCreating.extend({
-	id: z.number().positive()
-});
-
-const armySchemaCreating = z.object({
-	id: z.number().positive().optional(),
-	name: z.string().min(2).max(25),
-	townHall: z.number().positive(),
-	banner: z.enum(BANNERS),
-	units: z.array(unitSchemaCreating).min(1),
-	// Max 2 equipment per hero (further validation in `validateArmy`)
-	// TODO: move schema into own file, try to do as much as validation in one place as possible
-	// The current issue is that the `validateArmy` validation requires context which wasn't straight
-	// forward when I initially coded this, but may be worth taking a closer look at now
-	equipment: z
-		.array(equipmentSchemaCreating)
-		.max(VALID_HEROES.length * 2)
-		.optional(),
-	// Max 1 pet per hero (further validation in `validateArmy`)
-	pets: z.array(petSchemaCreating).max(VALID_HEROES.length).optional()
-});
-const armySchemaSaving = armySchemaCreating.extend({
-	id: z.number().positive(),
-	units: z.array(unitSchemaSaving).min(1),
-	equipment: z
-		.array(equipmentSchemaSaving)
-		.max(VALID_HEROES.length * 2)
-		.optional(),
-	pets: z.array(petSchemaSaving).max(VALID_HEROES.length).optional()
-});
-
-export async function saveArmy(event: RequestEvent, data: Partial<Army>) {
+export async function saveArmy(event: RequestEvent, data: SaveArmy): Promise<number> {
 	const user = event.locals.requireAuth();
 	const ctx = {
 		units: await getUnits(),
 		townHalls: await getTownHalls(),
 		equipment: await getEquipment(),
-		pets: await getPets()
+		pets: await getPets(),
 	};
 
-	// TODO: fix this (ArmyUnit, ArmyEquipment etc... should either have extra data attached at *all* times or not at all
-	// since it can be derived (more performant but possibly a lot of places need data attached so might be a bit of a pain))
-	function attachExtraData(army: z.infer<typeof armySchemaCreating>) {
-		return {
-			...army,
-			units: army.units.map((u) => {
-				const found = ctx.units.find((u2) => u2.id === u.unitId);
-				if (!found) {
-					throw new Error('Invalid troop');
-				}
-				return { ...u, ...found };
-			}),
-			equipment: (army.equipment ?? []).map((eq) => {
-				const found = ctx.equipment.find((eq2) => eq2.id === eq.equipmentId);
-				if (!found) {
-					throw new Error('Invalid equipment');
-				}
-				return { ...eq, ...found };
-			}),
-			pets: (army.pets ?? []).map((p) => {
-				const found = ctx.pets.find((p2) => p2.id === p.petId);
-				if (!found) {
-					throw new Error('Invalid pet');
-				}
-				return { ...p, ...found };
-			}),
-		};
-	}
+	const army = validateArmy(data, ctx);
+	const { units, equipment, pets } = army;
 
 	if (!data.id) {
 		// Creating army
@@ -402,111 +331,94 @@ export async function saveArmy(event: RequestEvent, data: Partial<Army>) {
 		if (userArmies.length === USER_MAX_ARMIES) {
 			throw new Error(`Maximum armies reached (${USER_MAX_ARMIES}/${USER_MAX_ARMIES})`);
 		}
-		const army = armySchemaCreating.parse(data);
-		const armyExtra = attachExtraData(army);
-		validateArmy(armyExtra, ctx);
 		return db.transaction(async (tx) => {
 			const armyId = await tx.insertOne('armies', {
 				name: army.name,
 				townHall: army.townHall,
 				banner: army.banner,
-				createdBy: user.id
+				createdBy: user.id,
 			});
-			await tx.insertMany(
-				'army_units',
-				army.units.map((unit) => {
-					return {
-						armyId,
-						home: unit.home,
-						unitId: unit.unitId,
-						amount: unit.amount
-					};
-				})
-			);
-			if (army.equipment?.length) {
-				await tx.insertMany(
-					'army_equipment',
-					army.equipment.map((eq) => {
-						return {
-							armyId,
-							equipmentId: eq.equipmentId,
-						};
-					})
-				);
+			const armyUnits = units.map((unit) => {
+				return {
+					armyId,
+					home: unit.home,
+					unitId: unit.unitId,
+					amount: unit.amount,
+				};
+			});
+			const armyEquipment = equipment.map((eq) => {
+				return {
+					armyId,
+					equipmentId: eq.equipmentId,
+				};
+			});
+			const armyPets = pets.map((p) => {
+				return {
+					armyId,
+					hero: p.hero,
+					petId: p.petId,
+				};
+			});
+			await tx.insertMany('army_units', armyUnits);
+			if (army.equipment.length) {
+				// TODO: fix this (insertMany should cope/bail if array is empty)
+				await tx.insertMany('army_equipment', armyEquipment);
 			}
-			if (army.pets?.length) {
-				await tx.insertMany(
-					'army_pets',
-					army.pets.map((p) => {
-						return {
-							armyId,
-							hero: p.hero,
-							petId: p.petId,
-						};
-					})
-				);
+			if (army.pets.length) {
+				// TODO: fix this (insertMany should cope/bail if array is empty)
+				await tx.insertMany('army_pets', armyPets);
 			}
 			return armyId;
 		});
+	}
+
+	// Updating existing army
+	const existing = await db.getRow<Army, null>('armies', { id: army.id });
+	if (!existing) {
+		throw new Error("This army doesn't exist");
+	}
+	if (user.id === existing.createdBy) {
+		// allow user to edit his own army
 	} else {
-		// Updating existing army
-		const army = armySchemaSaving.parse(data);
-		const armyExtra = attachExtraData(army);
-		validateArmy(armyExtra, ctx);
-		const existing = await db.getRow<Army, null>('armies', { id: army.id });
-		if (!existing) {
-			throw new Error("This army doesn't exist");
-		}
-		if (user.id === existing.createdBy) {
-			// allow user to edit his own army
-		} else {
-			// otherwise must be an admin to edit someone elses army
-			event.locals.requireRoles('admin');
-		}
-		return db.transaction(async (tx) => {
-			// Update army
-			await tx.query(
-				`
+		// otherwise must be an admin to edit someone elses army
+		event.locals.requireRoles('admin');
+	}
+	const armyId = numberSchema.parse(army.id);
+	await db.transaction(async (tx) => {
+		// Update army
+		const updateQuery = `
 				UPDATE armies SET
 					name = ?,
 					townHall = ?,
 					banner = ?
 				WHERE id = ?
-			`,
-				[army.name, army.townHall, army.banner, army.id]
-			);
-
-			// Remove deleted units
-			await tx.query('DELETE FROM army_units WHERE armyId = ? AND id NOT IN (?)', [army.id, army.units.map((u) => u.id)]);
-			// Upsert units
-			const unitsData = army.units.map((u) => ({ ...u, armyId: army.id, id: u.id }));
-			await tx.upsert('army_units', unitsData);
-
-			if (army.equipment?.length) {
-				// Remove deleted equipment
-				await tx.query('DELETE FROM army_equipment WHERE armyId = ? AND id NOT IN (?)', [army.id, army.equipment.map((eq) => eq.id)]);
-				// Upsert equipment
-				const equipmentData = army.equipment.map((eq) => ({ ...eq, armyId: army.id, id: eq.id }));
-				await tx.upsert('army_equipment', equipmentData);
-			} else {
-				// Remove equipment in case this army had any before
-				await tx.query('DELETE FROM army_equipment WHERE armyId = ?', [army.id]);
-			}
-
-			if (army.pets?.length) {
-				// Remove deleted pets
-				await tx.query('DELETE FROM army_pets WHERE armyId = ? AND id NOT IN (?)', [army.id, army.pets.map((p) => p.id)]);
-				// Upsert pets
-				const petsData = army.pets.map((p) => ({ ...p, armyId: army.id, id: p.id }));
-				await tx.upsert('army_pets', petsData);
-			} else {
-				// Remove pets in case this army had any before
-				await tx.query('DELETE FROM army_pets WHERE armyId = ?', [army.id]);
-			}
-
-			return army.id;
-		});
-	}
+		`;
+		await tx.query(updateQuery, [army.name, army.townHall, army.banner, armyId]);
+		// Remove deleted units
+		await tx.query('DELETE FROM army_units WHERE armyId = ? AND id NOT IN (?)', [armyId, units.map((u) => u.id ?? null)]);
+		// Upsert units
+		const unitsData = units.map((u) => ({ id: u.id ?? null, armyId, home: u.home, unitId: u.unitId, amount: u.amount }));
+		await tx.upsert('army_units', unitsData);
+		if (equipment.length) {
+			// Remove deleted equipment
+			await tx.query('DELETE FROM army_equipment WHERE armyId = ? AND id NOT IN (?)', [armyId, equipment.map((eq) => eq.id ?? null)]);
+			// Upsert equipment
+			const equipmentData = equipment.map((eq) => ({ id: eq.id ?? null, armyId, equipmentId: eq.equipmentId }));
+			await tx.upsert('army_equipment', equipmentData);
+		} else {
+			await tx.query('DELETE FROM army_equipment WHERE armyId = ?', [armyId]);
+		}
+		if (pets.length) {
+			// Remove deleted pets
+			await tx.query('DELETE FROM army_pets WHERE armyId = ? AND id NOT IN (?)', [armyId, pets.map((p) => p.id ?? null)]);
+			// Upsert pets
+			const petsData = pets.map((p) => ({ id: p.id ?? null, armyId, petId: p.petId, hero: p.hero }));
+			await tx.upsert('army_pets', petsData);
+		} else {
+			await tx.query('DELETE FROM army_pets WHERE armyId = ?', [armyId]);
+		}
+	});
+	return armyId;
 }
 
 export async function deleteArmy(event: RequestEvent, armyId: number) {
@@ -535,7 +447,7 @@ export async function saveVote(event: RequestEvent, data: SaveVoteParams) {
 	const { armyId, vote } = z
 		.object({
 			armyId: z.number(),
-			vote: z.number()
+			vote: z.number(),
 		})
 		.parse(data);
 	if (![-1, 0, 1].includes(vote)) {

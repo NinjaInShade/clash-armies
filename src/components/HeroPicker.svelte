@@ -1,18 +1,18 @@
 <script lang="ts">
 	import { getContext } from 'svelte';
-	import type { AppState, HeroType, Equipment, ArmyEquipment, Pet, ArmyPet, TownHall } from '~/lib/shared/types';
+	import type { Optional, AppState, HeroType, Equipment, ArmyEquipment, Pet, ArmyPet, TownHall } from '~/lib/shared/types';
 	import { getHeroLevel } from '~/lib/shared/utils';
 	import C from '~/components';
 
 	type Props = {
 		hero: HeroType;
 		/** All selected equipment across all heroes */
-		selectedEquipment: ArmyEquipment[];
+		selectedEquipment: Optional<ArmyEquipment, 'id'>[];
 		/** All selected pets across all heroes */
-		selectedPets: ArmyPet[];
+		selectedPets: Optional<ArmyPet, 'id'>[];
 		selectedTownHall: number;
-		getEquipmentLevel(equipment: Equipment | ArmyEquipment, ctx: { th: TownHall; equipment: Equipment[] }): number;
-		getPetLevel(pet: Pet | ArmyPet, ctx: { th: TownHall; pets: Pet[] }): number;
+		getEquipmentLevel(name: string, ctx: { th: TownHall; equipment: Equipment[] }): number;
+		getPetLevel(name: string, ctx: { th: TownHall; pets: Pet[] }): number;
 	};
 	const { hero, selectedEquipment = $bindable(), selectedPets = $bindable(), selectedTownHall, getEquipmentLevel, getPetLevel }: Props = $props();
 	const app = getContext<AppState>('app');
@@ -24,7 +24,7 @@
 	const sortedEquipment = $derived([...allEquipment.filter((eq) => !eq.epic), ...allEquipment.filter((eq) => eq.epic)]);
 	const thData = $derived(app.townHalls.find((th) => th.level === selectedTownHall));
 
-	function getEquipmentTitle(level: number, name: string, selected: ArmyEquipment[]) {
+	function getEquipmentTitle(level: number, name: string, selected: Optional<ArmyEquipment, 'id'>[]) {
 		if (level === -1) {
 			return `This equipment is unable to to be used at town hall ${selectedTownHall}`;
 		}
@@ -37,7 +37,7 @@
 		return undefined;
 	}
 
-	function getPetTitle(level: number, name: string, selected: ArmyPet[]) {
+	function getPetTitle(level: number, name: string, selected: Optional<ArmyPet, 'id'>[]) {
 		if (level === -1) {
 			return `This pet is unable to be used at town hall ${selectedTownHall}`;
 		}
@@ -53,21 +53,17 @@
 	}
 
 	/** Returns if this equipment is equipped for this hero */
-	function equipmentEquipped(name: string, selected: ArmyEquipment[]) {
+	function equipmentEquipped(name: string, selected: Optional<ArmyEquipment, 'id'>[]) {
 		return selected.find((eq) => eq.name === name) !== undefined;
 	}
 
 	/** Returns true if this pet is equipped across *all* heroes */
-	function petEquipped(name: string, selected: ArmyPet[]) {
+	function petEquipped(name: string, selected: Optional<ArmyPet, 'id'>[]) {
 		return selected.find((p) => p.name === name) !== undefined;
 	}
 
-	function addEquipment(equipment: ArmyEquipment) {
-		const _equipment = app.equipment.find((eq) => eq.hero === hero && eq.name === equipment.name);
-		if (!_equipment) {
-			throw new Error(`Unknown equipment: "${equipment.name}"`);
-		}
-		selectedEquipment.push({ ...equipment, equipmentId: _equipment.id });
+	function addEquipment(equipment: Equipment) {
+		selectedEquipment.push({ equipmentId: equipment.id, ...equipment, id: undefined });
 	}
 
 	function removeEquipment(name: string) {
@@ -75,12 +71,8 @@
 		selectedEquipment.splice(existingIndex, 1);
 	}
 
-	function addPet(pet: ArmyPet) {
-		const _pet = app.pets.find((p) => p.name === pet.name);
-		if (!_pet) {
-			throw new Error(`Unknown equipment: "${pet.name}"`);
-		}
-		selectedPets.push({ ...pet, hero, petId: _pet.id });
+	function addPet(pet: Pet) {
+		selectedPets.push({ hero, petId: pet.id, ...pet, id: undefined });
 	}
 
 	function removePet(name: string) {
@@ -126,7 +118,7 @@
 			</ul>
 			<ul class="picker-list">
 				{#each sortedEquipment as equipment}
-					{@const level = thData ? getEquipmentLevel(equipment, { th: thData, equipment: app.equipment }) : -1}
+					{@const level = thData ? getEquipmentLevel(equipment.name, { th: thData, equipment: app.equipment }) : -1}
 					{@const title = getEquipmentTitle(level, equipment.name, _selectedEquipment)}
 					<li>
 						<button
@@ -155,7 +147,7 @@
 				</div>
 				<ul class="picker-list">
 					{#each app.pets as pet}
-						{@const level = thData ? getPetLevel(pet, { th: thData, pets: app.pets }) : -1}
+						{@const level = thData ? getPetLevel(pet.name, { th: thData, pets: app.pets }) : -1}
 						{@const title = getPetTitle(level, pet.name, selectedPets)}
 						{@const equippedHero = selectedPets.find((p) => p.name === pet.name)?.hero}
 						{@const equippedOnDifferentHero = equippedHero !== undefined && equippedHero !== hero}

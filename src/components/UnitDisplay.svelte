@@ -1,11 +1,11 @@
 <script lang="ts">
-	import type { UnitLevel, UnitType } from '~/lib/shared/types';
+	import { getContext } from 'svelte';
+	import type { AppState, UnitType } from '~/lib/shared/types';
 
 	type Props = {
 		name: string;
 		type: UnitType;
 		isSuper: boolean;
-		levels: UnitLevel[];
 		/**
 		 * Title to use for the card
 		 * @default props.name
@@ -19,11 +19,10 @@
 		display?: 'inline' | 'block';
 		level?: number;
 	};
-	const { type, name, isSuper, amount, display, level, title, levels }: Props = $props();
-
-	function isMaxLevel() {
-		return level === Math.max(...levels.map((x) => x.level));
-	}
+	const { type, name, isSuper, amount, display, level, title }: Props = $props();
+	const app = getContext<AppState>('app');
+	const levels = $derived(app.units.find((u) => u.name === name)?.levels ?? []);
+	const isMaxLevel = $derived(level === Math.max(...levels.map((x) => x.level)));
 </script>
 
 <div class="unit-display {display} {type} {isSuper ? 'Super' : ''}" title={title ?? name}>
@@ -31,7 +30,7 @@
 		<b class="unit-amount {display}">x{amount}</b>
 	{/if}
 	{#if level && level > 0}
-		<b class="unit-lvl" class:max-lvl={isMaxLevel()}>{level}</b>
+		<b class="unit-lvl" class:max-lvl={isMaxLevel}>{level}</b>
 	{/if}
 	<img class="unit-img" src="/clash/units/{name}.png" alt="{type}: {name}" />
 </div>

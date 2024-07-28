@@ -1,9 +1,9 @@
 <script lang="ts">
-	import type { PetLevel } from '~/lib/shared/types';
+	import { getContext } from 'svelte';
+	import type { AppState } from '~/lib/shared/types';
 
 	type Props = {
 		name: string;
-		levels: PetLevel[];
 		/**
 		 * Title to use for the card
 		 * @default props.name
@@ -12,11 +12,10 @@
 		amount?: number;
 		level?: number;
 	};
-	const { name, amount, level, title, levels }: Props = $props();
-
-	function isMaxLevel() {
-		return level === Math.max(...levels.map((x) => x.level));
-	}
+	const { name, amount, level, title }: Props = $props();
+	const app = getContext<AppState>('app');
+	const levels = $derived(app.pets.find((p) => p.name === name)?.levels ?? []);
+	const isMaxLevel = $derived(level === Math.max(...levels.map((x) => x.level)));
 </script>
 
 <div class="display" title={title ?? name}>
@@ -24,7 +23,7 @@
 		<b class="amount">x{amount}</b>
 	{/if}
 	{#if level && level > 0}
-		<b class="lvl" class:max={isMaxLevel()}>{level}</b>
+		<b class="lvl" class:max={isMaxLevel}>{level}</b>
 	{/if}
 	<img src="/clash/heroes/pets/{name}.png" alt={name} />
 </div>

@@ -38,6 +38,7 @@ export async function getUsers(opts: GetUsersParams) {
 
 	const users = await db.query<User>(query, args);
 	for (const user of users) {
+		// @ts-expect-error data is a JSON string when it's queried from the database
 		user.roles = JSON.parse(user.roles);
 
 		// TODO: fetch player level (and other stats if added) from clash of clans API if player tag is defined
@@ -62,17 +63,17 @@ export async function getUser(req: Request, username: string) {
 const userSchema = z.object({
 	id: z.number(),
 	username: z.string().trim().min(3).max(30),
-})
+});
 
 export async function saveUser(event: RequestEvent, userData: Partial<User>) {
 	const authUser = event.locals.requireAuth();
 	const user = userSchema.parse(userData);
 	const { username } = user;
 
-	const usernameRe = /^[a-zA-Z0-9_-]+$/
+	const usernameRe = /^[a-zA-Z0-9_-]+$/;
 	const validUsername = usernameRe.test(username);
 	if (!validUsername) {
-		throw new Error("Username can only contain english letters, numbers, underscores and hyphens");
+		throw new Error('Username can only contain english letters, numbers, underscores and hyphens');
 	}
 
 	const existing = await db.getRow<User, null>('users', { id: user.id });
@@ -81,8 +82,8 @@ export async function saveUser(event: RequestEvent, userData: Partial<User>) {
 	}
 
 	const usernameExists = await db.getRows<User>('users', { username });
-	if (usernameExists.find(u => u.id !== user.id)) {
-		throw new Error("This username is already taken");
+	if (usernameExists.find((u) => u.id !== user.id)) {
+		throw new Error('This username is already taken');
 	}
 
 	if (authUser.id === existing.id) {
@@ -98,5 +99,4 @@ export async function saveUser(event: RequestEvent, userData: Partial<User>) {
 		WHERE id = ?
 	`;
 	await db.query(query, [username, user.id]);
-
 }
