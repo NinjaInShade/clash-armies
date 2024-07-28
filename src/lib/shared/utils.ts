@@ -1,4 +1,4 @@
-import type { Army, TownHall, Unit, ArmyUnit } from './types';
+import type { Army, TownHall, Unit, ArmyUnit, Equipment, ArmyEquipment, Pet, ArmyPet, HeroType } from './types';
 
 /**
  * A key:value of which regular troop corresponds to the super version.
@@ -92,6 +92,8 @@ export const BANNERS = [
 
 export const USER_MAX_ARMIES = 40;
 
+export const VALID_HEROES = ['Barbarian King', 'Archer Queen', 'Grand Warden', 'Royal Champion'] as const;
+
 /**
  * Given the passed in units, calculates how much housing space
  * has been used and how long it will take to train the army.
@@ -129,6 +131,16 @@ export function getCcCapacity(th: TownHall | undefined) {
 		return { troops: 0, spells: 0, sieges: 0 };
 	}
 	return { troops: th.ccTroopCapacity, spells: th.ccSpellCapacity, sieges: th.ccSiegeCapacity };
+}
+
+export function hasHero(hero: HeroType, army: Army) {
+	if (army.equipment.find((eq) => eq.hero === hero)) {
+		return true;
+	}
+	if (army.pets.find((pet) => pet.hero === hero)) {
+		return true;
+	}
+	return false;
 }
 
 /**
@@ -236,9 +248,9 @@ export function getCcUnitLevel(unit: Unit | ArmyUnit, ctx: { th: TownHall, units
 	const appUnit = ctx.units.find(u => u.type === type && u.name === name);
 
 	if (!appUnit) {
-		throw new Error(`Expected to find unit "${name}"`)
-	};
-	if (!ctx.th || ctx.th.maxCc === null || unit.name === 'Battle Drill' && ctx.th.maxCc < 9) {
+		throw new Error(`Expected to find unit "${name}"`);
+	}
+	if (!ctx.th || ctx.th.maxCc === null || (unit.name === 'Battle Drill' && ctx.th.maxCc < 9)) {
 		return -1;
 	}
 
@@ -280,30 +292,139 @@ export function getCcUnitLevel(unit: Unit | ArmyUnit, ctx: { th: TownHall, units
 	return maxLevel;
 }
 
-export function hasReachedSuperLimit(units: ArmyUnit[], ctx: { units: Unit[] }) {
+/**
+ * For the equipment given, this calculates the highest level the user has access to
+ * based on the user's blacksmith building level (which is based of the town hall selected)
+ *
+ * @returns highest available equipment level or -1 if player hasn't unlocked it at all
+ */
+export function getEquipmentLevel(equipment: Equipment | ArmyEquipment, ctx: { th: TownHall; equipment: Equipment[] }) {
+	const { name } = equipment;
+	const appEquipment = ctx.equipment.find((eq) => eq.name === name);
+	if (!appEquipment) {
+		throw new Error(`Expected to find equipment "${name}"`);
+	}
+	if (!ctx.th) {
+		return -1;
+	}
+
+
+	if (getHeroLevel(appEquipment.hero, ctx) === -1) {
+		// Check hero is unlocked
+		return -1;
+	}
+
+	let maxLevel = -1;
+	for (const levelData of appEquipment.levels) {
+		if ((levelData.blacksmithLevel ?? -1) > (ctx.th.maxBlacksmith ?? -1)) {
+			return maxLevel;
+		}
+		maxLevel = levelData.level;
+	}
+	return maxLevel;
+}
+
+/**
+ * For the equipment given, this calculates the highest level the user has access to
+ * based on the user's pet house building level (which is based of the town hall selected)
+ *
+ * @returns highest available pet level or -1 if player hasn't unlocked it at all
+ */
+export function getPetLevel(pet: Pet | ArmyPet, ctx: { th: TownHall; pets: Pet[] }) {
+	const { name } = pet;
+	const appPet = ctx.pets.find((p) => p.name === name);
+	if (!appPet) {
+		throw new Error(`Expected to find pet "${name}"`);
+	}
+	if (!ctx.th) {
+		return -1;
+	}
+	const prodLevel = ctx.th.maxPetHouse;
+	if (prodLevel === null) {
+		// Pet house is not unlocked at this town hall
+		return -1;
+	}
+
+	let maxLevel = -1;
+	for (const levelData of appPet.levels) {
+		if ((levelData.petHouseLevel ?? -1) > prodLevel) {
+			return maxLevel;
+		}
+		maxLevel = levelData.level;
+	}
+	return maxLevel;
+}
+
+export function getHeroLevel(hero: HeroType, ctx: { th: TownHall }) {
+	if (!VALID_HEROES.includes(hero)) {
+		return -1;
+	}
+	if (hero === 'Barbarian King') {
+		return ctx.th.maxBarbarianKing ?? -1;
+	}
+	if (hero === 'Archer Queen') {
+		return ctx.th.maxArcherQueen ?? -1;
+	}
+	if (hero === 'Grand Warden') {
+		return ctx.th.maxGrandWarden ?? -1;
+	}
+	if (hero === 'Royal Champion') {
+		return ctx.th.maxRoyalChampion ?? -1;
+	}
+	// Should never happen?
+	return -1;
+}
+
+export function getSuperTroopCount(units: ArmyUnit[], ctx: { units: Unit[] }) {
 	const troopUnits = units.filter((x) => x.type === 'Troop');
 	const superTroops = troopUnits.filter((troop) => {
 		const appUnit = ctx.units.find((x) => x.type === troop.type && x.name === troop.name);
 		return appUnit?.isSuper;
 	});
-	return superTroops.length >= 2;
+	return superTroops.length;
+}
+
+function findDuplicateUnits(units: Unit[]) {
+	const seen = new Set();
+	const duplicates = new Set();
+	for (const obj of units) {
+		if (seen.has(obj.name)) {
+			duplicates.add(obj.name);
+		} else {
+			seen.add(obj.name);
+		}
+	}
+	return Array.from(duplicates);
 }
 
 /**
  * Ensures the armies units/capacity is valid for the town hall level
  */
-export function validateArmy(army: Partial<Army>, ctx: { townHalls: TownHall[], units: Unit[] }) {
-	const th = ctx.townHalls.find(t => t.level === army.townHall);
+export function validateArmy(army: Partial<Army>, ctx: { townHalls: TownHall[]; units: Unit[]; equipment: Equipment[]; pets: Pet[] }) {
+	const th = ctx.townHalls.find((t) => t.level === army.townHall);
 	if (!th) {
-		throw new Error(`Expected to find data for town hall"${army.townHall}`)
+		throw new Error(`Expected to find data for town hall "${army.townHall}`);
 	}
 
 	if (!army.units) {
 		throw new Error('Expected units');
 	}
 
-	const units = army.units.filter(unit => unit.home === 'armyCamp');
-	const ccUnits = army.units.filter(unit => unit.home === 'clanCastle');
+	const units = army.units.filter((unit) => unit.home === 'armyCamp');
+	const ccUnits = army.units.filter((unit) => unit.home === 'clanCastle');
+	const equipment = army.equipment ?? [];
+	const pets = army.pets ?? [];
+
+	// Check for duplicate units
+	const duplicateUnits = findDuplicateUnits(units);
+	if (duplicateUnits.length) {
+		throw new Error(`Duplicate unit "${duplicateUnits[0]}" found`);
+	}
+	// Check for duplicate cc units
+	const duplicateCcUnits = findDuplicateUnits(ccUnits);
+	if (duplicateCcUnits.length) {
+		throw new Error(`Duplicate clan castle unit "${duplicateCcUnits[0]}" found`);
+	}
 
 	// Check totals don't overflow max town hall capacity
 	const totals = getTotals(units);
@@ -329,23 +450,70 @@ export function validateArmy(army: Partial<Army>, ctx: { townHalls: TownHall[], 
 	}
 
 	// Check we haven't exceeded the super limit (max 2 unique super troops per army)
-	if (hasReachedSuperLimit(units, ctx)) {
-		throw new Error(`An army can have a maximum of two unique super troops`)
+	if (getSuperTroopCount(units, ctx) > 2) {
+		throw new Error(`An army can have a maximum of two unique super troops`);
 	}
 
 	// Check units can all be selected
 	for (const unit of units) {
-		const level = getUnitLevel(unit, { ...ctx, th });
-		if (level === -1) {
+		if (getUnitLevel(unit, { ...ctx, th }) === -1) {
 			throw new Error(`Unit "${unit.name}" isn't available at town hall ${army.townHall}`);
 		}
 	}
 	// Check cc units can all be selected
 	for (const unit of ccUnits) {
-		const level = getCcUnitLevel(unit, { ...ctx, th });
-		if (level === -1) {
+		if (getCcUnitLevel(unit, { ...ctx, th }) === -1) {
 			throw new Error(`Clan castle unit "${unit.name}" isn't available at town hall ${army.townHall}`);
 		}
+	}
+
+	const heroToEquipment: Record<string, string[]> = {};
+	for (const eq of equipment) {
+		const hero = eq.hero.toLowerCase();
+		const stashedEquipment = heroToEquipment[eq.hero] ?? [];
+		const appEq = ctx.equipment.find((e) => e.name === eq.name);
+		if (!appEq) {
+			throw new Error(`Couldn't find equipment "${eq.name}"`);
+		}
+		if (eq.hero !== appEq.hero) {
+			throw new Error(`Equipment "${eq.name}" cannot be equipped on the ${hero}`);
+		}
+		if (stashedEquipment.includes(eq.name)) {
+			throw new Error(`Duplicate equipment "${eq.name}" on ${hero}`);
+		}
+		if (stashedEquipment.length === 2) {
+			throw new Error(`Hero ${hero} cannot have more than two pieces of equipment`);
+		}
+		if (getHeroLevel(eq.hero, { th }) === -1) {
+			throw new Error(`Equipment "${eq.name}" can't be used as the ${hero} isn't unlocked at town hall ${army.townHall}`);
+		}
+		if (getEquipmentLevel(eq, { ...ctx, th }) === -1) {
+			throw new Error(`Equipment "${eq.name}" isn't available at town hall ${army.townHall}`);
+		}
+		heroToEquipment[eq.hero] = [...stashedEquipment, eq.name];
+	}
+
+	const heroToPets: Record<string, string[]> = {};
+	for (const pet of pets) {
+		const hero = pet.hero.toLowerCase();
+		const stashedPets = heroToPets[pet.hero] ?? [];
+		if (stashedPets.length === 1) {
+			throw new Error(`Hero ${hero} cannot have more than one pet`);
+		}
+		if (
+			Object.values(heroToPets)
+				.flatMap((p) => p)
+				.includes(pet.name)
+		) {
+			throw new Error(`Pet "${pet.name}" has already been assigned to another hero`);
+		}
+		if (getHeroLevel(pet.hero, { th }) === -1) {
+			throw new Error(`Pet "${pet.name}" can't be used as the ${hero} isn't unlocked at town hall ${army.townHall}`);
+		}
+		if (getPetLevel(pet, { ...ctx, th }) === -1) {
+			throw new Error(`Pet "${pet.name}" isn't available at town hall ${army.townHall}`);
+		}
+		heroToPets[pet.hero] = [...stashedPets, pet.name];
 	}
 
 	return army;

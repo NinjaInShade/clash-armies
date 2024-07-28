@@ -63,6 +63,12 @@ export type TownHall = {
 	maxDarkSpellFactory: number | null;
 	maxWorkshop: number | null;
 	maxCc: number | null;
+	maxBlacksmith: number | null;
+	maxPetHouse: number | null;
+	maxBarbarianKing: number | null;
+	maxArcherQueen: number | null;
+	maxGrandWarden: number | null;
+	maxRoyalChampion: number | null;
 	troopCapacity: number;
 	spellCapacity: number;
 	siegeCapacity: number;
@@ -73,7 +79,14 @@ export type TownHall = {
 };
 
 export type UnitType = 'Troop' | 'Siege' | 'Spell';
+export type HeroType = 'Barbarian King' | 'Archer Queen' | 'Grand Warden' | 'Royal Champion';
 
+export type BlackSmithLevel = {
+	id: number;
+	level: number;
+	maxCommon: number;
+	maxEpic: number;
+}
 export type UnitLevel = {
 	id: number;
 	unitId: number;
@@ -81,6 +94,17 @@ export type UnitLevel = {
 	spellFactoryLevel: number | null;
 	barrackLevel: number | null;
 	laboratoryLevel: number | null;
+}
+export type EquipmentLevel = {
+	equipmentId: number;
+	level: number;
+	blacksmithLevel: number | null;
+}
+export type PetLevel = {
+	id: number;
+	petId: number;
+	level: number;
+	petHouseLevel: number | null;
 }
 
 export type Unit = {
@@ -99,9 +123,24 @@ export type Unit = {
 	groundTargets: boolean;
 	levels: UnitLevel[];
 }
+export type Equipment = {
+	/** ID of the hero equipment in the `equipment` table */
+	id: number;
+	/** Which hero this equipment can be applied to */
+	hero: HeroType;
+	name: string;
+	epic: boolean;
+	levels: EquipmentLevel[];
+}
+export type Pet = {
+	/** ID of the pet in the `pets` table */
+	id: number;
+	name: string;
+	levels: PetLevel[];
+}
 
 /**
- * An army unit with complete data.
+ * Selected army unit with complete data.
  */
 export type ArmyUnit = Unit & {
 	/** ID of the unit in the `army_units` table */
@@ -113,6 +152,30 @@ export type ArmyUnit = Unit & {
 	amount: number;
 	levels: never;
 };
+/**
+ * Selected army equipment with complete data
+ */
+export type ArmyEquipment = Equipment & {
+	/** ID of the equipment in the `army_equipment` table */
+	id: number;
+	armyId: number;
+	/** ID of the equipment in the `equipment` table */
+	equipmentId: number;
+	levels: never;
+}
+/**
+ * Selected army pet with complete data
+ */
+export type ArmyPet = Pet & {
+	/** ID of the pet in the `army_pets` table */
+	id: number;
+	/** Which hero this pet is assigned to */
+	hero: HeroType;
+	armyId: number;
+	/** ID of the equipment in the `pets` table */
+	petId: number;
+	levels: never;
+}
 
 /**
  * A complete saved army
@@ -123,6 +186,8 @@ export type Army = {
 	townHall: number;
 	banner: Banner;
 	units: ArmyUnit[];
+	equipment: ArmyEquipment[];
+	pets: ArmyPet[];
 	username: string;
 	createdBy: number;
 	createdTime: string;
@@ -150,6 +215,8 @@ export type AppState = {
 	// Frequently used data (cache)
 	units: Unit[];
 	townHalls: TownHall[];
+	equipment: Equipment[];
+	pets: Pet[];
 	user: (User & UserUtils) | null;
 	// Modals
 	modals: Modal[];

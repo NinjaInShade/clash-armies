@@ -14,6 +14,8 @@ export function requireHTML() {
 export function createAppState(initial: Omit<AppState, 'modals' | 'notifications' | 'openModal' | 'openModalAsync' | 'notify' | 'confirm'>) {
 	let units = $state<AppState['units']>(initial.units);
 	let townHalls = $state<AppState['townHalls']>(initial.townHalls);
+	let equipment = $state<AppState['equipment']>(initial.equipment);
+	let pets = $state<AppState['pets']>(initial.pets);
 	let user = $state<AppState['user']>(initial.user);
 	let modals = $state<AppState['modals']>([]);
 	let notifications = $state<AppState['notifications']>([]);
@@ -30,6 +32,18 @@ export function createAppState(initial: Omit<AppState, 'modals' | 'notifications
 		},
 		set units(newUnits: AppState['units']) {
 			units = newUnits;
+		},
+		get equipment() {
+			return equipment;
+		},
+		set equipment(newEquipment: AppState['equipment']) {
+			equipment = newEquipment;
+		},
+		get pets() {
+			return pets;
+		},
+		set pets(newPets: AppState['pets']) {
+			pets = newPets;
 		},
 		get user() {
 			return user;

@@ -1,9 +1,21 @@
 <script lang="ts">
 	import { getContext } from 'svelte';
 	import { invalidateAll, goto } from '$app/navigation';
-	import { getTotals, getCapacity, getCcCapacity, BANNERS, getUnitLevel, getCcUnitLevel } from '~/lib/shared/utils';
-	import type { AppState, Army, ArmyUnit, Banner, FetchErrors } from '~/lib/shared/types';
+	import {
+		VALID_HEROES,
+		getTotals,
+		getCapacity,
+		getCcCapacity,
+		BANNERS,
+		getUnitLevel,
+		getCcUnitLevel,
+		getEquipmentLevel,
+		getPetLevel,
+		getHeroLevel
+	} from '~/lib/shared/utils';
+	import type { AppState, Army, ArmyUnit, ArmyEquipment, ArmyPet, Banner, FetchErrors } from '~/lib/shared/types';
 	import AddClanCastle from './AddClanCastle.svelte';
+	import AddHeroes from './AddHeroes.svelte';
 	import C from '~/components';
 
 	type Props = { army?: Army };
@@ -17,11 +29,14 @@
 	let name = $state<string | null>(army?.name ?? null);
 	let units = $state<ArmyUnit[]>(army?.units?.filter((unit) => unit.home === 'armyCamp') ?? []);
 	let ccUnits = $state<ArmyUnit[]>(army?.units?.filter((unit) => unit.home === 'clanCastle') ?? []);
+	let equipment = $state<ArmyEquipment[]>(army?.equipment ?? []);
+	let pets = $state<ArmyPet[]>(army?.pets ?? []);
 
 	// Other state
 	let errors = $state<FetchErrors | null>(null);
 	let saveDisabled = $derived(!name || name.length < 2 || name.length > 25 || !units.length);
 	let showClanCastle = $state<boolean>(ccUnits.length > 0);
+	let showHeroes = $state<boolean>(equipment.length > 0 || pets.length > 0);
 
 	const thData = $derived(app.townHalls.find((th) => th.level === townHall));
 	const capacity = $derived.by(() => getCapacity(thData));
@@ -33,6 +48,10 @@
 		showClanCastle = true;
 	}
 
+	function addHeroes() {
+		showHeroes = true;
+	}
+
 	async function removeClanCastle() {
 		if (ccUnits.length) {
 			const confirmed = await app.confirm('Removing the clan castle will clear all clan castle units. Remove anyway?');
@@ -40,6 +59,16 @@
 		}
 		ccUnits = [];
 		showClanCastle = false;
+	}
+
+	async function removeHeroes() {
+		if (equipment.length || pets.length) {
+			const confirmed = await app.confirm('Removing heroes will clear all equipment and pets. Remove anyway?');
+			if (!confirmed) return;
+		}
+		equipment = [];
+		pets = [];
+		showHeroes = false;
 	}
 
 	function editBanner() {
@@ -54,9 +83,12 @@
 			throw new Error(`Town hall ${value} doesn't exist`);
 		}
 		if (value < townHall && units.length) {
-			const confirmed = await app.confirm('You are selecting a lower town hall, units will be cleared. Select anyway?');
+			const confirmed = await app.confirm('You are selecting a lower town hall, all selections will be cleared. Select anyway?');
 			if (confirmed) {
 				units = [];
+				ccUnits = [];
+				equipment = [];
+				pets = [];
 			} else {
 				return;
 			}
@@ -65,7 +97,7 @@
 	}
 
 	async function saveArmy() {
-		const data = { id: army?.id, name, units: [...units, ...ccUnits], banner, townHall };
+		const data = { id: army?.id, name, units: [...units, ...ccUnits], equipment, pets, banner, townHall };
 		const response = await fetch('/armies', {
 			method: 'POST',
 			body: JSON.stringify(data),
@@ -151,22 +183,32 @@
 	</div>
 </section>
 
-{#if thData && thData.maxCc !== null}
-	<section class="dashed units cc">
-		{#if showClanCastle}
-			<div>
-				<div class="title">
-					<h2>
-						<img src="/clash/ui/clan-castle.png" alt="Clash of clans clan castle" />
-						Clan castle
-						<C.ActionButton theme="danger" onclick={removeClanCastle} class="cc-remove-btn">Remove</C.ActionButton>
-					</h2>
-					<C.UnitTotals used={ccHousingSpaceUsed} capacity={ccCapacity} showTime={false} />
-				</div>
-				<C.UnitsList bind:selectedUnits={ccUnits} unitsRemovable />
+<section class="dashed units cc">
+	{#if thData && thData.maxCc !== null && showClanCastle}
+		<div>
+			<div class="title">
+				<h2>
+					<img src="/clash/ui/clan-castle.png" alt="Clash of clans clan castle" />
+					Clan castle
+					<C.ActionButton theme="danger" onclick={removeClanCastle} class="cc-remove-btn">Remove</C.ActionButton>
+				</h2>
+				<C.UnitTotals used={ccHousingSpaceUsed} capacity={ccCapacity} showTime={false} />
+			</div>
+			<C.UnitsList bind:selectedUnits={ccUnits} unitsRemovable />
+			<div class="picker-container">
+				<C.UnitsPicker
+					type="Troop"
+					capacity={ccCapacity}
+					getUnitLevel={getCcUnitLevel}
+					bind:selectedUnits={ccUnits}
+					housedIn="clanCastle"
+					selectedTownHall={townHall}
+				/>
+			</div>
+			{#if ccCapacity.spells > 0}
 				<div class="picker-container">
 					<C.UnitsPicker
-						type="Troop"
+						type="Spell"
 						capacity={ccCapacity}
 						getUnitLevel={getCcUnitLevel}
 						bind:selectedUnits={ccUnits}
@@ -174,36 +216,47 @@
 						selectedTownHall={townHall}
 					/>
 				</div>
-				{#if ccCapacity.spells > 0}
-					<div class="picker-container">
-						<C.UnitsPicker
-							type="Spell"
-							capacity={ccCapacity}
-							getUnitLevel={getCcUnitLevel}
-							bind:selectedUnits={ccUnits}
-							housedIn="clanCastle"
-							selectedTownHall={townHall}
-						/>
-					</div>
-				{/if}
-				{#if ccCapacity.sieges > 0}
-					<div class="picker-container">
-						<C.UnitsPicker
-							type="Siege"
-							capacity={ccCapacity}
-							getUnitLevel={getCcUnitLevel}
-							bind:selectedUnits={ccUnits}
-							housedIn="clanCastle"
-							selectedTownHall={townHall}
-						/>
-					</div>
-				{/if}
+			{/if}
+			{#if ccCapacity.sieges > 0}
+				<div class="picker-container">
+					<C.UnitsPicker
+						type="Siege"
+						capacity={ccCapacity}
+						getUnitLevel={getCcUnitLevel}
+						bind:selectedUnits={ccUnits}
+						housedIn="clanCastle"
+						selectedTownHall={townHall}
+					/>
+				</div>
+			{/if}
+		</div>
+	{:else}
+		<AddClanCastle onClick={addClanCastle} selectedTownHall={townHall} />
+	{/if}
+</section>
+
+<section class="dashed units heroes">
+	{#if thData && thData.maxBarbarianKing !== null && showHeroes}
+		<div>
+			<div class="title">
+				<h2>
+					<img src="/clash/heroes/Barbarian King.png" alt="Clash of clans barbarian king hero" />
+					Heroes
+					<C.ActionButton theme="danger" onclick={removeHeroes} class="cc-remove-btn">Remove</C.ActionButton>
+				</h2>
 			</div>
-		{:else}
-			<AddClanCastle onClick={addClanCastle} />
-		{/if}
-	</section>
-{/if}
+			{#each VALID_HEROES as hero}
+				{#if thData && getHeroLevel(hero, { th: thData }) !== -1}
+					<div class="hero-picker-container">
+						<C.HeroPicker {hero} bind:selectedEquipment={equipment} bind:selectedPets={pets} selectedTownHall={townHall} {getEquipmentLevel} {getPetLevel} />
+					</div>
+				{/if}
+			{/each}
+		</div>
+	{:else}
+		<AddHeroes onClick={addHeroes} selectedTownHall={townHall} />
+	{/if}
+</section>
 
 {#if errors}
 	<div class="errors">
@@ -338,20 +391,33 @@
 		--bottom-padding: 16px;
 		margin-top: 32px;
 	}
+	.units:global(:has(> .not-added)) {
+		margin-top: 24px;
+	}
 	.units .title {
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
 		padding: 0 24px;
 	}
-	.picker-container {
+	.picker-container,
+	.hero-picker-container {
 		padding: 0 32px;
 	}
 	.picker-container:not(:last-child) {
 		padding-bottom: 16px;
 	}
+	.hero-picker-container:not(:last-child) {
+		border-bottom: 1px dashed var(--grey-500);
+	}
 	.units > div {
 		padding-bottom: 24px;
+	}
+	.units.heroes > div {
+		padding-bottom: 0;
+	}
+	.units.heroes h2 {
+		margin-bottom: 0;
 	}
 	.units :global(h3) {
 		font-size: var(--fs);
@@ -393,6 +459,7 @@
 
 	@media (max-width: 650px) {
 		.units .title {
+			display: inline-flex;
 			flex-flow: column nowrap;
 			gap: 0px;
 		}
@@ -400,7 +467,7 @@
 			margin: 0;
 			width: 100%;
 		}
-		.units h2 {
+		.units:not(.heroes) h2 {
 			border-bottom: none;
 			padding-bottom: 0;
 		}
@@ -426,7 +493,8 @@
 		.units .title {
 			padding: 0 16px;
 		}
-		.picker-container {
+		.picker-container,
+		.hero-picker-container {
 			padding: 0 24px;
 		}
 	}

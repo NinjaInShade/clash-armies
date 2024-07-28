@@ -285,6 +285,8 @@ a:focus {
 
 button:disabled {
 	cursor: not-allowed;
+}
+button:disabled, button.visually-disabled {
 	opacity: 0.5;
 }
 

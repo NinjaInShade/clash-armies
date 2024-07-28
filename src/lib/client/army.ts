@@ -1,5 +1,5 @@
 import type { AppState, Army, ArmyUnit, SvelteComponentGeneric } from '~/lib/shared/types';
-import { SECOND, MINUTE, HOUR, OBJECT_ID_PREFIXES } from '~/lib/shared/utils';
+import { SECOND, MINUTE, HOUR, OBJECT_ID_PREFIXES, VALID_HEROES, hasHero } from '~/lib/shared/utils';
 import C from '~/components';
 
 /**
@@ -126,6 +126,10 @@ export function getTags(army: Army) {
 	const hasClanCastle = army.units.filter(unit => unit.home === 'clanCastle').length > 0;
 	if (hasClanCastle) {
 		tags.push({ label: 'Clan castle', icon: C.IconTagsClanCastle })
+	}
+	const hasHeroes = VALID_HEROES.some(hero => hasHero(hero, army));
+	if (hasHeroes) {
+		tags.push({ label: 'Heroes', icon: C.IconTagsHeroes })
 	}
 	if (army.guideId) {
 		//  TODO: guide system

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { getContext } from 'svelte';
-	import { getTotals, hasReachedSuperLimit, HOLD_ADD_SPEED } from '~/lib/shared/utils';
+	import { getTotals, getSuperTroopCount, HOLD_ADD_SPEED } from '~/lib/shared/utils';
 	import type { AppState, Unit, ArmyUnit, UnitType, TownHall, Totals } from '~/lib/shared/types';
 	import C from '~/components';
 
@@ -33,7 +33,7 @@
 			return;
 		}
 		// Disable if reached max unique super limit and this troop isn't one already selected
-		return unit.isSuper && !selected.find((u) => u.name === unit.name) && hasReachedSuperLimit(selected, { units: app.units });
+		return unit.isSuper && !selected.find((u) => u.name === unit.name) && getSuperTroopCount(selected, { units: app.units }) >= 2;
 	}
 
 	function willOverflowHousingSpace(unit: ArmyUnit) {

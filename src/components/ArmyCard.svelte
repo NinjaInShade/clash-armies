@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { getContext } from 'svelte';
 	import type { Army, AppState } from '~/lib/shared/types';
-	import { getTotals, getCapacity } from '~/lib/shared/utils';
+	import { VALID_HEROES, getTotals, getCapacity, hasHero } from '~/lib/shared/utils';
 	import { getTags, copyLink, openInGame, getCopyBtnTitle, getOpenBtnTitle } from '~/lib/client/army';
 	import C from '~/components';
 
@@ -22,14 +22,26 @@
 	let userVote = $state<number>(army.userVote ?? 0);
 </script>
 
+{#snippet extraUnits()}
+	{#if ccUnits.length > 0}
+		<li class="clan-castle">
+			<img src="/clash/ui/clan-castle.png" alt="Clash of clans clan castle" title="Has clan castle" />
+		</li>
+	{/if}
+	{#each VALID_HEROES as hero}
+		{#if hasHero(hero, army)}
+			<li>
+				<C.HeroDisplay name={hero} />
+			</li>
+		{/if}
+	{/each}
+{/snippet}
+
 <li class="army-card">
 	<div class="header">
-		<div>
+		<div class="top">
 			<a class="title-container" href="/armies/{army.id}">
 				<img src="/clash/town-halls/{army.townHall}.png" alt="Town hall {army.townHall}" class="town-hall" title="Town hall {army.townHall}" />
-				<!-- {#if ccUnits.length > 0}
-					<img src="/clash/ui/clan-castle.png" alt="Clash of clans clan castle" class="clan-castle" title="Has clan castle" />
-				{/if} -->
 				<h3>{army.name}</h3>
 			</a>
 			<ul class="tags">
@@ -55,7 +67,7 @@
 			</div>
 		</div>
 	</div>
-	<C.UnitsList selectedUnits={units} display="block" />
+	<C.UnitsList selectedUnits={units} display="block" {extraUnits} />
 	<div class="controls">
 		<div></div>
 		<div>
@@ -94,6 +106,8 @@
 
 <style>
 	.army-card {
+		--hero-height: 74.5px;
+		--hero-width: 56px;
 		--unit-size: 56px;
 		--unit-amount-size: 14px;
 		--unit-lvl-size: 13px;
@@ -112,6 +126,11 @@
 		padding: 10px 16px;
 		gap: 0.75em;
 	}
+	.header .top {
+		display: flex;
+		flex-flow: column;
+		align-items: flex-start;
+	}
 	.header .title-container {
 		display: flex;
 		align-items: center;
@@ -124,16 +143,12 @@
 		line-height: 18px;
 		margin-left: 2px;
 	}
-	.header .town-hall,
-	.header .clan-castle {
+	.header .town-hall {
 		flex-shrink: 0;
 		width: auto;
 	}
 	.header .town-hall {
 		max-height: 26px;
-	}
-	.header .clan-castle {
-		max-height: 23px;
 	}
 	.header .right,
 	.header .actions {
@@ -189,6 +204,7 @@
 		gap: 4px;
 	}
 	.header .tags li :global(svg) {
+		display: block;
 		flex-shrink: 0;
 	}
 
@@ -211,6 +227,20 @@
 		gap: 0.5em;
 	}
 
+	.clan-castle {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		background-color: #3d3d3d;
+		border-radius: 4px;
+		padding: 4px;
+		width: var(--unit-size);
+	}
+	.clan-castle img {
+		max-height: 48px;
+		width: auto;
+	}
+
 	@media (max-width: 850px) {
 		.army-card {
 			--unit-amount-size: 14px;
@@ -218,7 +248,7 @@
 		}
 	}
 
-	@media (max-width: 775px) {
+	@media (max-width: 815px) {
 		.header {
 			flex-flow: column nowrap;
 			align-items: flex-start;

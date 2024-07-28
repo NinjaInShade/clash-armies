@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { getContext } from 'svelte';
-	import { goto, invalidate } from '$app/navigation';
-	import { getTotals, getCapacity, getCcCapacity } from '~/lib/shared/utils';
+	import { goto } from '$app/navigation';
+	import { VALID_HEROES, getTotals, getCapacity, getCcCapacity, hasHero } from '~/lib/shared/utils';
 	import { copyLink, openInGame, getTags, getCopyBtnTitle, getOpenBtnTitle } from '~/lib/client/army';
 	import type { Army, AppState, FetchErrors } from '~/lib/shared/types';
 	import C from '~/components';
@@ -14,11 +14,14 @@
 	const thData = $derived(app.townHalls.find((th) => th.level === army.townHall));
 	const units = $derived(army.units.filter((unit) => unit.home === 'armyCamp'));
 	const ccUnits = $state(army.units.filter((unit) => unit.home === 'clanCastle'));
+	const equipment = $state(army.equipment);
+	const pets = $state(army.pets);
 	const capacity = $derived.by(() => getCapacity(thData));
 	const ccCapacity = $derived.by(() => getCcCapacity(thData));
 	const housingSpaceUsed = $derived.by(() => getTotals(units));
 	const ccHousingSpaceUsed = $derived.by(() => getTotals(ccUnits));
 	const showClanCastle = $state<boolean>(ccUnits.length > 0);
+	const showHeroes = $state<boolean>(VALID_HEROES.some((hero) => hasHero(hero, army)));
 
 	let errors = $state<FetchErrors | null>(null);
 	let votes = $state<number>(army.votes);
@@ -134,6 +137,26 @@
 	</section>
 {/if}
 
+{#if showHeroes}
+	<section class="dashed units heroes">
+		<div class="top">
+			<div>
+				<h2 class="dashed">
+					<img src="/clash/heroes/Barbarian King.png" alt="Clash of clans barbarian king hero" />
+					Heroes
+				</h2>
+			</div>
+			<div class="heroes-list">
+				{#each VALID_HEROES as hero}
+					{#if hasHero(hero, army)}
+						<C.HeroDisplayFull {hero} selectedEquipment={equipment} selectedPets={pets} />
+					{/if}
+				{/each}
+			</div>
+		</div>
+	</section>
+{/if}
+
 {#if errors}
 	<div class="errors">
 		<C.Errors {errors} />
@@ -223,12 +246,14 @@
 	}
 	.banner-content .left .tags {
 		display: flex;
+		flex-flow: row wrap;
 		gap: 6px;
 	}
 	.banner-content .left .tags li {
 		display: flex;
 		align-items: center;
 		text-transform: uppercase;
+		white-space: nowrap;
 		background-color: #4c4538;
 		color: #e0a553;
 		font-size: 12px;
@@ -286,7 +311,8 @@
 		--bottom-padding: 0;
 		margin-top: 48px;
 	}
-	.units.cc {
+	.units.cc,
+	.units.heroes {
 		margin-top: 32px;
 	}
 	.units .top {
@@ -336,9 +362,28 @@
 		margin-top: 24px;
 	}
 
+	.heroes-list {
+		--hero-height: 100px;
+		--unit-size: 48px;
+		display: flex;
+		justify-content: flex-start;
+		align-items: flex-start;
+		flex-wrap: wrap;
+		padding: 0 8px;
+		column-gap: 32px;
+		row-gap: 24px;
+	}
+
 	/* ERRORS */
 	.errors {
 		margin-top: 24px;
+	}
+
+	@media (max-width: 1000px) {
+		.heroes-list {
+			display: grid;
+			grid-template-columns: repeat(2, auto);
+		}
 	}
 
 	@media (max-width: 850px) {
@@ -347,6 +392,11 @@
 			--unit-amount-size: 14px;
 			--unit-lvl-size: 11px;
 			margin-top: 36px;
+		}
+		.heroes-list {
+			--hero-height: 90px;
+			--unit-size: 42.5px;
+			column-gap: 24px;
 		}
 		.errors {
 			margin-top: 16px;
@@ -401,11 +451,8 @@
 		.banner-img {
 			height: 550px;
 		}
-		.controls :global(.action-btn) {
-			justify-content: center;
-			width: 100%;
-		}
 		.title {
+			display: inline-flex;
 			flex-flow: column nowrap;
 			gap: 0;
 		}
@@ -426,7 +473,20 @@
 		}
 	}
 
+	@media (max-width: 475px) {
+		.heroes-list {
+			--hero-height: 84px;
+			--unit-size: 40px;
+			grid-template-columns: repeat(1, auto);
+			row-gap: 16px;
+		}
+	}
+
 	@media (max-width: 400px) {
+		.controls :global(.action-btn) {
+			justify-content: center;
+			width: 100%;
+		}
 		.units .controls {
 			flex-flow: column nowrap;
 		}

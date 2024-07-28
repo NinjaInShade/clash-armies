@@ -1,0 +1,482 @@
+{
+    "Lassi": [
+        {
+            "level": 1,
+            "petHouseLevel": 1
+        },
+        {
+            "level": 2,
+            "petHouseLevel": 1
+        },
+        {
+            "level": 3,
+            "petHouseLevel": 1
+        },
+        {
+            "level": 4,
+            "petHouseLevel": 1
+        },
+        {
+            "level": 5,
+            "petHouseLevel": 1
+        },
+        {
+            "level": 6,
+            "petHouseLevel": 1
+        },
+        {
+            "level": 7,
+            "petHouseLevel": 1
+        },
+        {
+            "level": 8,
+            "petHouseLevel": 1
+        },
+        {
+            "level": 9,
+            "petHouseLevel": 1
+        },
+        {
+            "level": 10,
+            "petHouseLevel": 1
+        },
+        {
+            "level": 11,
+            "petHouseLevel": 5
+        },
+        {
+            "level": 12,
+            "petHouseLevel": 5
+        },
+        {
+            "level": 13,
+            "petHouseLevel": 5
+        },
+        {
+            "level": 14,
+            "petHouseLevel": 5
+        },
+        {
+            "level": 15,
+            "petHouseLevel": 5
+        }
+    ],
+    "Electro Owl": [
+        {
+            "level": 1,
+            "petHouseLevel": 2
+        },
+        {
+            "level": 2,
+            "petHouseLevel": 2
+        },
+        {
+            "level": 3,
+            "petHouseLevel": 2
+        },
+        {
+            "level": 4,
+            "petHouseLevel": 2
+        },
+        {
+            "level": 5,
+            "petHouseLevel": 2
+        },
+        {
+            "level": 6,
+            "petHouseLevel": 2
+        },
+        {
+            "level": 7,
+            "petHouseLevel": 2
+        },
+        {
+            "level": 8,
+            "petHouseLevel": 2
+        },
+        {
+            "level": 9,
+            "petHouseLevel": 2
+        },
+        {
+            "level": 10,
+            "petHouseLevel": 2
+        },
+        {
+            "level": 11,
+            "petHouseLevel": 9
+        },
+        {
+            "level": 12,
+            "petHouseLevel": 9
+        },
+        {
+            "level": 13,
+            "petHouseLevel": 9
+        },
+        {
+            "level": 14,
+            "petHouseLevel": 9
+        },
+        {
+            "level": 15,
+            "petHouseLevel": 9
+        }
+    ],
+    "Mighty Yak": [
+        {
+            "level": 1,
+            "petHouseLevel": 3
+        },
+        {
+            "level": 2,
+            "petHouseLevel": 3
+        },
+        {
+            "level": 3,
+            "petHouseLevel": 3
+        },
+        {
+            "level": 4,
+            "petHouseLevel": 3
+        },
+        {
+            "level": 5,
+            "petHouseLevel": 3
+        },
+        {
+            "level": 6,
+            "petHouseLevel": 3
+        },
+        {
+            "level": 7,
+            "petHouseLevel": 3
+        },
+        {
+            "level": 8,
+            "petHouseLevel": 3
+        },
+        {
+            "level": 9,
+            "petHouseLevel": 3
+        },
+        {
+            "level": 10,
+            "petHouseLevel": 3
+        },
+        {
+            "level": 11,
+            "petHouseLevel": 7
+        },
+        {
+            "level": 12,
+            "petHouseLevel": 7
+        },
+        {
+            "level": 13,
+            "petHouseLevel": 7
+        },
+        {
+            "level": 14,
+            "petHouseLevel": 7
+        },
+        {
+            "level": 15,
+            "petHouseLevel": 7
+        }
+    ],
+    "Unicorn": [
+        {
+            "level": 1,
+            "petHouseLevel": 4
+        },
+        {
+            "level": 2,
+            "petHouseLevel": 4
+        },
+        {
+            "level": 3,
+            "petHouseLevel": 4
+        },
+        {
+            "level": 4,
+            "petHouseLevel": 4
+        },
+        {
+            "level": 5,
+            "petHouseLevel": 4
+        },
+        {
+            "level": 6,
+            "petHouseLevel": 4
+        },
+        {
+            "level": 7,
+            "petHouseLevel": 4
+        },
+        {
+            "level": 8,
+            "petHouseLevel": 4
+        },
+        {
+            "level": 9,
+            "petHouseLevel": 4
+        },
+        {
+            "level": 10,
+            "petHouseLevel": 4
+        }
+    ],
+    "Frosty": [
+        {
+            "level": 1,
+            "petHouseLevel": 5
+        },
+        {
+            "level": 2,
+            "petHouseLevel": 5
+        },
+        {
+            "level": 3,
+            "petHouseLevel": 5
+        },
+        {
+            "level": 4,
+            "petHouseLevel": 5
+        },
+        {
+            "level": 5,
+            "petHouseLevel": 5
+        },
+        {
+            "level": 6,
+            "petHouseLevel": 5
+        },
+        {
+            "level": 7,
+            "petHouseLevel": 5
+        },
+        {
+            "level": 8,
+            "petHouseLevel": 5
+        },
+        {
+            "level": 9,
+            "petHouseLevel": 5
+        },
+        {
+            "level": 10,
+            "petHouseLevel": 5
+        }
+    ],
+    "Diggy": [
+        {
+            "level": 1,
+            "petHouseLevel": 6
+        },
+        {
+            "level": 2,
+            "petHouseLevel": 6
+        },
+        {
+            "level": 3,
+            "petHouseLevel": 6
+        },
+        {
+            "level": 4,
+            "petHouseLevel": 6
+        },
+        {
+            "level": 5,
+            "petHouseLevel": 6
+        },
+        {
+            "level": 6,
+            "petHouseLevel": 6
+        },
+        {
+            "level": 7,
+            "petHouseLevel": 6
+        },
+        {
+            "level": 8,
+            "petHouseLevel": 6
+        },
+        {
+            "level": 9,
+            "petHouseLevel": 6
+        },
+        {
+            "level": 10,
+            "petHouseLevel": 6
+        }
+    ],
+    "Poison Lizard": [
+        {
+            "level": 1,
+            "petHouseLevel": 7
+        },
+        {
+            "level": 2,
+            "petHouseLevel": 7
+        },
+        {
+            "level": 3,
+            "petHouseLevel": 7
+        },
+        {
+            "level": 4,
+            "petHouseLevel": 7
+        },
+        {
+            "level": 5,
+            "petHouseLevel": 7
+        },
+        {
+            "level": 6,
+            "petHouseLevel": 7
+        },
+        {
+            "level": 7,
+            "petHouseLevel": 7
+        },
+        {
+            "level": 8,
+            "petHouseLevel": 7
+        },
+        {
+            "level": 9,
+            "petHouseLevel": 7
+        },
+        {
+            "level": 10,
+            "petHouseLevel": 7
+        }
+    ],
+    "Phoenix": [
+        {
+            "level": 1,
+            "petHouseLevel": 8
+        },
+        {
+            "level": 2,
+            "petHouseLevel": 8
+        },
+        {
+            "level": 3,
+            "petHouseLevel": 8
+        },
+        {
+            "level": 4,
+            "petHouseLevel": 8
+        },
+        {
+            "level": 5,
+            "petHouseLevel": 8
+        },
+        {
+            "level": 6,
+            "petHouseLevel": 8
+        },
+        {
+            "level": 7,
+            "petHouseLevel": 8
+        },
+        {
+            "level": 8,
+            "petHouseLevel": 8
+        },
+        {
+            "level": 9,
+            "petHouseLevel": 8
+        },
+        {
+            "level": 10,
+            "petHouseLevel": 8
+        }
+    ],
+    "Spirit Fox": [
+        {
+            "level": 1,
+            "petHouseLevel": 9
+        },
+        {
+            "level": 2,
+            "petHouseLevel": 9
+        },
+        {
+            "level": 3,
+            "petHouseLevel": 9
+        },
+        {
+            "level": 4,
+            "petHouseLevel": 9
+        },
+        {
+            "level": 5,
+            "petHouseLevel": 9
+        },
+        {
+            "level": 6,
+            "petHouseLevel": 9
+        },
+        {
+            "level": 7,
+            "petHouseLevel": 9
+        },
+        {
+            "level": 8,
+            "petHouseLevel": 9
+        },
+        {
+            "level": 9,
+            "petHouseLevel": 9
+        },
+        {
+            "level": 10,
+            "petHouseLevel": 9
+        }
+    ],
+    "Angry Jelly": [
+        {
+            "level": 1,
+            "petHouseLevel": 10
+        },
+        {
+            "level": 2,
+            "petHouseLevel": 10
+        },
+        {
+            "level": 3,
+            "petHouseLevel": 10
+        },
+        {
+            "level": 4,
+            "petHouseLevel": 10
+        },
+        {
+            "level": 5,
+            "petHouseLevel": 10
+        },
+        {
+            "level": 6,
+            "petHouseLevel": 10
+        },
+        {
+            "level": 7,
+            "petHouseLevel": 10
+        },
+        {
+            "level": 8,
+            "petHouseLevel": 10
+        },
+        {
+            "level": 9,
+            "petHouseLevel": 10
+        },
+        {
+            "level": 10,
+            "petHouseLevel": 10
+        }
+    ]
+}

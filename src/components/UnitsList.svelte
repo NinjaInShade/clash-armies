@@ -1,4 +1,5 @@
 <script lang="ts">
+	import type { Snippet } from 'svelte';
 	import { HOLD_REMOVE_SPEED } from '~/lib/shared/utils';
 	import type { Unit, ArmyUnit } from '~/lib/shared/types';
 	import C from '~/components';
@@ -6,8 +7,9 @@
 	type Props = {
 		selectedUnits: ArmyUnit[];
 		unitsRemovable?: boolean;
+		extraUnits?: Snippet;
 	};
-	const { selectedUnits = $bindable(), unitsRemovable = false, ...rest }: Props = $props();
+	const { selectedUnits = $bindable(), unitsRemovable = false, extraUnits, ...rest }: Props = $props();
 
 	const _troopUnits = $derived(selectedUnits.filter((unit) => unit.type === 'Troop'));
 	const troopUnits = $derived([..._troopUnits.filter((x) => !x.isSuper), ..._troopUnits.filter((x) => x.isSuper)]);
@@ -63,6 +65,9 @@
 <svelte:window onmouseup={stopHold} />
 
 <ul class="units-list {unitsRemovable ? 'removable' : ''}">
+	{#if extraUnits}
+		{@render extraUnits()}
+	{/if}
 	{#each [...troopUnits, ...spellUnits, ...siegeUnits] as unit}
 		<li>
 			<button

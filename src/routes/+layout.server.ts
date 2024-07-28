@@ -1,6 +1,6 @@
 import type { LayoutServerLoad } from './$types';
 import type { User } from '~/lib/shared/types';
-import { getTownHalls, getUnits } from '~/lib/server/army';
+import { getTownHalls, getUnits, getEquipment, getPets } from '~/lib/server/army';
 import { getUser } from '~/lib/server/user';
 
 export const load: LayoutServerLoad = async (ev) => {
@@ -10,8 +10,10 @@ export const load: LayoutServerLoad = async (ev) => {
 	}
 
 	return {
-		townHalls: await getTownHalls(),
 		units: await getUnits(),
+		townHalls: await getTownHalls(),
+		equipment: await getEquipment(),
+		pets: await getPets(),
 		user
 	};
 };

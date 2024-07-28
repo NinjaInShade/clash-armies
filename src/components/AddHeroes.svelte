@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { getContext } from 'svelte';
 	import type { AppState } from '~/lib/shared/types';
+	import { getHeroLevel } from '~/lib/shared/utils';
 
 	type Props = {
 		onClick: () => void;
@@ -9,17 +10,21 @@
 	const { onClick, selectedTownHall }: Props = $props();
 
 	const app = getContext<AppState>('app');
-	const thData = $derived(app.townHalls.find((th) => th.level === selectedTownHall));
-	const ccUnlocked = $derived(thData && thData.maxCc !== null);
-	const ccMinThLevel = $derived(Math.min(...app.townHalls.filter((th) => th.maxCc !== null).map((th) => th.level)));
+	const requiredThLvl = $derived.by(() => {
+		const kingThsLevel = app.townHalls.filter((th) => getHeroLevel('Barbarian King', { th }) !== -1).map((th) => th.level);
+		return Math.min(...kingThsLevel);
+	});
 </script>
 
 <div class="not-added">
-	<div class="cc-img-container">
-		<img src="/clash/ui/clan-castle.png" alt="Clash of clans clan castle" />
+	<div class="heroes-img-container">
+		<img src="/clash/heroes/Barbarian King.png" alt="Clash of clans barbarian king hero" />
+		<img src="/clash/heroes/Archer Queen.png" alt="Clash of clans archer queen hero" />
+		<img src="/clash/heroes/Grand Warden.png" alt="Clash of clans grand warden hero" />
+		<img src="/clash/heroes/Royal Champion.png" alt="Clash of clans royal champion hero" />
 	</div>
-	{#if ccUnlocked}
-		<h2>Add recommended clan castle</h2>
+	{#if selectedTownHall >= requiredThLvl}
+		<h2>Add recommended hero pets/equipment</h2>
 		<button class="add-cc-btn" onclick={onClick}>
 			<svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
 				<path
@@ -29,7 +34,7 @@
 			</svg>
 		</button>
 	{:else}
-		<h2>Clan castle is unlocked at town hall {ccMinThLevel}</h2>
+		<h2>Heroes are first unlocked at town hall {requiredThLvl}</h2>
 	{/if}
 </div>
 
@@ -40,7 +45,7 @@
 		align-items: center;
 		justify-content: center;
 		margin-top: 0;
-		padding: 24px;
+		padding: 32px 24px;
 	}
 	.not-added h2 {
 		font-family: 'Poppins', sans-serif;
@@ -86,12 +91,11 @@
 	.add-cc-btn:focus path {
 		fill: var(--grey-400);
 	}
-	.cc-img-container {
+	.heroes-img-container {
 		position: relative;
-		max-width: 125px;
-		width: 100%;
+		display: flex;
 	}
-	.cc-img-container::before {
+	.heroes-img-container::before {
 		position: absolute;
 		content: '';
 		top: 0;
@@ -100,9 +104,12 @@
 		height: 100%;
 		background: linear-gradient(0deg, rgba(41, 41, 41, 1) 0%, rgba(41, 41, 41, 0.95) 5%, rgba(41, 41, 41, 0) 100%);
 	}
-	.cc-img-container img {
-		max-width: 100%;
+	.heroes-img-container img {
+		max-width: 100px;
 		width: 100%;
 		height: auto;
+	}
+	.heroes-img-container img:not(:first-child) {
+		margin-left: -24px;
 	}
 </style>

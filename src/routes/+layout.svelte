@@ -38,6 +38,8 @@
 		// Frequently used data (cache)
 		units: data.units,
 		townHalls: data.townHalls,
+		equipment: data.equipment,
+		pets: data.pets,
 		user: extendUser(data.user)
 	});
 	setContext('app', appState);
@@ -46,6 +48,8 @@
 		// If layout data is invalidated, update app store
 		appState.units = data.units;
 		appState.townHalls = data.townHalls;
+		appState.equipment = data.equipment;
+		appState.pets = data.pets;
 		appState.user = extendUser(data.user);
 	});
 
