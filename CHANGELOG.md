@@ -1,5 +1,6 @@
 ## [Unreleased]
 
+- Add buy me a coffee support link
 - Add new banners
 - Add unit tests
 - Add hero equipment and pet support to armies
