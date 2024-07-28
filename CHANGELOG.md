@@ -1,5 +1,6 @@
 ## [Unreleased]
 
+- Add new banners
 - Add unit tests
 - Add hero equipment and pet support to armies
 - Add clan castle support to armies
