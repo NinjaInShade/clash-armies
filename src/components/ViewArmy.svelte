@@ -36,7 +36,7 @@
 		const response = await fetch('/armies', {
 			method: 'DELETE',
 			body: JSON.stringify(army.id),
-			headers: { 'Content-Type': 'application/json' }
+			headers: { 'Content-Type': 'application/json' },
 		});
 		const result = await response.json();
 		if (result.errors) {
@@ -56,7 +56,7 @@
 </svelte:head>
 
 <section class="banner">
-	<img class="banner-img" src="/clash/banners/{army.banner}.png" alt="Clash of clans banner artwork" />
+	<img class="banner-img" src="/clash/banners/{army.banner}.webp" alt="Clash of clans banner artwork" />
 	<div class="banner-overlay"></div>
 	<div class="banner-content">
 		<div class="left">

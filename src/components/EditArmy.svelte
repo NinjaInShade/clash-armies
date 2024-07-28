@@ -142,7 +142,7 @@
 </svelte:head>
 
 <section class="banner">
-	<img class="banner-img" src="/clash/banners/{banner}.png" alt="Clash of clans banner artwork" />
+	<img class="banner-img" src="/clash/banners/{banner}.webp" alt="Clash of clans banner artwork" />
 	<button class="banner-select-btn" type="button" onclick={editBanner}>
 		<svg width="27" height="27" viewBox="0 0 27 27" fill="none" xmlns="http://www.w3.org/2000/svg">
 			<path

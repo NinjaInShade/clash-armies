@@ -46,7 +46,7 @@
 	<div class="banner-grid" bind:this={grid}>
 		{#each BANNERS as bannerName}
 			<button onclick={() => selectBanner(bannerName)} class:selected={bannerName === banner}>
-				<img src="/clash/banners/{bannerName}.png" alt="Clash of clans banner artwork" />
+				<img src="/clash/banners/{bannerName}.webp" alt="Clash of clans banner artwork" />
 			</button>
 		{/each}
 	</div>
