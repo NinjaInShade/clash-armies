@@ -1,5 +1,6 @@
 <script lang="ts">
-	import type { HeroType, ArmyEquipment, ArmyPet } from '~/lib/shared/types';
+	import type { AppState, HeroType, ArmyEquipment, ArmyPet } from '~/lib/shared/types';
+	import { getContext } from 'svelte';
 	import C from '~/components';
 
 	type Props = {
@@ -8,12 +9,15 @@
 		selectedEquipment: ArmyEquipment[];
 		/** All selected pets across all heroes */
 		selectedPets: ArmyPet[];
+		selectedTownHall: number;
 	};
-	const { hero, selectedEquipment, selectedPets }: Props = $props();
+	const { hero, selectedEquipment, selectedPets, selectedTownHall }: Props = $props();
 
 	// Selected equipment/pets just for this hero
+	const app = getContext<AppState>('app');
 	const _selectedEquipment = $derived(selectedEquipment.filter((eq) => eq.hero === hero));
 	const _selectedPets = $derived(selectedPets.filter((p) => p.hero === hero));
+	const thData = $derived(app.townHalls.find((th) => th.level === selectedTownHall));
 </script>
 
 <div class="hero-display-full">
@@ -29,13 +33,15 @@
 				{/if}
 			{/each}
 		</div>
-		<div class="pet">
-			{#if _selectedPets[0]}
-				<C.PetDisplay {..._selectedPets[0]} />
-			{:else}
-				<div class="selected-placeholder" title="No pet selected"></div>
-			{/if}
-		</div>
+		{#if thData && thData.maxPetHouse !== null}
+			<div class="pet">
+				{#if _selectedPets[0]}
+					<C.PetDisplay {..._selectedPets[0]} />
+				{:else}
+					<div class="selected-placeholder" title="No pet selected"></div>
+				{/if}
+			</div>
+		{/if}
 	</div>
 </div>
 

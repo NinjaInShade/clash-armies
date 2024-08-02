@@ -149,7 +149,7 @@
 			<div class="heroes-list">
 				{#each VALID_HEROES as hero}
 					{#if hasHero(hero, army)}
-						<C.HeroDisplayFull {hero} selectedEquipment={equipment} selectedPets={pets} />
+						<C.HeroDisplayFull {hero} selectedEquipment={equipment} selectedPets={pets} selectedTownHall={army.townHall} />
 					{/if}
 				{/each}
 			</div>
