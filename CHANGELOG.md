@@ -1,11 +1,13 @@
 ## [Unreleased]
 
-- Add buy me a coffee support link
-- Add new banners
-- Add unit tests
+## [0.1.0] - 2024-08-02
+
 - Add hero equipment and pet support to armies
 - Add clan castle support to armies
 - Add ability to save/bookmark armies
+- Add new banners
+- Add buy me a coffee support link
+- Add unit tests
 - Add "Create army" button on home page to make it more clear that users can create armies
 - Display CHANGELOG.md on /changelog page
 - Increase user army limit from 20 to 40
