@@ -34,7 +34,7 @@
 <header>
 	<div class="container">
 		<h1>Find the best<br /> armies <span>EVER!</span></h1>
-		<p class="body">The number one tool to find, create, learn and share the best armies in the game</p>
+		<p class="body">The number one tool to find, create, learn and share the best armies in clash of clans</p>
 		<div class="buttons">
 			<C.Button asLink href="/armies">Find armies</C.Button>
 			<C.Button asLink href={createArmyHref}>Create army</C.Button>

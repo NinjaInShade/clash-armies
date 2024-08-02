@@ -11,7 +11,7 @@
 		<div class="top">
 			<div class="left">
 				<C.Logo />
-				<p class="desc">The number one tool to find, create and share the current best armies in the game!</p>
+				<p class="desc">The number one tool to find, create, learn and share the best armies in clash of clans!</p>
 				<ul class="social-links">
 					<li>
 						<a href="https://github.com/NinjaInShade/clash-armies" target="_blank">
