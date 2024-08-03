@@ -1,5 +1,7 @@
 ## [Unreleased]
 
+## [0.1.1] - 2024-08-03
+
 - Fix attack type filter not working
 - Fix being able to use certain equipment when it isn't unlocked yet
 
