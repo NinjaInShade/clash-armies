@@ -248,41 +248,26 @@ export async function getEquipment() {
 			eq.id,
 			eq.hero,
 			eq.name,
-			eq.epic
+			eq.epic,
+			JSON_ARRAYAGG(JSON_OBJECT(
+				'id', eql.id,
+				'equipmentId', eql.equipmentId,
+				'level', eql.level,
+				'blacksmithLevel', eql.blacksmithLevel
+			)) AS levels
 		FROM equipment eq
+		LEFT JOIN equipment_levels eql ON eql.equipmentId = eq.id
 		GROUP BY eq.id
 	`;
 	const equipment = await db.query<Equipment>(query, []);
 
 	for (const eq of equipment) {
-		eq.levels = await getEqLevels(eq);
+		// Parse JSON levels
+		// @ts-expect-error data is a JSON string when it's queried from the database
+		eq.levels = JSON.parse(eq.levels);
 	}
 
 	return equipment;
-}
-
-async function getEqLevels(eq: Equipment) {
-	const blacksmithLevels = await db.query<BlackSmithLevel>(`
-		SELECT *
-		FROM blacksmith_levels
-		ORDER BY level ASC
-	`);
-
-	// These equipment have a slightly different case than explained below as they don't require the blacksmith building to unlocked at all to use at all level 1
-	const unlockedByDefault = ['Barbarian Puppet', 'Rage Vial', 'Archer Puppet', 'Invisibility Vial', 'Eternal Tome', 'Life Gem', 'Royal Gem', 'Seeking Shield'];
-
-	// Attach equipment levels (these are determined by the blacksmith levels exclusively, unlike
-	// units where each unit could have a different level at the same building level as another)
-	return new Array(eq.epic ? 27 : 18)
-		.fill(() => null)
-		.map((_, idx) => {
-			const level = idx + 1;
-			if (unlockedByDefault.includes(eq.name) && level === 1) {
-				return { equipmentId: eq.id, level, blacksmithLevel: null };
-			}
-			const blacksmithLevel = blacksmithLevels.find((bLevel) => (eq.epic ? bLevel.maxEpic : bLevel.maxCommon) >= level)?.level ?? null;
-			return { equipmentId: eq.id, level, blacksmithLevel };
-		});
 }
 
 export async function getPets() {
