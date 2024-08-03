@@ -1,4 +1,4 @@
-import type { AppState, Army, ArmyUnit, SvelteComponentGeneric } from '~/lib/shared/types';
+import type { AppState, Army, Unit, ArmyUnit, SvelteComponentGeneric, Optional } from '~/lib/shared/types';
 import { SECOND, MINUTE, HOUR, OBJECT_ID_PREFIXES, VALID_HEROES, hasHero } from '~/lib/shared/utils';
 import C from '~/components';
 
@@ -26,7 +26,6 @@ export function generateLink(units: ArmyUnit[]): string {
 		url += 'u';
 		url += selectedTroops
 			.reduce<string[]>((prev, troop) => {
-				troop.objectId
 				const id = String(troop.objectId).slice(String(OBJECT_ID_PREFIXES.Characters).length);
 				const troopString = `${troop.amount}x${+id}`;
 				prev.push(troopString);
@@ -57,8 +56,69 @@ export function generateLink(units: ArmyUnit[]): string {
  * The army=querystring value can be parsed with regex into two groups (troops and spells):
  * - u([\d+x-]+)s([\d+x-]+)
  */
-export function parseLink(link: string): ArmyUnit[] {
-	// TODO: implement when adding "Load from link" input
+export function parseLink(link: string, ctx: { units: Unit[] }): Optional<ArmyUnit, 'id'>[] {
+	const units: Optional<ArmyUnit, 'id'>[] = [];
+	const parsedUnits = /u(?<troops>[\d+x-]+)s(?<spells>[\d+x-]+)/.exec(link);
+
+	const troops = parsedUnits?.groups?.troops;
+	const spells = parsedUnits?.groups?.spells;
+	if (typeof troops !== 'string' || typeof spells !== 'string') {
+		throw new Error('Invalid army link');
+	}
+
+	// parse troops/siege machine
+	for (const troop of troops.split('-')) {
+		const [amount, troopId] = troop.split('x');
+		if (!amount || Number.isNaN(+amount)) {
+			throw new Error('Invalid troop amount');
+		}
+		if (!troopId || Number.isNaN(+troopId)) {
+			throw new Error('Invalid troop ID');
+		}
+		const appTroop = ctx.units.find((u) => {
+			const objectId = String(u.objectId);
+			const prefix = String(OBJECT_ID_PREFIXES.Characters);
+			return objectId.startsWith(prefix) && +objectId.slice(prefix.length) === +troopId;
+		});
+		if (!appTroop) {
+			throw new Error(`Troop with ID "${troopId}" couldn't be found`);
+		}
+		units.push({
+			unitId: appTroop.id,
+			home: 'armyCamp',
+			amount: +amount,
+			...appTroop,
+			id: undefined,
+		});
+	}
+
+	// parse spells
+	for (const spell of spells.split('-')) {
+		const [amount, spellId] = spell.split('x');
+		if (!amount || Number.isNaN(+amount)) {
+			throw new Error('Invalid spell amount');
+		}
+		if (!spellId || Number.isNaN(+spellId)) {
+			throw new Error('Invalid spell ID');
+		}
+		const appSpell = ctx.units.find((u) => {
+			const objectId = String(u.objectId);
+			const prefix = String(OBJECT_ID_PREFIXES.Spells);
+			return objectId.startsWith(prefix) && +objectId.slice(prefix.length) === +spellId;
+		});
+		if (!appSpell) {
+			throw new Error(`Spell with ID "${spellId}" couldn't be found`);
+		}
+		units.push({
+			unitId: appSpell.id,
+			home: 'armyCamp',
+			amount: +amount,
+			...appSpell,
+			id: undefined,
+		});
+	}
+
+	return units;
 }
 
 export function openLink(href: string, openInNewTab = true) {

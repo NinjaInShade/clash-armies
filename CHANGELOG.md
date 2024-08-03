@@ -1,5 +1,7 @@
 ## [Unreleased]
 
+- Add ability to import units from clash of clans army link
+
 ## [0.1.1] - 2024-08-03
 
 - Fix attack type filter not working

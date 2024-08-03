@@ -37,7 +37,7 @@
 	<div class="modal">
 		<div class="modal-header">
 			<h2 class="modal-title">{title ?? ''}</h2>
-			<button type="button" class="close-btn" onclick={close}>
+			<button type="button" class="close-btn" onclick={() => close()}>
 				<img src="/clash/ui/close.png" alt="Close icon" />
 			</button>
 		</div>
@@ -52,7 +52,7 @@
 			{#if controls}
 				{@render controls()}
 			{:else}
-				<C.Button onClick={close}>Close</C.Button>
+				<C.Button onClick={() => close()}>Close</C.Button>
 			{/if}
 		</div>
 	</div>
@@ -112,7 +112,7 @@
 		padding: 14px 24px;
 	}
 
-	@media(max-width: 450px) {
+	@media (max-width: 450px) {
 		.modal {
 			max-width: calc(100dvw - 2em);
 			max-height: calc(100dvh - 2em);

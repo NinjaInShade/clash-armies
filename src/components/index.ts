@@ -34,6 +34,7 @@ export { default as Errors } from './Errors.svelte';
 export { default as ArmyCard } from './ArmyCard.svelte';
 export { default as ActionButton } from './ActionButton.svelte';
 export { default as BookmarkButton } from './BookmarkButton.svelte';
+export { default as ImportFromLink } from './ImportFromLink.svelte';
 export { default as IconTagsClanCastle } from './IconTagsClanCastle.svelte';
 export { default as IconTagsHeroes } from './IconTagsHeroes.svelte';
 

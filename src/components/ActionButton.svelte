@@ -5,7 +5,7 @@
 	type Props = {
 		children: Snippet;
 		/** Sets the theme of the button @default primary */
-		theme?: 'primary' | 'success' | 'danger';
+		theme?: 'primary' | 'primary-dark' | 'success' | 'danger';
         /** Whether to style as a ghost button (no background and a border) */
         ghost?: boolean;
         asLink?: boolean;
@@ -52,6 +52,16 @@
     .action-btn.primary:hover {
         background-color: hsl(33, 38%, 32%);
     }
+	.action-btn.primary-dark {
+		background-color: hsl(33, 15%, 26%);
+		color: #e0a153;
+	}
+	.action-btn.primary-dark :global(svg path) {
+		fill: #e0a153;
+	}
+	.action-btn.primary-dark:hover {
+		background-color: hsl(33, 15%, 22%);
+	}
     .action-btn.success {
         background-color: #424C38;
         color: #53E059;

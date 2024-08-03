@@ -71,6 +71,12 @@
 		showHeroes = false;
 	}
 
+	async function importUnits() {
+		const importedUnits = await app.openModalAsync<Optional<ArmyUnit, 'id'>[]>(C.ImportFromLink, { selectedUnits: units, selectedTownHall: townHall });
+		if (!importedUnits) return;
+		units = importedUnits;
+	}
+
 	function editBanner() {
 		const onSave = (newBanner: Banner) => {
 			banner = newBanner;
@@ -82,7 +88,7 @@
 		if (typeof value !== 'number' || value < 1 || value > app.townHalls.length) {
 			throw new Error(`Town hall ${value} doesn't exist`);
 		}
-		if (value < townHall && units.length) {
+		if (value < townHall && (units.length || ccUnits.length || equipment.length || pets.length)) {
 			const confirmed = await app.confirm('You are selecting a lower town hall, all selections will be cleared. Select anyway?');
 			if (confirmed) {
 				units = [];
@@ -177,6 +183,17 @@
 			<h2>
 				<img src="/clash/ui/army-camp.png" alt="Clash of clans army camp" />
 				Unit selector
+				<C.ActionButton theme="primary-dark" onclick={importUnits} class="title-action-btn">
+					<svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+						<path
+							fill-rule="evenodd"
+							clip-rule="evenodd"
+							d="M6.44941 5.8225L8.71951 3.5531L9.70931 4.5429L5.74941 8.5028L1.78951 4.5429L2.77931 3.5531L5.04941 5.8225V0H6.5L6.44941 5.8225ZM0.149414 7.8H1.54941V10.6H9.94941V7.8H11.3494V10.6C11.3494 11.37 10.7194 12 9.94941 12H1.54941C0.779414 12 0.149414 11.3259 0.149414 10.6V7.8Z"
+							fill="#E0A153"
+						/>
+					</svg>
+					Import
+				</C.ActionButton>
 			</h2>
 			<C.UnitTotals used={housingSpaceUsed} {capacity} />
 		</div>
@@ -204,7 +221,7 @@
 				<h2>
 					<img src="/clash/ui/clan-castle.png" alt="Clash of clans clan castle" />
 					Clan castle
-					<C.ActionButton theme="danger" onclick={removeClanCastle} class="cc-remove-btn">Remove</C.ActionButton>
+					<C.ActionButton theme="danger" onclick={removeClanCastle} class="title-action-btn">Remove</C.ActionButton>
 				</h2>
 				<C.UnitTotals used={ccHousingSpaceUsed} capacity={ccCapacity} showTime={false} />
 			</div>
@@ -256,7 +273,7 @@
 				<h2>
 					<img src="/clash/heroes/Barbarian King.png" alt="Clash of clans barbarian king hero" />
 					Heroes
-					<C.ActionButton theme="danger" onclick={removeHeroes} class="cc-remove-btn">Remove</C.ActionButton>
+					<C.ActionButton theme="danger" onclick={removeHeroes} class="title-action-btn">Remove</C.ActionButton>
 				</h2>
 			</div>
 			{#each VALID_HEROES as hero}
@@ -450,7 +467,7 @@
 		margin-top: 24px;
 	}
 
-	:global(.cc-remove-btn) {
+	:global(.title-action-btn) {
 		margin-left: 0.25em;
 	}
 
@@ -471,7 +488,7 @@
 		}
 	}
 
-	@media (max-width: 650px) {
+	@media (max-width: 750px) {
 		.units .title {
 			display: inline-flex;
 			flex-flow: column nowrap;
@@ -520,12 +537,12 @@
 		}
 	}
 
-	@media (max-width: 365px) {
+	@media (max-width: 400px) {
 		.dashed h2 {
 			flex-flow: row wrap;
-			row-gap: 0.75em;
+			row-gap: 0.65em;
 		}
-		:global(.cc-remove-btn) {
+		:global(.title-action-btn) {
 			margin-left: 0;
 		}
 	}

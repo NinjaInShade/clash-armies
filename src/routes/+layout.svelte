@@ -26,7 +26,7 @@
 			...user,
 			hasRoles(...roles: string[]) {
 				return roles.every((role) => user.roles.includes(role));
-			}
+			},
 		};
 	}
 
@@ -40,7 +40,7 @@
 		townHalls: data.townHalls,
 		equipment: data.equipment,
 		pets: data.pets,
-		user: extendUser(data.user)
+		user: extendUser(data.user),
 	});
 	setContext('app', appState);
 
@@ -82,8 +82,11 @@
 
 {#if appState.modals.length}
 	<div class="modals-container" transition:fade={{ duration: 150, easing: sineInOut }}>
-		<button class="modal-backdrop" type="button" onclick={popModal}></button>
-		{#each appState.modals as modal}
+		{#each appState.modals as modal, idx (modal.id)}
+			{#if idx === appState.modals.length - 1}
+				<!-- Render backdrop behind the last modal in case multiple nested modals are opened -->
+				<button class="modal-backdrop" type="button" onclick={popModal}></button>
+			{/if}
 			<svelte:component this={modal.component} {...modal.props} />
 		{/each}
 	</div>
@@ -114,7 +117,7 @@
 
 	.modal-backdrop {
 		background-color: hsla(0, 0%, 0%, 0.7);
-		/** Use svelte blur transition? */ 
+		/** Use svelte blur transition? */
 		backdrop-filter: blur(10px);
 		position: fixed;
 		height: 100%;
@@ -140,13 +143,8 @@
 		height: 100%;
 		width: 100%;
 		pointer-events: none;
-		--mask: linear-gradient(to top, 
-		    rgba(0,0,0, 1) 0,   
-		    rgba(0,0,0, 1) 85%, 
-		    rgba(0,0,0, 0) 95%, 
-		    rgba(0,0,0, 0) 0
-		) 100% 50% / 100% 100% repeat-x;
-		-webkit-mask: var(--mask); 
+		--mask: linear-gradient(to top, rgba(0, 0, 0, 1) 0, rgba(0, 0, 0, 1) 85%, rgba(0, 0, 0, 0) 95%, rgba(0, 0, 0, 0) 0) 100% 50% / 100% 100% repeat-x;
+		-webkit-mask: var(--mask);
 		mask: var(--mask);
 		/** So padding-right isn't less when there's a scrollbar */
 		scrollbar-gutter: stable;
@@ -211,7 +209,7 @@
 		padding: 24px var(--side-padding);
 	}
 
-	@media(max-width: 450px) {
+	@media (max-width: 450px) {
 		.toasts-container {
 			padding: 8px;
 		}
