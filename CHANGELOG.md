@@ -1,5 +1,7 @@
 ## [Unreleased]
 
+- Fix attack type filter not working
+
 ## [0.1.0] - 2024-08-02
 
 - Add hero equipment and pet support to armies

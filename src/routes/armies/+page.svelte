@@ -42,7 +42,7 @@
 			if (townHall !== null && a.townHall !== townHall) {
 				return false;
 			}
-			if (attackType !== null && !tags.includes(attackType)) {
+			if (attackType !== null && !tags.map((t) => t.label).includes(attackType)) {
 				return false;
 			}
 			if (search && !a.name.toLowerCase().includes(search.toLowerCase())) {
