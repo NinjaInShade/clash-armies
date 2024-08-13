@@ -19,11 +19,11 @@
 			<C.Logo />
 			<ul class="links">
 				<li>
-					<a class="body" href="/armies">Armies</a>
+					<a class="body focus-grey" href="/armies">Armies</a>
 				</li>
 				{#if app.user}
 					<li>
-						<a class="body" href="/create">Create</a>
+						<a class="body focus-grey" href="/create">Create</a>
 					</li>
 				{/if}
 			</ul>
@@ -31,12 +31,12 @@
 		<ul class="links">
 			{#if app.user && app.user.hasRoles('admin')}
 				<li>
-					<a class="body" href="/admin">Admin</a>
+					<a class="body focus-grey" href="/admin">Admin</a>
 				</li>
 			{/if}
 			{#if app.user}
 				<li>
-					<a class="body" href="/users/{app.user.username}">Account</a>
+					<a class="body focus-grey" href="/users/{app.user.username}">Account</a>
 				</li>
 			{/if}
 			<li class="control">

@@ -80,30 +80,10 @@
 					}
 					remove(unit.name);
 				}}
+				tabindex={unitsRemovable ? undefined : -1}
 			>
 				<C.UnitDisplay {...unit} {...rest} />
 			</button>
 		</li>
 	{/each}
 </ul>
-
-<style>
-	.units-list {
-		/* Prevent page shift when adding first unit */
-		min-height: calc(var(--unit-size) + var(--bottom-padding) + 1px);
-		display: flex;
-		flex-flow: row wrap;
-		gap: 6px;
-	}
-	.units-list li button {
-		display: block;
-		width: 100%;
-		height: 100%;
-	}
-	.units-list:not(.removable) li button {
-		cursor: default;
-	}
-	.units-list:not(.removable) li button:focus {
-		outline: none;
-	}
-</style>

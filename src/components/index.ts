@@ -11,6 +11,7 @@ export { default as Checkbox } from './Checkbox.svelte';
 export { default as Toast } from './Toast.svelte';
 export { default as Confirm } from './Confirm.svelte';
 export { default as TabStrip } from './TabStrip.svelte';
+export { default as Menu } from './Menu.svelte';
 
 // App specific components
 export { default as Nav } from './Nav.svelte';
@@ -35,6 +36,8 @@ export { default as ArmyCard } from './ArmyCard.svelte';
 export { default as ActionButton } from './ActionButton.svelte';
 export { default as BookmarkButton } from './BookmarkButton.svelte';
 export { default as ImportFromLink } from './ImportFromLink.svelte';
+export { default as ArmyFilters } from './ArmyFilters.svelte';
+export { default as FiltersPopup } from './FiltersPopup.svelte';
 export { default as IconTagsClanCastle } from './IconTagsClanCastle.svelte';
 export { default as IconTagsHeroes } from './IconTagsHeroes.svelte';
 

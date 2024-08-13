@@ -1,10 +1,10 @@
 <script lang="ts">
 	import type { HTMLInputAttributes } from 'svelte/elements';
-	import { getContext } from 'svelte';
+	import { getContext, type Snippet } from 'svelte';
 
 	type Props = {
 		/** Sets the bound value */
-		value: string | null;
+		value: string | null | undefined;
 		/** Sets the onchange handler */
 		onChange?: (value: string | null) => Promise<void> | void;
 		/** Sets the disabled state */
@@ -13,8 +13,12 @@
 		error?: string | null;
 		/** Sets the placeholder display */
 		placeholder?: string;
+		/** Sets the container class, useful for updating --input-width variables in media queries */
+		containerClass?: string;
+		/** Icon to render inside the input */
+		icon?: Snippet;
 	} & HTMLInputAttributes;
-	let { value = $bindable(), onChange, disabled, error, placeholder, ...rest }: Props = $props();
+	let { value = $bindable(), onChange, disabled, error, placeholder, containerClass, icon, ...rest }: Props = $props();
 
 	// Passed down from context in parent <Fieldset />
 	const htmlName = getContext<string>('htmlName');
@@ -28,8 +32,13 @@
 </script>
 
 <!-- Input -->
-<div class="outer-container" class:error>
+<div class="outer-container {containerClass ?? ''}" class:error>
 	<div class="inner-container">
+		{#if icon}
+			<div class="icon-container">
+				{@render icon()}
+			</div>
+		{/if}
 		<input bind:value oninput={_onChange} class="input" type="text" name={htmlName} id={htmlName} {disabled} {placeholder} {...rest} />
 	</div>
 	{#if error}
@@ -45,10 +54,23 @@
 		max-width: var(--input-width, 250px);
 		width: 100%;
 	}
-
 	.inner-container {
 		position: relative;
 		width: 100%;
+	}
+	.icon-container {
+		position: absolute;
+		transform: translateY(-50%);
+		top: 50%;
+		left: 16px;
+	}
+	.icon-container :global(svg) {
+		display: block;
+		max-width: 14px;
+		height: auto;
+	}
+	.icon-container :global(svg path) {
+		fill: var(--grey-500);
 	}
 
 	/* Input */
@@ -62,6 +84,9 @@
 		border-radius: 6px;
 		padding: 7px 16px;
 		width: 100%;
+	}
+	.icon-container + .input {
+		padding-left: 34px;
 	}
 
 	/* Input states */
@@ -106,5 +131,11 @@
 		line-height: var(--fs-sm-lh);
 		color: var(--error-400);
 		white-space: break-spaces;
+	}
+
+	@media (max-width: 850px) {
+		.icon-container :global(svg) {
+			max-width: 13px;
+		}
 	}
 </style>

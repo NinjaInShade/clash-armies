@@ -117,7 +117,7 @@
 			</span>
 			<div class="dropdown-icon-container">
 				<svg width="12" height="6" viewBox="0 0 22 11" fill="none" xmlns="http://www.w3.org/2000/svg">
-					<path d="M0 0L11 11L22 0H0Z" fill="var(--grey-100)" />
+					<path d="M0 0L11 11L22 0H0Z" fill="var(--grey-500)" />
 				</svg>
 			</div>
 		</button>

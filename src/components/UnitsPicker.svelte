@@ -122,29 +122,3 @@
 		</li>
 	{/each}
 </ul>
-
-<style>
-	.picker-list {
-		--gap: 6px;
-		--max-rows: 3;
-		display: flex;
-		flex-flow: row wrap;
-		gap: var(--gap);
-		padding-right: 12px;
-		/** Show max 3 rows of units (meant more for mobile so you can still see the unit you've selected at all times) */
-		max-height: calc((var(--unit-size) * var(--max-rows)) + (var(--gap) * (var(--max-rows) - 1)));
-		overflow-y: auto;
-	}
-	.picker-list li {
-		width: var(--unit-size);
-		height: var(--unit-size);
-	}
-	.picker-list li button {
-		display: block;
-		width: 100%;
-		height: 100%;
-	}
-	.picker-list li button:disabled {
-		filter: grayscale(1);
-	}
-</style>

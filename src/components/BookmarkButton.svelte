@@ -48,7 +48,7 @@
 </script>
 
 <button
-	class="bookmark {bookmarked ? 'bookmarked' : ''}"
+	class="bookmark {bookmarked ? 'bookmarked' : ''} focus-grey"
 	onclick={() => saveBookmark(bookmarked)}
 	disabled={savingBookmark}
 	title={bookmarked ? 'Remove this army from saved' : 'Save this army - you can view all saved armies on your account page'}

@@ -213,38 +213,19 @@
 		border-radius: 6px;
 	}
 	.picker-list {
-		--gap: 6px;
 		--max-cols: 3;
-		--max-rows: 3;
-		display: flex;
-		flex-flow: row wrap;
-		gap: var(--gap);
-		padding-right: 12px;
 		max-width: calc((var(--unit-size) * var(--max-cols)) + (var(--gap) * (var(--max-cols) - 1)) + 24px);
-		/** Show max 3 rows of units (meant more for mobile so you can still see the unit you've selected at all times) */
-		max-height: calc((var(--unit-size) * var(--max-rows)) + (var(--gap) * (var(--max-rows) - 1)));
-		overflow-y: auto;
 		align-self: flex-start;
 		width: 100%;
 	}
 	.pets .picker-list {
 		--max-cols: 5;
 	}
-	.picker-list li,
 	.selected-equipment li,
 	.selected-pet li {
 		width: var(--unit-size);
 		height: var(--unit-size);
 		position: relative;
-	}
-	.picker-list li > button:not(.replace-pet) {
-		display: block;
-		width: 100%;
-		height: 100%;
-	}
-	.picker-list li button:disabled,
-	.picker-list li button.visually-disabled {
-		filter: grayscale(1);
 	}
 	.replace-pet {
 		position: absolute;

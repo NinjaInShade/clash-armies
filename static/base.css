@@ -280,13 +280,14 @@ a {
 
 button:focus,
 a:focus {
-	outline: var(--primary-400) dotted 2px;
+	outline: var(--primary-400) dotted 1.5px;
 }
 
 button:disabled {
 	cursor: not-allowed;
 }
-button:disabled, button.visually-disabled {
+button:disabled,
+button.visually-disabled {
 	opacity: 0.5;
 }
 
@@ -294,6 +295,14 @@ button span {
 	display: flex;
 	align-items: center;
 	gap: 6px;
+}
+
+.focus-grey:focus {
+	outline: var(--grey-300) dotted 1.5px;
+}
+
+.focus-primary:focus {
+	outline: var(--primary-400) dotted 1.5px;
 }
 
 .body {

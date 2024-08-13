@@ -1,74 +1,21 @@
 <script lang="ts">
 	import type { PageData } from './$types';
-	import { getTags } from '~/lib/client/army';
-	import THWidgetDisplay from '~/routes/admin/townhalls/THWidgetDisplay.svelte';
+	import type { Army } from '~/lib/shared/types';
 	import C from '~/components';
 
 	const { data }: { data: PageData } = $props();
-	const { armies, townHalls } = $derived(data);
-
-	const thSelectData = $derived.by(() => {
-		const data = [];
-		data.push({ value: null, label: 'All' });
-		data.push(
-			...townHalls.map((x) => {
-				return { value: x.level, component: [THWidgetDisplay, { level: x.level, displayLevel: true, height: 22 }] };
-			})
-		);
-		return data;
-	});
-	const attackTypeSelectData = [
-		{ value: null, label: 'All' },
-		{ value: 'Ground', label: 'Ground' },
-		{ value: 'Air', label: 'Air' }
-	];
-	const sortSelectData = [
-		{ value: null, label: 'Alphabetical' },
-		{ value: 'new', label: 'Newest' },
-		{ value: 'votes', label: 'Votes' }
-	];
+	const { armies } = $derived(data);
 
 	const ENTRIES_PER_PAGE = 25;
 	let page = $state<number>(1);
 
-	let search = $state<string | null>(null);
-	let townHall = $state<number | null>(null);
-	let attackType = $state<string | null>(null);
-	let sortOrder = $state<'votes' | 'new' | null>('new');
-
-	const filteredArmies = $derived.by(() => {
-		return armies.filter((a) => {
-			const tags = getTags(a);
-			if (townHall !== null && a.townHall !== townHall) {
-				return false;
-			}
-			if (attackType !== null && !tags.map((t) => t.label).includes(attackType)) {
-				return false;
-			}
-			if (search && !a.name.toLowerCase().includes(search.toLowerCase())) {
-				return false;
-			}
-			return true;
-		});
-	});
-	let displayArmies = $derived.by(() => {
-		filteredArmies.sort((a, b) => {
-			if (sortOrder === 'new') {
-				return +b.createdTime - +a.createdTime;
-			}
-			if (sortOrder === 'votes') {
-				return b.votes - a.votes;
-			}
-			// Default sorting (a-z|A-Z )
-			return a.name.localeCompare(b.name);
-		});
-		return filteredArmies.slice(0, page * ENTRIES_PER_PAGE);
-	});
+	let armyFiltersRef = $state<C.ArmyFilters>();
+	let filteredArmies = $state<Army[] | null>(null);
+	let displayArmies = $derived((filteredArmies ?? []).slice(0, page * ENTRIES_PER_PAGE));
 
 	function resetFilters() {
-		search = null;
-		townHall = null;
-		attackType = null;
+		if (!armyFiltersRef) return;
+		armyFiltersRef.resetAllFilters();
 	}
 
 	function loadMore() {
@@ -82,44 +29,35 @@
 
 <section class="armies">
 	<div class="container">
-		<div class="filters">
-			<C.Fieldset label="Search" htmlName="search" --input-width="250px">
-				<C.Input bind:value={search} placeholder="Electro zap..." />
-			</C.Fieldset>
-			<div class="right">
-				<C.Fieldset label="Town Hall" htmlName="townhall" --input-width="130px">
-					<C.Select bind:value={townHall} data={thSelectData} />
-				</C.Fieldset>
-				<C.Fieldset label="Attack Type" htmlName="type" --input-width="130px">
-					<C.Select bind:value={attackType} data={attackTypeSelectData} />
-				</C.Fieldset>
-				<C.Fieldset label="Sort by" htmlName="sort" --input-width="175px" class="sort-control">
-					<C.Select bind:value={sortOrder} data={sortSelectData} />
-				</C.Fieldset>
+		<C.ArmyFilters {armies} bind:filteredArmies bind:this={armyFiltersRef} />
+		{#if filteredArmies === null}
+			<div class="spinner-container">
+				<span class="spinner"></span>
 			</div>
-		</div>
-		<ul class="armies-grid">
-			{#each displayArmies as army (army.id)}
-				<C.ArmyCard {army} />
-			{/each}
-		</ul>
-		{#if displayArmies.length && displayArmies.length < filteredArmies.length}
-			<C.Button onClick={loadMore} style="display: block; margin: 24px auto 0 auto;">Load more...</C.Button>
-		{/if}
+		{:else}
+			<ul class="armies-grid">
+				{#each displayArmies as army (army.id)}
+					<C.ArmyCard {army} />
+				{/each}
+			</ul>
+			{#if displayArmies.length && displayArmies.length < filteredArmies.length}
+				<C.Button onClick={loadMore} style="display: block; margin: 24px auto 0 auto;">Load more...</C.Button>
+			{/if}
 
-		{#if !displayArmies.length}
-			<div class="no-data">
-				<img src="/clash/ui/pekka.png" alt="PEKKA" />
-				<h2>There are no armies matching this criteria warrior!</h2>
-				<C.Button onClick={resetFilters}>Reset filters</C.Button>
-			</div>
+			{#if !displayArmies.length}
+				<div class="no-data">
+					<img src="/clash/ui/pekka.png" alt="PEKKA" />
+					<h2>There are no armies matching this criteria warrior!</h2>
+					<C.Button onClick={resetFilters}>Reset all filters</C.Button>
+				</div>
+			{/if}
 		{/if}
 	</div>
 </section>
 
 <style>
 	.armies {
-		padding: 50px var(--side-padding);
+		padding: 32px var(--side-padding);
 		flex: 1 0 0px;
 	}
 
@@ -129,26 +67,11 @@
 		height: 100%;
 	}
 
-	.filters {
-		display: flex;
-		justify-content: space-between;
-		align-items: flex-end;
-		margin-bottom: 1em;
-		gap: 0.5em;
-	}
-
-	.filters .right {
-		display: flex;
-		justify-content: flex-end;
-		align-items: flex-end;
-		flex: 1 0 0px;
-		gap: 0.5em;
-	}
-
 	.armies-grid {
 		display: grid;
 		grid-template-columns: 1fr;
 		grid-template-rows: auto;
+		margin-top: 1em;
 		gap: 0.5em;
 	}
 
@@ -159,12 +82,12 @@
 		flex-flow: column nowrap;
 		background-color: var(--grey-800);
 		border-radius: 8px;
-		padding: 2em 0;
+		padding: 2em 1em;
 		flex: 1 0 0px;
 	}
 
 	.no-data h2 {
-		max-width: 675px;
+		max-width: 450px;
 		text-align: center;
 		font-size: var(--h2);
 		line-height: var(--h2-lh);
@@ -177,10 +100,30 @@
 		width: 100%;
 	}
 
-	@media (max-width: 600px) {
-		.filters {
-			flex-flow: column nowrap;
-			align-items: flex-start;
+	.spinner-container {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		margin-top: 1em;
+		flex: 1 0 0px;
+	}
+	.spinner {
+		width: 24px;
+		height: 24px;
+		border: 5px solid var(--grey-500);
+		border-bottom-color: transparent;
+		border-radius: 50%;
+		display: inline-block;
+		box-sizing: border-box;
+		animation: rotation 1s linear infinite;
+	}
+
+	@keyframes rotation {
+		0% {
+			transform: rotate(0deg);
+		}
+		100% {
+			transform: rotate(360deg);
 		}
 	}
 
@@ -191,12 +134,6 @@
 	}
 
 	@media (max-width: 450px) {
-		.filters .right {
-			display: grid;
-			grid-template-columns: repeat(2, 1fr);
-			width: 100%;
-		}
-
 		:global(.filters fieldset) {
 			--input-width: 100%;
 			width: 100%;
