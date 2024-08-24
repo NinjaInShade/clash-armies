@@ -21,7 +21,7 @@
 	};
 	const { type, name, isSuper, amount, display, level, title }: Props = $props();
 	const app = getContext<AppState>('app');
-	const levels = $derived(app.units.find((u) => u.name === name)?.levels ?? []);
+	const levels = $derived(app.units.find((unit) => unit.name === name)?.levels ?? []);
 	const isMaxLevel = $derived(level === Math.max(...levels.map((x) => x.level)));
 </script>
 

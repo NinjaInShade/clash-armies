@@ -8,7 +8,8 @@
 	let { children, theme = 'warning' }: Props = $props();
 </script>
 
-<div class="alert theme-{theme}">
+<div class="alert theme-{theme}" >
+<!-- div class="alert" class:theme={theme} -->
 	<!-- /icons/warning.svg -->
 	<svg width="13" height="13" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
 		<path
