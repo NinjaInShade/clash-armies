@@ -12,6 +12,7 @@
 		getEquipmentLevel,
 		getPetLevel,
 		getHeroLevel,
+		GUIDE_TEXT_CHAR_LIMIT,
 	} from '~/lib/shared/utils';
 	import type { Optional, AppState, Army, ArmyUnit, ArmyEquipment, ArmyPet, Banner, FetchErrors } from '~/lib/shared/types';
 	import AddClanCastle from './AddClanCastle.svelte';
@@ -24,19 +25,22 @@
 	const app = getContext<AppState>('app');
 
 	// Army state
-	let townHall = $state<number>(army?.townHall ?? 16);
-	let banner = $state<Banner>(army?.banner ?? BANNERS[Math.floor(Math.random() * BANNERS.length)]);
-	let name = $state<string | null>(army?.name ?? null);
+	let townHall = $state(army?.townHall ?? 16);
+	let banner = $state(army?.banner ?? BANNERS[Math.floor(Math.random() * BANNERS.length)]);
+	let name = $state(army?.name ?? null);
 	let units = $state<Optional<ArmyUnit, 'id'>[]>(army?.units?.filter((unit) => unit.home === 'armyCamp') ?? []);
 	let ccUnits = $state<Optional<ArmyUnit, 'id'>[]>(army?.units?.filter((unit) => unit.home === 'clanCastle') ?? []);
 	let equipment = $state<Optional<ArmyEquipment, 'id'>[]>(army?.equipment ?? []);
 	let pets = $state<Optional<ArmyPet, 'id'>[]>(army?.pets ?? []);
+	let guideText = $state(army?.guideTextContent ?? null);
+	let guideYoutubeUrl = $state(army?.guideYoutubeUrl ?? null);
 
 	// Other state
 	let errors = $state<FetchErrors | null>(null);
 	let saveDisabled = $derived(!name || name.length < 2 || name.length > 25 || !units.length);
-	let showClanCastle = $state<boolean>(ccUnits.length > 0);
-	let showHeroes = $state<boolean>(equipment.length > 0 || pets.length > 0);
+	let showClanCastle = $state(ccUnits.length > 0);
+	let showHeroes = $state(equipment.length > 0 || pets.length > 0);
+	let showGuide = $state(true || typeof army?.guideId === 'number');
 
 	const thData = $derived(app.townHalls.find((th) => th.level === townHall));
 	const capacity = $derived.by(() => getCapacity(thData));
@@ -50,6 +54,10 @@
 
 	function addHeroes() {
 		showHeroes = true;
+	}
+
+	function addGuide() {
+		showGuide = true;
 	}
 
 	async function removeClanCastle() {
@@ -69,6 +77,11 @@
 		equipment = [];
 		pets = [];
 		showHeroes = false;
+	}
+
+	async function removeGuide() {
+		// CONFIRM
+		showGuide = false;
 	}
 
 	async function importUnits() {
@@ -117,6 +130,11 @@
 			pets: pets.map((p) => {
 				return { id: p.id, petId: p.petId, hero: p.hero };
 			}),
+			guide: {
+				id: army?.guideId,
+				textContent: guideText,
+				youtubeUrl: guideYoutubeUrl,
+			},
 		};
 		const response = await fetch('/armies', {
 			method: 'POST',
@@ -141,6 +159,8 @@
 			errors = `${response.status} error`;
 		}
 	}
+
+	// <div data-youtube-video=""><iframe width="640" height="480" allowfullscreen="true" autoplay="false" disablekbcontrols="false" enableiframeapi="false" endtime="0" ivloadpolicy="0" loop="false" modestbranding="false" origin="" playlist="" src="https://www.youtube.com/embed/MJu9vjBq2tE" start="0"></iframe></div>
 </script>
 
 <svelte:head>
@@ -286,6 +306,28 @@
 		</div>
 	{:else}
 		<AddHeroes onClick={addHeroes} selectedTownHall={townHall} />
+	{/if}
+</section>
+
+<section class="dashed units guide">
+	{#if showGuide}
+		<div>
+			<div class="title">
+				<h2>
+					<!-- <img src="/clash/heroes/Barbarian King.png" alt="Clash of clans barbarian king hero" /> -->
+					Guide
+					<C.ActionButton theme="danger" onclick={removeGuide} class="title-action-btn">Remove</C.ActionButton>
+				</h2>
+			</div>
+			<div class="guide-edit">
+				<C.GuideEditor bind:text={guideText} charLimit={GUIDE_TEXT_CHAR_LIMIT} />
+				<C.Fieldset label="Video guide" htmlName="youtubeUrl" style="margin-top: 1em">
+					<C.Input bind:value={guideYoutubeUrl} placeholder="https://youtube.com/..." />
+				</C.Fieldset>
+			</div>
+		</div>
+	{:else}
+		<!-- <AddGuide /> -->
 	{/if}
 </section>
 
@@ -465,6 +507,10 @@
 		align-items: center;
 		justify-content: center;
 		margin-top: 24px;
+	}
+
+	.guide-edit {
+		padding: 0 32px;
 	}
 
 	:global(.title-action-btn) {

@@ -216,7 +216,7 @@
 		/>
 	</div>
 	<div class="filter-btns">
-		<button class="th-filter filter-btn" class:active={$townHall !== undefined} type="button" bind:this={thMenuEl}>
+		<button class="th-filter filter-btn" class:active={$townHall !== undefined} type="button" bind:this={thMenuEl} onclick={() => (thMenuShow = !thMenuShow)}>
 			{#if $townHall === undefined}
 				<img src="/clash/town-halls/16.png" alt="Town hall 16" />
 				TH
@@ -225,7 +225,7 @@
 				TH{$townHall}
 			{/if}
 		</button>
-		<C.Menu bind:open={thMenuShow} refEl={thMenuEl} idealPlacement="left">
+		<C.Menu bind:open={thMenuShow} elRef={thMenuEl}>
 			<ul class="menu th-menu">
 				{#each [...app.townHalls].reverse() as th}
 					{@const isSelected = $townHall === th.level}
@@ -262,7 +262,7 @@
 			</svg>
 			{filtersLength > 0 ? `${filtersLength} ` : ''}{filtersLength === 1 ? 'Filter' : 'Filters'}
 		</button>
-		<button class="filter-btn" class:active={$sort !== undefined} type="button" bind:this={sortMenuEl}>
+		<button class="filter-btn" class:active={$sort !== undefined} type="button" bind:this={sortMenuEl} onclick={() => (sortMenuShow = !sortMenuShow)}>
 			<svg width="17" height="14" viewBox="0 0 17 14" fill="none" xmlns="http://www.w3.org/2000/svg">
 				<path
 					fill-rule="evenodd"
@@ -297,7 +297,7 @@
 			</svg>
 			{$sort !== undefined ? $sort : 'Sort'}
 		</button>
-		<C.Menu bind:open={sortMenuShow} refEl={sortMenuEl} idealPlacement="left">
+		<C.Menu bind:open={sortMenuShow} elRef={sortMenuEl}>
 			<ul class="menu sort-menu">
 				{#each sortOptions as option}
 					<li>

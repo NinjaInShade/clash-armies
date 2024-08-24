@@ -1,10 +1,13 @@
-import type { SaveArmy, Army, TownHall, Unit, Equipment, Pet, UnitType, BlackSmithLevel } from '~/lib/shared/types';
+import type { SaveArmy, Army, TownHall, Unit, Equipment, Pet, UnitType } from '~/lib/shared/types';
 import { db } from '~/lib/server/db';
 import { USER_MAX_ARMIES } from '~/lib/shared/utils';
 import { validateArmy, numberSchema } from '~/lib/shared/validation';
 import z from 'zod';
 import type { RequestEvent } from '@sveltejs/kit';
 import type { Request } from '~/app';
+
+import { generateJSON, generateHTML } from '@tiptap/html';
+import { getGuideEditorExtensions } from '~/lib/shared/guideEditor';
 
 type GetArmiesParams = {
 	req: Request;
@@ -31,6 +34,9 @@ export async function getArmies(opts: GetArmiesParams) {
 			ae.equipment,
             ap.pets,
 			av.votes,
+			ag.id AS guideId,
+			ag.textContent AS guideTextContent,
+			ag.youtubeUrl AS guideYoutubeUrl,
 			COALESCE(uv.vote, 0) AS userVote,
 			sa.id IS NOT NULL AS userBookmarked
 		FROM armies a
@@ -100,6 +106,7 @@ export async function getArmies(opts: GetArmiesParams) {
 			FROM army_votes
 			GROUP BY armyId
 		) av ON av.armyId = a.id
+		LEFT JOIN army_guides ag ON ag.armyId = a.id
 		LEFT JOIN army_votes uv ON uv.armyId = a.id AND uv.votedBy = ?
 		LEFT JOIN saved_armies sa ON sa.armyId = a.id AND sa.userId = ?
 	`;
@@ -308,7 +315,7 @@ export async function saveArmy(event: RequestEvent, data: SaveArmy): Promise<num
 	};
 
 	const army = validateArmy(data, ctx);
-	const { units, equipment, pets } = army;
+	const { units, equipment, pets, guide } = army;
 
 	if (!data.id) {
 		// Creating army
@@ -353,6 +360,13 @@ export async function saveArmy(event: RequestEvent, data: SaveArmy): Promise<num
 				// TODO: fix this (insertMany should cope/bail if array is empty)
 				await tx.insertMany('army_pets', armyPets);
 			}
+			if (guide) {
+				await tx.insertOne('army_guides', {
+					armyId,
+					textContent: guide.textContent,
+					youtubeUrl: guide.youtubeUrl,
+				});
+			}
 			return armyId;
 		});
 	}
@@ -391,7 +405,7 @@ export async function saveArmy(event: RequestEvent, data: SaveArmy): Promise<num
 			const equipmentData = equipment.map((eq) => ({ id: eq.id ?? null, armyId, equipmentId: eq.equipmentId }));
 			await tx.upsert('army_equipment', equipmentData);
 		} else {
-			await tx.query('DELETE FROM army_equipment WHERE armyId = ?', [armyId]);
+			await tx.delete('army_equipment', { armyId });
 		}
 		if (pets.length) {
 			// Remove deleted pets
@@ -400,7 +414,19 @@ export async function saveArmy(event: RequestEvent, data: SaveArmy): Promise<num
 			const petsData = pets.map((p) => ({ id: p.id ?? null, armyId, petId: p.petId, hero: p.hero }));
 			await tx.upsert('army_pets', petsData);
 		} else {
-			await tx.query('DELETE FROM army_pets WHERE armyId = ?', [armyId]);
+			await tx.delete('army_pets', { armyId });
+		}
+		if (guide) {
+			let textContent = null;
+			if (guide.textContent) {
+				// Escapes/sanitizes the HTML for security reasons (converting to JSON and back to HTML achieves this)
+				const extensions = getGuideEditorExtensions();
+				textContent = generateHTML(generateJSON(guide.textContent, extensions), extensions);
+			}
+			const guideData = [{ id: guide.id ?? null, armyId, textContent, youtubeUrl: guide.youtubeUrl }];
+			await tx.upsert('army_guides', guideData);
+		} else {
+			await tx.delete('army_guides', { armyId });
 		}
 	});
 	return armyId;

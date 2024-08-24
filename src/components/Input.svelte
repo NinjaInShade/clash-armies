@@ -39,7 +39,7 @@
 				{@render icon()}
 			</div>
 		{/if}
-		<input bind:value oninput={_onChange} class="input" type="text" name={htmlName} id={htmlName} {disabled} {placeholder} {...rest} />
+		<input bind:value oninput={_onChange} class="input focus-grey" type="text" name={htmlName} id={htmlName} {disabled} {placeholder} {...rest} />
 	</div>
 	{#if error}
 		<small class="error-container">
@@ -75,7 +75,6 @@
 
 	/* Input */
 	.input {
-		outline: none;
 		background-color: var(--grey-700);
 		border: 1px solid var(--grey-500);
 		font-size: var(--fs);
@@ -94,8 +93,7 @@
 		color: var(--grey-500);
 	}
 
-	.input:active,
-	.input:focus {
+	.input:active {
 		outline: none;
 		border: 1px solid var(--primary-400);
 		box-shadow: 0 0 10px 0 hsla(33, 78%, 57%, 0.2);

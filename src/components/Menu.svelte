@@ -1,122 +1,105 @@
 <script lang="ts">
-	import { type Snippet } from 'svelte';
+	import { type Snippet, onDestroy } from 'svelte';
+	import { computePosition, autoUpdate, flip, shift, offset, type Placement } from '@floating-ui/dom';
 
 	type Props = {
 		open: boolean;
-		refEl: HTMLElement | undefined;
+		elRef: HTMLElement | undefined;
+		placement?: Placement;
+		onClose?: () => void;
 		children: Snippet;
-		/** The ideal position for the menu @default center */
-		idealPlacement?: 'left' | 'center' | 'right';
 	};
-	let { open = $bindable(), refEl, children, idealPlacement = 'center' }: Props = $props();
+	let { open = $bindable(), elRef, children, placement = 'bottom', onClose = () => {} }: Props = $props();
 
-	let menuEl = $state<HTMLElement | undefined>();
+	// This shouldn't be state as $effect will infinitely re-run otherwise
+	let autoUpdateDispose = () => {};
+
+	let menuRef = $state<HTMLElement | undefined>();
 	let x = $state<number | null>(null);
 	let y = $state<number | null>(null);
 
-	$effect(() => {
-		if (refEl) {
-			refEl.addEventListener('click', toggleOpen);
-		}
-	});
+	onDestroy(unregisterAutoUpdate);
 
-	$effect(() => {
-		if (open && refEl && menuEl) {
-			updatePosition();
-		}
-	});
+	$effect(() => void updateOpen(open));
+	$effect(() => registerAutoUpdate(elRef, menuRef, open));
 
-	function toggleOpen() {
-		open = !open;
+	function registerAutoUpdate(el: HTMLElement | undefined, menu: HTMLElement | undefined, open: boolean) {
+		if (!el || !menu || !open) return;
+		unregisterAutoUpdate();
+		autoUpdateDispose = autoUpdate(el, menu, async () => await updatePos(el, menu));
 	}
 
-	function updatePosition() {
-		if (!open || !refEl || !menuEl) return;
+	function unregisterAutoUpdate() {
+		if (!autoUpdateDispose) return;
+		autoUpdateDispose();
+	}
 
-		const refBBox = refEl.getBoundingClientRect();
-		const menuBBox = menuEl.getBoundingClientRect();
+	async function updatePos(el: HTMLElement | undefined, menu: HTMLElement | undefined) {
+		if (!el || !menu) return;
+		const middleware = [offset(2), flip(), shift({ padding: 16 })];
+		const pos = await computePosition(el, menu, { placement, middleware });
+		x = pos.x;
+		y = pos.y;
+	}
 
-		let newX = 0;
-		let newY = refBBox.y + refBBox.height + 2;
-
-		const leftPlacement = refBBox.x;
-		const centerPlacement = refBBox.x + refBBox.width / 2 - menuBBox.width / 2;
-		const rightPlacement = refBBox.x + refBBox.width - menuBBox.width;
-
-		if (idealPlacement === 'left') {
-			newX = leftPlacement;
-			if (newX + menuBBox.width > document.body.clientWidth) {
-				// No space to left, try right
-				newX = rightPlacement;
-			}
-		} else if (idealPlacement === 'center') {
-			newX = centerPlacement;
-		} else if (idealPlacement === 'right') {
-			newX = rightPlacement;
-			if (newX < 0) {
-				// No space to right, try left
-				newX = leftPlacement;
-			}
-		} else {
-			throw new Error(`Invalid placement "${idealPlacement}"`);
+	async function updateOpen(shouldOpen: boolean) {
+		if (shouldOpen) {
+			await updatePos(elRef, menuRef);
+			open = true;
+		} else if (open) {
+			open = false;
+			onClose();
 		}
-
-		x = newX;
-		y = newY;
 	}
 
 	function handleClickOutside(ev: MouseEvent) {
-		if (!ev.target) return;
-		if ((menuEl && menuEl.contains(ev.target)) || (refEl && refEl.contains(ev.target))) {
+		const target = ev.target as Node | undefined;
+		if (!open || !target || menuRef?.contains(target) || elRef?.contains(target)) {
 			return;
 		}
-		open = false;
+		updateOpen(false);
+	}
+
+	function handleFocusOutside(ev: FocusEvent) {
+		const target = ev.relatedTarget as Node | undefined;
+		if (!open || !target || menuRef?.contains(target) || elRef?.contains(target)) {
+			return;
+		}
+		updateOpen(false);
+	}
+
+	function handleEscape(ev: KeyboardEvent) {
+		if (open && ev.key === 'Escape') {
+			updateOpen(false);
+		}
 	}
 </script>
 
-<svelte:window
-	onfocusout={(ev) => {
-		if (!ev.relatedTarget || (menuEl && menuEl.contains(ev.relatedTarget))) {
-			return;
-		}
-		open = false;
-	}}
-	onclick={handleClickOutside}
-	onresize={updatePosition}
-	onscroll={updatePosition}
-/>
-
-<svelte:body onscroll={updatePosition} />
+<svelte:window onfocusout={handleFocusOutside} onclick={handleClickOutside} onkeydown={handleEscape} />
 
 <!-- svelte-ignore a11y_no_static_element_interactions -->
+<!-- svelte-ignore a11y_click_events_have_key_events -->
 <div
 	class="menu focus-grey"
 	class:hidden={!open || x === null || y === null}
 	style="--x: {x}px; --y: {y}px;"
-	onclick={(ev) => {
-		ev.stopPropagation();
-	}}
-	onkeydown={(ev) => {
-		ev.stopPropagation();
-	}}
-	bind:this={menuEl}
+	onclick={(ev) => ev.stopPropagation()}
+	bind:this={menuRef}
 >
-	{@render children()}
+	{#if open}
+		{@render children()}
+	{/if}
 </div>
 
 <style>
 	.menu {
-		max-width: calc(100dvw - (16px * 2));
-		transition: visibility 0s;
-		visibility: visible;
-		pointer-events: all;
-		position: fixed;
-		z-index: 1;
+		position: absolute;
+		width: max-content;
 		left: var(--x);
 		top: var(--y);
+		z-index: 1;
 	}
 	.menu.hidden {
-		visibility: hidden;
-		pointer-events: none;
+		display: none;
 	}
 </style>

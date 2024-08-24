@@ -1,4 +1,4 @@
-import type { SaveArmy, TownHall, Unit, Equipment, Pet, SaveUnit, SaveEquipment, SavePet } from './types';
+import type { SaveArmy, TownHall, Unit, Equipment, Pet, SaveUnit, SaveEquipment, SavePet, SaveGuide } from './types';
 import {
 	BANNERS,
 	VALID_UNIT_HOME,
@@ -13,7 +13,9 @@ import {
 	requireUnit,
 	requireEquipment,
 	requirePet,
+	GUIDE_TEXT_CHAR_LIMIT,
 } from './utils';
+import { checkGuideEditorSchema } from './guideEditor';
 import z from 'zod';
 
 export const numberSchema = z.number().int().positive();
@@ -32,6 +34,11 @@ export const petSchema = z.object({
 	petId: numberSchema,
 	hero: z.enum(VALID_HEROES),
 });
+export const guideSchema = z.object({
+	id: numberSchema.optional(),
+	textContent: z.string().min(5).max(GUIDE_TEXT_CHAR_LIMIT).nullable(),
+	youtubeUrl: z.string().min(1).max(75).nullable(),
+});
 export const armySchema = z.object({
 	id: numberSchema.optional(),
 	name: z.string().min(2).max(25),
@@ -40,6 +47,7 @@ export const armySchema = z.object({
 	units: z.array(unitSchema).nonempty(),
 	equipment: z.array(equipmentSchema),
 	pets: z.array(petSchema),
+	guide: guideSchema.optional(),
 });
 
 export type Ctx = { townHalls: TownHall[]; units: Unit[]; equipment: Equipment[]; pets: Pet[] };
@@ -60,6 +68,7 @@ export function validateArmy(data: unknown, ctx: Ctx): SaveArmy {
 	validateCcUnits(ccUnits, army.townHall, ctx);
 	validateEquipment(equipment, army.townHall, ctx);
 	validatePets(pets, army.townHall, ctx);
+	validateGuide(army.guide);
 
 	return army;
 }
@@ -186,6 +195,28 @@ export function validatePets(pets: SavePet[], townHall: number, ctx: Pick<Ctx, '
 			throw new Error(`Pet "${pet.name}" isn't available at town hall ${townHall}`);
 		}
 		heroToPets[pet.hero] = [...stashedPets, pet.name];
+	}
+}
+
+function validateGuide(guide?: SaveGuide) {
+	if (!guide) return;
+
+	const { textContent, youtubeUrl } = guide;
+
+	if (!textContent && !youtubeUrl) {
+		throw new Error('Guide must have at least either text content or youtube video link');
+	}
+
+	if (textContent) {
+		checkGuideEditorSchema(textContent);
+	}
+
+	if (youtubeUrl) {
+		// Validate YouTube URL
+		const youtubeUrlRegex = /^(?:https?:\/\/)?(?:www\.)?youtube\.com\/watch\?(?=.*v=((\w|-){11}))(?:\S+)?$/;
+		if (!youtubeUrlRegex.test(youtubeUrl)) {
+			throw new Error('Guide has an invalid YouTube URL');
+		}
 	}
 }
 

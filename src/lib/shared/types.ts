@@ -141,9 +141,18 @@ export type Pet = {
 	name: string;
 	levels: PetLevel[];
 };
+export type Guide = {
+	/** ID of the guide in the `army_guides` table */
+	id: number;
+	armyId: number;
+	textContent: string | null;
+	youtubeUrl: string | null;
+	createdTime: string;
+	updatedTime: string;
+};
 
 /**
- * The following `NewFoo` types are the bare minimum data required for army creation/saving
+ * The following `SaveFoo` types are the bare minimum data required for army creation/saving
  */
 export type SaveUnit = {
 	id?: number;
@@ -163,6 +172,11 @@ export type SavePet = {
 	petId: number;
 	hero: HeroType;
 };
+export type SaveGuide = {
+	id?: number;
+	textContent: string | null;
+	youtubeUrl: string | null;
+};
 
 /**
  * The following `ArmyFoo` types is the complete data `getArmy` will return for convenience
@@ -179,6 +193,13 @@ export type ArmyPet = (SavePet & Omit<Pet, 'levels'>) & {
 	/** ID of the pet in the `army_pets` table */
 	id: number;
 };
+export type ArmyGuide = SaveGuide & {
+	/** ID of the guide in the `army_guides` table */
+	id: number;
+	armyId: number;
+	createdTime: string;
+	updatedTime: string;
+};
 
 /** The bare minimum data required for army creation/saving */
 export type SaveArmy = {
@@ -190,6 +211,7 @@ export type SaveArmy = {
 	units: SaveUnit[];
 	equipment: SaveEquipment[];
 	pets: SavePet[];
+	guide?: SaveGuide;
 };
 /** A complete saved army, as returned by `getArmy` */
 export type Army = Omit<SaveArmy, 'units' | 'equipment' | 'pets'> & {
@@ -205,6 +227,9 @@ export type Army = Omit<SaveArmy, 'units' | 'equipment' | 'pets'> & {
 	username: string;
 	userVote: number;
 	userBookmarked: boolean;
+	guideId: number | null;
+	guideTextContent: string | null;
+	guideYoutubeUrl: string | null;
 };
 
 export type Totals = {

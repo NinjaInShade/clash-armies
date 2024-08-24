@@ -59,7 +59,7 @@
 	</div>
 </nav>
 
-<nav class="sidebar" class:sidebar-active={sidebarOpen}>
+<nav class="sidebar" class:sidebar-active={sidebarOpen} tabIndex={sidebarOpen ? undefined : -1}>
 	<div>
 		<ul class="sidebar-links">
 			<li class="sidebar-link">

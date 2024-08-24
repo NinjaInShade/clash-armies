@@ -103,6 +103,7 @@ export const BANNERS = [
 export const USER_MAX_ARMIES = 40;
 export const VALID_UNIT_HOME = ['armyCamp', 'clanCastle'] as const;
 export const VALID_HEROES = ['Barbarian King', 'Archer Queen', 'Grand Warden', 'Royal Champion'] as const;
+export const GUIDE_TEXT_CHAR_LIMIT = 10_000;
 
 /**
  * Given the passed in units, calculates how much housing space

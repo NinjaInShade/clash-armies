@@ -103,10 +103,13 @@
 * {
 	font-family: 'Poppins', sans-serif;
 	box-sizing: border-box;
-	text-decoration: none;
 	list-style: none;
 	margin: 0;
 	padding: 0;
+}
+
+*:not(s) {
+	text-decoration: none;
 }
 
 html,
