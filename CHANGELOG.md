@@ -2,6 +2,7 @@
 
 - Add guide support to armies
 - Add ability to import units from clash of clans army link
+- Add new "Magic Mirror" archer queen equipment
 - Improve and extend filtering UI/capabilities
 
 ## [0.1.1] - 2024-08-03
