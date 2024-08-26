@@ -18,14 +18,14 @@
 			const response = await fetch('/armies/bookmarks', {
 				method: removing ? 'DELETE' : 'POST',
 				body: JSON.stringify({ armyId: army.id }),
-				headers: { 'Content-Type': 'application/json' }
+				headers: { 'Content-Type': 'application/json' },
 			});
 			const result = await response.json();
 			if (result.errors || response.status !== 200) {
 				app.notify({
 					title: 'Failed action',
 					description: `There was a problem ${removing ? 'removing this army from saved' : 'saving this army'}`,
-					theme: 'failure'
+					theme: 'failure',
 				});
 			}
 			if (result.errors) {

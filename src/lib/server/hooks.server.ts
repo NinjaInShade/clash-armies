@@ -1,10 +1,10 @@
 import type { Handle, RequestEvent } from '@sveltejs/kit';
 import { db } from '~/lib/server/db';
 import { migration } from '~/lib/server/migration';
-import { lucia } from "~/lib/server/auth/lucia";
-import { hasAuth, requireAuth, hasRoles, requireRoles } from "~/lib/server/auth/utils";
+import { lucia } from '~/lib/server/auth/lucia';
+import { hasAuth, requireAuth, hasRoles, requireRoles } from '~/lib/server/auth/utils';
 import { CronJob } from 'cron';
-import { dev } from "$app/environment";
+import { dev } from '$app/environment';
 import util from '@ninjalib/util';
 
 util.Logger.showTimestamp = true;
@@ -12,9 +12,9 @@ util.Logger.showDate = !dev;
 
 export const log = util.logger('clash-armies:server');
 
-const hourlyTask = new CronJob('0 0 * * * *', async function() {
+const hourlyTask = new CronJob('0 0 * * * *', async function () {
 	await lucia.deleteExpiredSessions();
-})
+});
 
 const serverInit = (async () => {
 	hourlyTask.start();
@@ -46,8 +46,8 @@ export const handle: Handle = async ({ event, resolve }) => {
 
 	event.locals.hasAuth = () => hasAuth(event);
 	event.locals.requireAuth = () => requireAuth(event);
-	event.locals.hasRoles = (...roles: string[]) => hasRoles(event, ...roles)
-	event.locals.requireRoles = (...roles: string[]) => requireRoles(event, ...roles)
+	event.locals.hasRoles = (...roles: string[]) => hasRoles(event, ...roles);
+	event.locals.requireRoles = (...roles: string[]) => requireRoles(event, ...roles);
 
 	const sessionId = event.cookies.get(lucia.sessionCookieName);
 	if (!sessionId) {
@@ -61,15 +61,15 @@ export const handle: Handle = async ({ event, resolve }) => {
 	if (session && session.fresh) {
 		const sessionCookie = lucia.createSessionCookie(session.id);
 		event.cookies.set(sessionCookie.name, sessionCookie.value, {
-			path: ".",
-			...sessionCookie.attributes
+			path: '.',
+			...sessionCookie.attributes,
 		});
 	}
 	if (!session) {
 		const sessionCookie = lucia.createBlankSessionCookie();
 		event.cookies.set(sessionCookie.name, sessionCookie.value, {
-			path: ".",
-			...sessionCookie.attributes
+			path: '.',
+			...sessionCookie.attributes,
 		});
 	}
 

@@ -22,7 +22,7 @@
 				return [THWidgetDisplay, { level: row.level }];
 			},
 			width: '65px',
-			cellStyle: 'justify-content: center; overflow-y: hidden'
+			cellStyle: 'justify-content: center; overflow-y: hidden',
 		},
 		{ key: 'level' },
 		{ key: 'maxBarracks', label: 'Barracks' },
@@ -33,7 +33,7 @@
 		{ key: 'maxWorkshop', label: 'Workshop', width: '110px' },
 		{ key: 'troopCapacity', label: 'Troops', width: '85px' },
 		{ key: 'siegeCapacity', label: 'Sieges', width: '85px' },
-		{ key: 'spellCapacity', label: 'Spells', width: '80px' }
+		{ key: 'spellCapacity', label: 'Spells', width: '80px' },
 	];
 
 	let selectedUnits = $state<number[]>([]);
@@ -44,13 +44,13 @@
 				return [UnitTableDisplay, { name: row.name }];
 			},
 			width: '65px',
-			cellStyle: 'justify-content: center; overflow-y: hidden'
+			cellStyle: 'justify-content: center; overflow-y: hidden',
 		},
 		{ key: 'type', label: 'Type', width: '100px' },
 		{ key: 'name', label: 'Name' },
 		{ key: 'objectId', label: 'Object ID', width: '120px' },
 		{ key: 'trainingTime', label: 'Training time', render: (row: Unit) => formatTime(row.trainingTime * 1000), width: '165px' },
-		{ key: 'housingSpace', label: 'Housing space', width: '165px' }
+		{ key: 'housingSpace', label: 'Housing space', width: '165px' },
 	];
 
 	function addTownHall() {

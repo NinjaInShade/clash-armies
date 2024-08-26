@@ -18,7 +18,7 @@ export const db = new MySQL({
 	password: DB_PASSWORD,
 	port: +DB_PORT,
 	database: 'clash-armies',
-	typeCast: function(field, next) {
+	typeCast: function (field, next) {
 		if (field.type === 'TINY' && field.length === 1) {
 			const str = field.string();
 			if (str === null) {
@@ -32,5 +32,5 @@ export const db = new MySQL({
 			}
 		}
 		return next();
-	}
+	},
 });

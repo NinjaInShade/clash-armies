@@ -13,20 +13,20 @@ const config = {
 		adapter: adapter({
 			// Where the final node build that uses the vite build goes.
 			// This is the code that gets deployed to prod.
-			out: 'dist'
+			out: 'dist',
 		}),
 		alias: {
-			'~': 'src'
+			'~': 'src',
 		},
 		files: {
 			hooks: {
-				server: 'src/lib/server/hooks.server.ts'
-			}
+				server: 'src/lib/server/hooks.server.ts',
+			},
 		},
 		version: { name: pkg.version },
 		// Where the optimized vite build output goes.
-		outDir: 'build'
-	}
+		outDir: 'build',
+	},
 };
 
 export default config;

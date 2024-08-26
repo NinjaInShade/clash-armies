@@ -14,6 +14,6 @@ export const load: LayoutServerLoad = async (ev) => {
 		townHalls: await getTownHalls(),
 		equipment: await getEquipment(),
 		pets: await getPets(),
-		user
+		user,
 	};
 };

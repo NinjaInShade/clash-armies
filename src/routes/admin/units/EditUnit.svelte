@@ -50,7 +50,7 @@
 			level: max + 1,
 			spellFactoryLevel: null,
 			barrackLevel: null,
-			laboratoryLevel: null
+			laboratoryLevel: null,
 		});
 		levels.sort(sortLevels);
 	}
@@ -75,14 +75,14 @@
 	const UNIT_TYPES = [
 		{ value: 'Troop', label: 'Troop' },
 		{ value: 'Siege', label: 'Siege' },
-		{ value: 'Spell', label: 'Spell' }
+		{ value: 'Spell', label: 'Spell' },
 	];
 	const PROD_BUILDINGS = [
 		{ value: 'Barrack', label: 'Barrack' },
 		{ value: 'Dark Elixir Barrack', label: 'Dark Elixir Barrack' },
 		{ value: 'Siege Workshop', label: 'Siege Workshop' },
 		{ value: 'Spell Factory', label: 'Spell Factory' },
-		{ value: 'Dark Spell Factory', label: 'Dark Spell Factory' }
+		{ value: 'Dark Spell Factory', label: 'Dark Spell Factory' },
 	];
 
 	async function saveUnit() {
@@ -100,7 +100,7 @@
 			isJumper,
 			airTargets,
 			groundTargets,
-			levels
+			levels,
 		};
 		body.append('unit', JSON.stringify(data));
 		if (image && image[0]) {

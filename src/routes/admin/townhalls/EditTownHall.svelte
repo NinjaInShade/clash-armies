@@ -54,7 +54,7 @@
 			maxWorkshop,
 			troopCapacity,
 			siegeCapacity,
-			spellCapacity
+			spellCapacity,
 		};
 		body.append('townHall', JSON.stringify(data));
 		if (image && image[0]) {

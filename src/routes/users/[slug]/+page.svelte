@@ -52,7 +52,7 @@
 		<C.TabStrip
 			tabs={[
 				{ name: 'created', label: `Created (${armies.length}/${USER_MAX_ARMIES})`, component: CreatedArmiesTab, componentProps: { armies, user } },
-				{ name: 'saved', label: `Saved (${savedArmies.length})`, component: SavedArmiesTab, componentProps: { savedArmies, user } }
+				{ name: 'saved', label: `Saved (${savedArmies.length})`, component: SavedArmiesTab, componentProps: { savedArmies, user } },
 			]}
 		/>
 	</div>
