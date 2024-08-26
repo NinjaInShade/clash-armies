@@ -30,12 +30,15 @@
 		originallyFocusedEl = (document.activeElement ?? null) as HTMLElement | null;
 		focusableEls = getFocusableEls();
 
-		if (!focusableEls.length || !trapContainer) return;
+		setTimeout(() => {
+			// Focus first element in the trap
+			if (!focusableEls.length) return;
+			focusableEls[0].focus();
+		}, 0);
 
-		// Focus first element in the trap
-		focusableEls[0].focus();
-
-		observer.observe(trapContainer, { attributes: true, childList: true, subtree: true });
+		if (trapContainer) {
+			observer.observe(trapContainer, { attributes: true, childList: true, subtree: true });
+		}
 
 		return dispose;
 	});

@@ -16,11 +16,11 @@
 </script>
 
 {#if asLink}
-    <a class='action-btn {theme} {_class ? _class : ''}' class:ghost type='button' {...rest}>
+	<a class="action-btn {theme} {_class ? _class : ''} {theme === 'grey' ? 'focus-grey' : ''}" class:ghost type="button" {...rest}>
         {@render children()}
     </a>
 {:else}
-    <button class='action-btn {theme} {_class ? _class : ''}' class:ghost type='button' {...rest}>
+	<button class="action-btn {theme} {_class ? _class : ''} {theme === 'grey' ? 'focus-grey' : ''}" class:ghost type="button" {...rest}>
         {@render children()}
     </button>
 {/if}

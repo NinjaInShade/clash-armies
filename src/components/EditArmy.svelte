@@ -12,10 +12,12 @@
 		getEquipmentLevel,
 		getPetLevel,
 		getHeroLevel,
+		GUIDE_TEXT_CHAR_LIMIT,
 	} from '~/lib/shared/utils';
 	import type { Optional, AppState, Army, ArmyUnit, ArmyEquipment, ArmyPet, Banner, FetchErrors } from '~/lib/shared/types';
 	import AddClanCastle from './AddClanCastle.svelte';
 	import AddHeroes from './AddHeroes.svelte';
+	import AddGuide from './AddGuide.svelte';
 	import C from '~/components';
 
 	type Props = { army?: Army };
@@ -24,19 +26,22 @@
 	const app = getContext<AppState>('app');
 
 	// Army state
-	let townHall = $state<number>(army?.townHall ?? 16);
-	let banner = $state<Banner>(army?.banner ?? BANNERS[Math.floor(Math.random() * BANNERS.length)]);
-	let name = $state<string | null>(army?.name ?? null);
+	let townHall = $state(army?.townHall ?? 16);
+	let banner = $state(army?.banner ?? BANNERS[Math.floor(Math.random() * BANNERS.length)]);
+	let name = $state(army?.name ?? null);
 	let units = $state<Optional<ArmyUnit, 'id'>[]>(army?.units?.filter((unit) => unit.home === 'armyCamp') ?? []);
 	let ccUnits = $state<Optional<ArmyUnit, 'id'>[]>(army?.units?.filter((unit) => unit.home === 'clanCastle') ?? []);
 	let equipment = $state<Optional<ArmyEquipment, 'id'>[]>(army?.equipment ?? []);
 	let pets = $state<Optional<ArmyPet, 'id'>[]>(army?.pets ?? []);
+	let guideText = $state(army?.guide?.textContent ?? null);
+	let guideYoutubeUrl = $state(army?.guide?.youtubeUrl ?? null);
 
 	// Other state
 	let errors = $state<FetchErrors | null>(null);
 	let saveDisabled = $derived(!name || name.length < 2 || name.length > 25 || !units.length);
-	let showClanCastle = $state<boolean>(ccUnits.length > 0);
-	let showHeroes = $state<boolean>(equipment.length > 0 || pets.length > 0);
+	let showClanCastle = $state(ccUnits.length > 0);
+	let showHeroes = $state(equipment.length > 0 || pets.length > 0);
+	let showGuide = $state(typeof army?.guide?.id === 'number');
 
 	const thData = $derived(app.townHalls.find((th) => th.level === townHall));
 	const capacity = $derived.by(() => getCapacity(thData));
@@ -50,6 +55,10 @@
 
 	function addHeroes() {
 		showHeroes = true;
+	}
+
+	function addGuide() {
+		showGuide = true;
 	}
 
 	async function removeClanCastle() {
@@ -69,6 +78,16 @@
 		equipment = [];
 		pets = [];
 		showHeroes = false;
+	}
+
+	async function removeGuide() {
+		if (guideText || guideYoutubeUrl) {
+			const confirmed = await app.confirm('Removing the guide will clear already written text and youtube URL. Remove anyway?');
+			if (!confirmed) return;
+		}
+		guideText = null;
+		guideYoutubeUrl = null;
+		showGuide = false;
 	}
 
 	async function importUnits() {
@@ -103,6 +122,11 @@
 	}
 
 	async function saveArmy() {
+		const guide = {
+			id: army?.guide?.id,
+			textContent: guideText,
+			youtubeUrl: guideYoutubeUrl,
+		};
 		const data = {
 			id: army?.id,
 			name,
@@ -117,6 +141,7 @@
 			pets: pets.map((p) => {
 				return { id: p.id, petId: p.petId, hero: p.hero };
 			}),
+			guide: guideText || guideYoutubeUrl ? guide : null,
 		};
 		const response = await fetch('/armies', {
 			method: 'POST',
@@ -286,6 +311,28 @@
 		</div>
 	{:else}
 		<AddHeroes onClick={addHeroes} selectedTownHall={townHall} />
+	{/if}
+</section>
+
+<section class="dashed units guide">
+	{#if showGuide}
+		<div>
+			<div class="title">
+				<h2>
+					<img src="/clash/ui/bb-duel.png" alt="Clash of clans builder base swords" />
+					Guide
+					<C.ActionButton theme="danger" onclick={removeGuide} class="title-action-btn">Remove</C.ActionButton>
+				</h2>
+			</div>
+			<div class="guide-edit">
+				<C.GuideEditor bind:text={guideText} charLimit={GUIDE_TEXT_CHAR_LIMIT} mode="edit" />
+				<C.Fieldset label="Video guide" htmlName="youtubeUrl" style="margin-top: 1em">
+					<C.Input bind:value={guideYoutubeUrl} placeholder="https://youtube.com/..." />
+				</C.Fieldset>
+			</div>
+		</div>
+	{:else}
+		<AddGuide onClick={addGuide} />
 	{/if}
 </section>
 
@@ -467,6 +514,10 @@
 		margin-top: 24px;
 	}
 
+	.guide-edit {
+		padding: 0 32px;
+	}
+
 	:global(.title-action-btn) {
 		margin-left: 0.25em;
 	}
@@ -494,11 +545,11 @@
 			flex-flow: column nowrap;
 			gap: 0px;
 		}
-		.units .title > * {
+		.units:not(.guide) .title > * {
 			margin: 0;
 			width: 100%;
 		}
-		.units:not(.heroes) h2 {
+		.units:not(.heroes):not(.guide) h2 {
 			border-bottom: none;
 			padding-bottom: 0;
 		}
@@ -526,6 +577,10 @@
 		}
 		.picker-container,
 		.hero-picker-container {
+			padding: 0 24px;
+		}
+		.guide-edit {
+			--input-width: 100%;
 			padding: 0 24px;
 		}
 	}

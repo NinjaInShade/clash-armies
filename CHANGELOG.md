@@ -1,5 +1,6 @@
 ## [Unreleased]
 
+- Add guide support to armies
 - Add ability to import units from clash of clans army link
 - Improve and extend filtering UI/capabilities
 

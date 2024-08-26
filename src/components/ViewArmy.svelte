@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { getContext } from 'svelte';
 	import { goto } from '$app/navigation';
-	import { VALID_HEROES, getTotals, getCapacity, getCcCapacity, hasHero } from '~/lib/shared/utils';
+	import { VALID_HEROES, getTotals, getCapacity, getCcCapacity, hasHero, YOUTUBE_URL_REGEX } from '~/lib/shared/utils';
 	import { copyLink, openInGame, getTags, getCopyBtnTitle, getOpenBtnTitle } from '~/lib/client/army';
 	import type { Army, AppState, FetchErrors } from '~/lib/shared/types';
 	import C from '~/components';
@@ -22,10 +22,20 @@
 	const ccHousingSpaceUsed = $derived.by(() => getTotals(ccUnits));
 	const showClanCastle = $state<boolean>(ccUnits.length > 0);
 	const showHeroes = $state<boolean>(VALID_HEROES.some((hero) => hasHero(hero, army)));
+	const showGuide = $state(army.guide !== null);
 
 	let errors = $state<FetchErrors | null>(null);
 	let votes = $state<number>(army.votes);
 	let userVote = $state<number>(army.userVote ?? 0);
+
+	function getYoutubeEmbedSrc(url: string) {
+		const match = url.match(YOUTUBE_URL_REGEX);
+		if (!match || !match[1]) {
+			return null;
+		}
+		const videoId = match[1];
+		return `https://www.youtube.com/embed/${videoId}`;
+	}
 
 	async function deleteArmy() {
 		if (!army) return;
@@ -153,6 +163,47 @@
 					{/if}
 				{/each}
 			</div>
+		</div>
+	</section>
+{/if}
+
+{#if showGuide}
+	<section class="dashed guide">
+		<div class="top">
+			<div class="title">
+				<h2 class="dashed">
+					<img src="/clash/ui/bb-duel.png" alt="Clash of clans builder base swords" />
+					Guide
+				</h2>
+			</div>
+			{#if army.guide?.textContent}
+				<div class="guide-editor-container">
+					<C.GuideEditor text={army.guide.textContent} mode="view" />
+				</div>
+			{/if}
+			{#if army.guide?.youtubeUrl}
+				<div class="guide-youtube-container">
+					<h2 class="video-guide-title">
+						<img src="/icons/youtube-coloured.png" alt="Youtube icon" />
+						Video guide
+					</h2>
+					<iframe
+						src={getYoutubeEmbedSrc(army.guide.youtubeUrl)}
+						allowfullscreen={true}
+						autoplay={false}
+						disablekbcontrols={false}
+						enableiframeapi={false}
+						endtime="0"
+						ivloadpolicy="0"
+						loop={false}
+						modestbranding={false}
+						origin=""
+						playlist=""
+						start="0"
+						title="Army video guide"
+					></iframe>
+				</div>
+			{/if}
 		</div>
 	</section>
 {/if}
@@ -311,15 +362,25 @@
 		--bottom-padding: 0;
 		margin-top: 48px;
 	}
-	.units.cc,
-	.units.heroes {
+	.cc,
+	.heroes,
+	.guide {
 		margin-top: 32px;
 	}
 	.units .top {
 		padding: 0 24px 24px 24px;
 		margin-top: -12px;
 	}
-	.units .top h2 {
+	.guide .top {
+		padding: 0;
+		margin-top: -12px;
+	}
+	.guide .top .title {
+		padding: 0 24px;
+	}
+	.units .top h2,
+	.guide .top h2,
+	.guide .top .video-guide-title {
 		display: inline-flex;
 		align-items: center;
 		gap: 0.5em;
@@ -334,7 +395,11 @@
 		margin-bottom: 16px;
 		padding: 6px 8px;
 	}
-	.units .top h2 img {
+	.guide .top .video-guide-title {
+		padding: 0;
+	}
+	.units .top h2 img,
+	.guide .top img {
 		flex-shrink: 0;
 		max-height: 24px;
 		height: 100%;
@@ -343,6 +408,28 @@
 
 	.units :global(.units-list) {
 		padding: 0 8px;
+	}
+
+	.guide-editor-container {
+		--editor-min-height: 0;
+		padding: 0 32px 24px 32px;
+		border-bottom: 1px dashed var(--grey-500);
+	}
+	.guide-youtube-container {
+		display: flex;
+		flex-flow: column nowrap;
+		padding: 0 32px 24px 32px;
+	}
+	.guide :has(.guide-editor-container) .guide-youtube-container {
+		padding-top: 24px;
+	}
+	.guide-youtube-container iframe {
+		max-width: 800px;
+		aspect-ratio: 16 / 9;
+		width: 100%;
+	}
+	.guide-youtube-container .video-guide-title img {
+		max-height: 18px;
 	}
 
 	.units .controls {
@@ -391,7 +478,6 @@
 			--unit-size: 60px;
 			--unit-amount-size: 14px;
 			--unit-lvl-size: 11px;
-			margin-top: 36px;
 		}
 		.heroes-list {
 			--hero-height: 90px;
@@ -470,6 +556,16 @@
 			border-radius: 0;
 			border-top: none;
 			width: 100%;
+		}
+		.guide .top .title {
+			padding: 0 16px;
+		}
+		.guide-editor-container,
+		.guide-youtube-container {
+			padding: 0 24px 16px 24px;
+		}
+		.guide :has(.guide-editor-container) .guide-youtube-container {
+			padding-top: 16px;
 		}
 	}
 

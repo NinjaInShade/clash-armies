@@ -1,4 +1,5 @@
 import type { Army, TownHall, Unit, UnitType, Equipment, Pet, HeroType } from './types';
+import type { VDocumentFragment, VHTMLDocument } from 'zeed-dom';
 
 /**
  * A key:value of which regular troop corresponds to the super version.
@@ -103,6 +104,8 @@ export const BANNERS = [
 export const USER_MAX_ARMIES = 40;
 export const VALID_UNIT_HOME = ['armyCamp', 'clanCastle'] as const;
 export const VALID_HEROES = ['Barbarian King', 'Archer Queen', 'Grand Warden', 'Royal Champion'] as const;
+export const GUIDE_TEXT_CHAR_LIMIT = 3_000;
+export const YOUTUBE_URL_REGEX = /^(?:https:\/\/)?(?:www\.)?youtube\.com\/watch\?(?=.*v=((\w|-){11}))(?:\S+)?$/;
 
 /**
  * Given the passed in units, calculates how much housing space
@@ -405,4 +408,41 @@ export function requirePet(petId: number, ctx: { pets: Pet[] }) {
 		throw new Error(`Expected pet ${petId}`);
 	}
 	return pet;
+}
+
+/**
+ * Counts amount of characters inside the el and it's descendants
+ * This also counts an empty tag as one character
+ */
+export function countCharacters(el: HTMLElement | VDocumentFragment | VHTMLDocument) {
+	let charCount = el.textContent?.length ?? 0;
+	el.querySelectorAll('*').forEach((tag) => {
+		const isEmpty = !tag.textContent || (tag.childNodes.length === 0 && tag.textContent.trim() === '');
+		// zeed-dom doesn't seem to support querySelector(':empty')
+		if (isEmpty) {
+			charCount += 1;
+		}
+	});
+	return charCount;
+}
+
+/**
+ * Merges adjacent empty tags, so for example 5 empty <p> tags get merged into one empty <p> tag
+ */
+export function mergeAdjacentEmptyTags(el: HTMLElement | VDocumentFragment | VHTMLDocument) {
+	let previousWasEmpty = false;
+	el.querySelectorAll('*').forEach((tag) => {
+		// zeed-dom doesn't seem to support querySelector(':empty')
+		const isEmpty = !tag.textContent || (tag.childNodes.length === 0 && tag.textContent.trim() === '');
+		if (isEmpty) {
+			if (previousWasEmpty) {
+				tag.remove();
+			}
+			previousWasEmpty = true;
+		} else {
+			previousWasEmpty = false;
+		}
+	});
+
+	return el.innerHTML;
 }

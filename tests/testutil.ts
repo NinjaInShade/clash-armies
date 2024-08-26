@@ -74,7 +74,7 @@ export async function resetDB() {
 
 /** Returns an army, defaulting certain fields with dummy data for convenience */
 export function makeData(data: Record<string, unknown>) {
-	return { units: [], equipment: [], pets: [], banner: BANNERS[0], ...data } as unknown as SaveArmy;
+	return { units: [], equipment: [], pets: [], guide: null, banner: BANNERS[0], ...data } as unknown as SaveArmy;
 }
 
 export function assertArmies(actual: Army[], expected: SaveArmy[]) {
