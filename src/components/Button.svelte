@@ -16,16 +16,16 @@
 	let _loading = $state<boolean>(false);
 
 	async function _onClick(ev: MouseEvent | KeyboardEvent) {
-        if (!onClick || _loading) {
+		if (!onClick || _loading) {
 			return;
-        }
-        _loading = true;
-        await onClick(ev);
-        _loading = false;
+		}
+		_loading = true;
+		await onClick(ev);
+		_loading = false;
 		if (ref) {
 			// Prevents losing focus on keyboard enter
 			await tick();
-            ref.focus();
+			ref.focus();
 		}
 	}
 </script>
@@ -83,7 +83,8 @@
 		gap: 6px;
 	}
 
-	.btn-sm, .btn-sm span {
+	.btn-sm,
+	.btn-sm span {
 		font-size: var(--fs-sm);
 		line-height: var(--fs-sm-lh);
 	}
@@ -128,15 +129,15 @@
 	}
 
 	.spinner-container {
-        position: absolute;
-        transform: translate(-50%, -50%);
-        left: 50%;
-        top: 50%;
-    }
+		position: absolute;
+		transform: translate(-50%, -50%);
+		left: 50%;
+		top: 50%;
+	}
 	.spinner {
 		width: 12px;
 		height: 12px;
-		border: 5px solid #FFF;
+		border: 5px solid #fff;
 		border-bottom-color: transparent;
 		border-radius: 50%;
 		display: inline-block;
@@ -151,5 +152,5 @@
 		100% {
 			transform: rotate(360deg);
 		}
-    }
+	}
 </style>

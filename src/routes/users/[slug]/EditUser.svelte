@@ -23,7 +23,7 @@
 		const response = await fetch('/users', {
 			method: 'POST',
 			body: JSON.stringify(data),
-			headers: { 'Content-Type': 'application/json' }
+			headers: { 'Content-Type': 'application/json' },
 		});
 		const result = await response.json();
 		if (result.errors) {

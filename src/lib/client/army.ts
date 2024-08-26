@@ -128,7 +128,7 @@ export function openLink(href: string, openInNewTab = true) {
 export async function copyLink(units: ArmyUnit[], app: AppState) {
 	const link = generateLink(units);
 	await copy(link);
-	app.notify({ title: 'Copied army!', description: 'Successfully copied army link to clipboard', theme: 'success' })
+	app.notify({ title: 'Copied army!', description: 'Successfully copied army link to clipboard', theme: 'success' });
 }
 
 async function copy(text: string) {
@@ -166,7 +166,7 @@ export function openInGame(units: ArmyUnit[]) {
 }
 
 export function getTags(army: Army) {
-	const tags: { label: string, icon?: SvelteComponentGeneric }[] = [];
+	const tags: { label: string; icon?: SvelteComponentGeneric }[] = [];
 	tags.push({ label: `TH${army.townHall}` });
 	const typeData = army.units.reduce(
 		(prev, curr) => {
@@ -183,13 +183,13 @@ export function getTags(army: Army) {
 		{ air: 0, ground: 0 }
 	);
 	tags.push({ label: typeData.ground > typeData.air ? 'Ground' : 'Air' });
-	const hasClanCastle = army.units.filter(unit => unit.home === 'clanCastle').length > 0;
+	const hasClanCastle = army.units.filter((unit) => unit.home === 'clanCastle').length > 0;
 	if (hasClanCastle) {
-		tags.push({ label: 'Clan castle', icon: C.IconTagsClanCastle })
+		tags.push({ label: 'Clan castle', icon: C.IconTagsClanCastle });
 	}
-	const hasHeroes = VALID_HEROES.some(hero => hasHero(hero, army));
+	const hasHeroes = VALID_HEROES.some((hero) => hasHero(hero, army));
 	if (hasHeroes) {
-		tags.push({ label: 'Heroes', icon: C.IconTagsHeroes })
+		tags.push({ label: 'Heroes', icon: C.IconTagsHeroes });
 	}
 	if (army.guide?.id) {
 		tags.push({ label: 'Guide' });

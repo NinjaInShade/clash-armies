@@ -14,7 +14,7 @@
 		flex: 1 0 0px;
 	}
 
-	@media(max-width: 850px) {
+	@media (max-width: 850px) {
 		.army {
 			padding: 32px var(--side-padding) 24px var(--side-padding);
 		}

@@ -22,14 +22,14 @@
 			const response = await fetch('/armies/votes', {
 				method: 'POST',
 				body: JSON.stringify(data),
-				headers: { 'Content-Type': 'application/json' }
+				headers: { 'Content-Type': 'application/json' },
 			});
 			const result = await response.json();
 			if (result.errors || response.status !== 200) {
 				app.notify({
 					title: 'Failed action',
 					description: `There was a problem saving your vote`,
-					theme: 'failure'
+					theme: 'failure',
 				});
 			}
 			if (result.errors) {

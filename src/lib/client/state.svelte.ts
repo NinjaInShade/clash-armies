@@ -73,7 +73,7 @@ export function createAppState(initial: Omit<AppState, 'modals' | 'notifications
 						if (onClose) {
 							onClose(rtnValue);
 						}
-					}
+					},
 				},
 			};
 			modals.push(modalSpec);
@@ -82,7 +82,7 @@ export function createAppState(initial: Omit<AppState, 'modals' | 'notifications
 		openModalAsync<T>(component: Modal['component'], props: Record<string, unknown> = {}): Promise<T | undefined> {
 			let _resolve: ((value: T | undefined) => void) | undefined;
 			const promise = new Promise<T | undefined>((resolve) => (_resolve = resolve));
-			this.openModal<T>(component, props, _resolve)
+			this.openModal<T>(component, props, _resolve);
 			return promise;
 		},
 		notify(opts: Notification['opts']) {
@@ -96,16 +96,16 @@ export function createAppState(initial: Omit<AppState, 'modals' | 'notifications
 				dismiss() {
 					notifications = notifications.filter((n) => n.id !== id);
 					clearTimeout(timeout);
-				}
-			}
+				},
+			};
 			notifications.push(notificationSpec);
 			timeout = setTimeout(() => {
 				notificationSpec.dismiss();
-			}, opts.duration ?? TOAST_DEFAULT_DURATION)
+			}, opts.duration ?? TOAST_DEFAULT_DURATION);
 		},
 		async confirm(confirmText: string) {
 			const confirmed = await this.openModalAsync<boolean>(C.Confirm, { confirmText });
 			return Boolean(confirmed);
-		}
+		},
 	};
 }

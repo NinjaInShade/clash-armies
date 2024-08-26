@@ -11,7 +11,7 @@ declare global {
 		// interface Platform {}
 	}
 
-	declare const __CHANGELOG__: string
+	declare const __CHANGELOG__: string;
 }
 
 export interface Request {
