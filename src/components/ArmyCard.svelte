@@ -188,6 +188,7 @@
 	.header .tags {
 		margin-top: 6px;
 		display: flex;
+		flex-flow: row wrap;
 		gap: 4px;
 	}
 	.header .tags li {

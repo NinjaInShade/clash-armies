@@ -16,6 +16,7 @@ import {
 } from '../testutil';
 import type { UnitType } from '~/lib/shared/types';
 import { validateArmy, type Ctx } from '~/lib/shared/validation';
+import { GUIDE_TEXT_CHAR_LIMIT } from '~/lib/shared/utils';
 import { getArmies, saveArmy } from '~/lib/server/army';
 
 describe('Saving', function () {
@@ -102,6 +103,43 @@ describe('Saving', function () {
 			const armies = await getArmies(REQ);
 			assertArmies(armies, [data]);
 		});
+
+		it('Should save army with guide', async function () {
+			const data = makeData({
+				name: 'test',
+				townHall: 16,
+				units: [{ home: 'armyCamp', unitId: requireUnit('Barbarian', ctx).id, amount: 10 }],
+				guide: {
+					textContent: '<p>Guide!</p>',
+					youtubeUrl: null,
+				},
+			});
+			await saveArmy(EVENT, data);
+			const armies = await getArmies(REQ);
+			assertArmies(armies, [data]);
+		});
+
+		it('Should merge empty guide tags into one', async function () {
+			const data = makeData({
+				name: 'test',
+				townHall: 16,
+				units: [{ home: 'armyCamp', unitId: requireUnit('Barbarian', ctx).id, amount: 10 }],
+				guide: {
+					textContent: `
+						<p></p>
+						<p></p>
+						<p></p>
+						<p></p>
+					`,
+					youtubeUrl: null,
+				},
+			});
+			await saveArmy(EVENT, data);
+			const armies = await getArmies(REQ);
+			// Expect one empty tag
+			data.guide.textContent = '<p></p>';
+			assertArmies(armies, [data]);
+		});
 	});
 
 	describe('Existing', function () {
@@ -167,6 +205,25 @@ describe('Saving', function () {
 			const army = (await getArmies(REQ))[0];
 			// Update amount
 			army.units[0].amount = 20;
+			await saveArmy(EVENT, army);
+			const armySaved = (await getArmies(REQ))[0];
+			assertArmies([armySaved], [army]);
+		});
+
+		it('Should remove guide if it was removed', async function () {
+			const data = makeData({
+				name: 'test',
+				townHall: 16,
+				units: [{ home: 'armyCamp', unitId: requireUnit('Barbarian', ctx).id, amount: 10 }],
+				guide: {
+					textContent: '<p>Guide!</p>',
+					youtubeUrl: null,
+				},
+			});
+			await saveArmy(EVENT, data);
+			const army = (await getArmies(REQ))[0];
+			// Remove guide
+			army.guide = null;
 			await saveArmy(EVENT, army);
 			const armySaved = (await getArmies(REQ))[0];
 			assertArmies([armySaved], [army]);
@@ -489,6 +546,90 @@ describe('Validation', function () {
 			assert.throws(function () {
 				validateArmy(data, ctx);
 			}, 'Pet "Mighty Yak" has already been assigned to another hero');
+		});
+	});
+
+	describe('Guide', function () {
+		it('Should make sure there is either text content or a youtube URL', function () {
+			const data = makeData({
+				name: 'test',
+				townHall: 16,
+				units: [{ home: 'armyCamp', unitId: requireUnit('Barbarian', ctx).id, amount: 10 }],
+				guide: {
+					textContent: null,
+					youtubeUrl: null,
+				},
+			});
+			assert.throws(function () {
+				validateArmy(data, ctx);
+			}, 'Guide must have at least either text content or YouTube video URL');
+		});
+
+		it('Should not allow invalid youtube URLs', function () {
+			const data = makeData({
+				name: 'test',
+				townHall: 16,
+				units: [{ home: 'armyCamp', unitId: requireUnit('Barbarian', ctx).id, amount: 10 }],
+				guide: {
+					textContent: null,
+					youtubeUrl: 'https://www.youtube.com/invalid-url',
+				},
+			});
+			const invalidURLs = [
+				'https://www.random.com',
+				'https://www.youtube.com/invalid-url',
+				'http://www.youtube.com/watch?v=ZxWrWMDJS8Q', // HTTP
+				'https://www.youtube.com/watch?v=ZxWrWMDJS8', // Invalid ID length (10 instead of 11)
+			];
+			const validURLs = [
+				'https://www.youtube.com/watch?v=ZxWrWMDJS8Q',
+				'https://youtube.com/watch?v=ZxWrWMDJS8Q', // No www
+				'https://www.youtube.com/watch?v=ZxWrWMDJS8Q&t=4s', // Has time param
+			];
+			for (const invalid of invalidURLs) {
+				data.guide.youtubeUrl = invalid;
+				assert.throws(function () {
+					validateArmy(data, ctx);
+				}, 'Guide has an invalid YouTube URL');
+			}
+			for (const valid of validURLs) {
+				// Should not throw as now the youtube URL is valid
+				data.guide.youtubeUrl = valid;
+				validateArmy(data, ctx);
+			}
+		});
+
+		it('Should not allow empty text content', function () {
+			const data = makeData({
+				name: 'test',
+				townHall: 16,
+				units: [{ home: 'armyCamp', unitId: requireUnit('Barbarian', ctx).id, amount: 10 }],
+				guide: {
+					textContent: '',
+					youtubeUrl: null,
+				},
+			});
+			assert.throws(function () {
+				validateArmy(data, ctx);
+			}, 'String must contain at least 5 character(s)');
+		});
+
+		it('Should not allow text content to go over the max char limit', function () {
+			const data = makeData({
+				name: 'test',
+				townHall: 16,
+				units: [{ home: 'armyCamp', unitId: requireUnit('Barbarian', ctx).id, amount: 10 }],
+				guide: {
+					textContent: `<p>${'a'.repeat(GUIDE_TEXT_CHAR_LIMIT + 1)}</p>`,
+					youtubeUrl: null,
+				},
+			});
+			assert.throws(function () {
+				validateArmy(data, ctx);
+			}, 'Guide text content exceeded the character limit');
+			// Should not fail now as within limit
+			data.guide.textContent = `<p>${'a'.repeat(GUIDE_TEXT_CHAR_LIMIT)}</p>`;
+			validateArmy(data, ctx);
 		});
 	});
 });

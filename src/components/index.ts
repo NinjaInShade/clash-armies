@@ -12,6 +12,7 @@ export { default as Toast } from './Toast.svelte';
 export { default as Confirm } from './Confirm.svelte';
 export { default as TabStrip } from './TabStrip.svelte';
 export { default as Menu } from './Menu.svelte';
+export { default as GuideEditor } from './GuideEditor.svelte';
 
 // App specific components
 export { default as Nav } from './Nav.svelte';

@@ -1,10 +1,13 @@
-import type { SaveArmy, Army, TownHall, Unit, Equipment, Pet, UnitType, BlackSmithLevel } from '~/lib/shared/types';
+import type { SaveArmy, Army, TownHall, Unit, Equipment, Pet, UnitType } from '~/lib/shared/types';
 import { db } from '~/lib/server/db';
-import { USER_MAX_ARMIES } from '~/lib/shared/utils';
+import { USER_MAX_ARMIES, mergeAdjacentEmptyTags } from '~/lib/shared/utils';
 import { validateArmy, numberSchema } from '~/lib/shared/validation';
 import z from 'zod';
 import type { RequestEvent } from '@sveltejs/kit';
 import type { Request } from '~/app';
+import { generateJSON, generateHTML } from '@tiptap/html';
+import { getExtensions } from '~/lib/shared/guideEditor';
+import { parseHTML } from 'zeed-dom';
 
 type GetArmiesParams = {
 	req: Request;
@@ -31,6 +34,11 @@ export async function getArmies(opts: GetArmiesParams) {
 			ae.equipment,
             ap.pets,
 			av.votes,
+			IF(ag.id, JSON_OBJECT(
+				'id', ag.id,
+				'textContent', ag.textContent,
+				'youtubeUrl', ag.youtubeUrl
+			), NULL) as guide,
 			COALESCE(uv.vote, 0) AS userVote,
 			sa.id IS NOT NULL AS userBookmarked
 		FROM armies a
@@ -100,6 +108,7 @@ export async function getArmies(opts: GetArmiesParams) {
 			FROM army_votes
 			GROUP BY armyId
 		) av ON av.armyId = a.id
+		LEFT JOIN army_guides ag ON ag.armyId = a.id
 		LEFT JOIN army_votes uv ON uv.armyId = a.id AND uv.votedBy = ?
 		LEFT JOIN saved_armies sa ON sa.armyId = a.id AND sa.userId = ?
 	`;
@@ -137,6 +146,10 @@ export async function getArmies(opts: GetArmiesParams) {
 		army.equipment = JSON.parse(army.equipment) ?? [];
 		// @ts-expect-error data is a JSON string when it's queried from the database
 		army.pets = JSON.parse(army.pets) ?? [];
+		if (army.guide) {
+			// @ts-expect-error data is a JSON string when it's queried from the database
+			army.guide = JSON.parse(army.guide);
+		}
 		army.votes = +army.votes;
 		// @ts-expect-error data is 0/1 number when it's queried from the database // TODO: I think TINYINT(1) should just be returning a boolean?
 		army.userBookmarked = army.userBookmarked === 1 ? true : false;
@@ -307,8 +320,20 @@ export async function saveArmy(event: RequestEvent, data: SaveArmy): Promise<num
 		pets: await getPets(),
 	};
 
+	if (data.guide && typeof data.guide.textContent === 'string') {
+		// Escapes/sanitizes the HTML for security reasons (converting to JSON and back to HTML achieves this)
+		const extensions = getExtensions();
+		const sanitized = generateHTML(generateJSON(data.guide.textContent, extensions), extensions);
+
+		// Merge empty lines (empty tags) into one
+		const doc = parseHTML(sanitized);
+		const merged = mergeAdjacentEmptyTags(doc).trim();
+
+		data.guide.textContent = merged;
+	}
+
 	const army = validateArmy(data, ctx);
-	const { units, equipment, pets } = army;
+	const { units, equipment, pets, guide } = army;
 
 	if (!data.id) {
 		// Creating army
@@ -353,6 +378,13 @@ export async function saveArmy(event: RequestEvent, data: SaveArmy): Promise<num
 				// TODO: fix this (insertMany should cope/bail if array is empty)
 				await tx.insertMany('army_pets', armyPets);
 			}
+			if (guide) {
+				await tx.insertOne('army_guides', {
+					armyId,
+					textContent: guide.textContent,
+					youtubeUrl: guide.youtubeUrl,
+				});
+			}
 			return armyId;
 		});
 	}
@@ -391,7 +423,7 @@ export async function saveArmy(event: RequestEvent, data: SaveArmy): Promise<num
 			const equipmentData = equipment.map((eq) => ({ id: eq.id ?? null, armyId, equipmentId: eq.equipmentId }));
 			await tx.upsert('army_equipment', equipmentData);
 		} else {
-			await tx.query('DELETE FROM army_equipment WHERE armyId = ?', [armyId]);
+			await tx.delete('army_equipment', { armyId });
 		}
 		if (pets.length) {
 			// Remove deleted pets
@@ -400,7 +432,13 @@ export async function saveArmy(event: RequestEvent, data: SaveArmy): Promise<num
 			const petsData = pets.map((p) => ({ id: p.id ?? null, armyId, petId: p.petId, hero: p.hero }));
 			await tx.upsert('army_pets', petsData);
 		} else {
-			await tx.query('DELETE FROM army_pets WHERE armyId = ?', [armyId]);
+			await tx.delete('army_pets', { armyId });
+		}
+		if (guide) {
+			const guideData = [{ id: guide.id ?? null, armyId, textContent: guide.textContent, youtubeUrl: guide.youtubeUrl }];
+			await tx.upsert('army_guides', guideData);
+		} else {
+			await tx.delete('army_guides', { armyId });
 		}
 	});
 	return armyId;

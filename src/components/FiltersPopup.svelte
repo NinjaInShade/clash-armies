@@ -65,6 +65,10 @@
 		return 0;
 	}
 
+	function setHasGuide(value?: boolean) {
+		filters.hasGuide = value || undefined;
+	}
+
 	function setAttackType(value?: string) {
 		filters.attackType = value;
 	}
@@ -227,6 +231,7 @@
 			<section class="group">
 				<h3>Tags</h3>
 				<div class="row">
+					{@render filterBtn('Has guide', filters.hasGuide === true, () => setHasGuide(!filters.hasGuide))}
 					{@render filterBtn('Ground', filters.attackType === 'Ground', () => setAttackType(filters.attackType === 'Ground' ? undefined : 'Ground'))}
 					{@render filterBtn('Air', filters.attackType === 'Air', () => setAttackType(filters.attackType === 'Air' ? undefined : 'Air'))}
 				</div>

@@ -191,8 +191,7 @@ export function getTags(army: Army) {
 	if (hasHeroes) {
 		tags.push({ label: 'Heroes', icon: C.IconTagsHeroes })
 	}
-	if (army.guideId) {
-		//  TODO: guide system
+	if (army.guide?.id) {
 		tags.push({ label: 'Guide' });
 	}
 	return tags;

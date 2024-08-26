@@ -1,4 +1,4 @@
-import type { SaveArmy, TownHall, Unit, Equipment, Pet, SaveUnit, SaveEquipment, SavePet } from './types';
+import type { SaveArmy, TownHall, Unit, Equipment, Pet, SaveUnit, SaveEquipment, SavePet, SaveGuide } from './types';
 import {
 	BANNERS,
 	VALID_UNIT_HOME,
@@ -13,7 +13,11 @@ import {
 	requireUnit,
 	requireEquipment,
 	requirePet,
+	countCharacters,
+	GUIDE_TEXT_CHAR_LIMIT,
+	YOUTUBE_URL_REGEX,
 } from './utils';
+import { parseHTML } from 'zeed-dom';
 import z from 'zod';
 
 export const numberSchema = z.number().int().positive();
@@ -32,6 +36,11 @@ export const petSchema = z.object({
 	petId: numberSchema,
 	hero: z.enum(VALID_HEROES),
 });
+export const guideSchema = z.object({
+	id: numberSchema.optional(),
+	textContent: z.string().nullable(),
+	youtubeUrl: z.string().nullable(),
+});
 export const armySchema = z.object({
 	id: numberSchema.optional(),
 	name: z.string().min(2).max(25),
@@ -40,6 +49,7 @@ export const armySchema = z.object({
 	units: z.array(unitSchema).nonempty(),
 	equipment: z.array(equipmentSchema),
 	pets: z.array(petSchema),
+	guide: guideSchema.nullable(),
 });
 
 export type Ctx = { townHalls: TownHall[]; units: Unit[]; equipment: Equipment[]; pets: Pet[] };
@@ -60,6 +70,7 @@ export function validateArmy(data: unknown, ctx: Ctx): SaveArmy {
 	validateCcUnits(ccUnits, army.townHall, ctx);
 	validateEquipment(equipment, army.townHall, ctx);
 	validatePets(pets, army.townHall, ctx);
+	validateGuide(army.guide);
 
 	return army;
 }
@@ -186,6 +197,37 @@ export function validatePets(pets: SavePet[], townHall: number, ctx: Pick<Ctx, '
 			throw new Error(`Pet "${pet.name}" isn't available at town hall ${townHall}`);
 		}
 		heroToPets[pet.hero] = [...stashedPets, pet.name];
+	}
+}
+
+function validateGuide(guide: SaveGuide | null) {
+	if (!guide) return;
+
+	const { textContent, youtubeUrl } = guide;
+
+	if (!textContent && !youtubeUrl) {
+		throw new Error('Guide must have at least either text content or YouTube video URL');
+	}
+
+	if (typeof textContent === 'string') {
+		// TODO: find a client/server compatible way to make this error if the schema is invalid
+		// Right now this doesn't work as invalid tags/text gets stripped by generateJSON instead of leaving it so .check() never throws
+		// const extensions = getExtensions();
+		// const json = generateJSON(textContent, extensions);
+		// const schema = getSchema(extensions);
+		// schema.nodeFromJSON(json).check();
+
+		const doc = parseHTML(textContent);
+		const charsLength = countCharacters(doc);
+
+		// Validate not over the char limit
+		if (charsLength > GUIDE_TEXT_CHAR_LIMIT) {
+			throw new Error('Guide text content exceeded the character limit');
+		}
+	}
+
+	if (typeof youtubeUrl === 'string' && !YOUTUBE_URL_REGEX.test(youtubeUrl)) {
+		throw new Error('Guide has an invalid YouTube URL');
 	}
 }
 

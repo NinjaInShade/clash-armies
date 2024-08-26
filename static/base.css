@@ -103,10 +103,13 @@
 * {
 	font-family: 'Poppins', sans-serif;
 	box-sizing: border-box;
-	text-decoration: none;
 	list-style: none;
 	margin: 0;
 	padding: 0;
+}
+
+*:not(s) {
+	text-decoration: none;
 }
 
 html,
@@ -168,6 +171,9 @@ body {
 
 	--h1: 56px;
 	--h1-lh: 68px;
+
+	--h1-guide: 38px;
+	--h1-guide-lh: 46px;
 
 	--h2: 24px;
 	--h2-lh: 29px;
@@ -340,6 +346,9 @@ button span {
 	:root {
 		--h1: 42px;
 		--h1-lh: 49px;
+
+		--h1-guide: 31px;
+		--h1-guide-lh: 27px;
 
 		--fs: 15px;
 		--fs-lh: 22px;

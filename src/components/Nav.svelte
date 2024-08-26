@@ -48,7 +48,7 @@
 			</li>
 		</ul>
 		<div class="mobile-nav">
-			<button class="navbar-hamburger" type="button" aria-label="Sidebar toggle" onclick={toggleSidebar}>
+			<button class="navbar-hamburger focus-grey" type="button" aria-label="Sidebar toggle" onclick={toggleSidebar}>
 				<svg class="ham hamRotate ham4" class:active={sidebarOpen} viewBox="0 0 100 100" width="45">
 					<path class="line top" d="m 70,33 h -40 c 0,0 -8.5,-0.149796 -8.5,8.5 0,8.649796 8.5,8.5 8.5,8.5 h 20 v -20" />
 					<path class="line middle" d="m 70,50 h -40" />
@@ -59,34 +59,34 @@
 	</div>
 </nav>
 
-<nav class="sidebar" class:sidebar-active={sidebarOpen}>
+<nav class="sidebar" class:sidebar-active={sidebarOpen} tabIndex={sidebarOpen ? undefined : -1}>
 	<div>
 		<ul class="sidebar-links">
 			<li class="sidebar-link">
-				<a href="/" onclick={toggleSidebar}>Home</a>
+				<a class="focus-grey" href="/" onclick={toggleSidebar}>Home</a>
 			</li>
 			<li class="sidebar-link">
-				<a href="/armies" onclick={toggleSidebar}>Armies</a>
+				<a class="focus-grey" href="/armies" onclick={toggleSidebar}>Armies</a>
 			</li>
 			{#if app.user}
 				<li class="sidebar-link">
-					<a href="/create" onclick={toggleSidebar}>Create</a>
+					<a class="focus-grey" href="/create" onclick={toggleSidebar}>Create</a>
 				</li>
 			{/if}
 			{#if app.user && app.user.hasRoles('admin')}
 				<li class="sidebar-link">
-					<a href="/admin" onclick={toggleSidebar}>Admin</a>
+					<a class="focus-grey" href="/admin" onclick={toggleSidebar}>Admin</a>
 				</li>
 			{/if}
 			{#if app.user}
 				<li class="sidebar-link">
-					<a href="/users/{app.user.username}" onclick={toggleSidebar}>Account</a>
+					<a class="focus-grey" href="/users/{app.user.username}" onclick={toggleSidebar}>Account</a>
 				</li>
 			{/if}
 		</ul>
 		<ul class="sidebar-links">
 			<li class="sidebar-link">
-				<a class="bmc" href="https://www.buymeacoffee.com/clasharmies" target="_blank">
+				<a class="bmc focus-grey" href="https://www.buymeacoffee.com/clasharmies" target="_blank">
 					<svg width="14" height="21" viewBox="0 0 884 1279" fill="none" xmlns="http://www.w3.org/2000/svg">
 						<path d="M791.109 297.518L790.231 297.002L788.201 296.383C789.018 297.072 790.04 297.472 791.109 297.518V297.518Z" fill="var(--grey-400)" />
 						<path d="M803.896 388.891L802.916 389.166L803.896 388.891Z" fill="var(--grey-400)" />
@@ -143,7 +143,7 @@
 		</ul>
 	</div>
 </nav>
-<button class="sidebar-overlay" class:sidebar-overlay-active={sidebarOpen} onclick={toggleSidebar}></button>
+<button class="sidebar-overlay" class:sidebar-overlay-active={sidebarOpen} onclick={toggleSidebar} tabIndex={sidebarOpen ? undefined : -1}></button>
 
 <style>
 	nav {
@@ -194,7 +194,6 @@
 	.navbar-hamburger {
 		position: relative;
 		background: none;
-		outline: none;
 		border: none;
 		width: 1.875rem;
 		height: 1.875rem;
