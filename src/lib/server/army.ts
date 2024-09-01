@@ -1,7 +1,7 @@
-import type { SaveArmy, Army, TownHall, Unit, Equipment, Pet, UnitType } from '~/lib/shared/types';
+import type { SaveArmy, Army, TownHall, Unit, Equipment, Pet, UnitType, Comment, SaveComment } from '~/lib/shared/types';
 import { db } from '~/lib/server/db';
 import { USER_MAX_ARMIES, mergeAdjacentEmptyTags } from '~/lib/shared/utils';
-import { validateArmy, numberSchema } from '~/lib/shared/validation';
+import { validateArmy, numberSchema, commentSchema } from '~/lib/shared/validation';
 import z from 'zod';
 import type { RequestEvent } from '@sveltejs/kit';
 import type { Request } from '~/app';
@@ -33,6 +33,7 @@ export async function getArmies(opts: GetArmiesParams) {
             au.units,
 			ae.equipment,
             ap.pets,
+			ac.comments,
 			av.votes,
 			IF(ag.id, JSON_OBJECT(
 				'id', ag.id,
@@ -104,6 +105,25 @@ export async function getArmies(opts: GetArmiesParams) {
 			GROUP BY a.id
 		) ap ON ap.id = a.id
 		LEFT JOIN (
+			SELECT
+				a.id,
+				JSON_ARRAYAGG(JSON_OBJECT(
+					'id', ac.id,
+					'armyId', ac.armyId,
+					'comment', ac.comment,
+					'replyTo', ac.replyTo,
+					'username', u.username,
+					'createdBy', ac.createdBy,
+					'createdTime', ac.createdTime,
+					'updatedTime', ac.updatedTime
+				)) AS comments
+			FROM armies a
+			LEFT JOIN army_comments ac ON ac.armyId = a.id
+			LEFT JOIN users u ON u.id = ac.createdBy
+			WHERE ac.id IS NOT NULL
+			GROUP BY a.id
+		) ac ON ac.id = a.id
+		LEFT JOIN (
 			SELECT armyId, COALESCE(SUM(vote), 0) AS votes
 			FROM army_votes
 			GROUP BY armyId
@@ -149,6 +169,13 @@ export async function getArmies(opts: GetArmiesParams) {
 		if (army.guide) {
 			// @ts-expect-error data is a JSON string when it's queried from the database
 			army.guide = JSON.parse(army.guide);
+		}
+		// @ts-expect-error data is a JSON string when it's queried from the database
+		army.comments = JSON.parse(army.comments) ?? [];
+		for (const comment of army.comments) {
+			// JSON agg objects lose date type casting
+			comment.createdTime = new Date(`${comment.createdTime}Z`);
+			comment.updatedTime = new Date(`${comment.updatedTime}Z`);
 		}
 		army.votes = +army.votes;
 		// @ts-expect-error data is 0/1 number when it's queried from the database // TODO: I think TINYINT(1) should just be returning a boolean?
@@ -390,7 +417,8 @@ export async function saveArmy(event: RequestEvent, data: SaveArmy): Promise<num
 	}
 
 	// Updating existing army
-	const existing = await db.getRow<Army, null>('armies', { id: army.id });
+	const armyId = numberSchema.parse(army.id);
+	const existing = await db.getRow<Army, null>('armies', { id: armyId });
 	if (!existing) {
 		throw new Error("This army doesn't exist");
 	}
@@ -400,7 +428,6 @@ export async function saveArmy(event: RequestEvent, data: SaveArmy): Promise<num
 		// otherwise must be an admin to edit someone elses army
 		event.locals.requireRoles('admin');
 	}
-	const armyId = numberSchema.parse(army.id);
 	await db.transaction(async (tx) => {
 		// Update army
 		const updateQuery = `
@@ -485,6 +512,61 @@ export async function saveVote(event: RequestEvent, data: SaveVoteParams) {
 	} else {
 		await db.upsert('army_votes', [{ armyId, votedBy: user.id, vote }]);
 	}
+}
+
+export async function saveComment(event: RequestEvent, data: SaveComment) {
+	const user = event.locals.requireAuth();
+	const comment = commentSchema.parse(data);
+	if (!comment.id) {
+		// Creating new comment
+		return db.transaction(async (tx) => {
+			return tx.insertOne('army_comments', {
+				armyId: comment.armyId,
+				comment: comment.comment,
+				replyTo: comment.replyTo,
+				createdBy: user.id,
+			});
+		});
+	}
+	const commentId = numberSchema.parse(comment.id);
+	const existing = await db.getRow<Comment, null>('army_comments', { id: commentId });
+	if (!existing) {
+		throw new Error("This comment doesn't exist");
+	}
+	if (user.id === existing.createdBy) {
+		// allow user to delete his own comment
+	} else {
+		// otherwise must be an admin to delete someone elses comment
+		event.locals.requireRoles('admin');
+	}
+	if (existing.armyId !== comment.armyId || existing.replyTo !== comment.replyTo) {
+		throw new Error('Moving comments is not allowed');
+	}
+	await db.transaction(async (tx) => {
+		const query = `
+			UPDATE army_comments SET
+				comment = ?
+			WHERE id = ?
+		`;
+		await tx.query(query, [comment.comment, commentId]);
+	});
+	return commentId;
+}
+
+export async function deleteComment(event: RequestEvent, commentId: number) {
+	const { id } = z.object({ id: z.number() }).parse({ id: commentId });
+	const user = event.locals.requireAuth();
+	const existing = await db.getRow<Comment, null>('army_comments', { id });
+	if (!existing) {
+		throw new Error("This comment doesn't exist");
+	}
+	if (user.id === existing.createdBy) {
+		// allow user to delete his own comment
+	} else {
+		// otherwise must be an admin to delete someone elses comment
+		event.locals.requireRoles('admin');
+	}
+	await db.delete('army_comments', { id });
 }
 
 export async function bookmarkArmy(event: RequestEvent, data: { armyId: number }) {

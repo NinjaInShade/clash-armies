@@ -13,9 +13,7 @@
 
 	const thData = $derived(app.townHalls.find((th) => th.level === army.townHall));
 	const units = $derived(army.units.filter((unit) => unit.home === 'armyCamp'));
-	const ccUnits = $state(army.units.filter((unit) => unit.home === 'clanCastle'));
-	const equipment = $state(army.equipment);
-	const pets = $state(army.pets);
+	const ccUnits = $derived(army.units.filter((unit) => unit.home === 'clanCastle'));
 	const capacity = $derived.by(() => getCapacity(thData));
 	const ccCapacity = $derived.by(() => getCcCapacity(thData));
 	const housingSpaceUsed = $derived.by(() => getTotals(units));
@@ -159,7 +157,7 @@
 			<div class="heroes-list">
 				{#each VALID_HEROES as hero}
 					{#if hasHero(hero, army)}
-						<C.HeroDisplayFull {hero} selectedEquipment={equipment} selectedPets={pets} selectedTownHall={army.townHall} />
+						<C.HeroDisplayFull {hero} selectedEquipment={army.equipment} selectedPets={army.pets} selectedTownHall={army.townHall} />
 					{/if}
 				{/each}
 			</div>
@@ -220,6 +218,12 @@
 		<C.Button asLink href="/armies/edit/{army.id}">Edit</C.Button>
 	{/if}
 </div>
+
+{#if app.user || (!app.user && army.comments.length)}
+	<div class="comments-feed" id="comments">
+		<C.Comments armyId={army.id} comments={army.comments} />
+	</div>
+{/if}
 
 <style>
 	/* BANNER */
@@ -446,7 +450,9 @@
 		gap: 8px;
 	}
 	.army-controls:not(:empty) {
-		margin-top: 24px;
+		margin-top: 16px;
+		padding-bottom: 16px;
+		border-bottom: 1px dashed var(--grey-500);
 	}
 
 	.heroes-list {
@@ -459,6 +465,10 @@
 		padding: 0 8px;
 		column-gap: 32px;
 		row-gap: 24px;
+	}
+
+	.comments-feed {
+		margin-top: 24px;
 	}
 
 	/* ERRORS */
@@ -492,6 +502,9 @@
 		}
 		.banner-content .left .town-hall {
 			max-height: 48px;
+		}
+		.comments-feed {
+			margin-top: 16px;
 		}
 	}
 

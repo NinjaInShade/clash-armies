@@ -3,10 +3,13 @@ import {
 	assert,
 	EVENT,
 	REQ,
+	USER,
+	USER_2,
+	ADMIN_USER,
+	createEvent,
 	getCtx,
 	createDB,
 	destroyDB,
-	resetDB,
 	makeData,
 	assertArmies,
 	requireTh,
@@ -17,22 +20,24 @@ import {
 import type { UnitType } from '~/lib/shared/types';
 import { validateArmy, type Ctx } from '~/lib/shared/validation';
 import { GUIDE_TEXT_CHAR_LIMIT } from '~/lib/shared/utils';
-import { getArmies, saveArmy } from '~/lib/server/army';
+import { getArmy, getArmies, saveArmy, saveComment } from '~/lib/server/army';
+import type { MySQL } from '@ninjalib/sql';
+
+let db: MySQL;
+let ctx: Ctx;
+
+before(async function () {
+	db = await createDB();
+	ctx = await getCtx();
+});
+
+after(async function () {
+	await destroyDB();
+});
 
 describe('Saving', function () {
-	let ctx: Ctx;
-
-	before(async function () {
-		await createDB();
-		ctx = await getCtx();
-	});
-
-	after(async function () {
-		await destroyDB();
-	});
-
 	afterEach(async function () {
-		await resetDB();
+		await db.delete('armies');
 	});
 
 	describe('New', function () {
@@ -232,19 +237,8 @@ describe('Saving', function () {
 });
 
 describe('Fetching', function () {
-	let ctx: Ctx;
-
-	before(async function () {
-		await createDB();
-		ctx = await getCtx();
-	});
-
-	after(async function () {
-		await destroyDB();
-	});
-
 	afterEach(async function () {
-		await resetDB();
+		await db.delete('armies');
 	});
 
 	it('Should not return duplicate entries for JSON fields', async function () {
@@ -273,9 +267,129 @@ describe('Fetching', function () {
 	});
 });
 
-describe('Validation', function () {
-	let ctx: Ctx;
+describe('Army comments', function () {
+	let armyId: number;
 
+	before(async function () {
+		// Create test army for saving comments
+		const data = makeData({
+			name: 'test',
+			townHall: 1,
+			units: [{ home: 'armyCamp', unitId: requireUnit('Barbarian', ctx).id, amount: 5 }],
+		});
+		armyId = await saveArmy(EVENT, data);
+	});
+
+	afterEach(async function () {
+		await db.delete('army_comments');
+	});
+
+	it('Should be able to create a comment', async function () {
+		const data = {
+			armyId,
+			comment: 'Test comment',
+			replyTo: null,
+		};
+		const id = await saveComment(EVENT, data);
+		const comment = await db.getRow('army_comments', { id });
+		assert.include(comment, {
+			armyId,
+			comment: 'Test comment',
+			replyTo: null,
+			createdBy: USER.id,
+		});
+	});
+
+	it('Should be able to edit existing comment text', async function () {
+		const data = {
+			armyId,
+			comment: 'Test comment',
+			replyTo: null,
+		};
+		const id = await saveComment(EVENT, data);
+		const newData = { ...data, id, comment: 'Test comment updated' };
+		await saveComment(EVENT, newData);
+		const comment = await db.getRow('army_comments', { id });
+		assert.include(comment, {
+			armyId,
+			comment: 'Test comment updated',
+			replyTo: null,
+			createdBy: USER.id,
+		});
+	});
+
+	it('Should throw if armyId or replyTo for comment changed', async function () {
+		const data = {
+			armyId,
+			comment: 'Test comment',
+			replyTo: null,
+		};
+		const id = await saveComment(EVENT, data);
+
+		// Ensure changing armyId throws
+		await assert.throwsAsync(async function () {
+			const newData = { ...data, id, armyId: data.armyId + 1 };
+			await saveComment(EVENT, newData);
+		}, 'Moving comments is not allowed');
+
+		// Ensure changing replyTo throws
+		await assert.throwsAsync(async function () {
+			const newData = { ...data, id, replyTo: 1 };
+			await saveComment(EVENT, newData);
+		}, 'Moving comments is not allowed');
+	});
+
+	it('Should be able to reply to other comments', async function () {
+		const data = {
+			armyId,
+			comment: 'Test comment',
+			replyTo: null,
+		};
+		const id = await saveComment(EVENT, data);
+		const replyingData = {
+			armyId,
+			comment: 'Replying',
+			replyTo: id,
+		};
+		const replyId = await saveComment(EVENT, replyingData);
+		const comment = await db.getRow('army_comments', { id: replyId });
+		assert.include(comment, {
+			armyId,
+			comment: 'Replying',
+			replyTo: id,
+			createdBy: USER.id,
+		});
+	});
+
+	it('Should not be able to edit other peoples comments (unless admin)', async function () {
+		const data = {
+			armyId,
+			comment: 'Test comment',
+			replyTo: null,
+		};
+		const id = await saveComment(EVENT, data);
+
+		try {
+			// Saving this comment with another non-admin user should throw
+			const USER_2_EVENT = createEvent(USER_2);
+			await saveComment(USER_2_EVENT, { ...data, id, comment: 'Updated ' });
+			assert.fail('Expected error');
+		} catch (err) {
+			assert.equal(err.body.message, "You don't have permission to do this warrior!");
+			// Assert comment was not changed
+			const comment = await db.getRow('army_comments', { id });
+			assert.include(comment, { ...data, createdBy: USER.id });
+		}
+
+		// Admin should be able to save any comment
+		const ADMIN_EVENT = createEvent(ADMIN_USER);
+		await saveComment(ADMIN_EVENT, { ...data, id, comment: 'Updated ' });
+		const comment = await db.getRow('army_comments', { id });
+		assert.include(comment, { ...data, createdBy: USER.id, comment: 'Updated' });
+	});
+});
+
+describe('Validation', function () {
 	function testCapacity(type: UnitType, clanCastle: boolean) {
 		function _testCapacity(overflow: boolean) {
 			const th = requireTh(16, ctx);
@@ -318,15 +432,6 @@ describe('Validation', function () {
 			`Duplicate ${clanCastle ? 'clan castle ' : ''}unit "Barbarian" found`
 		);
 	}
-
-	before(async function () {
-		await createDB();
-		ctx = await getCtx();
-	});
-
-	after(async function () {
-		await destroyDB();
-	});
 
 	describe('Regular units', function () {
 		it('Should not allow units to overflow max capacity', function () {
@@ -611,7 +716,7 @@ describe('Validation', function () {
 			});
 			assert.throws(function () {
 				validateArmy(data, ctx);
-			}, 'String must contain at least 5 character(s)');
+			}, 'Guide must have at least either text content or YouTube video URL');
 		});
 
 		it('Should not allow text content to go over the max char limit', function () {

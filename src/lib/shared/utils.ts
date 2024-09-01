@@ -106,6 +106,7 @@ export const VALID_UNIT_HOME = ['armyCamp', 'clanCastle'] as const;
 export const VALID_HEROES = ['Barbarian King', 'Archer Queen', 'Grand Warden', 'Royal Champion'] as const;
 export const GUIDE_TEXT_CHAR_LIMIT = 3_000;
 export const YOUTUBE_URL_REGEX = /^(?:https:\/\/)?(?:www\.)?youtube\.com\/watch\?(?=.*v=((\w|-){11}))(?:\S+)?$/;
+export const MAX_COMMENT_LENGTH = 256;
 
 /**
  * Given the passed in units, calculates how much housing space

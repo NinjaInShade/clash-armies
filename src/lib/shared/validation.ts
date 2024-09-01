@@ -16,6 +16,7 @@ import {
 	countCharacters,
 	GUIDE_TEXT_CHAR_LIMIT,
 	YOUTUBE_URL_REGEX,
+	MAX_COMMENT_LENGTH,
 } from './utils';
 import { parseHTML } from 'zeed-dom';
 import z from 'zod';
@@ -50,6 +51,13 @@ export const armySchema = z.object({
 	equipment: z.array(equipmentSchema),
 	pets: z.array(petSchema),
 	guide: guideSchema.nullable(),
+});
+
+export const commentSchema = z.object({
+	id: numberSchema.optional(),
+	armyId: numberSchema,
+	comment: z.string().trim().min(1).max(MAX_COMMENT_LENGTH),
+	replyTo: numberSchema.nullable(),
 });
 
 export type Ctx = { townHalls: TownHall[]; units: Unit[]; equipment: Equipment[]; pets: Pet[] };

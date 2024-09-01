@@ -1,5 +1,5 @@
 import { getUnits, getTownHalls, getEquipment, getPets } from '~/lib/server/army';
-import type { SaveArmy, Army } from '~/lib/shared/types';
+import type { SaveArmy, Army, User } from '~/lib/shared/types';
 import type { Ctx } from '~/lib/shared/validation';
 import { BANNERS } from '~/lib/shared/utils';
 import { migration } from '~/lib/server/migration';
@@ -7,6 +7,7 @@ import { db } from '~/lib/server/db';
 import chai from 'chai';
 import chaiSubset from 'chai-subset';
 import type { RequestEvent } from '@sveltejs/kit';
+import { hasAuth, requireAuth, hasRoles, requireRoles } from '~/lib/server/auth/utils';
 
 chai.use(chaiSubset);
 
@@ -18,26 +19,61 @@ export const USER = {
 	playerTag: null,
 	level: null,
 };
+export const USER_2 = {
+	id: 2,
+	googleId: '123',
+	username: 'test-2',
+	roles: ['user'],
+	playerTag: null,
+	level: null,
+};
+export const ADMIN_USER = {
+	id: 3,
+	googleId: '123',
+	username: 'admin-test',
+	roles: ['user', 'admin'],
+	playerTag: null,
+	level: null,
+};
+export const EVENT = createEvent(USER);
+export const ADMIN_EVENT = createEvent(ADMIN_USER);
+export const REQ = { req: EVENT.locals };
 
 /**
  * Sveltekit event object shim
  */
-export const EVENT = {
-	locals: {
-		hasAuth: () => true,
-		requireAuth: () => USER,
-		hasRoles: () => true,
-		requireRoles: () => USER,
-		user: USER,
-		session: {
-			id: '1',
-			userId: USER.id,
-			expiresAt: new Date('2100-01-01T12:00:00'),
-			fresh: false,
+export function createEvent(user: User) {
+	const event = {
+		locals: {
+			hasAuth: () => hasAuth(event),
+			requireAuth: () => requireAuth(event),
+			hasRoles: (...roles: string[]) => hasRoles(event, ...roles),
+			requireRoles: (...roles: string[]) => requireRoles(event, ...roles),
+			user,
+			session: {
+				id: '1',
+				userId: user.id,
+				expiresAt: new Date('2100-01-01T12:00:00'),
+				fresh: false,
+			},
 		},
-	},
-} as unknown as RequestEvent;
-export const REQ = { req: EVENT.locals };
+	} as unknown as RequestEvent;
+	return event;
+}
+
+export async function createDB() {
+	// Init database & migrate
+	await db.connect();
+	await db.migrate(migration);
+	// Create basic test user
+	const userId = await db.insertOne('users', { username: USER.username, googleId: USER.googleId });
+	await db.insertOne('user_roles', { userId, role: USER.roles[0] });
+	return db;
+}
+
+export async function destroyDB() {
+	await db.dispose();
+}
 
 export async function getCtx() {
 	const ctx: Ctx = {
@@ -47,29 +83,6 @@ export async function getCtx() {
 		pets: await getPets(),
 	};
 	return ctx;
-}
-
-let dbSetupRan = false;
-
-export async function createDB() {
-	// Init database & migrate
-	await db.connect();
-	if (dbSetupRan) {
-		return;
-	}
-	await db.migrate(migration);
-	// Create basic test user
-	const userId = await db.insertOne('users', { username: USER.username, googleId: USER.googleId });
-	await db.insertOne('user_roles', { userId, role: USER.roles[0] });
-	dbSetupRan = true;
-}
-
-export async function destroyDB() {
-	await db.dispose();
-}
-
-export async function resetDB() {
-	await db.delete('armies');
 }
 
 /** Returns an army, defaulting certain fields with dummy data for convenience */

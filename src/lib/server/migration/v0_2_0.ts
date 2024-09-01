@@ -55,4 +55,19 @@ export default function migration(runStep: MigrationFn) {
             CONSTRAINT unique_army_guides_armyId UNIQUE (armyId)
         )
     `);
+
+	runStep(28, `
+		CREATE TABLE army_comments (
+			id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+			armyId INT NOT NULL,
+			comment VARCHAR(512) DEFAULT NULL,
+			replyTo INT DEFAULT NULL,
+			createdBy INT NOT NULL,
+			createdTime TIMESTAMP DEFAULT NOW(),
+            updatedTime TIMESTAMP DEFAULT NOW() ON UPDATE NOW(),
+			CONSTRAINT fk_army_comments_reply_to FOREIGN KEY (replyTo) REFERENCES army_comments (id) ON DELETE CASCADE,
+			CONSTRAINT fk_army_comments_created_by FOREIGN KEY (createdBy) REFERENCES users (id) ON DELETE CASCADE,
+            CONSTRAINT fk_army_comments_army_id FOREIGN KEY (armyId) REFERENCES armies (id) ON DELETE CASCADE
+		)
+	`);
 }

@@ -2,6 +2,7 @@
 export { default as Button } from './Button.svelte';
 export { default as Fieldset } from './Fieldset.svelte';
 export { default as Input } from './Input.svelte';
+export { default as TextArea } from './TextArea.svelte';
 export { default as Modal } from './Modal.svelte';
 export { default as FocusTrap } from './FocusTrap.svelte';
 export { default as Alert } from './Alert.svelte';
@@ -32,6 +33,7 @@ export { default as HeroPicker } from './HeroPicker.svelte';
 export { default as UnitsList } from './UnitsList.svelte';
 export { default as EditBanner } from './EditBanner.svelte';
 export { default as Votes } from './Votes.svelte';
+export { default as Comments } from './Comments.svelte';
 export { default as Errors } from './Errors.svelte';
 export { default as ArmyCard } from './ArmyCard.svelte';
 export { default as ActionButton } from './ActionButton.svelte';

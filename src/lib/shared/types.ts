@@ -147,8 +147,8 @@ export type Guide = {
 	armyId: number;
 	textContent: string | null;
 	youtubeUrl: string | null;
-	createdTime: string;
-	updatedTime: string;
+	createdTime: Date;
+	updatedTime: Date;
 };
 
 /**
@@ -214,9 +214,10 @@ export type Army = Omit<SaveArmy, 'units' | 'equipment' | 'pets' | 'guide'> & {
 	equipment: ArmyEquipment[];
 	pets: ArmyPet[];
 	guide: ArmyGuide | null;
+	comments: Comment[];
 	createdBy: number;
-	createdTime: string;
-	updatedTime: string;
+	createdTime: Date;
+	updatedTime: Date;
 	votes: number;
 	username: string;
 	userVote: number;
@@ -228,6 +229,25 @@ export type Totals = {
 	sieges: number;
 	spells: number;
 	time: number;
+};
+
+export type SaveComment = {
+	id?: number;
+	armyId: number;
+	comment: string;
+	replyTo: number | null;
+};
+
+export type Comment = SaveComment & {
+	id: number;
+	username: string;
+	createdBy: number;
+	createdTime: Date;
+	updatedTime: Date;
+};
+
+export type StructuredComment = Comment & {
+	replies: Comment[];
 };
 
 type UserUtils = {

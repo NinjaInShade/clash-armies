@@ -33,4 +33,5 @@ export const db = new MySQL({
 		}
 		return next();
 	},
+	timezone: 'Z',
 });
