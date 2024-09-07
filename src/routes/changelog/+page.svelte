@@ -51,28 +51,4 @@
 		font-family: 'monospace';
 		color: var(--grey-300);
 	}
-
-	img {
-		margin: 0 auto;
-		display: block;
-		max-width: 350px;
-		height: auto;
-	}
-
-	section h1 {
-		text-align: center;
-		margin: 0.5em 0 0.25em 0;
-	}
-
-	p {
-		margin: 0 auto;
-		max-width: 350px;
-		text-align: center;
-		color: var(--grey-400);
-	}
-
-	a {
-		color: var(--primary-400);
-		font-weight: 500;
-	}
 </style>

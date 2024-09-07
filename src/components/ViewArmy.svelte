@@ -13,18 +13,22 @@
 
 	const thData = $derived(app.townHalls.find((th) => th.level === army.townHall));
 	const units = $derived(army.units.filter((unit) => unit.home === 'armyCamp'));
-	const ccUnits = $derived(army.units.filter((unit) => unit.home === 'clanCastle'));
+	const ccUnits = $derived.by(() => getCcUnits());
 	const capacity = $derived.by(() => getCapacity(thData));
 	const ccCapacity = $derived.by(() => getCcCapacity(thData));
 	const housingSpaceUsed = $derived.by(() => getTotals(units));
 	const ccHousingSpaceUsed = $derived.by(() => getTotals(ccUnits));
-	const showClanCastle = $state<boolean>(ccUnits.length > 0);
+	const showClanCastle = $state<boolean>(getCcUnits().length > 0);
 	const showHeroes = $state<boolean>(VALID_HEROES.some((hero) => hasHero(hero, army)));
 	const showGuide = $state(army.guide !== null);
 
 	let errors = $state<FetchErrors | null>(null);
 	let votes = $state<number>(army.votes);
 	let userVote = $state<number>(army.userVote ?? 0);
+
+	function getCcUnits() {
+		return army.units.filter((unit) => unit.home === 'clanCastle');
+	}
 
 	function getYoutubeEmbedSrc(url: string) {
 		const match = url.match(YOUTUBE_URL_REGEX);

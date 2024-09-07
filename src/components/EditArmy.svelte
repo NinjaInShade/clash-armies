@@ -27,7 +27,7 @@
 	let banner = $state(army?.banner ?? BANNERS[Math.floor(Math.random() * BANNERS.length)]);
 	let name = $state(army?.name ?? null);
 	let units = $state<Optional<ArmyUnit, 'id'>[]>(army?.units?.filter((unit) => unit.home === 'armyCamp') ?? []);
-	let ccUnits = $state<Optional<ArmyUnit, 'id'>[]>(army?.units?.filter((unit) => unit.home === 'clanCastle') ?? []);
+	let ccUnits = $state<Optional<ArmyUnit, 'id'>[]>(getCcUnits());
 	let equipment = $state<Optional<ArmyEquipment, 'id'>[]>(army?.equipment ?? []);
 	let pets = $state<Optional<ArmyPet, 'id'>[]>(army?.pets ?? []);
 	let guideText = $state(army?.guide?.textContent ?? null);
@@ -36,8 +36,8 @@
 	// Other state
 	let errors = $state<FetchErrors | null>(null);
 	let saveDisabled = $derived(!name || name.length < 2 || name.length > 25 || !units.length);
-	let showClanCastle = $state(ccUnits.length > 0);
-	let showHeroes = $state(equipment.length > 0 || pets.length > 0);
+	let showClanCastle = $state(getCcUnits().length > 0);
+	let showHeroes = $state((army?.equipment || []).length > 0 || (army?.pets || []).length > 0);
 	let showGuide = $state(typeof army?.guide?.id === 'number');
 
 	const thData = $derived(app.townHalls.find((th) => th.level === townHall));
@@ -45,6 +45,10 @@
 	const ccCapacity = $derived.by(() => getCcCapacity(thData));
 	const housingSpaceUsed = $derived.by(() => getTotals(units));
 	const ccHousingSpaceUsed = $derived.by(() => getTotals(ccUnits));
+
+	function getCcUnits() {
+		return army?.units?.filter((unit) => unit.home === 'clanCastle') ?? [];
+	}
 
 	function addClanCastle() {
 		showClanCastle = true;
