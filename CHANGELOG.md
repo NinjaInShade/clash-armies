@@ -1,5 +1,7 @@
 ## [Unreleased]
 
+## [0.2.0] - 2024-09-07
+
 - Add guide support to armies
 - Add ability to comment on armies
 - Add ability to import units from clash of clans army link
