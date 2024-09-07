@@ -10,7 +10,7 @@ During the making of this I had to find resources myself so for anyone making a 
 
 Found on the [Clash API Developers discord](https://discord.gg/clashapi) FAQs. For internal troop/spell ID's see [Static data](./README.md#static-data)
 
-> Army Link URLs enable sharing of army compositions externally from the Clash of Clans game client.  Other players can then use the link to import the army composition to one of their army slots in game.  These URLs can be generated programmatically if you know the troop and spell IDs.
+> Army Link URLs enable sharing of army compositions externally from the Clash of Clans game client. Other players can then use the link to import the army composition to one of their army slots in game. These URLs can be generated programmatically if you know the troop and spell IDs.
 >
 > Example of a simple army link breakdown:
 >
@@ -36,18 +36,11 @@ I found some resources from [Clash API Developers discord](https://discord.gg/cl
 
 ## Sanitised JSON Files
 
-> Provided by @Magic?! | ClashKing  (docs)
+> Provided by @Magic?! | ClashKing (docs)
 >
-> https://api.clashking.xyz/json/troops <br/>
-> https://api.clashking.xyz/json/spells <br/>
-> https://api.clashking.xyz/json/heroes <br/>
-> https://api.clashking.xyz/json/buildings <br/>
-> https://api.clashking.xyz/json/pets <br/>
-> https://api.clashking.xyz/json/supers <br/>
-> https://api.clashking.xyz/json/translations <br/>
+> https://api.clashking.xyz/json/troops <br/> > https://api.clashking.xyz/json/spells <br/> > https://api.clashking.xyz/json/heroes <br/> > https://api.clashking.xyz/json/buildings <br/> > https://api.clashking.xyz/json/pets <br/> > https://api.clashking.xyz/json/supers <br/> > https://api.clashking.xyz/json/translations <br/>
 >
-> https://api.clashking.xyz/assets (Zip File of Game Assets) <br/>
-> https://api.clashking.xyz/csv (Zip File of all Game CSV's) <br/>
+> https://api.clashking.xyz/assets (Zip File of Game Assets) <br/> > https://api.clashking.xyz/csv (Zip File of all Game CSV's) <br/>
 
 ### Raw JSON Conversions
 
@@ -114,7 +107,7 @@ This refers to the [Official API](https://developer.clashofclans.com/#/).
 
 Found on the [Clash API Developers discord](https://discord.gg/clashapi) FAQs:
 
-> Each API response from the Clash of Clans API is cached for a certain amount of time.  This means that the response will not change until the cache timer has expired, therefore there isn't any benefit from repeating the request again until this time.  The cache timer varies by API endpoint:
+> Each API response from the Clash of Clans API is cached for a certain amount of time. This means that the response will not change until the cache timer has expired, therefore there isn't any benefit from repeating the request again until this time. The cache timer varies by API endpoint:
 >
 > Clan - 120 seconds (2 minutes)<br />
 > Current War (Classic) - 120 seconds (2 minutes)<br />
@@ -127,7 +120,7 @@ Found on the [Clash API Developers discord](https://discord.gg/clashapi) FAQs:
 
 Found on the [Clash API Developers discord](https://discord.gg/clashapi) FAQs:
 
-> Each API Token for the Clash of Clans API is to rate limitations.  There isn't an official rate limit figure provided, however we have tested 30-40 requests per second without issues.
+> Each API Token for the Clash of Clans API is to rate limitations. There isn't an official rate limit figure provided, however we have tested 30-40 requests per second without issues.
 >
 > If you exceed the rate limit, the API will respond with a 429 error and you will be temporarily unable to make API requests with that token (it can last 1 hour).
 
@@ -135,12 +128,12 @@ Found on the [Clash API Developers discord](https://discord.gg/clashapi) FAQs:
 
 Found on the [Clash API Developers discord](https://discord.gg/clashapi) FAQs:
 
-> Each API Tokens for the Clash of Clans API is restricted to specific IP addresses (IPv4).  This can cause issues when attempting to access it from a connection with a dynamic IP address. There are a couple workarounds:
+> Each API Tokens for the Clash of Clans API is restricted to specific IP addresses (IPv4). This can cause issues when attempting to access it from a connection with a dynamic IP address. There are a couple workarounds:
 >
-> 1) Use a library with dynamic IP address support
+> 1. Use a library with dynamic IP address support
 >
-> A number of the community created API libraries have the ability to create and use a new API token each time your IP address changes.  This happens seamlessly with each request, so enable you to make API requests without needing to manually create a new API Token each time your IP changes.
+> A number of the community created API libraries have the ability to create and use a new API token each time your IP address changes. This happens seamlessly with each request, so enable you to make API requests without needing to manually create a new API Token each time your IP changes.
 >
-> 2) Use an API proxy
+> 2. Use an API proxy
 >
-> Making your API requests via a proxy will mean that the API will "see" the requests as coming from the IP address of the proxy service.  If you create your token using the IP address of the proxy service and then make your API calls via that service, you will be able to make API requests from any IP address.
+> Making your API requests via a proxy will mean that the API will "see" the requests as coming from the IP address of the proxy service. If you create your token using the IP address of the proxy service and then make your API calls via that service, you will be able to make API requests from any IP address.

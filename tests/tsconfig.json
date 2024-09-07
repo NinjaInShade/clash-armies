@@ -11,12 +11,22 @@
 		"strict": true,
 		"moduleResolution": "bundler",
 		"paths": {
-			"~": ["../src"],
-			"~/*": ["../src/*"],
-			"$lib": ["../src/lib"],
-			"$lib/*": ["../src/lib/*"],
+			"~": [
+				"../src"
+			],
+			"~/*": [
+				"../src/*"
+			],
+			"$lib": [
+				"../src/lib"
+			],
+			"$lib/*": [
+				"../src/lib/*"
+			],
 			// $env/dynamic/private is required for tests to work
-			"$env/dynamic/private": ["./import-shims"]
+			"$env/dynamic/private": [
+				"./import-shims"
+			]
 		}
 	}
 }
