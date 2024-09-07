@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import type { Unit, UnitType, UnitLevel, FetchErrors } from '~/lib/shared/types';
+	import type { Unit, UnitType, UnitLevel, FetchErrors } from '$types';
 	import { invalidateAll } from '$app/navigation';
-	import C from '~/components';
+	import C from '$components';
 
 	// TODO: fix this type, id/unitId should be optional as we may be creating and don't have that info yet
 	type Level = Omit<UnitLevel, 'id' | 'unitId'>;

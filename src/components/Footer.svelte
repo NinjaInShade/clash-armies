@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { getContext } from 'svelte';
-	import type { AppState } from '~/lib/shared/types';
-	import C from '~/components';
+	import type { AppState } from '$types';
+	import C from '$components';
 
 	const app = getContext<AppState>('app');
 </script>

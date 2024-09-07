@@ -1,5 +1,5 @@
 import type { MySQL } from '@ninjalib/sql';
-import type { Session, User } from '~/lib/shared/types';
+import type { Session, User } from '$types';
 import type { UserId, DatabaseUser, DatabaseSession } from 'lucia';
 
 export class sqlAdapter {

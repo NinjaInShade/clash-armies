@@ -1,8 +1,8 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
-	import { HOLD_REMOVE_SPEED } from '~/lib/shared/utils';
-	import type { Optional, Unit, ArmyUnit } from '~/lib/shared/types';
-	import C from '~/components';
+	import { HOLD_REMOVE_SPEED } from '$shared/utils';
+	import type { Optional, Unit, ArmyUnit } from '$types';
+	import C from '$components';
 
 	type Props = {
 		selectedUnits: Optional<ArmyUnit, 'id'>[];

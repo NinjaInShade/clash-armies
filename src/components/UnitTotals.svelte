@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { formatTime } from '~/lib/client/army';
-	import type { Totals } from '~/lib/shared/types';
+	import { formatTime } from '$client/army';
+	import type { Totals } from '$types';
 
 	type Props = {
 		used: Totals;

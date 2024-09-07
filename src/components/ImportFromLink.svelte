@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { getContext } from 'svelte';
-	import type { AppState, Optional, ArmyUnit } from '~/lib/shared/types';
-	import { validateUnits } from '~/lib/shared/validation';
-	import { parseLink } from '~/lib/client/army';
-	import C from '~/components';
+	import type { AppState, Optional, ArmyUnit } from '$types';
+	import { validateUnits } from '$shared/validation';
+	import { parseLink } from '$client/army';
+	import C from '$components';
 
 	type Props = {
 		/** Function that closes the modal */

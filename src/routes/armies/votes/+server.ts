@@ -1,7 +1,7 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { saveVote } from '~/lib/server/army';
-import { middleware } from '~/lib/server/utils';
+import { saveVote } from '$server/army';
+import { middleware } from '$server/utils';
 
 export const POST: RequestHandler = async (event) => {
 	return middleware(event, async function () {

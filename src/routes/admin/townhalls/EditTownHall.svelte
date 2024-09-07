@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import type { TownHall, FetchErrors } from '~/lib/shared/types';
+	import type { TownHall, FetchErrors } from '$types';
 	import { invalidateAll } from '$app/navigation';
 	import { deserialize } from '$app/forms';
-	import C from '~/components';
+	import C from '$components';
 
 	type Props = {
 		/** Function that closes the modal */

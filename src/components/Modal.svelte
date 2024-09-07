@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
-	import type { SvelteComponentGeneric } from '~/lib/shared/types';
-	import C from '~/components';
+	import type { SvelteComponentGeneric } from '$types';
+	import C from '$components';
 
 	type ComponentRendering = {
 		/** Sets the component the modal renders. Uses children as fallback */

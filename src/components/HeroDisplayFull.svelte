@@ -1,7 +1,7 @@
 <script lang="ts">
-	import type { AppState, HeroType, ArmyEquipment, ArmyPet } from '~/lib/shared/types';
+	import type { AppState, HeroType, ArmyEquipment, ArmyPet } from '$types';
 	import { getContext } from 'svelte';
-	import C from '~/components';
+	import C from '$components';
 
 	type Props = {
 		hero: HeroType;

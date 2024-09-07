@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { getContext } from 'svelte';
-	import type { AppState, Army, User } from '~/lib/shared/types';
-	import C from '~/components';
+	import type { AppState, Army, User } from '$types';
+	import C from '$components';
 
 	type Props = {
 		savedArmies: Army[];

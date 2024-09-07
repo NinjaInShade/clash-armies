@@ -17,6 +17,11 @@ const config = {
 		}),
 		alias: {
 			'~': 'src',
+			'$types': 'src/lib/shared/types',
+			'$components': 'src/components',
+			'$client': 'src/lib/client',
+			'$server': 'src/lib/server',
+			'$shared': 'src/lib/shared',
 		},
 		files: {
 			hooks: {

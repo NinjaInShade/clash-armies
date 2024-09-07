@@ -5,7 +5,7 @@
 
 <script lang="ts">
 	import { getContext } from 'svelte';
-	import type { AppState, Comment } from '~/lib/shared/types';
+	import type { AppState, Comment } from '$types';
 	import { intlFormatDistance } from 'date-fns';
 	import { invalidateAll } from '$app/navigation';
 	import SaveComment from './SaveComment.svelte';

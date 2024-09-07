@@ -11,17 +11,23 @@
 		"strict": true,
 		"moduleResolution": "bundler",
 		"paths": {
-			"~": [
-				"../src"
-			],
 			"~/*": [
 				"../src/*"
 			],
-			"$lib": [
-				"../src/lib"
-			],
 			"$lib/*": [
 				"../src/lib/*"
+			],
+			"$types": [
+				"../src/lib/shared/types.ts"
+			],
+			"$client/*": [
+				"../src/lib/client/*"
+			],
+			"$server/*": [
+				"../src/lib/server/*"
+			],
+			"$shared/*": [
+				"../src/lib/shared/*"
 			],
 			// $env/dynamic/private is required for tests to work
 			"$env/dynamic/private": [

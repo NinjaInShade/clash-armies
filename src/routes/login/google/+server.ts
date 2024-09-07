@@ -1,7 +1,7 @@
 import type { RequestEvent } from '@sveltejs/kit';
 import { redirect } from '@sveltejs/kit';
 import { generateCodeVerifier } from 'arctic';
-import { google } from '~/lib/server/auth/lucia';
+import { google } from '$server/auth/lucia';
 import { dev } from '$app/environment';
 
 export async function GET(event: RequestEvent): Promise<Response> {

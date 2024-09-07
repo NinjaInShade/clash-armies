@@ -1,5 +1,5 @@
 <script lang="ts">
-	import C from '~/components';
+	import C from '$components';
 </script>
 
 <section class="army">

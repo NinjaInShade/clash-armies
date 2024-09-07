@@ -1,8 +1,8 @@
 import type { Handle, RequestEvent } from '@sveltejs/kit';
-import { db } from '~/lib/server/db';
-import { migration } from '~/lib/server/migration';
-import { lucia } from '~/lib/server/auth/lucia';
-import { hasAuth, requireAuth, hasRoles, requireRoles } from '~/lib/server/auth/utils';
+import { db } from '$server/db';
+import { migration } from '$server/migration';
+import { lucia } from '$server/auth/lucia';
+import { hasAuth, requireAuth, hasRoles, requireRoles } from '$server/auth/utils';
 import { CronJob } from 'cron';
 import { dev } from '$app/environment';
 import util from '@ninjalib/util';

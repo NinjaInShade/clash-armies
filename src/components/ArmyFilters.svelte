@@ -1,5 +1,5 @@
 <script lang="ts" context="module">
-	import type { AppState, Army, Unit, Equipment, Pet } from '~/lib/shared/types';
+	import type { AppState, Army, Unit, Equipment, Pet } from '$types';
 	export type PickUnit = (Unit & { pickType: 'unit' }) | (Equipment & { pickType: 'equipment' }) | (Pet & { pickType: 'pet' });
 	export type Filters = {
 		hasGuide?: true;
@@ -15,9 +15,9 @@
 
 <script lang="ts">
 	import { getContext } from 'svelte';
-	import { getTags } from '~/lib/client/army';
-	import { mkParamStore } from '~/lib/client/utils';
-	import C from '~/components';
+	import { getTags } from '$client/army';
+	import { mkParamStore } from '$client/utils';
+	import C from '$components';
 
 	type Props = {
 		/** The full list of armies */

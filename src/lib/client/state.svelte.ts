@@ -1,5 +1,5 @@
-import type { AppState, Modal, Notification } from '~/lib/shared/types';
-import C from '~/components';
+import type { AppState, Modal, Notification } from '$types';
+import C from '$components';
 
 const TOAST_DEFAULT_DURATION = 1000;
 

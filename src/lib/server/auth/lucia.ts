@@ -1,6 +1,6 @@
 import { Lucia } from 'lucia';
 import { Google } from 'arctic';
-import { db } from '~/lib/server/db';
+import { db } from '$server/db';
 import { sqlAdapter } from './adapter';
 import { dev, building } from '$app/environment';
 import { env } from '$env/dynamic/private';

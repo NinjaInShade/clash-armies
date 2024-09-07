@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { getContext } from 'svelte';
-	import type { AppState } from '~/lib/shared/types';
-	import { getHeroLevel } from '~/lib/shared/utils';
+	import type { AppState } from '$types';
+	import { getHeroLevel } from '$shared/utils';
 
 	type Props = {
 		onClick: () => void;

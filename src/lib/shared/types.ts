@@ -1,5 +1,5 @@
 import type { SvelteComponent } from 'svelte';
-import { BANNERS, VALID_UNIT_HOME, VALID_HEROES } from '~/lib/shared/utils';
+import { BANNERS, VALID_UNIT_HOME, VALID_HEROES } from '$shared/utils';
 
 export type SvelteComponentGeneric = typeof SvelteComponent<Record<string, unknown>>;
 

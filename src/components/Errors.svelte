@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { FetchErrors } from '~/lib/shared/types';
+	import type { FetchErrors } from '$types';
 
 	type Props = {
 		errors: FetchErrors | null;

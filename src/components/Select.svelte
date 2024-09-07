@@ -4,7 +4,7 @@
 </script>
 
 <script lang="ts">
-	import type { SvelteComponentGeneric } from '~/lib/shared/types';
+	import type { SvelteComponentGeneric } from '$types';
 
 	type SelectData = { value: any; label: string; component?: [SvelteComponentGeneric, Record<string, any>] };
 

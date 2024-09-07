@@ -1,13 +1,13 @@
-import { getUnits, getTownHalls, getEquipment, getPets } from '~/lib/server/army';
-import type { SaveArmy, Army, User } from '~/lib/shared/types';
-import type { Ctx } from '~/lib/shared/validation';
-import { BANNERS } from '~/lib/shared/utils';
-import { migration } from '~/lib/server/migration';
-import { db } from '~/lib/server/db';
+import { getUnits, getTownHalls, getEquipment, getPets } from '$server/army';
+import type { SaveArmy, Army, User } from '$types';
+import type { Ctx } from '$shared/validation';
+import { BANNERS } from '$shared/utils';
+import { migration } from '$server/migration';
+import { db } from '$server/db';
 import chai from 'chai';
 import chaiSubset from 'chai-subset';
 import type { RequestEvent } from '@sveltejs/kit';
-import { hasAuth, requireAuth, hasRoles, requireRoles } from '~/lib/server/auth/utils';
+import { hasAuth, requireAuth, hasRoles, requireRoles } from '$server/auth/utils';
 
 chai.use(chaiSubset);
 

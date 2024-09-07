@@ -1,8 +1,8 @@
 <script lang="ts">
-	import C from '~/components';
+	import C from '$components';
 	import type { PageData } from './$types';
 	import { getContext } from 'svelte';
-	import type { AppState } from '~/lib/shared/types';
+	import type { AppState } from '$types';
 
 	const app = getContext<AppState>('app');
 

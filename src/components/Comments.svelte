@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { getContext } from 'svelte';
-	import type { AppState, Comment, StructuredComment } from '~/lib/shared/types';
+	import type { AppState, Comment, StructuredComment } from '$types';
 	import CommentsList from './CommentsList.svelte';
 	import SaveComment from './SaveComment.svelte';
 

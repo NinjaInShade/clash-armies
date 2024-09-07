@@ -1,5 +1,5 @@
 import type { PageServerLoad } from './$types';
-import { getArmies, getTownHalls } from '~/lib/server/army';
+import { getArmies, getTownHalls } from '$server/army';
 
 export const load: PageServerLoad = async (ev) => {
 	const armies = await getArmies({ req: ev.locals });

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { page } from '$app/stores';
-	import C from '~/components';
+	import C from '$components';
 
 	let pageRef: HTMLElement | null = null;
 

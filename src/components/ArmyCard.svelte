@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { getContext } from 'svelte';
-	import type { Army, AppState } from '~/lib/shared/types';
-	import { VALID_HEROES, getTotals, getCapacity, hasHero } from '~/lib/shared/utils';
-	import { getTags, copyLink, openInGame, getCopyBtnTitle, getOpenBtnTitle } from '~/lib/client/army';
-	import C from '~/components';
+	import type { Army, AppState } from '$types';
+	import { VALID_HEROES, getTotals, getCapacity, hasHero } from '$shared/utils';
+	import { getTags, copyLink, openInGame, getCopyBtnTitle, getOpenBtnTitle } from '$client/army';
+	import C from '$components';
 
 	type Props = {
 		army: Army;

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { getContext } from 'svelte';
-	import type { AppState } from '~/lib/shared/types';
+	import type { AppState } from '$types';
 
 	type Props = {
 		onClick: () => void;

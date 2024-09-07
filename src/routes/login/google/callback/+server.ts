@@ -1,8 +1,8 @@
 import type { RequestEvent } from '@sveltejs/kit';
 import { OAuth2RequestError } from 'arctic';
-import type { User } from '~/lib/shared/types';
-import { google, lucia } from '~/lib/server/auth/lucia';
-import { db } from '~/lib/server/db';
+import type { User } from '$types';
+import { google, lucia } from '$server/auth/lucia';
+import { db } from '$server/db';
 
 type GoogleUser = {
 	sub: string;

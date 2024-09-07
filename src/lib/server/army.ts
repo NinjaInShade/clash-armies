@@ -1,12 +1,12 @@
-import type { SaveArmy, Army, TownHall, Unit, Equipment, Pet, UnitType, Comment, SaveComment } from '~/lib/shared/types';
-import { db } from '~/lib/server/db';
-import { USER_MAX_ARMIES, mergeAdjacentEmptyTags } from '~/lib/shared/utils';
-import { validateArmy, numberSchema, commentSchema } from '~/lib/shared/validation';
+import type { SaveArmy, Army, TownHall, Unit, Equipment, Pet, UnitType, Comment, SaveComment } from '$types';
+import { db } from '$server/db';
+import { USER_MAX_ARMIES, mergeAdjacentEmptyTags } from '$shared/utils';
+import { validateArmy, numberSchema, commentSchema } from '$shared/validation';
 import z from 'zod';
 import type { RequestEvent } from '@sveltejs/kit';
 import type { Request } from '~/app';
 import { generateJSON, generateHTML } from '@tiptap/html';
-import { getExtensions } from '~/lib/shared/guideEditor';
+import { getExtensions } from '$shared/guideEditor';
 import { parseHTML } from 'zeed-dom';
 
 type GetArmiesParams = {

@@ -1,4 +1,4 @@
-import type { Army, TownHall, Unit, UnitType, Equipment, Pet, HeroType } from './types';
+import type { Army, TownHall, Unit, UnitType, Equipment, Pet, HeroType } from '$types';
 import type { VDocumentFragment, VHTMLDocument } from 'zeed-dom';
 
 /**

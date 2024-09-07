@@ -5,9 +5,9 @@
 	import UnitTableDisplay from './units/UnitTableDisplay.svelte';
 	import EditTownHall from './townhalls/EditTownHall.svelte';
 	import EditUnit from './units/EditUnit.svelte';
-	import { formatTime } from '~/lib/client/army';
-	import type { Unit, TownHall, AppState } from '~/lib/shared/types';
-	import C from '~/components';
+	import { formatTime } from '$client/army';
+	import type { Unit, TownHall, AppState } from '$types';
+	import C from '$components';
 
 	const { data } = $props<{ data: PageData }>();
 	const { units, townHalls } = $derived(data);

@@ -1,6 +1,6 @@
 import type { RequestEvent } from '@sveltejs/kit';
 import { redirect } from '@sveltejs/kit';
-import { lucia } from '~/lib/server/auth/lucia';
+import { lucia } from '$server/auth/lucia';
 
 export async function GET(event: RequestEvent): Promise<Response> {
 	if (!event.locals.session) {

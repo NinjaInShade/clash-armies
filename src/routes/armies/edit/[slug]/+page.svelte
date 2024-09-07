@@ -1,8 +1,8 @@
 <script lang="ts">
 	import type { PageData } from './$types';
-	import type { AppState } from '~/lib/shared/types';
+	import type { AppState } from '$types';
 	import { getContext } from 'svelte';
-	import C from '~/components';
+	import C from '$components';
 
 	const { data }: { data: PageData } = $props();
 	const { army } = $derived(data);

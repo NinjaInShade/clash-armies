@@ -1,10 +1,10 @@
 <script lang="ts">
 	import { getContext } from 'svelte';
 	import { goto } from '$app/navigation';
-	import { VALID_HEROES, getTotals, getCapacity, getCcCapacity, hasHero, YOUTUBE_URL_REGEX } from '~/lib/shared/utils';
-	import { copyLink, openInGame, getTags, getCopyBtnTitle, getOpenBtnTitle } from '~/lib/client/army';
-	import type { Army, AppState, FetchErrors } from '~/lib/shared/types';
-	import C from '~/components';
+	import { VALID_HEROES, getTotals, getCapacity, getCcCapacity, hasHero, YOUTUBE_URL_REGEX } from '$shared/utils';
+	import { copyLink, openInGame, getTags, getCopyBtnTitle, getOpenBtnTitle } from '$client/army';
+	import type { Army, AppState, FetchErrors } from '$types';
+	import C from '$components';
 
 	type Props = { army: Army };
 	const { army }: Props = $props();

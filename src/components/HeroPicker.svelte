@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { getContext } from 'svelte';
-	import type { Optional, AppState, HeroType, Equipment, ArmyEquipment, Pet, ArmyPet, TownHall } from '~/lib/shared/types';
-	import { getHeroLevel } from '~/lib/shared/utils';
-	import C from '~/components';
+	import type { Optional, AppState, HeroType, Equipment, ArmyEquipment, Pet, ArmyPet, TownHall } from '$types';
+	import { getHeroLevel } from '$shared/utils';
+	import C from '$components';
 
 	type Props = {
 		hero: HeroType;

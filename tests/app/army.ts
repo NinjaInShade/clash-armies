@@ -17,10 +17,10 @@ import {
 	requireEquipment,
 	requirePet,
 } from '../testutil';
-import type { UnitType } from '~/lib/shared/types';
-import { validateArmy, type Ctx } from '~/lib/shared/validation';
-import { GUIDE_TEXT_CHAR_LIMIT } from '~/lib/shared/utils';
-import { getArmy, getArmies, saveArmy, saveComment } from '~/lib/server/army';
+import type { UnitType } from '$types';
+import { validateArmy, type Ctx } from '$shared/validation';
+import { GUIDE_TEXT_CHAR_LIMIT } from '$shared/utils';
+import { getArmies, saveArmy, saveComment } from '$server/army';
 import type { MySQL } from '@ninjalib/sql';
 
 let db: MySQL;

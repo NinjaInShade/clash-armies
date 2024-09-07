@@ -3,9 +3,9 @@
 	import { sineInOut } from 'svelte/easing';
 	import { setContext, type Snippet } from 'svelte';
 	import type { LayoutData } from './$types';
-	import { createAppState, requireHTML } from '~/lib/client/state.svelte';
-	import type { AppState } from '~/lib/shared/types';
-	import C from '~/components';
+	import { createAppState, requireHTML } from '$client/state.svelte';
+	import type { AppState } from '$types';
+	import C from '$components';
 
 	type Props = {
 		data: LayoutData;

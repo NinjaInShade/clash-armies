@@ -1,6 +1,6 @@
 import { error } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
-import { getArmy } from '~/lib/server/army';
+import { getArmy } from '$server/army';
 import z from 'zod';
 
 export const load: PageServerLoad = async (ev) => {

@@ -1,7 +1,7 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { middleware, STATIC_BASE_PATH } from '~/lib/server/utils';
-import { db } from '~/lib/server/db';
+import { middleware, STATIC_BASE_PATH } from '$server/utils';
+import { db } from '$server/db';
 import fs from 'node:fs/promises';
 import z from 'zod';
 

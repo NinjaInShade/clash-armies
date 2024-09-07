@@ -1,8 +1,8 @@
 <script lang="ts">
-	import C from '~/components';
-	import { USER_MAX_ARMIES } from '~/lib/shared/utils';
+	import C from '$components';
+	import { USER_MAX_ARMIES } from '$shared/utils';
 	import { getContext } from 'svelte';
-	import type { AppState } from '~/lib/shared/types';
+	import type { AppState } from '$types';
 	import type { PageData } from './$types';
 	import EditUser from './EditUser.svelte';
 	import CreatedArmiesTab from './CreatedArmiesTab.svelte';

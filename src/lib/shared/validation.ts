@@ -1,4 +1,4 @@
-import type { SaveArmy, TownHall, Unit, Equipment, Pet, SaveUnit, SaveEquipment, SavePet, SaveGuide } from './types';
+import type { SaveArmy, TownHall, Unit, Equipment, Pet, SaveUnit, SaveEquipment, SavePet, SaveGuide } from '$types';
 import {
 	BANNERS,
 	VALID_UNIT_HOME,

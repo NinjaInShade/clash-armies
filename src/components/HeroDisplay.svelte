@@ -1,7 +1,7 @@
 <script lang="ts">
-	import type { AppState, HeroType } from '~/lib/shared/types';
+	import type { AppState, HeroType } from '$types';
 	import { getContext } from 'svelte';
-	import { getHeroLevel } from '~/lib/shared/utils';
+	import { getHeroLevel } from '$shared/utils';
 
 	type Props = {
 		name: HeroType;

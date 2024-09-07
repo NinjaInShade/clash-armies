@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { onDestroy } from 'svelte';
 	import { Editor } from '@tiptap/core';
-	import { getExtensions } from '~/lib/shared/guideEditor';
-	import C from '~/components';
+	import { getExtensions } from '$shared/guideEditor';
+	import C from '$components';
 
 	type Props = {
 		text: string | null;

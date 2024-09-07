@@ -13,12 +13,9 @@
 		getPetLevel,
 		getHeroLevel,
 		GUIDE_TEXT_CHAR_LIMIT,
-	} from '~/lib/shared/utils';
-	import type { Optional, AppState, Army, ArmyUnit, ArmyEquipment, ArmyPet, Banner, FetchErrors } from '~/lib/shared/types';
-	import AddClanCastle from './AddClanCastle.svelte';
-	import AddHeroes from './AddHeroes.svelte';
-	import AddGuide from './AddGuide.svelte';
-	import C from '~/components';
+	} from '$shared/utils';
+	import type { Optional, AppState, Army, ArmyUnit, ArmyEquipment, ArmyPet, Banner, FetchErrors } from '$types';
+	import C from '$components';
 
 	type Props = { army?: Army };
 
@@ -287,7 +284,7 @@
 			{/if}
 		</div>
 	{:else}
-		<AddClanCastle onClick={addClanCastle} selectedTownHall={townHall} />
+		<C.AddClanCastle onClick={addClanCastle} selectedTownHall={townHall} />
 	{/if}
 </section>
 
@@ -310,7 +307,7 @@
 			{/each}
 		</div>
 	{:else}
-		<AddHeroes onClick={addHeroes} selectedTownHall={townHall} />
+		<C.AddHeroes onClick={addHeroes} selectedTownHall={townHall} />
 	{/if}
 </section>
 
@@ -332,7 +329,7 @@
 			</div>
 		</div>
 	{:else}
-		<AddGuide onClick={addGuide} />
+		<C.AddGuide onClick={addGuide} />
 	{/if}
 </section>
 

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import C from '~/components';
+	import C from '$components';
 
 	type Props = {
 		/** Function that closes the modal */

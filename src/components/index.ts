@@ -43,5 +43,8 @@ export { default as ArmyFilters } from './ArmyFilters.svelte';
 export { default as FiltersPopup } from './FiltersPopup.svelte';
 export { default as IconTagsClanCastle } from './IconTagsClanCastle.svelte';
 export { default as IconTagsHeroes } from './IconTagsHeroes.svelte';
+export { default as AddClanCastle } from './AddClanCastle.svelte';
+export { default as AddHeroes } from './AddHeroes.svelte';
+export { default as AddGuide } from './AddGuide.svelte';
 
 export * as default from './index';

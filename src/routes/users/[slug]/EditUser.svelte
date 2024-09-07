@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { getContext } from 'svelte';
-	import type { AppState, User, FetchErrors } from '~/lib/shared/types';
+	import type { AppState, User, FetchErrors } from '$types';
 	import { invalidateAll, goto } from '$app/navigation';
-	import C from '~/components';
+	import C from '$components';
 
 	type Props = {
 		/** Function that closes the modal */

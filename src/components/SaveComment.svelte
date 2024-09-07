@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { getContext } from 'svelte';
-	import type { AppState, Comment } from '~/lib/shared/types';
-	import { MAX_COMMENT_LENGTH } from '~/lib/shared/utils';
+	import type { AppState, Comment } from '$types';
+	import { MAX_COMMENT_LENGTH } from '$shared/utils';
 	import { invalidateAll } from '$app/navigation';
-	import C from '~/components';
+	import C from '$components';
 
 	type Props = {
 		armyId: number;

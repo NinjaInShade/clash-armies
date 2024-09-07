@@ -1,5 +1,5 @@
-import type { User } from '~/lib/shared/types';
-import { db } from '~/lib/server/db';
+import type { User } from '$types';
+import { db } from '$server/db';
 import z from 'zod';
 import type { RequestEvent } from '@sveltejs/kit';
 import type { Request } from '~/app';

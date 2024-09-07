@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { getContext } from 'svelte';
-	import { getTotals, HOLD_ADD_SPEED, requireUnit } from '~/lib/shared/utils';
-	import type { Optional, AppState, Unit, SaveUnit, ArmyUnit, UnitType, TownHall, Totals } from '~/lib/shared/types';
-	import C from '~/components';
+	import { getTotals, HOLD_ADD_SPEED, requireUnit } from '$shared/utils';
+	import type { Optional, AppState, Unit, SaveUnit, ArmyUnit, UnitType, TownHall, Totals } from '$types';
+	import C from '$components';
 
 	type TitleOptions = {
 		level: number;

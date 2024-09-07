@@ -3,7 +3,7 @@
 </script>
 
 <script lang="ts">
-	import type { StructuredComment } from '~/lib/shared/types';
+	import type { StructuredComment } from '$types';
 	import CommentCard from './Comment.svelte';
 
 	type Props = {

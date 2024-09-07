@@ -1,6 +1,6 @@
-import type { AppState, Army, Unit, ArmyUnit, SvelteComponentGeneric, Optional } from '~/lib/shared/types';
-import { SECOND, MINUTE, HOUR, OBJECT_ID_PREFIXES, VALID_HEROES, hasHero } from '~/lib/shared/utils';
-import C from '~/components';
+import type { AppState, Army, Unit, ArmyUnit, SvelteComponentGeneric, Optional } from '$types';
+import { SECOND, MINUTE, HOUR, OBJECT_ID_PREFIXES, VALID_HEROES, hasHero } from '$shared/utils';
+import C from '$components';
 
 /**
  * Generates URL link to copy army into clash of clans.

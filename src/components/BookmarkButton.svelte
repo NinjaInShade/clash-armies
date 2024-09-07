@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { getContext } from 'svelte';
-	import type { Army, AppState } from '~/lib/shared/types';
+	import type { Army, AppState } from '$types';
 	import { invalidate } from '$app/navigation';
 
 	type Props = {

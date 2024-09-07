@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { PageData } from './$types';
-	import type { Army } from '~/lib/shared/types';
-	import C from '~/components';
+	import type { Army } from '$types';
+	import C from '$components';
 
 	const { data }: { data: PageData } = $props();
 	const { armies } = $derived(data);

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { getContext } from 'svelte';
-	import type { AppState, UnitType } from '~/lib/shared/types';
+	import type { AppState, UnitType } from '$types';
 
 	type Props = {
 		name: string;

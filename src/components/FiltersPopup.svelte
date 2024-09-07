@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { getContext } from 'svelte';
-	import type { AppState } from '~/lib/shared/types';
+	import type { AppState } from '$types';
 	import type { PickUnit, Filters } from './ArmyFilters.svelte';
-	import C from '~/components';
+	import C from '$components';
 
 	type Props = {
 		close: (newFilters?: Filters) => void;

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { PageData } from './$types';
-	import C from '~/components';
+	import C from '$components';
 
 	const { data }: { data: PageData } = $props();
 	const { army } = $derived(data);
