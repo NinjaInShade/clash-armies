@@ -1,6 +1,64 @@
 # Introduction
 
-The high-level premise of this website is a place where users can make, share, view and learn clash of clans armies and attack strategies.
+Clash Armies is a website where users can find, create, share and learn clash of clans armies.
+
+Join the [discord server](https://discord.gg/9wCmfXhZM6) to keep up to date with discussions, sneak peaks and releases!
+
+# Run locally
+
+If you need extra help, or have suggestions on improving the dev workflow, give me a message on discord/github.
+
+## Prerequisites
+
+- `npm` >= 10.5.0
+- `node` >= 21.0.0
+- `docker` >= 20.10.24
+- `docker compose` >= 2.20.3
+
+## Running app
+
+Clone the repo and go into:
+
+```bash
+git clone https://github.com/NinjaInShade/clash-armies.git
+cd clash-armies
+```
+
+The first setup step before being able to run the app and have it function is to create a google oAuth project and generate a client id and secret which are needed for the login to work. This is totally free. These are the steps:
+
+- Go to the [Google API dashboard](https://console.cloud.google.com/apis/dashboard)
+- Go to `credentials` and create an oAuth client id/secret. In the setup wizard add `http://localhost:5173` as an authorized javascript origin, and `http://localhost:5173/login/google/callback` as an authorized redirect URI.
+- Go to `oAuth consent screen` and customize the oAuth consent screen to your liking
+
+Next thing you will need to do is create a `.env` file at the root of the project with the following vars:
+
+- DB_PORT
+- DB_ROOT_PASSWORD
+- DB_USER
+- DB_PASSWORD
+- BASE_APP_URL (set this to `http://localhost:5173`)
+- GOOGLE_AUTH_CLIENT_ID (use the google client id from before)
+- GOOGLE_AUTH_SECRET (use the google secret from before)
+
+Once all that is done, install the dependencies:
+
+```bash
+npm i
+```
+
+And run the app:
+
+```bash
+npm start
+```
+
+You should now have the app running locally on port 5173!
+
+# Contributing
+
+I appreciate any contributions, I find it really cool people can help make the project better for everyone.
+
+If you wish to contribute, give me a shout on discord/github and we can discuss the idea/fix you want to do (or I can help with ideas).
 
 # Useful documentation/reading
 
