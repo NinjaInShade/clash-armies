@@ -51,6 +51,15 @@
 		{ key: 'objectId', label: 'Object ID', width: '120px' },
 		{ key: 'trainingTime', label: 'Training time', render: (row: Unit) => formatTime(row.trainingTime * 1000), width: '165px' },
 		{ key: 'housingSpace', label: 'Housing space', width: '165px' },
+		{
+			key: 'maxLevel',
+			label: 'Max level',
+			width: '105px',
+			render: (row: Unit) => {
+				const levels = row.levels.map((lvl) => lvl.level);
+				return Math.max(...levels);
+			},
+		},
 	];
 
 	function addTownHall() {
