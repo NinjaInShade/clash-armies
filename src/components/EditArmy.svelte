@@ -23,7 +23,7 @@
 	const app = getContext<AppState>('app');
 
 	// Army state
-	let townHall = $state(army?.townHall ?? 16);
+	let townHall = $state(army?.townHall ?? 17);
 	let banner = $state(army?.banner ?? BANNERS[Math.floor(Math.random() * BANNERS.length)]);
 	let name = $state(army?.name ?? null);
 	let units = $state<Optional<ArmyUnit, 'id'>[]>(army?.units?.filter((unit) => unit.home === 'armyCamp') ?? []);

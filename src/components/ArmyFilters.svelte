@@ -226,7 +226,7 @@
 	<div class="filter-btns">
 		<button class="th-filter filter-btn" class:active={$townHall !== undefined} type="button" bind:this={thMenuEl} onclick={() => (thMenuShow = !thMenuShow)}>
 			{#if $townHall === undefined}
-				<img src="/clash/town-halls/16.png" alt="Town hall 16" />
+				<img src="/clash/town-halls/17.png" alt="Town hall 17" />
 				TH
 			{:else}
 				<img src="/clash/town-halls/{$townHall}.png" alt="Town hall {$townHall}" />
