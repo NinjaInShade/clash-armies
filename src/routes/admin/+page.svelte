@@ -9,7 +9,7 @@
 	import type { Unit, TownHall, AppState } from '$types';
 	import C from '$components';
 
-	const { data } = $props<{ data: PageData }>();
+	const { data }: { data: PageData } = $props();
 	const { units, townHalls } = $derived(data);
 
 	const app = getContext<AppState>('app');

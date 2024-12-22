@@ -25,7 +25,7 @@
 	</div>
 	{#if selectedTownHall >= requiredThLvl}
 		<h2>Add recommended hero pets/equipment</h2>
-		<button class="add-cc-btn" onclick={onClick}>
+		<button class="add-cc-btn" onclick={onClick} aria-label="Displays the hero equipment/pets editor">
 			<svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
 				<path
 					d="M15 0C11.0367 0.0480892 7.24926 1.64388 4.44657 4.44657C1.64388 7.24926 0.0480892 11.0367 0 15C0.0480892 18.9633 1.64388 22.7507 4.44657 25.5534C7.24926 28.3561 11.0367 29.9519 15 30C18.9633 29.9519 22.7507 28.3561 25.5534 25.5534C28.3561 22.7507 29.9519 18.9633 30 15C29.9519 11.0367 28.3561 7.24926 25.5534 4.44657C22.7507 1.64388 18.9633 0.0480892 15 0ZM23.5714 16.0714H16.0714V23.5714H13.9286V16.0714H6.42857V13.9286H13.9286V6.42857H16.0714V13.9286H23.5714V16.0714Z"
@@ -63,7 +63,7 @@
 		margin: -24px 0 0 0;
 		position: relative;
 	}
-	.not-added h2:has(+ .add-cc-btn) {
+	.not-added :global(h2:has(+ .add-cc-btn)) {
 		margin-bottom: 8px;
 	}
 	.add-cc-btn {
@@ -83,9 +83,6 @@
 	.add-cc-btn:focus,
 	.add-cc-btn:active {
 		outline: var(--grey-400) dotted 2px;
-	}
-	.add-cc-btn:hover {
-		/* background-color: var(--grey-500); */
 	}
 	.add-cc-btn:hover path,
 	.add-cc-btn:focus path {

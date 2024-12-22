@@ -21,7 +21,7 @@ async function getEnv() {
 	let fileData;
 	try {
 		fileData = (await fsp.readFile(pathToEnv, { encoding: 'utf-8' })).trim();
-	} catch (err) {
+	} catch (err: any) {
 		if (err?.message.startsWith('ENOENT: no such file or directory')) {
 			throw new Error(`Error reading .env file, make sure it exists at: '${pathToEnv}'`);
 		}

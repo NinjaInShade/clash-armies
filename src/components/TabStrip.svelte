@@ -1,12 +1,11 @@
 <script lang="ts">
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 	import { goto } from '$app/navigation';
-	import { onMount } from 'svelte';
-	import type { SvelteComponentGeneric } from '$types';
+	import { onMount, type Component } from 'svelte';
 
 	type Tab = {
 		name: string;
-		component: SvelteComponentGeneric;
+		component: Component;
 		componentProps?: Record<string, unknown>;
 		label?: string;
 	};
@@ -28,7 +27,7 @@
 	});
 
 	function loadTab() {
-		const tab = $page.url.searchParams.get('tab');
+		const tab = page.url.searchParams.get('tab');
 		if (!tab) {
 			const defaultTab = tabs[0];
 			setTabQuery(defaultTab.name);
@@ -45,8 +44,8 @@
 	}
 
 	function setTabQuery(tab: string) {
-		$page.url.searchParams.set('tab', tab);
-		goto(`?${$page.url.searchParams.toString()}`);
+		page.url.searchParams.set('tab', tab);
+		goto(`?${page.url.searchParams.toString()}`);
 	}
 </script>
 
@@ -65,7 +64,7 @@
 </div>
 
 {#if currentTab}
-	<svelte:component this={currentTab.component} {...currentTab.componentProps ?? {}} />
+	<currentTab.component {...currentTab.componentProps ?? {}} />
 {/if}
 
 <style>

@@ -1,11 +1,10 @@
 <script lang="ts">
-	import type { Snippet } from 'svelte';
-	import type { SvelteComponentGeneric } from '$types';
+	import type { Snippet, Component } from 'svelte';
 	import C from '$components';
 
 	type ComponentRendering = {
 		/** Sets the component the modal renders. Uses children as fallback */
-		component: SvelteComponentGeneric;
+		component: Component;
 		children?: never;
 	};
 	type ChildrenRendering = {
@@ -43,7 +42,8 @@
 		</div>
 		<div class="modal-content">
 			{#if component}
-				<svelte:component this={component} {...componentProps} />
+				{@const SvelteComponent = component}
+				<SvelteComponent {...componentProps} />
 			{:else if children}
 				{@render children()}
 			{/if}

@@ -183,7 +183,7 @@
 	}
 
 	.image-container:hover,
-	.image-container:has(input:focus) {
+	.image-container:has(:global(input:focus)) {
 		border-color: var(--primary-400);
 	}
 

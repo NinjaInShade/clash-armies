@@ -1,4 +1,4 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
 	import type { ComponentType } from 'svelte';
 	type Component = [ComponentType, Record<string, any>];
 	export type Column<Row> = {
@@ -70,6 +70,14 @@
 	 * TODO: use getRawValue() here
 	 */
 	function sortData(data: Row[], field: string, order: 'asc' | 'desc' = 'asc') {
+		function requireColumn(key: string) {
+			const column = columns.find((col) => col.key === field);
+			if (!column) {
+				throw new Error(`Column "${key}" not found`);
+			}
+			return column;
+		}
+
 		const sortedData = [...data];
 
 		// Use this and if true convert value's into dates and compare times?
@@ -78,14 +86,8 @@
 		// }
 
 		sortedData.sort((a: Row, b: Row) => {
-			const valueA = getRawValue(
-				a,
-				columns.find((col) => col.key === field)
-			);
-			const valueB = getRawValue(
-				b,
-				columns.find((col) => col.key === field)
-			);
+			const valueA = getRawValue(a, requireColumn(field));
+			const valueB = getRawValue(b, requireColumn(field));
 
 			if (typeof valueA === 'string') {
 				return valueA.localeCompare(valueB);
@@ -250,8 +252,9 @@
 						{@const style = getCellStyle(col)}
 						{#if col.component}
 							{@const c = typeof col.component === 'function' ? col.component(row) : col.component}
+							{@const SvelteComponent = c[0]}
 							<td {style} {title} class="cell">
-								<svelte:component this={c[0]} {...c[1]} />
+								<SvelteComponent {...c[1]} />
 							</td>
 						{:else}
 							{@const renderedValue = getRenderedValue(row, col)}

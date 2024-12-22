@@ -1,4 +1,5 @@
-import type { AppState, Army, Unit, ArmyUnit, SvelteComponentGeneric, Optional } from '$types';
+import type { AppState, Army, Unit, ArmyUnit, Optional } from '$types';
+import type { Component } from 'svelte';
 import { SECOND, MINUTE, HOUR, OBJECT_ID_PREFIXES, VALID_HEROES, hasHero } from '$shared/utils';
 import C from '$components';
 
@@ -166,7 +167,7 @@ export function openInGame(units: ArmyUnit[]) {
 }
 
 export function getTags(army: Army) {
-	const tags: { label: string; icon?: SvelteComponentGeneric }[] = [];
+	const tags: { label: string; icon?: Component }[] = [];
 	tags.push({ label: `TH${army.townHall}` });
 	const typeData = army.units.reduce(
 		(prev, curr) => {

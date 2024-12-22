@@ -4,7 +4,7 @@
 
 	type Props = {
 		/** Sets the bound value */
-		value: string | null | undefined;
+		value: string | number | null | undefined;
 		/** Sets the onchange handler */
 		onChange?: (value: string | null) => Promise<void> | void;
 		/** Sets the disabled state */
@@ -27,7 +27,8 @@
 		if (!onChange) {
 			return;
 		}
-		await onChange(e.target?.value || null);
+		const el = e.target as HTMLInputElement;
+		await onChange(el?.value || null);
 	}
 </script>
 

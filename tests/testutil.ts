@@ -4,7 +4,7 @@ import type { Ctx } from '$shared/validation';
 import { BANNERS } from '$shared/utils';
 import { migration } from '$server/migration';
 import { db } from '$server/db';
-import chai from 'chai';
+import * as chai from 'chai';
 import chaiSubset from 'chai-subset';
 import type { RequestEvent } from '@sveltejs/kit';
 import { hasAuth, requireAuth, hasRoles, requireRoles } from '$server/auth/utils';

@@ -40,7 +40,7 @@
 			<C.Button asLink href={createArmyHref}>Create army</C.Button>
 		</div>
 
-		<img class="graphic" src="/header-barbarian.png" alt="Angry clash of clans barbarian" />
+		<img class="graphic" src="/clash/ui/header-barbarian.png" alt="Angry clash of clans barbarian" />
 		<img class="graphic-mobile" src="/clash/ui/league-king-1.png" alt="Clash of clans barbarian king with league skin" />
 	</div>
 </header>
@@ -69,7 +69,7 @@
 
 <style>
 	header {
-		background: repeat-x 0 25% url('/stones-background.png');
+		background: repeat-x 0 25% url('/clash/ui/stones-background.png');
 		padding: 0 var(--side-padding);
 	}
 
@@ -131,7 +131,7 @@
 
 	@media (max-width: 1000px) {
 		header {
-			background: repeat-x 0 15% url('/stones-background.png');
+			background: repeat-x 0 15% url('/clash/ui/stones-background.png');
 		}
 
 		header .container {
@@ -152,7 +152,7 @@
 
 	@media (max-width: 625px) {
 		header {
-			background: repeat-x 0 8.5% url('/stones-background.png');
+			background: repeat-x 0 8.5% url('/clash/ui/stones-background.png');
 		}
 
 		.graphic {

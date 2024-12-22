@@ -68,7 +68,7 @@
 		gap: 10px;
 	}
 
-	.comments-list-container:has(+ .add-comment) :global(> .comments-list:not(:empty)) {
+	.comments-list-container:has(:global(+ .add-comment)) :global(> .comments-list:not(:empty)) {
 		margin-bottom: 1em;
 	}
 </style>

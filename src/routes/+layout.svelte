@@ -3,7 +3,7 @@
 	import { sineInOut } from 'svelte/easing';
 	import { setContext, type Snippet } from 'svelte';
 	import type { LayoutData } from './$types';
-	import { createAppState, requireHTML } from '$client/state.svelte';
+	import { createAppState } from '$client/state.svelte';
 	import type { AppState } from '$types';
 	import C from '$components';
 
@@ -85,9 +85,9 @@
 		{#each appState.modals as modal, idx (modal.id)}
 			{#if idx === appState.modals.length - 1}
 				<!-- Render backdrop behind the last modal in case multiple nested modals are opened -->
-				<button class="modal-backdrop" type="button" onclick={popModal}></button>
+				<button class="modal-backdrop" type="button" onclick={popModal} aria-label="Close modal"></button>
 			{/if}
-			<svelte:component this={modal.component} {...modal.props} />
+			<modal.component {...modal.props} />
 		{/each}
 	</div>
 {/if}

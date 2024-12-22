@@ -1,10 +1,11 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
 	const MAX_DEPTH = 2;
 </script>
 
 <script lang="ts">
 	import type { StructuredComment } from '$types';
 	import CommentCard from './Comment.svelte';
+	import Self from './CommentsList.svelte';
 
 	type Props = {
 		armyId: number;
@@ -20,7 +21,7 @@
 	{#each sortedComments as comment (comment.id)}
 		<CommentCard {armyId} {comment} />
 		{#if comment.replies.length}
-			<svelte:self {armyId} comments={comment.replies} depth={depth + 1} />
+			<Self {armyId} comments={comment.replies} depth={depth + 1} />
 		{/if}
 	{/each}
 </ul>

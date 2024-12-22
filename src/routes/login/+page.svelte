@@ -1,7 +1,7 @@
 <script lang="ts">
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 
-	const redirect = $derived($page.url.searchParams.get('r') ?? null);
+	const redirect = $derived(page.url.searchParams.get('r') ?? null);
 </script>
 
 <svelte:head>

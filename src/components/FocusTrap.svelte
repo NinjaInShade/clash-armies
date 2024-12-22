@@ -1,4 +1,4 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
 	export const FOCUSABLE = ['a[href]', 'button', 'input', 'select', 'textarea', '[contenteditable]', '[tabindex]'].map(
 		(selector) => `${selector}:not(:disabled):not([hidden]):not([tabindex^="-"])`
 	);

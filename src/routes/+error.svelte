@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 	import C from '$components';
 
-	let pageRef: HTMLElement | null = null;
+	let pageRef: HTMLElement | null = $state(null);
 
 	onMount(() => {
 		if (!pageRef) {
@@ -16,7 +16,7 @@
 		}
 	});
 
-	function getMessage(diagnostics: typeof $page) {
+	function getMessage(diagnostics: typeof page) {
 		const status = diagnostics.status;
 		const error = diagnostics.error;
 		if (!error) {
@@ -30,13 +30,13 @@
 </script>
 
 <svelte:head>
-	<title>ClashArmies • {$page.status}</title>
+	<title>ClashArmies • {page.status}</title>
 </svelte:head>
 
 <header bind:this={pageRef}>
 	<div class="container">
-		<h1>{$page.status}!</h1>
-		<p class="body">{getMessage($page)}</p>
+		<h1>{page.status}!</h1>
+		<p class="body">{getMessage(page)}</p>
 		<C.Button asLink href="/">Go to home</C.Button>
 	</div>
 </header>

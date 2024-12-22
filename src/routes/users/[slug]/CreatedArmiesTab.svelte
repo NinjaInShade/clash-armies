@@ -75,7 +75,7 @@
 		margin-top: 1em;
 	}
 
-	.no-armies h2:has(+ a) {
+	.no-armies :global(h2:has(+ a)) {
 		margin-bottom: 1em;
 	}
 

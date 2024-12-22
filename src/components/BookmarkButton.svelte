@@ -52,6 +52,7 @@
 	onclick={() => saveBookmark(bookmarked)}
 	disabled={savingBookmark}
 	title={bookmarked ? 'Remove this army from saved' : 'Save this army - you can view all saved armies on your account page'}
+	aria-label={bookmarked ? 'Remove this army from saved' : 'Save this army - you can view all saved armies on your account page'}
 >
 	<svg width="11.7" height="15" viewBox="0 0 10 12" fill="none" xmlns="http://www.w3.org/2000/svg">
 		<path

@@ -143,7 +143,13 @@
 		</ul>
 	</div>
 </nav>
-<button class="sidebar-overlay" class:sidebar-overlay-active={sidebarOpen} onclick={toggleSidebar} tabIndex={sidebarOpen ? undefined : -1}></button>
+<button
+	class="sidebar-overlay"
+	class:sidebar-overlay-active={sidebarOpen}
+	onclick={toggleSidebar}
+	tabIndex={sidebarOpen ? undefined : -1}
+	aria-label="Close sidebar"
+></button>
 
 <style>
 	nav {
@@ -304,7 +310,7 @@
 	.sidebar-link:not(:last-child) {
 		padding-bottom: 16px;
 	}
-	.sidebar-link:has(> .bmc) {
+	.sidebar-link:has(:global(> .bmc)) {
 		padding-bottom: 12px;
 	}
 

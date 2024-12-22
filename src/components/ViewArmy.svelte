@@ -81,7 +81,7 @@
 				{#each getTags(army) as tag}
 					<li>
 						{#if tag.icon}
-							<svelte:component this={tag.icon} />
+							<tag.icon />
 						{/if}
 						{tag.label}
 					</li>
@@ -428,7 +428,7 @@
 		flex-flow: column nowrap;
 		padding: 0 32px 24px 32px;
 	}
-	.guide :has(.guide-editor-container) .guide-youtube-container {
+	.guide :has(:global(.guide-editor-container)) .guide-youtube-container {
 		padding-top: 24px;
 	}
 	.guide-youtube-container iframe {
@@ -581,7 +581,7 @@
 		.guide-youtube-container {
 			padding: 0 24px 16px 24px;
 		}
-		.guide :has(.guide-editor-container) .guide-youtube-container {
+		.guide :has(:global(.guide-editor-container)) .guide-youtube-container {
 			padding-top: 16px;
 		}
 	}

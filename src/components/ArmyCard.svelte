@@ -48,7 +48,7 @@
 				{#each getTags(army) as tag}
 					<li>
 						{#if tag.icon}
-							<svelte:component this={tag.icon} />
+							<tag.icon />
 						{/if}
 						{tag.label}
 					</li>

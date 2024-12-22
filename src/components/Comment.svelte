@@ -1,4 +1,4 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
 	let editingComment = $state<number | null>(null);
 	let addingReplyTo = $state<number | null>(null);
 </script>

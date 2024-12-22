@@ -1,12 +1,12 @@
-<script context="module" lang="ts">
+<script lang="ts" module>
 	type CloseFunction = () => void;
 	const selectInstances: [HTMLElement, CloseFunction][] = [];
 </script>
 
 <script lang="ts">
-	import type { SvelteComponentGeneric } from '$types';
+	import type { Component } from 'svelte';
 
-	type SelectData = { value: any; label: string; component?: [SvelteComponentGeneric, Record<string, any>] };
+	type SelectData = { value: any; label: string; component?: [Component, Record<string, any>] };
 
 	import { onMount, getContext } from 'svelte';
 
@@ -66,7 +66,7 @@
 
 	// Closes if you click outside of the select
 	const handleOutsideClick = (e: MouseEvent) => {
-		if (!open || !selectButton) {
+		if (!open || !selectButton || !(e.target instanceof Node)) {
 			return;
 		}
 		if (selectButton.contains(e.target)) {
@@ -112,7 +112,8 @@
 				{#if label}
 					{label}
 				{:else if component}
-					<svelte:component this={component[0]} {...component[1]} />
+					{@const SvelteComponent = component[0]}
+					<SvelteComponent {...component[1]} />
 				{/if}
 			</span>
 			<div class="dropdown-icon-container">
@@ -136,7 +137,8 @@
 						{#if item.label}
 							{item.label}
 						{:else if item.component}
-							<svelte:component this={item.component[0]} {...item.component[1]} />
+							{@const SvelteComponent_1 = item.component[0]}
+							<SvelteComponent_1 {...item.component[1]} />
 						{/if}
 					</button>
 				</li>

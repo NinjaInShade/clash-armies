@@ -215,7 +215,7 @@
 	<div class="filters-popup">
 		<header>
 			<h2>Filters</h2>
-			<button class="close-btn focus-grey" onclick={() => close()}>
+			<button class="close-btn focus-grey" onclick={() => close()} aria-label="Close modal">
 				<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
 					<path
 						fill-rule="evenodd"

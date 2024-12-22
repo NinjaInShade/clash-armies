@@ -24,7 +24,8 @@
 		if (!onChange) {
 			return;
 		}
-		await onChange(e.target?.checked);
+		const el = e.target as HTMLInputElement;
+		await onChange(el?.checked);
 	};
 </script>
 
@@ -74,14 +75,14 @@
 	}
 
 	/* Checkbox states */
-	.inner-container:has(.checkbox:active),
-	.inner-container:has(.checkbox:focus) {
+	.inner-container:has(:global(.checkbox:active)),
+	.inner-container:has(:global(.checkbox:focus)) {
 		outline: none;
 		border: 1px solid var(--primary-400);
 		box-shadow: 0 0 10px 0 hsla(33, 78%, 57%, 0.2);
 	}
 
-	.inner-container:has(.checkbox:disabled) {
+	.inner-container:has(:global(.checkbox:disabled)) {
 		user-select: none;
 		cursor: not-allowed;
 		opacity: 0.5;
@@ -91,7 +92,7 @@
 		cursor: not-allowed;
 	}
 
-	.inner-container:has(.checkbox:checked) {
+	.inner-container:has(:global(.checkbox:checked)) {
 		border-color: var(--primary-500);
 		background-color: var(--primary-500);
 	}

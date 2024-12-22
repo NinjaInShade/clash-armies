@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { HTMLInputAttributes } from 'svelte/elements';
+	import type { HTMLTextareaAttributes } from 'svelte/elements';
 	import { getContext, type Snippet } from 'svelte';
 
 	type Props = {
@@ -17,7 +17,7 @@
 		containerClass?: string;
 		/** Icon to render inside the input */
 		icon?: Snippet;
-	} & HTMLInputAttributes;
+	} & HTMLTextareaAttributes;
 	let { value = $bindable(), onChange, disabled, error, placeholder, containerClass, icon, ...rest }: Props = $props();
 
 	// Passed down from context in parent <Fieldset />
@@ -36,7 +36,8 @@
 		if (!onChange) {
 			return;
 		}
-		await onChange(e.target?.value || null);
+		const el = e.target as HTMLTextAreaElement;
+		await onChange(el?.value || null);
 	}
 
 	function autoGrow() {
@@ -47,24 +48,14 @@
 </script>
 
 <!-- Input -->
-<div class="outer-container {containerClass ?? ''}" class:error>
+<div class="outer-container {containerClass ?? ''} {error ? 'error' : ''}">
 	<div class="inner-container">
 		{#if icon}
 			<div class="icon-container">
 				{@render icon()}
 			</div>
 		{/if}
-		<textarea
-			bind:value
-			oninput={_onChange}
-			class="input focus-grey"
-			type="text"
-			name={htmlName}
-			id={htmlName}
-			{disabled}
-			{placeholder}
-			{...rest}
-			bind:this={txRef}
+		<textarea bind:value oninput={_onChange} class="input focus-grey" name={htmlName} id={htmlName} {disabled} {placeholder} {...rest} bind:this={txRef}
 		></textarea>
 	</div>
 	{#if error}
