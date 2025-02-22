@@ -306,4 +306,8 @@ export default function migration(runStep: MigrationFn) {
             { petId: unicornId, level: 15, petHouseLevel: 11 },
         ]);
     });
+    runStep(32, `
+        ALTER TABLE users
+        ADD COLUMN googleEmail VARCHAR(255) DEFAULT NULL AFTER googleId
+    `);
 }

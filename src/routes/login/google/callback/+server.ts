@@ -7,6 +7,8 @@ import { db } from '$server/db';
 type GoogleUser = {
 	sub: string;
 	picture: string;
+	email?: string;
+	email_verified?: string;
 };
 
 function isObject(obj: unknown): obj is Record<string, unknown> {
@@ -48,9 +50,20 @@ export async function GET(event: RequestEvent): Promise<Response> {
 		});
 		const googleUser: GoogleUser = await response.json();
 		const googleId = googleUser.sub;
+		const googleEmail = googleUser.email;
 
 		const existingUser = await db.getRow<User>('users', { googleId });
 		if (existingUser) {
+			if (googleEmail) {
+				await db.transaction(async (tx) => {
+					// prettier-ignore
+					await tx.query(`
+						UPDATE users
+						SET googleEmail = ?
+						WHERE id = ?
+					`, [existingUser.id, googleUser.email ?? null])
+				});
+			}
 			const session = await lucia.createSession(existingUser.id, {});
 			const sessionCookie = lucia.createSessionCookie(session.id);
 			event.cookies.set(sessionCookie.name, sessionCookie.value, {
@@ -73,6 +86,7 @@ export async function GET(event: RequestEvent): Promise<Response> {
 				userId = await tx.insertOne('users', {
 					username,
 					googleId,
+					googleEmail,
 				});
 				await tx.insertOne('user_roles', { userId, role: 'user' });
 			});
