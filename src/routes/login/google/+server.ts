@@ -6,14 +6,14 @@ import { dev } from '$app/environment';
 
 export async function GET(event: RequestEvent): Promise<Response> {
 	const redirectQuery = event.url.searchParams.get('r');
+	const decodedRedirect = decodeURIComponent(redirectQuery || '/');
 
 	if (event.locals.user) {
 		// already logged in
-		const redirectPath = redirectQuery || '/';
-		redirect(302, redirectPath);
+		redirect(302, decodedRedirect);
 	}
 
-	const state = JSON.stringify({ r: redirectQuery });
+	const state = JSON.stringify({ r: decodedRedirect });
 	const codeVerifier = generateCodeVerifier();
 
 	const url = await google.createAuthorizationURL(state, codeVerifier);

@@ -7,7 +7,9 @@ export function hasAuth(event: RequestEvent) {
 export function requireAuth(event: RequestEvent) {
 	const user = event.locals.user;
 	if (!user) {
-		redirect(302, '/login');
+		const redirectQuery = `${event.url.pathname}${event.url.search}`;
+		const encodedRedirect = encodeURIComponent(redirectQuery);
+		redirect(302, `/login?r=${encodedRedirect}`);
 	}
 	return user;
 }
@@ -18,8 +20,8 @@ export function hasRoles(event: RequestEvent, ...roles: string[]) {
 }
 
 export function requireRoles(event: RequestEvent, ...roles: string[]) {
-	const user = event.locals.user;
-	if (!user || !roles.every((role) => user.roles.includes(role))) {
+	const user = event.locals.requireAuth();
+	if (!roles.every((role) => user.roles.includes(role))) {
 		return error(403, "You don't have permission to do this warrior!");
 	}
 	return user;

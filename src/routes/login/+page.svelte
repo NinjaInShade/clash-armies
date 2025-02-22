@@ -17,7 +17,7 @@
 				<p>By logging in, you will be able to start creating armies!</p>
 			</header>
 			<div class="btn-container">
-				<a href="/login/google{redirect ? `?r=${redirect}` : ''}" class="login-btn">
+				<a href="/login/google{redirect ? `?r=${encodeURIComponent(redirect)}` : ''}" class="login-btn">
 					<img src="/icons/google-logo.svg" alt="Google logo" />
 					Sign in with Google
 				</a>

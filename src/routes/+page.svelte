@@ -1,16 +1,11 @@
 <script lang="ts">
 	import C from '$components';
 	import type { PageData } from './$types';
-	import { getContext } from 'svelte';
-	import type { AppState } from '$types';
-
-	const app = getContext<AppState>('app');
 
 	const { data }: { data: PageData } = $props();
 	const { armies } = $derived(data);
 
 	const ENTRIES_PER_PAGE = 10;
-	const createArmyHref = $derived(app.user ? '/create' : '/login?r=/create');
 
 	let page = $state<number>(1);
 
@@ -37,7 +32,7 @@
 		<p class="body">The number one tool to find, create, learn and share the best armies in clash of clans</p>
 		<div class="buttons">
 			<C.Button asLink href="/armies">Find armies</C.Button>
-			<C.Button asLink href={createArmyHref}>Create army</C.Button>
+			<C.Button asLink href="/create">Create army</C.Button>
 		</div>
 
 		<img class="graphic" src="/clash/ui/header-barbarian.png" alt="Angry clash of clans barbarian" />
