@@ -306,11 +306,131 @@ export default function migration(runStep: MigrationFn) {
             { petId: unicornId, level: 15, petHouseLevel: 11 },
         ]);
     });
-    runStep(32, `
+    runStep(32, async (db: MySQL) => {
+        await db.query(`
+            ALTER TABLE town_halls
+            ADD COLUMN maxMinionPrince SMALLINT DEFAULT NULL AFTER maxRoyalChampion
+        `, []);
+        const thToMPLvl = [
+            { thLvl: 1, mpLvl: null },
+            { thLvl: 2, mpLvl: null },
+            { thLvl: 3, mpLvl: null },
+            { thLvl: 4, mpLvl: null },
+            { thLvl: 5, mpLvl: null },
+            { thLvl: 6, mpLvl: null },
+            { thLvl: 7, mpLvl: null },
+            { thLvl: 8, mpLvl: null },
+            { thLvl: 9, mpLvl: 10 },
+            { thLvl: 10, mpLvl: 20 },
+            { thLvl: 11, mpLvl: 30 },
+            { thLvl: 12, mpLvl: 40 },
+            { thLvl: 13, mpLvl: 50 },
+            { thLvl: 14, mpLvl: 60 },
+            { thLvl: 15, mpLvl: 70 },
+            { thLvl: 16, mpLvl: 80 },
+            { thLvl: 17, mpLvl: 90 },
+        ];
+        await Promise.all(thToMPLvl.map((entry) => {
+            return db.query(`
+                UPDATE town_halls SET
+                    maxMinionPrince = ?
+                WHERE level = ?
+            `, [entry.mpLvl, entry.thLvl]);
+        }))
+        // Henchmen Puppet
+        const hpId = await db.insertOne('equipment', { hero: 'Minion Prince', name: 'Henchmen Puppet', epic: false });
+        await db.insertMany('equipment_levels', [
+            { equipmentId: hpId, level: 1, blacksmithLevel: 1 },
+            { equipmentId: hpId, level: 2, blacksmithLevel: 1 },
+            { equipmentId: hpId, level: 3, blacksmithLevel: 1 },
+            { equipmentId: hpId, level: 4, blacksmithLevel: 1 },
+            { equipmentId: hpId, level: 5, blacksmithLevel: 1 },
+            { equipmentId: hpId, level: 6, blacksmithLevel: 1 },
+            { equipmentId: hpId, level: 7, blacksmithLevel: 1 },
+            { equipmentId: hpId, level: 8, blacksmithLevel: 1 },
+            { equipmentId: hpId, level: 9, blacksmithLevel: 1 },
+            { equipmentId: hpId, level: 10, blacksmithLevel: 3 },
+            { equipmentId: hpId, level: 11, blacksmithLevel: 3 },
+            { equipmentId: hpId, level: 12, blacksmithLevel: 3 },
+            { equipmentId: hpId, level: 13, blacksmithLevel: 5 },
+            { equipmentId: hpId, level: 14, blacksmithLevel: 5 },
+            { equipmentId: hpId, level: 15, blacksmithLevel: 5 },
+            { equipmentId: hpId, level: 16, blacksmithLevel: 7 },
+            { equipmentId: hpId, level: 17, blacksmithLevel: 7 },
+            { equipmentId: hpId, level: 18, blacksmithLevel: 7 },
+        ]);
+        // Dark Orb
+        const doId = await db.insertOne('equipment', { hero: 'Minion Prince', name: 'Dark Orb', epic: false });
+        await db.insertMany('equipment_levels', [
+            { equipmentId: doId, level: 1, blacksmithLevel: 1 },
+            { equipmentId: doId, level: 2, blacksmithLevel: 1 },
+            { equipmentId: doId, level: 3, blacksmithLevel: 1 },
+            { equipmentId: doId, level: 4, blacksmithLevel: 1 },
+            { equipmentId: doId, level: 5, blacksmithLevel: 1 },
+            { equipmentId: doId, level: 6, blacksmithLevel: 1 },
+            { equipmentId: doId, level: 7, blacksmithLevel: 1 },
+            { equipmentId: doId, level: 8, blacksmithLevel: 1 },
+            { equipmentId: doId, level: 9, blacksmithLevel: 1 },
+            { equipmentId: doId, level: 10, blacksmithLevel: 3 },
+            { equipmentId: doId, level: 11, blacksmithLevel: 3 },
+            { equipmentId: doId, level: 12, blacksmithLevel: 3 },
+            { equipmentId: doId, level: 13, blacksmithLevel: 5 },
+            { equipmentId: doId, level: 14, blacksmithLevel: 5 },
+            { equipmentId: doId, level: 15, blacksmithLevel: 5 },
+            { equipmentId: doId, level: 16, blacksmithLevel: 7 },
+            { equipmentId: doId, level: 17, blacksmithLevel: 7 },
+            { equipmentId: doId, level: 18, blacksmithLevel: 7 },
+        ]);
+        // Metal Pants
+        const mpId = await db.insertOne('equipment', { hero: 'Minion Prince', name: 'Metal Pants', epic: false });
+        await db.insertMany('equipment_levels', [
+            { equipmentId: mpId, level: 1, blacksmithLevel: 3 },
+            { equipmentId: mpId, level: 2, blacksmithLevel: 3 },
+            { equipmentId: mpId, level: 3, blacksmithLevel: 3 },
+            { equipmentId: mpId, level: 4, blacksmithLevel: 3 },
+            { equipmentId: mpId, level: 5, blacksmithLevel: 3 },
+            { equipmentId: mpId, level: 6, blacksmithLevel: 3 },
+            { equipmentId: mpId, level: 7, blacksmithLevel: 3 },
+            { equipmentId: mpId, level: 8, blacksmithLevel: 3 },
+            { equipmentId: mpId, level: 9, blacksmithLevel: 3 },
+            { equipmentId: mpId, level: 10, blacksmithLevel: 3 },
+            { equipmentId: mpId, level: 11, blacksmithLevel: 3 },
+            { equipmentId: mpId, level: 12, blacksmithLevel: 3 },
+            { equipmentId: mpId, level: 13, blacksmithLevel: 5 },
+            { equipmentId: mpId, level: 14, blacksmithLevel: 5 },
+            { equipmentId: mpId, level: 15, blacksmithLevel: 5 },
+            { equipmentId: mpId, level: 16, blacksmithLevel: 7 },
+            { equipmentId: mpId, level: 17, blacksmithLevel: 7 },
+            { equipmentId: mpId, level: 18, blacksmithLevel: 7 },
+        ]);
+        // Noble Iron
+        const niId = await db.insertOne('equipment', { hero: 'Minion Prince', name: 'Noble Iron', epic: false });
+        await db.insertMany('equipment_levels', [
+            { equipmentId: niId, level: 1, blacksmithLevel: 5 },
+            { equipmentId: niId, level: 2, blacksmithLevel: 5 },
+            { equipmentId: niId, level: 3, blacksmithLevel: 5 },
+            { equipmentId: niId, level: 4, blacksmithLevel: 5 },
+            { equipmentId: niId, level: 5, blacksmithLevel: 5 },
+            { equipmentId: niId, level: 6, blacksmithLevel: 5 },
+            { equipmentId: niId, level: 7, blacksmithLevel: 5 },
+            { equipmentId: niId, level: 8, blacksmithLevel: 5 },
+            { equipmentId: niId, level: 9, blacksmithLevel: 5 },
+            { equipmentId: niId, level: 10, blacksmithLevel: 5 },
+            { equipmentId: niId, level: 11, blacksmithLevel: 5 },
+            { equipmentId: niId, level: 12, blacksmithLevel: 5 },
+            { equipmentId: niId, level: 13, blacksmithLevel: 5 },
+            { equipmentId: niId, level: 14, blacksmithLevel: 5 },
+            { equipmentId: niId, level: 15, blacksmithLevel: 5 },
+            { equipmentId: niId, level: 16, blacksmithLevel: 7 },
+            { equipmentId: niId, level: 17, blacksmithLevel: 7 },
+            { equipmentId: niId, level: 18, blacksmithLevel: 7 },
+        ]);
+    });
+    runStep(33, `
         ALTER TABLE users
         ADD COLUMN googleEmail VARCHAR(255) DEFAULT NULL AFTER googleId
     `);
-    runStep(33, `
+    runStep(34, `
         CREATE TABLE army_notifications (
             id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
             type VARCHAR(50) NOT NULL,
@@ -326,7 +446,7 @@ export default function migration(runStep: MigrationFn) {
             CONSTRAINT fk_army_notifications_comment_id FOREIGN KEY (commentId) REFERENCES army_comments (id) ON DELETE CASCADE
         )
     `);
-    runStep(34, async (db: MySQL) => {
+    runStep(35, async (db: MySQL) => {
         // Back-insert notifications for already existing comments before army notifications were implemented
         const comments = await db.query(`
             SELECT

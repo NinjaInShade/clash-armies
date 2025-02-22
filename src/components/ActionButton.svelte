@@ -49,7 +49,7 @@
 	.action-btn.primary :global(svg path) {
 		fill: #f3e7d8;
 	}
-	.action-btn.primary:hover {
+	.action-btn.primary:hover:not(:disabled) {
 		background-color: hsl(33, 38%, 32%);
 	}
 	.action-btn.primary-dark {
@@ -59,7 +59,7 @@
 	.action-btn.primary-dark :global(svg path) {
 		fill: #e0a153;
 	}
-	.action-btn.primary-dark:hover {
+	.action-btn.primary-dark:hover:not(:disabled) {
 		background-color: hsl(33, 15%, 22%);
 	}
 	.action-btn.success {
@@ -72,7 +72,7 @@
 	.action-btn.success :global(svg path) {
 		fill: #53e059;
 	}
-	.action-btn.success:hover {
+	.action-btn.success:hover:not(:disabled) {
 		background-color: #384130;
 	}
 	.action-btn.danger {
@@ -85,7 +85,7 @@
 	.action-btn.danger :global(svg path) {
 		fill: #e05353;
 	}
-	.action-btn.danger:hover {
+	.action-btn.danger:hover:not(:disabled) {
 		background-color: #413030;
 	}
 
@@ -96,7 +96,7 @@
 	.action-btn.grey :global(svg path) {
 		fill: var(--grey-400);
 	}
-	.action-btn.grey:hover {
+	.action-btn.grey:hover:not(:disabled) {
 		background-color: var(--grey-600);
 	}
 
@@ -109,7 +109,7 @@
 	.action-btn.primary.ghost :global(svg path) {
 		fill: #cb995b;
 	}
-	.action-btn.primary.ghost:hover {
+	.action-btn.primary.ghost:hover:not(:disabled) {
 		background-color: #463c2e;
 	}
 	.action-btn.success.ghost {
@@ -120,7 +120,7 @@
 	.action-btn.success.ghost :global(svg path) {
 		fill: #759257;
 	}
-	.action-btn.success.ghost:hover {
+	.action-btn.success.ghost:hover:not(:disabled) {
 		background-color: #20211e;
 	}
 

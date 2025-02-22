@@ -13,8 +13,9 @@
 		getPetLevel,
 		getHeroLevel,
 		GUIDE_TEXT_CHAR_LIMIT,
+		hasHero,
 	} from '$shared/utils';
-	import type { Optional, AppState, Army, ArmyUnit, ArmyEquipment, ArmyPet, Banner, FetchErrors } from '$types';
+	import type { Optional, AppState, Army, ArmyUnit, ArmyEquipment, ArmyPet, Banner, FetchErrors, HeroType } from '$types';
 	import C from '$components';
 
 	type Props = { army?: Army };
@@ -37,7 +38,7 @@
 	let errors = $state<FetchErrors | null>(null);
 	let saveDisabled = $derived(!name || name.length < 2 || name.length > 25 || !units.length);
 	let showClanCastle = $state(getCcUnits().length > 0);
-	let showHeroes = $state((army?.equipment || []).length > 0 || (army?.pets || []).length > 0);
+	let shownHeroes = $state(army ? VALID_HEROES.filter((hero) => hasHero(hero, army)) : null);
 	let showGuide = $state(typeof army?.guide?.id === 'number');
 
 	const thData = $derived(app.townHalls.find((th) => th.level === townHall));
@@ -55,11 +56,21 @@
 	}
 
 	function addHeroes() {
-		showHeroes = true;
+		shownHeroes = getDefaultHeroes(townHall);
 	}
 
 	function addGuide() {
 		showGuide = true;
+	}
+
+	function getDefaultHeroes(thLvl: number) {
+		return VALID_HEROES.filter((hero) => {
+			const thData = app.townHalls.find((th) => th.level === thLvl);
+			if (!thData) {
+				return false;
+			}
+			return getHeroLevel(hero, { th: thData }) !== -1;
+		}).slice(0, 4);
 	}
 
 	async function removeClanCastle() {
@@ -78,7 +89,7 @@
 		}
 		equipment = [];
 		pets = [];
-		showHeroes = false;
+		shownHeroes = null;
 	}
 
 	async function removeGuide() {
@@ -115,6 +126,7 @@
 				ccUnits = [];
 				equipment = [];
 				pets = [];
+				shownHeroes = shownHeroes ? getDefaultHeroes(value) : null;
 			} else {
 				return;
 			}
@@ -293,7 +305,7 @@
 </section>
 
 <section class="dashed units heroes">
-	{#if thData && thData.maxBarbarianKing !== null && showHeroes}
+	{#if thData && thData.maxBarbarianKing !== null && shownHeroes}
 		<div>
 			<div class="title">
 				<h2>
@@ -305,7 +317,15 @@
 			{#each VALID_HEROES as hero}
 				{#if thData && getHeroLevel(hero, { th: thData }) !== -1}
 					<div class="hero-picker-container">
-						<C.HeroPicker {hero} bind:selectedEquipment={equipment} bind:selectedPets={pets} selectedTownHall={townHall} {getEquipmentLevel} {getPetLevel} />
+						<C.HeroPicker
+							{hero}
+							bind:shownHeroes
+							bind:selectedEquipment={equipment}
+							bind:selectedPets={pets}
+							selectedTownHall={townHall}
+							{getEquipmentLevel}
+							{getPetLevel}
+						/>
 					</div>
 				{/if}
 			{/each}

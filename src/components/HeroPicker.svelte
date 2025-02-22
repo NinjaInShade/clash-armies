@@ -6,6 +6,7 @@
 
 	type Props = {
 		hero: HeroType;
+		shownHeroes: HeroType[];
 		/** All selected equipment across all heroes */
 		selectedEquipment: Optional<ArmyEquipment, 'id'>[];
 		/** All selected pets across all heroes */
@@ -14,7 +15,15 @@
 		getEquipmentLevel(name: string, ctx: { th: TownHall; equipment: Equipment[] }): number;
 		getPetLevel(name: string, ctx: { th: TownHall; pets: Pet[] }): number;
 	};
-	const { hero, selectedEquipment = $bindable(), selectedPets = $bindable(), selectedTownHall, getEquipmentLevel, getPetLevel }: Props = $props();
+	const {
+		hero,
+		shownHeroes = $bindable(),
+		selectedEquipment = $bindable(),
+		selectedPets = $bindable(),
+		selectedTownHall,
+		getEquipmentLevel,
+		getPetLevel,
+	}: Props = $props();
 	const app = getContext<AppState>('app');
 
 	// Selected equipment/pets just for this hero
@@ -23,6 +32,7 @@
 	const allEquipment = $derived(app.equipment.filter((eq) => eq.hero === hero));
 	const sortedEquipment = $derived([...allEquipment.filter((eq) => !eq.epic), ...allEquipment.filter((eq) => eq.epic)]);
 	const thData = $derived(app.townHalls.find((th) => th.level === selectedTownHall));
+	const shown = $derived(shownHeroes.includes(hero));
 
 	function getEquipmentTitle(level: number, name: string, selected: Optional<ArmyEquipment, 'id'>[]) {
 		if (level === -1) {
@@ -93,87 +103,121 @@
 		}
 		selectedPet.hero = hero;
 	}
+
+	function addHero() {
+		shownHeroes.push(hero);
+	}
+
+	async function removeHero() {
+		const removeEq = selectedEquipment.filter((eq) => eq.hero === hero).map((eq) => eq.name);
+		const removePets = selectedPets.filter((pet) => pet.hero === hero).map((pet) => pet.name);
+		if (removeEq.length || removePets.length) {
+			const confirmed = await app.confirm("Removing this hero will clear it's equipment and pets. Remove anyway?");
+			if (!confirmed) return;
+		}
+		for (const eq of removeEq) {
+			removeEquipment(eq);
+		}
+		for (const pet of removePets) {
+			removePet(pet);
+		}
+		const heroIndex = shownHeroes.findIndex((h) => h === hero);
+		shownHeroes.splice(heroIndex, 1);
+	}
 </script>
 
-<div class="hero {hero.replaceAll(' ', '-').toLowerCase()}">
-	<div class="hero-container">
-		<C.HeroDisplay name={hero} level={getHeroLevel(hero, { th: thData })} />
-	</div>
-	<div class="vertical-separator"></div>
-	<div class="selection">
-		<div class="equipment">
-			<ul class="selected-equipment">
-				{#each new Array(2) as _, index}
-					{@const selected = _selectedEquipment[index]}
-					{#if selected}
-						<li>
-							<button type="button" onclick={() => removeEquipment(selected.name)}>
-								<C.EquipmentDisplay {...selected} amount={1} />
-							</button>
-						</li>
-					{:else}
-						<li class="selected-placeholder"></li>
-					{/if}
-				{/each}
-			</ul>
-			<ul class="picker-list">
-				{#each sortedEquipment as equipment}
-					{@const level = thData ? getEquipmentLevel(equipment.name, { th: thData, equipment: app.equipment }) : -1}
-					{@const title = getEquipmentTitle(level, equipment.name, _selectedEquipment)}
-					<li>
-						<button
-							type="button"
-							disabled={_selectedEquipment.length >= 2 || equipmentEquipped(equipment.name, _selectedEquipment) || level === -1}
-							onclick={() => addEquipment(equipment)}
-						>
-							<C.EquipmentDisplay {...equipment} {level} {title} />
-						</button>
-					</li>
-				{/each}
-			</ul>
+<div class="hero {hero.replaceAll(' ', '-').toLowerCase()}" class:shown>
+	{#if shown}
+		<div class="hero-container">
+			<C.HeroDisplay name={hero} level={getHeroLevel(hero, { th: thData })} />
+			<C.ActionButton style="margin-top: 8px" theme="danger" onclick={removeHero}>Remove</C.ActionButton>
 		</div>
-		{#if thData && thData.maxPetHouse !== null}
-			<div class="pets">
-				<div class="selected-pet">
-					{#if _selectedPets[0]}
-						<li>
-							<button type="button" onclick={() => removePet(_selectedPets[0].name)}>
-								<C.PetDisplay {..._selectedPets[0]} amount={1} />
-							</button>
-						</li>
-					{:else}
-						<div class="selected-placeholder"></div>
-					{/if}
-				</div>
+		<div class="vertical-separator"></div>
+	{/if}
+	<div class="selection">
+		{#if shown}
+			<div class="equipment">
+				<ul class="selected-equipment">
+					{#each new Array(2) as _, index}
+						{@const selected = _selectedEquipment[index]}
+						{#if selected}
+							<li>
+								<button type="button" onclick={() => removeEquipment(selected.name)}>
+									<C.EquipmentDisplay {...selected} amount={1} />
+								</button>
+							</li>
+						{:else}
+							<li class="selected-placeholder"></li>
+						{/if}
+					{/each}
+				</ul>
 				<ul class="picker-list">
-					{#each app.pets as pet}
-						{@const level = thData ? getPetLevel(pet.name, { th: thData, pets: app.pets }) : -1}
-						{@const title = getPetTitle(level, pet.name, selectedPets)}
-						{@const equippedHero = selectedPets.find((p) => p.name === pet.name)?.hero}
-						{@const equippedOnDifferentHero = equippedHero !== undefined && equippedHero !== hero}
+					{#each sortedEquipment as equipment}
+						{@const level = thData ? getEquipmentLevel(equipment.name, { th: thData, equipment: app.equipment }) : -1}
+						{@const title = getEquipmentTitle(level, equipment.name, _selectedEquipment)}
 						<li>
 							<button
 								type="button"
-								class:visually-disabled={equippedOnDifferentHero}
-								disabled={!equippedOnDifferentHero && (_selectedPets.length >= 1 || petEquipped(pet.name, selectedPets) || level === -1)}
-								onclick={() => (equippedOnDifferentHero ? replacePet(pet.name) : addPet(pet))}
+								disabled={_selectedEquipment.length >= 2 || equipmentEquipped(equipment.name, _selectedEquipment) || level === -1}
+								onclick={() => addEquipment(equipment)}
 							>
-								<C.PetDisplay {...pet} {level} {title} />
+								<C.EquipmentDisplay {...equipment} {level} {title} />
 							</button>
-							{#if _selectedPets.length === 0 && equippedOnDifferentHero}
-								<button type="button" class="replace-pet" onclick={() => replacePet(pet.name)} aria-label="Replace pet">
-									<svg width="14" height="10" viewBox="0 0 13 9" fill="none" xmlns="http://www.w3.org/2000/svg">
-										<path
-											d="M2.08936 4.39634L0.101876 6.39097C-0.0339588 6.53395 -0.0339588 6.75558 0.101876 6.89856L2.08936 8.89319C2.31098 9.12197 2.69704 8.95754 2.69704 8.64297V7.35611H6.99372C7.38693 7.35611 7.70864 7.0344 7.70864 6.64119C7.70864 6.24798 7.38693 5.92627 6.99372 5.92627H2.69704V4.64656C2.69704 4.32484 2.31098 4.16756 2.08936 4.39634ZM12.4629 2.10144L10.4754 0.106805C10.2538 -0.121969 9.86771 0.0424625 9.86771 0.357028V1.63674H5.56388C5.17067 1.63674 4.84896 1.95845 4.84896 2.35166C4.84896 2.74487 5.17067 3.06658 5.56388 3.06658H9.86056V4.34629C9.86056 4.66801 10.2466 4.82529 10.4682 4.59651L12.4557 2.60188C12.5987 2.46605 12.5987 2.23727 12.4629 2.10144Z"
-											fill="#FCEFEF"
-										/>
-									</svg>
-								</button>
-							{/if}
 						</li>
 					{/each}
 				</ul>
 			</div>
+			{#if thData && thData.maxPetHouse !== null}
+				<div class="pets">
+					<div class="selected-pet">
+						{#if _selectedPets[0]}
+							<li>
+								<button type="button" onclick={() => removePet(_selectedPets[0].name)}>
+									<C.PetDisplay {..._selectedPets[0]} amount={1} />
+								</button>
+							</li>
+						{:else}
+							<div class="selected-placeholder"></div>
+						{/if}
+					</div>
+					<ul class="picker-list">
+						{#each app.pets as pet}
+							{@const level = thData ? getPetLevel(pet.name, { th: thData, pets: app.pets }) : -1}
+							{@const title = getPetTitle(level, pet.name, selectedPets)}
+							{@const equippedHero = selectedPets.find((p) => p.name === pet.name)?.hero}
+							{@const equippedOnDifferentHero = equippedHero !== undefined && equippedHero !== hero}
+							<li>
+								<button
+									type="button"
+									class:visually-disabled={equippedOnDifferentHero}
+									disabled={!equippedOnDifferentHero && (_selectedPets.length >= 1 || petEquipped(pet.name, selectedPets) || level === -1)}
+									onclick={() => (equippedOnDifferentHero ? replacePet(pet.name) : addPet(pet))}
+								>
+									<C.PetDisplay {...pet} {level} {title} />
+								</button>
+								{#if _selectedPets.length === 0 && equippedOnDifferentHero}
+									<button type="button" class="replace-pet" onclick={() => replacePet(pet.name)} aria-label="Replace pet">
+										<svg width="14" height="10" viewBox="0 0 13 9" fill="none" xmlns="http://www.w3.org/2000/svg">
+											<path
+												d="M2.08936 4.39634L0.101876 6.39097C-0.0339588 6.53395 -0.0339588 6.75558 0.101876 6.89856L2.08936 8.89319C2.31098 9.12197 2.69704 8.95754 2.69704 8.64297V7.35611H6.99372C7.38693 7.35611 7.70864 7.0344 7.70864 6.64119C7.70864 6.24798 7.38693 5.92627 6.99372 5.92627H2.69704V4.64656C2.69704 4.32484 2.31098 4.16756 2.08936 4.39634ZM12.4629 2.10144L10.4754 0.106805C10.2538 -0.121969 9.86771 0.0424625 9.86771 0.357028V1.63674H5.56388C5.17067 1.63674 4.84896 1.95845 4.84896 2.35166C4.84896 2.74487 5.17067 3.06658 5.56388 3.06658H9.86056V4.34629C9.86056 4.66801 10.2466 4.82529 10.4682 4.59651L12.4557 2.60188C12.5987 2.46605 12.5987 2.23727 12.4629 2.10144Z"
+												fill="#FCEFEF"
+											/>
+										</svg>
+									</button>
+								{/if}
+							</li>
+						{/each}
+					</ul>
+				</div>
+			{/if}
+		{:else}
+			{@const maxHeroesSelected = shownHeroes.length >= 4}
+			<C.AddHero
+				{hero}
+				onClick={addHero}
+				disabled={maxHeroesSelected}
+				title={maxHeroesSelected ? `Cannot have more than 4 heroes\nRemove another hero to add the ${hero.toLowerCase()}` : ''}
+			/>
 		{/if}
 	</div>
 </div>
@@ -182,6 +226,12 @@
 	.hero {
 		--hero-height: 110px;
 		display: flex;
+	}
+	.hero:not(.shown) .selection {
+		justify-content: center;
+	}
+	.selection {
+		flex: 1 0 0px;
 	}
 	.selection,
 	.equipment,
@@ -214,6 +264,7 @@
 	}
 	.picker-list {
 		--max-cols: 3;
+		--max-rows: 2;
 		max-width: calc((var(--unit-size) * var(--max-cols)) + (var(--gap) * (var(--max-cols) - 1)) + 24px);
 		align-self: flex-start;
 		width: 100%;
@@ -298,6 +349,7 @@
 		.picker-list {
 			margin-top: 8px;
 			--max-cols: 6;
+			--max-rows: 3;
 		}
 		.vertical-separator {
 			display: none;

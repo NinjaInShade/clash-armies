@@ -1,4 +1,4 @@
-import type { Army, TownHall, Unit, UnitType, Equipment, Pet, HeroType } from '$types';
+import type { Army, SaveArmy, TownHall, Unit, UnitType, Equipment, Pet, HeroType } from '$types';
 import type { VDocumentFragment, VHTMLDocument } from 'zeed-dom';
 
 /**
@@ -103,7 +103,7 @@ export const BANNERS = [
 ] as const;
 export const USER_MAX_ARMIES = 40;
 export const VALID_UNIT_HOME = ['armyCamp', 'clanCastle'] as const;
-export const VALID_HEROES = ['Barbarian King', 'Archer Queen', 'Grand Warden', 'Royal Champion'] as const;
+export const VALID_HEROES = ['Barbarian King', 'Archer Queen', 'Grand Warden', 'Royal Champion', 'Minion Prince'] as const;
 export const GUIDE_TEXT_CHAR_LIMIT = 3_000;
 export const YOUTUBE_URL_REGEX = /^(?:https:\/\/)?(?:www\.)?youtube\.com\/watch\?(?=.*v=((\w|-){11}))(?:\S+)?$/;
 export const MAX_COMMENT_LENGTH = 256;
@@ -374,6 +374,9 @@ export function getHeroLevel(hero: HeroType, ctx: { th: TownHall }) {
 	}
 	if (hero === 'Royal Champion') {
 		return ctx.th.maxRoyalChampion ?? -1;
+	}
+	if (hero === 'Minion Prince') {
+		return ctx.th.maxMinionPrince ?? -1;
 	}
 	// Should never happen?
 	return -1;

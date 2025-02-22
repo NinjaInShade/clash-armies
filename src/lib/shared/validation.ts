@@ -1,4 +1,4 @@
-import type { SaveArmy, TownHall, Unit, Equipment, Pet, SaveUnit, SaveEquipment, SavePet, SaveGuide } from '$types';
+import type { SaveArmy, TownHall, Unit, Equipment, Pet, SaveUnit, SaveEquipment, SavePet, SaveGuide, HeroType } from '$types';
 import {
 	BANNERS,
 	VALID_UNIT_HOME,
@@ -73,6 +73,11 @@ export function validateArmy(data: unknown, ctx: Ctx): SaveArmy {
 	const ccUnits = army.units.filter((unit) => unit.home === 'clanCastle');
 	const equipment = army.equipment;
 	const pets = army.pets;
+
+	const heroesUsed = VALID_HEROES.filter((hero) => hasHero(hero, army, ctx)).length;
+	if (heroesUsed > 4) {
+		throw new Error('Cannot use more than 4 heroes');
+	}
 
 	validateUnits(units, army.townHall, ctx);
 	validateCcUnits(ccUnits, army.townHall, ctx);
@@ -250,4 +255,23 @@ function findDuplicateUnits(units: SaveUnit[]) {
 		}
 	}
 	return Array.from(duplicates);
+}
+
+/**
+ * Achieves the same function as the shared `hasHero` that takes in a fully saved `Army` type.
+ * Unlike that function, this one can take in a `SaveArmy` so useful for validating a new/edited army.
+ */
+export function hasHero(hero: HeroType, army: SaveArmy, ctx: Ctx) {
+	for (const equipment of army.equipment) {
+		const eqHero = requireEquipment(equipment.equipmentId, ctx).hero;
+		if (eqHero === hero) {
+			return hero;
+		}
+	}
+	for (const pet of army.pets) {
+		if (pet.hero === hero) {
+			return true;
+		}
+	}
+	return false;
 }

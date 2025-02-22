@@ -2,6 +2,7 @@
 	import { getContext } from 'svelte';
 	import type { AppState } from '$types';
 	import type { PickUnit, Filters } from './ArmyFilters.svelte';
+	import { VALID_HEROES } from '$shared/utils';
 	import C from '$components';
 
 	type Props = {
@@ -52,9 +53,8 @@
 			}
 		}
 		if (a.pickType === 'equipment' && b.pickType === 'equipment') {
-			const heroOrder = ['Barbarian King', 'Archer Queen', 'Grand Warden', 'Royal Champion'];
-			const heroIndexA = heroOrder.indexOf(a.hero);
-			const heroIndexB = heroOrder.indexOf(b.hero);
+			const heroIndexA = VALID_HEROES.indexOf(a.hero);
+			const heroIndexB = VALID_HEROES.indexOf(b.hero);
 			if (+a.epic !== +b.epic) {
 				return +a.epic - +b.epic;
 			}

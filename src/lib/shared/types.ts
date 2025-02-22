@@ -92,6 +92,7 @@ export type TownHall = {
 	maxArcherQueen: number | null;
 	maxGrandWarden: number | null;
 	maxRoyalChampion: number | null;
+	maxMinionPrince: number | null;
 	troopCapacity: number;
 	spellCapacity: number;
 	siegeCapacity: number;
