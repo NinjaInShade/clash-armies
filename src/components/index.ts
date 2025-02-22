@@ -41,6 +41,7 @@ export { default as BookmarkButton } from './BookmarkButton.svelte';
 export { default as ImportFromLink } from './ImportFromLink.svelte';
 export { default as ArmyFilters } from './ArmyFilters.svelte';
 export { default as FiltersPopup } from './FiltersPopup.svelte';
+export { default as NotificationsMenu } from './NotificationsMenu.svelte';
 export { default as IconTagsClanCastle } from './IconTagsClanCastle.svelte';
 export { default as IconTagsHeroes } from './IconTagsHeroes.svelte';
 export { default as AddClanCastle } from './AddClanCastle.svelte';

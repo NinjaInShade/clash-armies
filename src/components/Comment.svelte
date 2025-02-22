@@ -28,6 +28,8 @@
 	}
 
 	async function deleteComment() {
+		const confirmed = await app.confirm('Are you sure you want to delete this comment?');
+		if (!confirmed) return;
 		const response = await fetch('/armies/comments', {
 			method: 'DELETE',
 			body: JSON.stringify(comment.id),
@@ -90,7 +92,7 @@
 	</div>
 {/snippet}
 
-<li class="card">
+<li class="card" id="comment-{comment.id}">
 	<div class="header">
 		<div class="details">
 			<a class="author" href="/users/{comment.username}">@{comment.username}</a>

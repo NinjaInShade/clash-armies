@@ -1,4 +1,4 @@
-import type { AppState, Modal, Notification } from '$types';
+import type { AppState, Modal, ToastNotification } from '$types';
 import C from '$components';
 
 const TOAST_DEFAULT_DURATION = 1000;
@@ -85,12 +85,11 @@ export function createAppState(initial: Omit<AppState, 'modals' | 'notifications
 			this.openModal<T>(component, props, _resolve);
 			return promise;
 		},
-		notify(opts: Notification['opts']) {
-			// eslint-disable-next-line prefer-const
+		notify(opts: ToastNotification['opts']) {
 			let timeout: ReturnType<typeof setTimeout> | undefined;
 			// Should be fine in practice
 			const id = Date.now();
-			const notificationSpec: Notification = {
+			const notificationSpec: ToastNotification = {
 				id,
 				opts,
 				dismiss() {

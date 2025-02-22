@@ -39,7 +39,8 @@
 			fill="#EFEFEF"
 		/>
 	</svg>
-	{comments.length > 0 ? `${comments.length} ` : ''}Comments
+	{comments.length}
+	{comments.length === 1 ? 'comment' : 'comments'}
 </h2>
 
 <div class="comments-list-container">

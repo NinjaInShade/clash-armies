@@ -5,11 +5,27 @@
 
 	const app = getContext<AppState>('app');
 
+	const hasUnseenNotifications = $derived(app.user ? app.user.notifications.filter((notif) => !notif.seen).length > 0 : false);
+
 	let sidebarOpen = $state<boolean>(false);
+
+	let notificationsBtn = $state<HTMLButtonElement>();
+	let notificationsBtnMobile = $state<HTMLButtonElement>();
+
+	let notificationsOpen = $state<boolean>(false);
+	let notificationsOpenMobile = $state<boolean>(false);
 
 	function toggleSidebar() {
 		sidebarOpen = !sidebarOpen;
 		document.body.classList.toggle('sidebar-active');
+	}
+
+	function toggleNotifications() {
+		notificationsOpen = !notificationsOpen;
+	}
+
+	function toggleNotificationsMobile() {
+		notificationsOpenMobile = !notificationsOpenMobile;
 	}
 </script>
 
@@ -25,18 +41,38 @@
 					<li>
 						<a class="body focus-grey" href="/create">Create</a>
 					</li>
+					{#if app.user.hasRoles('admin')}
+						<li>
+							<a class="body focus-grey" href="/admin">Admin</a>
+						</li>
+					{/if}
 				{/if}
 			</ul>
 		</div>
 		<ul class="links">
-			{#if app.user && app.user.hasRoles('admin')}
-				<li>
-					<a class="body focus-grey" href="/admin">Admin</a>
-				</li>
-			{/if}
 			{#if app.user}
 				<li>
 					<a class="body focus-grey" href="/users/{app.user.username}">Account</a>
+				</li>
+				<li>
+					<button
+						class="notifications-btn"
+						class:has-unseen={hasUnseenNotifications}
+						onclick={toggleNotifications}
+						aria-label="Notifications"
+						bind:this={notificationsBtn}
+					>
+						<svg width="18" height="20" viewBox="0 0 18 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+							<path
+								d="M8.93816 0.5C7.08165 0.5 5.30117 1.2375 3.98842 2.55025C2.67566 3.86301 1.93816 5.64348 1.93816 7.5V11.028C1.93831 11.1831 1.90236 11.3362 1.83316 11.475L0.116163 14.908C0.0322892 15.0757 -0.00731514 15.2621 0.00111129 15.4494C0.00953771 15.6368 0.0657151 15.8188 0.164308 15.9783C0.262901 16.1379 0.400635 16.2695 0.56443 16.3608C0.728224 16.4521 0.912641 16.5 1.10016 16.5H16.7762C16.9637 16.5 17.1481 16.4521 17.3119 16.3608C17.4757 16.2695 17.6134 16.1379 17.712 15.9783C17.8106 15.8188 17.8668 15.6368 17.8752 15.4494C17.8836 15.2621 17.844 15.0757 17.7602 14.908L16.0442 11.475C15.9746 11.3362 15.9383 11.1832 15.9382 11.028V7.5C15.9382 5.64348 15.2007 3.86301 13.8879 2.55025C12.5752 1.2375 10.7947 0.5 8.93816 0.5ZM8.93816 19.5C8.31751 19.5003 7.71204 19.3081 7.20518 18.9499C6.69833 18.5917 6.31505 18.0852 6.10816 17.5H11.7682C11.5613 18.0852 11.178 18.5917 10.6711 18.9499C10.1643 19.3081 9.55882 19.5003 8.93816 19.5Z"
+								fill="currentColor"
+							/>
+						</svg>
+						{#if hasUnseenNotifications}
+							<div class="notifications-count"></div>
+						{/if}
+					</button>
+					<C.NotificationsMenu bind:open={notificationsOpen} elRef={notificationsBtn} />
 				</li>
 			{/if}
 			<li class="control">
@@ -48,6 +84,28 @@
 			</li>
 		</ul>
 		<div class="mobile-nav">
+			{#if app.user}
+				<li>
+					<button
+						class="notifications-btn"
+						class:has-unseen={hasUnseenNotifications}
+						onclick={toggleNotificationsMobile}
+						aria-label="Notifications"
+						bind:this={notificationsBtnMobile}
+					>
+						<svg width="18" height="20" viewBox="0 0 18 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+							<path
+								d="M8.93816 0.5C7.08165 0.5 5.30117 1.2375 3.98842 2.55025C2.67566 3.86301 1.93816 5.64348 1.93816 7.5V11.028C1.93831 11.1831 1.90236 11.3362 1.83316 11.475L0.116163 14.908C0.0322892 15.0757 -0.00731514 15.2621 0.00111129 15.4494C0.00953771 15.6368 0.0657151 15.8188 0.164308 15.9783C0.262901 16.1379 0.400635 16.2695 0.56443 16.3608C0.728224 16.4521 0.912641 16.5 1.10016 16.5H16.7762C16.9637 16.5 17.1481 16.4521 17.3119 16.3608C17.4757 16.2695 17.6134 16.1379 17.712 15.9783C17.8106 15.8188 17.8668 15.6368 17.8752 15.4494C17.8836 15.2621 17.844 15.0757 17.7602 14.908L16.0442 11.475C15.9746 11.3362 15.9383 11.1832 15.9382 11.028V7.5C15.9382 5.64348 15.2007 3.86301 13.8879 2.55025C12.5752 1.2375 10.7947 0.5 8.93816 0.5ZM8.93816 19.5C8.31751 19.5003 7.71204 19.3081 7.20518 18.9499C6.69833 18.5917 6.31505 18.0852 6.10816 17.5H11.7682C11.5613 18.0852 11.178 18.5917 10.6711 18.9499C10.1643 19.3081 9.55882 19.5003 8.93816 19.5Z"
+								fill="currentColor"
+							/>
+						</svg>
+						{#if hasUnseenNotifications}
+							<div class="notifications-count"></div>
+						{/if}
+					</button>
+					<C.NotificationsMenu bind:open={notificationsOpenMobile} elRef={notificationsBtnMobile} />
+				</li>
+			{/if}
 			<button class="navbar-hamburger focus-grey" type="button" aria-label="Sidebar toggle" onclick={toggleSidebar}>
 				<svg class="ham hamRotate ham4" class:active={sidebarOpen} viewBox="0 0 100 100" width="45">
 					<path class="line top" d="m 70,33 h -40 c 0,0 -8.5,-0.149796 -8.5,8.5 0,8.649796 8.5,8.5 8.5,8.5 h 20 v -20" />
@@ -190,6 +248,37 @@
 
 	.links li a:hover {
 		color: var(--grey-300);
+	}
+
+	.notifications-btn {
+		position: relative;
+		color: var(--grey-400);
+	}
+
+	.notifications-btn.has-unseen {
+		color: var(--grey-100);
+	}
+
+	.notifications-count {
+		display: none;
+		position: absolute;
+		background-color: var(--primary-600);
+		border: 2px solid var(--grey-700);
+		border-radius: 50%;
+		padding: 2px;
+		height: 12px;
+		width: 12px;
+		right: -3px;
+		top: -3px;
+	}
+
+	.has-unseen .notifications-count {
+		display: block;
+	}
+
+	.notifications-btn,
+	.notifications-btn svg {
+		display: block;
 	}
 
 	/* Hamburger */

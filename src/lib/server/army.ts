@@ -517,15 +517,46 @@ export async function saveVote(event: RequestEvent, data: SaveVoteParams) {
 export async function saveComment(event: RequestEvent, data: SaveComment) {
 	const user = event.locals.requireAuth();
 	const comment = commentSchema.parse(data);
+	const army = await getArmy(event.locals, comment.armyId);
+
+	if (!army) {
+		throw new Error('Invalid army');
+	}
+
 	if (!comment.id) {
 		// Creating new comment
 		return db.transaction(async (tx) => {
-			return tx.insertOne('army_comments', {
+			const commentId = await tx.insertOne('army_comments', {
 				armyId: comment.armyId,
 				comment: comment.comment,
 				replyTo: comment.replyTo,
 				createdBy: user.id,
 			});
+			const notification = {
+				armyId: army.id,
+				triggeringUserId: user.id,
+				commentId,
+			};
+			if (comment.replyTo) {
+				const parentComment = await tx.getRow<Comment, null>('army_comments', { id: comment.replyTo });
+				if (!parentComment) {
+					throw new Error('Parent comment does not exist');
+				}
+				if (parentComment.createdBy !== user.id) {
+					// Notify the person to which this comment is replying to (but not if replying to yourself)
+					await tx.insertOne('army_notifications', { ...notification, type: 'comment-reply', recipientId: parentComment.createdBy });
+				}
+				if (parentComment.createdBy !== army.createdBy && user.id !== army.createdBy) {
+					// Notify the army creator someone commented if the reply wasn't already to the creator
+					await tx.insertOne('army_notifications', { ...notification, type: 'comment', recipientId: army.createdBy });
+				}
+			} else {
+				if (user.id !== army.createdBy) {
+					// Notify the army creator someone commented
+					await tx.insertOne('army_notifications', { ...notification, type: 'comment', recipientId: army.createdBy });
+				}
+			}
+			return commentId;
 		});
 	}
 	const commentId = numberSchema.parse(comment.id);

@@ -4,6 +4,7 @@
 	import { VALID_HEROES, getTotals, getCapacity, getCcCapacity, hasHero, YOUTUBE_URL_REGEX } from '$shared/utils';
 	import { copyLink, openInGame, getTags, getCopyBtnTitle, getOpenBtnTitle } from '$client/army';
 	import type { Army, AppState, FetchErrors } from '$types';
+	import { invalidateAll } from '$app/navigation';
 	import C from '$components';
 
 	type Props = { army: Army };
@@ -55,6 +56,7 @@
 			errors = result.errors as FetchErrors;
 			return;
 		}
+		await invalidateAll();
 		if (response.status === 200) {
 			goto(`/armies`);
 		} else {

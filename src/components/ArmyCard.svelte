@@ -78,7 +78,8 @@
 							fill="currentColor"
 						/>
 					</svg>
-					{army.comments.length} comments
+					{army.comments.length}
+					{army.comments.length === 1 ? 'comment' : 'comments'}
 				</a>
 			{/if}
 		</div>

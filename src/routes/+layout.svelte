@@ -4,7 +4,8 @@
 	import { setContext, type Snippet } from 'svelte';
 	import type { LayoutData } from './$types';
 	import { createAppState } from '$client/state.svelte';
-	import type { AppState } from '$types';
+	import { invalidateAll } from '$app/navigation';
+	import type { AppState, ArmyNotification } from '$types';
 	import C from '$components';
 
 	type Props = {
@@ -15,15 +16,52 @@
 
 	const alerts = [];
 
-	let devDebugOpen: boolean = $state(false);
+	async function ackArmyNotification(notification: ArmyNotification) {
+		const data = {
+			...notification,
+			seen: true,
+		};
+		const response = await fetch('/notifications', {
+			method: 'POST',
+			body: JSON.stringify(data),
+			headers: { 'Content-Type': 'application/json' },
+		});
+		const result = await response.json();
+		if (result.errors || response.status !== 200) {
+			appState.notify({
+				title: 'Failed action',
+				description: 'There was a problem acknowledging this notification',
+				theme: 'failure',
+			});
+			if (result.errors) {
+				console.error(`Error:`, result.errors);
+			}
+			if (response.status !== 200) {
+				console.error(`${response.status} error`);
+			}
+		} else {
+			await invalidateAll();
+		}
+	}
 
 	/** Extends user to include properties AppState needs */
-	function extendUser(user: LayoutData['user']): AppState['user'] {
+	function extendUser(user: LayoutData['user'], userNotifications: LayoutData['userNotifications']): AppState['user'] {
 		if (!user) {
 			return null;
 		}
+
+		const notifications = (userNotifications ?? []).map((notif) => {
+			return {
+				...notif,
+				dismiss() {
+					return ackArmyNotification(notif);
+				},
+			};
+		});
+
 		return {
 			...user,
+			notifications,
 			hasRoles(...roles: string[]) {
 				return roles.every((role) => user.roles.includes(role));
 			},
@@ -40,7 +78,7 @@
 		townHalls: data.townHalls,
 		equipment: data.equipment,
 		pets: data.pets,
-		user: extendUser(data.user),
+		user: extendUser(data.user, data.userNotifications),
 	});
 	setContext('app', appState);
 
@@ -50,12 +88,8 @@
 		appState.townHalls = data.townHalls;
 		appState.equipment = data.equipment;
 		appState.pets = data.pets;
-		appState.user = extendUser(data.user);
+		appState.user = extendUser(data.user, data.userNotifications);
 	});
-
-	function toggleDevDebug() {
-		devDebugOpen = !devDebugOpen;
-	}
 
 	function popModal() {
 		const lastModal = appState.modals.at(-1);
@@ -98,18 +132,6 @@
 	{/each}
 </div>
 
-{#if import.meta.env.DEV}
-	<div class="dev-debug-container" class:open={devDebugOpen}>
-		<div class="dev-debug">
-			<b>DEBUG</b>
-			<p>• TODO <span>...</span></p>
-		</div>
-		<button class="toggle-open" onclick={toggleDevDebug}>
-			{'>'}
-		</button>
-	</div>
-{/if}
-
 <style>
 	.modals-container {
 		z-index: 4;
@@ -148,61 +170,6 @@
 		mask: var(--mask);
 		/** So padding-right isn't less when there's a scrollbar */
 		scrollbar-gutter: stable;
-	}
-
-	.dev-debug-container {
-		position: fixed;
-		display: flex;
-		align-items: center;
-		transition: transform 0.1s ease-in-out;
-		transform: translateY(-50%) translateX(calc(-100% + 20px));
-		top: 50%;
-		left: 0;
-	}
-
-	.dev-debug-container.open {
-		transform: translateY(-50%) translateX(0);
-	}
-
-	.dev-debug-container .toggle-open {
-		color: var(--grey-100);
-		background-color: var(--grey-900);
-		border-radius: 0 4px 4px 0;
-		border-left: 1px solid var(--grey-600);
-		padding: 6px 0;
-		width: 20px;
-	}
-
-	.dev-debug {
-		border-radius: 0 8px 8px 0;
-		background-color: var(--grey-900);
-		padding: 1em;
-	}
-
-	.dev-debug b {
-		display: block;
-		color: var(--grey-100);
-		padding-bottom: 0.4em;
-		margin-bottom: 0.6em;
-		border-bottom: 1px solid var(--grey-700);
-	}
-
-	.dev-debug p {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		color: var(--grey-100);
-		font-weight: 500;
-		font-size: 1em;
-		gap: 0.75em;
-	}
-
-	.dev-debug p span {
-		color: var(--grey-500);
-	}
-
-	.dev-debug p:not(:last-child) {
-		margin-bottom: 0.5em;
 	}
 
 	.alerts {
