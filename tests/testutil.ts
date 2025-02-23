@@ -65,9 +65,16 @@ export async function createDB() {
 	// Init database & migrate
 	await db.connect();
 	await db.migrate(migration);
-	// Create basic test user
-	const userId = await db.insertOne('users', { username: USER.username, googleId: USER.googleId });
-	await db.insertOne('user_roles', { userId, role: USER.roles[0] });
+	// Create test users
+	const users = [USER, USER_2, ADMIN_USER];
+	await db.insertMany(
+		'users',
+		users.map((user) => ({ username: user.username, googleId: user.googleId }))
+	);
+	await db.insertMany(
+		'user_roles',
+		users.flatMap((user) => user.roles.map((role) => ({ userId: user.id, role })))
+	);
 	return db;
 }
 

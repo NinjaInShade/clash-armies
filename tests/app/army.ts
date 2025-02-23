@@ -21,6 +21,7 @@ import type { UnitType } from '$types';
 import { validateArmy, type Ctx } from '$shared/validation';
 import { GUIDE_TEXT_CHAR_LIMIT } from '$shared/utils';
 import { getArmies, saveArmy, saveComment } from '$server/army';
+import { getNotifications, acknowledgeNotifications } from '$server/notifications';
 import type { MySQL } from '@ninjalib/sql';
 
 let db: MySQL;
@@ -269,15 +270,22 @@ describe('Fetching', function () {
 
 describe('Army comments', function () {
 	let armyId: number;
+	let armyId2: number;
 
 	before(async function () {
-		// Create test army for saving comments
+		// Create test armies for saving comments
 		const data = makeData({
 			name: 'test',
 			townHall: 1,
 			units: [{ home: 'armyCamp', unitId: requireUnit('Barbarian', ctx).id, amount: 5 }],
 		});
+		const data2 = makeData({
+			name: 'test2',
+			townHall: 1,
+			units: [{ home: 'armyCamp', unitId: requireUnit('Barbarian', ctx).id, amount: 5 }],
+		});
 		armyId = await saveArmy(EVENT, data);
+		armyId2 = await saveArmy(EVENT, data2);
 	});
 
 	afterEach(async function () {
@@ -328,7 +336,7 @@ describe('Army comments', function () {
 
 		// Ensure changing armyId throws
 		await assert.throwsAsync(async function () {
-			const newData = { ...data, id, armyId: data.armyId + 1 };
+			const newData = { ...data, id, armyId: armyId2 };
 			await saveComment(EVENT, newData);
 		}, 'Moving comments is not allowed');
 
@@ -389,6 +397,117 @@ describe('Army comments', function () {
 	});
 });
 
+describe('Army notifications', function () {
+	const USER_1_EVENT = createEvent(USER);
+	const USER_2_EVENT = createEvent(USER_2);
+	const ADMIN_EVENT = createEvent(ADMIN_USER);
+
+	let armyId: number;
+
+	before(async function () {
+		const data = makeData({
+			name: 'test',
+			townHall: 1,
+			units: [{ home: 'armyCamp', unitId: requireUnit('Barbarian', ctx).id, amount: 5 }],
+		});
+		armyId = await saveArmy(USER_1_EVENT, data);
+	});
+
+	afterEach(async function () {
+		await db.delete('army_comments');
+		await db.delete('army_notifications');
+	});
+
+	describe('Comment', function () {
+		it('should notify army creator if someone comments', async function () {
+			const data = { armyId, comment: 'Comment...', replyTo: null };
+			const commentId = await saveComment(USER_2_EVENT, data);
+			const notifications = await getNotifications(USER.id);
+			assert.lengthOf(notifications, 1);
+			assert.include(notifications[0], { armyId, commentId, type: 'comment', recipientId: USER.id, triggeringUserId: USER_2.id });
+		});
+
+		it('should not notify army creator if they comment on their own army', async function () {
+			const data = { armyId, comment: 'Comment...', replyTo: null };
+			await saveComment(USER_1_EVENT, data);
+			const notifications = await getNotifications(USER.id);
+			assert.lengthOf(notifications, 0);
+		});
+	});
+
+	describe('Comment reply', function () {
+		it('should notify commenter if someone replies', async function () {
+			// Comment on own army (should not notify)
+			const data = { armyId, comment: 'Comment...', replyTo: null };
+			const commentId = await saveComment(USER_1_EVENT, data);
+
+			// Another user replies (should notify, but with type "comment-reply")
+			const data2 = { armyId, comment: 'Comment reply...', replyTo: commentId };
+			const commentId2 = await saveComment(USER_2_EVENT, data2);
+
+			const notifications = await getNotifications(USER.id);
+			assert.lengthOf(notifications, 1);
+			assert.include(notifications[0], { armyId, commentId: commentId2, type: 'comment-reply', recipientId: USER.id, triggeringUserId: USER_2.id });
+		});
+
+		it('should not notify commenter if they reply to themselves', async function () {
+			// Comment on user army
+			const data = { armyId, comment: 'Comment...', replyTo: null };
+			const commentId = await saveComment(USER_2_EVENT, data);
+
+			// Reply to self
+			const data2 = { armyId, comment: 'Comment reply...', replyTo: commentId };
+			await saveComment(USER_2_EVENT, data2);
+
+			// Should be 2 notifications, but only to the army creator of 2 new comments
+			const notifications = await getNotifications(USER.id);
+			assert.lengthOf(notifications, 2);
+			assert.include(notifications[0], { armyId, type: 'comment', recipientId: USER.id, triggeringUserId: USER_2.id });
+			assert.include(notifications[1], { armyId, type: 'comment', recipientId: USER.id, triggeringUserId: USER_2.id });
+		});
+
+		it('should not notify army creator if they reply to someone else', async function () {
+			// Comment on user army
+			const data = { armyId, comment: 'Comment...', replyTo: null };
+			const commentId = await saveComment(USER_2_EVENT, data);
+
+			// Reply to comment as the army creator
+			const data2 = { armyId, comment: 'Comment reply...', replyTo: commentId };
+			await saveComment(USER_1_EVENT, data2);
+
+			// Should be 2 notifications, one to the creator that someone commented, and another to the commenter as the creator replied
+			const notificationsCreator = await getNotifications(USER.id);
+			assert.lengthOf(notificationsCreator, 1);
+			assert.include(notificationsCreator[0], { armyId, type: 'comment', recipientId: USER.id, triggeringUserId: USER_2.id });
+
+			const notificationsCommenter = await getNotifications(USER_2.id);
+			assert.lengthOf(notificationsCommenter, 1);
+			assert.include(notificationsCommenter[0], { armyId, type: 'comment-reply', recipientId: USER_2.id, triggeringUserId: USER.id });
+		});
+	});
+
+	describe('Acknowledgement', function () {
+		it("should not allow user to acknowledge other users' notifications, unless admin", async function () {
+			// Comment on user army
+			const data = { armyId, comment: 'Comment...', replyTo: null };
+			await saveComment(USER_2_EVENT, data);
+			const notificationId = (await getNotifications(USER.id))[0]?.id;
+
+			await assert.throwsAsync(async () => {
+				// Acknowledging the notification with a different non-admin user should throw
+				await acknowledgeNotifications(USER_2_EVENT, [notificationId]);
+			}, "Cannot acknowledge notifications that aren't yours");
+
+			// Should not have changed if the notification has been acknowledged
+			assert.isNull((await getNotifications(USER.id))[0]?.seen);
+
+			// Admin should be able to acknowledge
+			await acknowledgeNotifications(ADMIN_EVENT, [notificationId]);
+			assert.isNotNull((await getNotifications(USER.id))[0]?.seen);
+		});
+	});
+});
+
 describe('Validation', function () {
 	function testCapacity(type: UnitType, clanCastle: boolean) {
 		function _testCapacity(overflow: boolean) {
@@ -432,6 +551,32 @@ describe('Validation', function () {
 			`Duplicate ${clanCastle ? 'clan castle ' : ''}unit "Barbarian" found`
 		);
 	}
+
+	it('Should not allow more than 4 heroes', function () {
+		// The amount of heroes used by an army is defined by what equipment/pets are used
+		const data = makeData({
+			name: 'test',
+			townHall: 6,
+			units: [{ home: 'armyCamp', unitId: requireUnit('Barbarian', ctx).id, amount: 1 }],
+			equipment: [
+				// Barbarian King equipment
+				{ equipmentId: requireEquipment('Barbarian Puppet', ctx).id },
+				// Archer Queen equipment
+				{ equipmentId: requireEquipment('Archer Puppet', ctx).id },
+				// Royal Champion equipment
+				{ equipmentId: requireEquipment('Rocket Spear', ctx).id },
+				// Grand Warden equipment
+				{ equipmentId: requireEquipment('Eternal Tome', ctx).id },
+			],
+			pets: [
+				// Minion Prince
+				{ hero: 'Minion Prince', petId: requirePet('Lassi', ctx).id },
+			],
+		});
+		assert.throws(function () {
+			validateArmy(data, ctx);
+		}, 'Cannot use more than 4 heroes');
+	});
 
 	describe('Regular units', function () {
 		it('Should not allow units to overflow max capacity', function () {

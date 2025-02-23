@@ -10,6 +10,6 @@ services:
       MARIADB_PASSWORD: ${DB_PASSWORD}
       MARIADB_DATABASE: clash-armies
     volumes:
-      - clash-armies-db:/var/lib/mysql
+      - clash-armies-test-db:/var/lib/mysql
 volumes:
-  clash-armies-db: {}
+  clash-armies-test-db: {}
