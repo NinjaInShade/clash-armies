@@ -397,14 +397,8 @@ export async function saveArmy(event: RequestEvent, data: SaveArmy): Promise<num
 				};
 			});
 			await tx.insertMany('army_units', armyUnits);
-			if (army.equipment.length) {
-				// TODO: fix this (insertMany should cope/bail if array is empty)
-				await tx.insertMany('army_equipment', armyEquipment);
-			}
-			if (army.pets.length) {
-				// TODO: fix this (insertMany should cope/bail if array is empty)
-				await tx.insertMany('army_pets', armyPets);
-			}
+			await tx.insertMany('army_equipment', armyEquipment);
+			await tx.insertMany('army_pets', armyPets);
 			if (guide) {
 				await tx.insertOne('army_guides', {
 					armyId,

@@ -18,7 +18,7 @@ const hourlyTask = new CronJob('0 0 * * * *', async function () {
 
 const serverInit = (async () => {
 	hourlyTask.start();
-	await db.connect(); // TODO: this should only throw for fatal errors and only resolve when connected
+	await db.connect();
 	await db.migrate(migration);
 })();
 
