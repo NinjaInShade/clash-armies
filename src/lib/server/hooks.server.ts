@@ -17,9 +17,9 @@ const hourlyTask = new CronJob('0 0 * * * *', async function () {
 });
 
 const serverInit = (async () => {
-	hourlyTask.start();
 	await db.connect();
 	await db.migrate(migration);
+	hourlyTask.start();
 })();
 
 const serverDispose = async () => {
