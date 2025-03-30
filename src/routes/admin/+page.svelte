@@ -47,7 +47,7 @@
 		},
 		{ key: 'type', label: 'Type', width: '100px' },
 		{ key: 'name', label: 'Name' },
-		{ key: 'objectId', label: 'Object ID', width: '120px' },
+		{ key: 'clashId', label: 'Clash ID', width: '120px' },
 		{ key: 'housingSpace', label: 'Housing space', width: '165px' },
 		{
 			key: 'maxLevel',

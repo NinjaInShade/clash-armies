@@ -15,7 +15,22 @@
 		GUIDE_TEXT_CHAR_LIMIT,
 		hasHero,
 	} from '$shared/utils';
-	import type { Optional, AppState, Army, ArmyUnit, ArmyEquipment, ArmyPet, Banner, FetchErrors, HeroType } from '$types';
+	import type {
+		Optional,
+		AppState,
+		Army,
+		ArmyUnit,
+		ArmyEquipment,
+		ArmyPet,
+		Banner,
+		FetchErrors,
+		HeroType,
+		UnsavedUnit,
+		UnsavedEquipment,
+		UnsavedPet,
+		ImportedUnit,
+		ImportedHero,
+	} from '$types';
 	import ImportFromLink from './ImportFromLink.svelte';
 	import EditBanner from './EditBanner.svelte';
 	import Fieldset from './Fieldset.svelte';
@@ -42,10 +57,10 @@
 	let townHall = $state(army?.townHall ?? 17);
 	let banner = $state(army?.banner ?? BANNERS[Math.floor(Math.random() * BANNERS.length)]);
 	let name = $state(army?.name ?? null);
-	let units = $state<Optional<ArmyUnit, 'id'>[]>(army?.units?.filter((unit) => unit.home === 'armyCamp') ?? []);
-	let ccUnits = $state<Optional<ArmyUnit, 'id'>[]>(getCcUnits());
-	let equipment = $state<Optional<ArmyEquipment, 'id'>[]>(army?.equipment ?? []);
-	let pets = $state<Optional<ArmyPet, 'id'>[]>(army?.pets ?? []);
+	let units = $state<UnsavedUnit[]>(army?.units?.filter((unit) => unit.home === 'armyCamp') ?? []);
+	let ccUnits = $state<UnsavedUnit[]>(getCcUnits());
+	let equipment = $state<UnsavedEquipment[]>(army?.equipment ?? []);
+	let pets = $state<UnsavedPet[]>(army?.pets ?? []);
 	let guideText = $state(army?.guide?.textContent ?? null);
 	let guideYoutubeUrl = $state(army?.guide?.youtubeUrl ?? null);
 
@@ -118,9 +133,39 @@
 	}
 
 	async function importUnits() {
-		const importedUnits = await app.openModalAsync<Optional<ArmyUnit, 'id'>[]>(ImportFromLink, { selectedUnits: units, selectedTownHall: townHall });
-		if (!importedUnits) return;
-		units = importedUnits;
+		const imported = await app.openModalAsync<{ units: ImportedUnit[]; ccUnits: ImportedUnit[]; heroes: Record<string, ImportedHero> }>(ImportFromLink, {
+			selectedUnits: units,
+			selectedCCUnits: ccUnits,
+			selectedEquipment: equipment,
+			selectedPets: pets,
+			selectedTownHall: townHall,
+		});
+		if (!imported) return;
+
+		units = imported.units;
+		ccUnits = imported.ccUnits;
+
+		if (imported.ccUnits.length) {
+			showClanCastle = true;
+		}
+
+		const heroes = Object.entries(imported.heroes);
+		if (heroes.length) {
+			const newShownHeroes: HeroType[] = [];
+			const newEquipment: UnsavedEquipment[] = [];
+			const newPets: UnsavedPet[] = [];
+			for (const [name, hero] of heroes) {
+				newShownHeroes.push(name);
+				newEquipment.push(...(hero.eq1 ? [hero.eq1] : []));
+				newEquipment.push(...(hero.eq2 ? [hero.eq2] : []));
+				newPets.push(...(hero.pet ? [hero.pet] : []));
+			}
+			shownHeroes = newShownHeroes;
+			equipment = newEquipment;
+			pets = newPets;
+		} else {
+			shownHeroes = null;
+		}
 	}
 
 	function editBanner() {

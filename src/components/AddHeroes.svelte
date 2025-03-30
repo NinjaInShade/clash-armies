@@ -24,7 +24,7 @@
 		<img src="/clash/heroes/Royal Champion.png" alt="Clash of clans royal champion hero" />
 	</div>
 	{#if selectedTownHall >= requiredThLvl}
-		<h2>Add recommended hero pets/equipment</h2>
+		<h2>Add hero pets/equipment</h2>
 		<button class="add-cc-btn" onclick={onClick} aria-label="Displays the hero equipment/pets editor">
 			<svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
 				<path

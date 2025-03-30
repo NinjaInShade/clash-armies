@@ -19,7 +19,7 @@
 
 	let type = $state<UnitType | null>(null);
 	let name = $state<string | null>(null);
-	let objectId = $state<number | null>(null);
+	let clashId = $state<number | null>(null);
 	let housingSpace = $state<number | null>(null);
 	let productionBuilding = $state<string | null>(null);
 	let isSuper = $state<boolean>(false);
@@ -58,7 +58,7 @@
 		if (!unit) return;
 		type = unit.type;
 		name = unit.name;
-		objectId = unit.objectId;
+		clashId = unit.clashId;
 		housingSpace = unit.housingSpace;
 		productionBuilding = unit.productionBuilding;
 		isSuper = unit.isSuper;
@@ -89,7 +89,7 @@
 			id: unit?.id,
 			name,
 			type,
-			objectId,
+			clashId,
 			housingSpace,
 			productionBuilding,
 			isSuper,
@@ -177,8 +177,8 @@
 		<C.Fieldset label="Production building" htmlName="productionBuilding" style="flex: 1 0 0px;" --input-width="100%">
 			<C.Select data={PROD_BUILDINGS} bind:value={productionBuilding} />
 		</C.Fieldset>
-		<C.Fieldset label="Object ID" htmlName="objectId" style="flex: 1 0 0px;" --input-width="100%">
-			<C.Input bind:value={objectId} type="number" />
+		<C.Fieldset label="Object ID" htmlName="clashId" style="flex: 1 0 0px;" --input-width="100%">
+			<C.Input bind:value={clashId} type="number" />
 		</C.Fieldset>
 	</div>
 

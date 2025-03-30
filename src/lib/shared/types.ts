@@ -137,7 +137,7 @@ export type Unit = {
 	id: number;
 	type: UnitType;
 	name: string;
-	objectId: number;
+	clashId: number;
 	housingSpace: number;
 	productionBuilding: string;
 	isSuper: boolean;
@@ -153,6 +153,7 @@ export type Equipment = {
 	/** Which hero this equipment can be applied to */
 	hero: HeroType;
 	name: string;
+	clashId: number;
 	epic: boolean;
 	levels: EquipmentLevel[];
 };
@@ -160,6 +161,7 @@ export type Pet = {
 	/** ID of the pet in the `pets` table */
 	id: number;
 	name: string;
+	clashId: number;
 	levels: PetLevel[];
 };
 export type Guide = {
@@ -214,6 +216,13 @@ export type ArmyGuide = SaveGuide & {
 	/** ID of the guide in the `army_guides` table */
 	id: number;
 };
+
+export type UnsavedUnit = Optional<ArmyUnit, 'id'>;
+export type UnsavedEquipment = Optional<ArmyEquipment, 'id'>;
+export type UnsavedPet = Optional<ArmyPet, 'id'>;
+
+export type ImportedUnit = UnsavedUnit;
+export type ImportedHero = { pet?: UnsavedPet; eq1?: UnsavedEquipment; eq2?: UnsavedEquipment };
 
 /** The bare minimum data required for army creation/saving */
 export type SaveArmy = {

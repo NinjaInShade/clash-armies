@@ -502,4 +502,76 @@ export default function migration(runStep: MigrationFn) {
         ALTER TABLE units
         DROP COLUMN trainingTime
     `);
+    runStep(37, async (db: MySQL) => {
+        // Standardize "ObjectIds" to be called "clashId".
+        await db.query(`
+            ALTER TABLE units
+            RENAME COLUMN objectId TO clashId
+        `);
+
+        // Get rid of "object id prefix" distinction (like troops start with 4xxx), we don't care in clash armies.
+        // For existing object id's in the database we should strip the prefixes this so we're left with just the ID.
+        // We already know in the database that for example a troop is a "troop", so we don't need any prefix, and makes it a bit confusing to work with.
+        await db.query(`
+            UPDATE units
+            SET clashId = COALESCE(NULLIF(REGEXP_REPLACE(clashId, '^(26|4)0+', ''), ''), '0');
+        `);
+
+        // Add clashId's for pets
+        const petClashIDs = {
+            "Lassi": 0,
+            "Mighty Yak": 1,
+            "Electro Owl": 2,
+            "Unicorn": 3,
+            "Phoenix": 4,
+            "Poison Lizard": 7,
+            "Diggy": 8,
+            "Frosty": 9,
+            "Spirit Fox": 10,
+            "Angry Jelly": 11,
+            "Sneezy": 16
+        };
+        await db.query('ALTER TABLE pets ADD COLUMN clashId INT UNSIGNED NOT NULL AFTER name');
+        await Promise.all(Object.entries(petClashIDs).map(([name, id]) => {
+            return db.query('UPDATE pets SET clashId = ? WHERE name = ?', [id, name]);
+        }));
+
+        // Add clashId's for equipment
+        const equipmentClashIDs = {
+            "Barbarian Puppet": 0,
+            "Rage Vial": 1,
+            "Archer Puppet": 2,
+            "Invisibility Vial": 3,
+            "Eternal Tome": 4,
+            "Life Gem": 5,
+            "Seeking Shield": 6,
+            "Royal Gem": 7,
+            "Earthquake Boots": 8,
+            "Hog Rider Puppet": 9,
+            "Giant Gauntlet": 10,
+            "Vampstache": 11,
+            "Haste Vial": 12,
+            "Rocket Spear": 13,
+            "Spiky Ball": 14,
+            "Frozen Arrow": 15,
+            "Giant Arrow": 17,
+            "Healer Puppet": 20,
+            "Fireball": 22,
+            "Rage Gem": 24,
+            "Snake Bracelet": 32,
+            "Healing Tome": 34,
+            "Dark Crown": 35,
+            "Magic Mirror": 39,
+            "Electro Boots": 40,
+            "Lavaloon Puppet": 41,
+            "Henchmen Puppet": 42,
+            "Dark Orb": 43,
+            "Metal Pants": 44,
+            "Noble Iron": 47
+        };
+        await db.query('ALTER TABLE equipment ADD COLUMN clashId INT UNSIGNED NOT NULL AFTER name');
+        await Promise.all(Object.entries(equipmentClashIDs).map(([name, id]) => {
+            return db.query('UPDATE equipment SET clashId = ? WHERE name = ?', [id, name]);
+        }));
+    });
 }

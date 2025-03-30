@@ -108,6 +108,15 @@ export const GUIDE_TEXT_CHAR_LIMIT = 3_000;
 export const YOUTUBE_URL_REGEX = /^(?:https:\/\/)?(?:www\.)?youtube\.com\/watch\?(?=.*v=((\w|-){11}))(?:\S+)?$/;
 export const MAX_COMMENT_LENGTH = 256;
 
+// Heroes aren't stored explicitly in the database so storing here instead (for now at least)
+export const HERO_CLASH_IDS = {
+	'Barbarian King': 0,
+	'Archer Queen': 1,
+	'Grand Warden': 2,
+	'Royal Champion': 4,
+	'Minion Prince': 6,
+};
+
 /**
  * Given the passed in units, calculates how much housing space has been used.
  */
@@ -404,6 +413,38 @@ export function requirePet(petId: number, ctx: { pets: Pet[] }) {
 	const pet = ctx.pets.find((p) => p.id === petId);
 	if (!pet) {
 		throw new Error(`Expected pet ${petId}`);
+	}
+	return pet;
+}
+
+export function requireTroopByClashID(clashId: number, ctx: { units: Unit[] }) {
+	const unit = ctx.units.find((u) => (u.type === 'Troop' || u.type === 'Siege') && u.clashId === clashId);
+	if (!unit) {
+		throw new Error(`Expected troop with ID "${clashId}"`);
+	}
+	return unit;
+}
+
+export function requireSpellByClashID(clashId: number, ctx: { units: Unit[] }) {
+	const unit = ctx.units.find((u) => u.type === 'Spell' && u.clashId === clashId);
+	if (!unit) {
+		throw new Error(`Expected spell with ID "${clashId}"`);
+	}
+	return unit;
+}
+
+export function requireEquipmentByClashID(clashId: number, ctx: { equipment: Equipment[] }) {
+	const eq = ctx.equipment.find((eq) => eq.clashId === clashId);
+	if (!eq) {
+		throw new Error(`Expected equipment with ID "${clashId}"`);
+	}
+	return eq;
+}
+
+export function requirePetByClashID(clashId: number, ctx: { pets: Pet[] }) {
+	const pet = ctx.pets.find((p) => p.clashId === clashId);
+	if (!pet) {
+		throw new Error(`Expected pet with ID "${clashId}"`);
 	}
 	return pet;
 }

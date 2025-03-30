@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { getContext } from 'svelte';
-	import type { AppState, Optional, ArmyUnit } from '$types';
-	import { validateUnits } from '$shared/validation';
+	import type { AppState, ImportedUnit, ImportedHero, UnsavedUnit, UnsavedPet, UnsavedEquipment } from '$types';
+	import { validateUnits, validateCcUnits, validateEquipment, validatePets } from '$shared/validation';
 	import { parseLink } from '$client/army';
 	import Button from './Button.svelte';
 	import Modal from './Modal.svelte';
@@ -11,39 +11,62 @@
 
 	type Props = {
 		/** Function that closes the modal */
-		close: (units?: Optional<ArmyUnit, 'id'>[]) => void;
-		selectedUnits: Optional<ArmyUnit, 'id'>[];
+		close: (data?: { units: ImportedUnit[]; ccUnits: ImportedUnit[]; heroes: Record<string, ImportedHero> }) => void;
+		selectedUnits: UnsavedUnit[];
+		selectedCCUnits: UnsavedUnit[];
+		selectedEquipment: UnsavedEquipment[];
+		selectedPets: UnsavedPet[];
 		selectedTownHall: number;
 	};
-	const { close, selectedUnits, selectedTownHall }: Props = $props();
+	const { close, selectedUnits, selectedCCUnits, selectedEquipment, selectedPets, selectedTownHall }: Props = $props();
 	const app = getContext<AppState>('app');
 
 	let link = $state<string>('');
 	let error = $state<string | null>(null);
 
 	async function importUnits() {
-		let importedUnits: Optional<ArmyUnit, 'id'>[] = [];
+		let importedUnits: ReturnType<typeof parseLink>['units'] = [];
+		let importedCCUnits: ReturnType<typeof parseLink>['ccUnits'] = [];
+		let importedHeroes: ReturnType<typeof parseLink>['heroes'] = {};
 		try {
-			importedUnits = parseLink(link, { units: app.units });
+			const imported = parseLink(link, { units: app.units, pets: app.pets, equipment: app.equipment });
+			importedUnits = imported.units;
+			importedCCUnits = imported.ccUnits;
+			importedHeroes = imported.heroes;
 		} catch (err: unknown) {
 			error = err.message;
 			return;
 		}
-		if (!importedUnits.length) {
+		if (!importedUnits.length && !importedCCUnits.length && !Object.keys(importedHeroes).length) {
 			error = "This import link didn't have any units - are you sure it's correct?";
 			return;
 		}
 		try {
-			validateUnits(importedUnits, selectedTownHall, { units: app.units, townHalls: app.townHalls });
+			const equipment: UnsavedEquipment[] = [];
+			const pets: UnsavedPet[] = [];
+			for (const hero of Object.values(importedHeroes)) {
+				equipment.push(...(hero.eq1 ? [hero.eq1] : []));
+				equipment.push(...(hero.eq2 ? [hero.eq2] : []));
+				pets.push(...(hero.pet ? [hero.pet] : []));
+			}
+			const ctx = { units: app.units, equipment: app.equipment, pets: app.pets, townHalls: app.townHalls };
+			validateUnits(importedUnits, selectedTownHall, ctx);
+			validateCcUnits(importedCCUnits, selectedTownHall, ctx);
+			validateEquipment(equipment, selectedTownHall, ctx);
+			validatePets(pets, selectedTownHall, ctx);
 		} catch (err: unknown) {
 			error = err.message;
 			return;
 		}
-		if (selectedUnits.length) {
+		if (selectedUnits.length || selectedCCUnits.length || selectedEquipment.length || selectedPets.length) {
 			const confirmed = await app.confirm('Importing these units will clear existing ones. Import anyway?');
 			if (!confirmed) return;
 		}
-		close(importedUnits);
+		if (!importedUnits.length && !importedCCUnits.length && !Object.keys(importedHeroes).length) {
+			close(undefined);
+		} else {
+			close({ units: importedUnits, ccUnits: importedCCUnits, heroes: importedHeroes });
+		}
 	}
 </script>
 

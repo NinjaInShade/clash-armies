@@ -1,133 +1,209 @@
-import type { AppState, Army, Unit, ArmyUnit, Optional } from '$types';
+import type { AppState, Army, Unit, Pet, Equipment, ArmyUnit, ArmyEquipment, ArmyPet, ImportedUnit, ImportedHero } from '$types';
 import type { Component } from 'svelte';
-import { SECOND, MINUTE, HOUR, OBJECT_ID_PREFIXES, VALID_HEROES, hasHero } from '$shared/utils';
+import {
+	VALID_HEROES,
+	hasHero,
+	requireTroopByClashID,
+	requireSpellByClashID,
+	requirePetByClashID,
+	requireEquipmentByClashID,
+	HERO_CLASH_IDS,
+} from '$shared/utils';
 import C from '$components';
 
 /**
  * Generates URL link to copy army into clash of clans.
  *
  * Example: https://link.clashofclans.com/en?action=CopyArmy&army=u10x0-2x3s1x9-3x2
- *
- * First are troops, prefixed with the "u" character):
- * - First item is 10 troops with id 0, which are Barbarians.
- * - Next item is 2 troops with id 3, which are Giants.
- *
- * Then come the spells (starting with the s character):
- * - First is 1 spell with id 9, which is a Poison Spell.
- * - Second is 3 spells with id 2, which is a Rage Spell.
  */
-export function generateLink(units: ArmyUnit[]): string {
-	let url = 'https://link.clashofclans.com/?action=CopyArmy&army=';
-
-	const selectedTroops = units.filter((item) => item.type === 'Troop' || item.type === 'Siege');
-	const selectedSpells = units.filter((item) => item.type === 'Spell');
-
-	// generate troops
-	if (selectedTroops.length) {
-		url += 'u';
-		url += selectedTroops
-			.reduce<string[]>((prev, troop) => {
-				const id = String(troop.objectId).slice(String(OBJECT_ID_PREFIXES.Characters).length);
-				const troopString = `${troop.amount}x${+id}`;
+export function generateLink(units: ArmyUnit[], ccUnits: ArmyUnit[], equipment: ArmyEquipment[], pets: ArmyPet[]): string {
+	function buildUnitStr(units: ArmyUnit[]) {
+		return units
+			.reduce<string[]>((prev, unit) => {
+				const troopString = `${unit.amount}x${+unit.clashId}`;
 				prev.push(troopString);
 				return prev;
 			}, [])
 			.join('-');
 	}
-
-	// generate spells
-	if (selectedSpells.length) {
-		url += 's';
-		url += selectedSpells
-			.reduce<string[]>((prev, spell) => {
-				const id = String(spell.objectId).slice(String(OBJECT_ID_PREFIXES.Spells).length);
-				const spellString = `${spell.amount}x${+id}`;
-				prev.push(spellString);
+	function buildHeroesStr(heroes: Record<string, { pet?: ArmyPet; eq1?: ArmyEquipment; eq2?: ArmyEquipment }>) {
+		return Object.entries(heroes)
+			.reduce<string[]>((prev, [name, hero]) => {
+				const clashId = HERO_CLASH_IDS[name];
+				let heroStr = clashId;
+				if (hero.pet) {
+					heroStr += `p${hero.pet.clashId}`;
+				}
+				if (hero.eq1 || hero.eq2) {
+					const firstEq = hero.eq1 || hero.eq2;
+					const secondEq = firstEq === hero.eq1 ? hero.eq2 : hero.eq1;
+					heroStr += `e${firstEq?.clashId}`;
+					if (secondEq) {
+						heroStr += `_${secondEq.clashId}`;
+					}
+				}
+				prev.push(heroStr);
 				return prev;
 			}, [])
 			.join('-');
 	}
 
+	let url = 'https://link.clashofclans.com/?action=CopyArmy&army=';
+
+	const selectedTroops = units.filter((item) => item.type === 'Troop' || item.type === 'Siege');
+	const selectedSpells = units.filter((item) => item.type === 'Spell');
+	const selectedCCTroops = ccUnits.filter((item) => item.type === 'Troop' || item.type === 'Siege');
+	const selectedCCSpells = ccUnits.filter((item) => item.type === 'Spell');
+	const heroes: Record<string, { pet?: ArmyPet; eq1?: ArmyEquipment; eq2?: ArmyEquipment }> = {};
+
+	for (const eq of equipment) {
+		if (!(eq.hero in heroes)) {
+			heroes[eq.hero] = {};
+		}
+		if (!heroes[eq.hero].eq1) {
+			heroes[eq.hero].eq1 = eq;
+		} else if (!heroes[eq.hero].eq2) {
+			heroes[eq.hero].eq2 = eq;
+		}
+	}
+	for (const pet of pets) {
+		if (!(pet.hero in heroes)) {
+			heroes[pet.hero] = {};
+		} else if (!heroes[pet.hero].pet) {
+			heroes[pet.hero].pet = pet;
+		}
+	}
+
+	console.log('??', equipment, pets, heroes);
+
+	// generate heroes
+	if (Object.keys(heroes).length) {
+		url += 'h';
+		url += buildHeroesStr(heroes);
+	}
+	// generate cc troops
+	if (selectedCCTroops.length) {
+		url += 'i';
+		url += buildUnitStr(selectedCCTroops);
+	}
+	// generate cc spells
+	if (selectedCCSpells.length) {
+		url += 'd';
+		url += buildUnitStr(selectedCCSpells);
+	}
+	// generate troops
+	if (selectedTroops.length) {
+		url += 'u';
+		url += buildUnitStr(selectedTroops);
+	}
+	// generate spells
+	if (selectedSpells.length) {
+		url += 's';
+		url += buildUnitStr(selectedSpells);
+	}
+
 	return url;
 }
 
+const ARMY_LINK_SEPARATOR = /h(?<heroes>[^idus]+)|i(?<castle_units>[\d+x-]+)|d(?<castle_spells>[\d+x-]+)|u(?<units>[\d+x-]+)|s(?<spells>[\d+x-]+)/gm;
+const ARMY_LINK_HERO_PATTERN = /(?<hero_id>\d+)(?:m\d+)?(?:p(?<pet_id>\d+))?(?:e(?<eq1>\d+)(?:_(?<eq2>\d+))?)?/gm;
+
 /**
- * Takes in a clash of clans army link and parses it into an array of selected items
- *
- * The army=querystring value can be parsed with regex into two groups (troops and spells):
- * - u([\d+x-]+)s([\d+x-]+)
+ * Takes in a clash of clans army link and parses it into clash army units/ccUnits/heroes data.
  */
-export function parseLink(link: string, ctx: { units: Unit[] }): Optional<ArmyUnit, 'id'>[] {
-	const units: Optional<ArmyUnit, 'id'>[] = [];
-	const parsedUnits = /u(?<troops>[\d+x-]+)s(?<spells>[\d+x-]+)/.exec(link);
-
-	const troops = parsedUnits?.groups?.troops;
-	const spells = parsedUnits?.groups?.spells;
-	if (typeof troops !== 'string' || typeof spells !== 'string') {
-		throw new Error('Invalid army link');
+export function parseLink(fullLink: string, ctx: { units: Unit[]; pets: Pet[]; equipment: Equipment[] }) {
+	const url = new URL(fullLink);
+	const link = url.searchParams.get('army');
+	if (!link) {
+		throw new Error(`Import link "${fullLink}" is invalid`);
 	}
 
-	// parse troops/siege machine
-	for (const troop of troops.split('-')) {
-		const [amount, troopId] = troop.split('x');
-		if (!amount || Number.isNaN(+amount)) {
-			throw new Error('Invalid troop amount');
-		}
-		if (!troopId || Number.isNaN(+troopId)) {
-			throw new Error('Invalid troop ID');
-		}
-		const appTroop = ctx.units.find((u) => {
-			const objectId = String(u.objectId);
-			const prefix = String(OBJECT_ID_PREFIXES.Characters);
-			return objectId.startsWith(prefix) && +objectId.slice(prefix.length) === +troopId;
+	function parseUnits(data: string) {
+		return data.split('-').map((item) => {
+			const [amount, id] = item.split('x').map(Number);
+			return { id, amount };
 		});
-		if (!appTroop) {
-			throw new Error(`Troop with ID "${troopId}" couldn't be found`);
-		}
-		units.push({
-			unitId: appTroop.id,
-			home: 'armyCamp',
-			amount: +amount,
-			...appTroop,
+	}
+	function mapUnit(data: { id: number; amount: number }, type: 'Troop' | 'Spell', isCC = false) {
+		const unit = type === 'Troop' ? requireTroopByClashID(data.id, ctx) : requireSpellByClashID(data.id, ctx);
+		return {
+			unitId: unit.id,
+			home: isCC ? 'clanCastle' : ('armyCamp' as 'clanCastle' | 'armyCamp'),
+			amount: data.amount,
+			...unit,
 			id: undefined,
-		});
+		};
 	}
 
-	// parse spells
-	for (const spell of spells.split('-')) {
-		const [amount, spellId] = spell.split('x');
-		if (!amount || Number.isNaN(+amount)) {
-			throw new Error('Invalid spell amount');
+	let units: ImportedUnit[] = [];
+	const ccUnits: ImportedUnit[] = [];
+	const heroes: Record<string, ImportedHero> = {};
+
+	for (const match of link.matchAll(ARMY_LINK_SEPARATOR)) {
+		if (match.groups?.heroes) {
+			for (const hero of match.groups.heroes.split('-')) {
+				const m = ARMY_LINK_HERO_PATTERN.exec(hero);
+				const groups = m?.groups;
+				if (groups) {
+					const heroName = Object.entries(HERO_CLASH_IDS).find(([name, id]) => id === parseInt(groups.hero_id, 10))?.[0];
+					if (!heroName) {
+						throw new Error('Invalid hero ID');
+					}
+					const hero: (typeof heroes)[string] = {};
+					if (groups.pet_id) {
+						const pet = requirePetByClashID(parseInt(groups.pet_id, 10), ctx);
+						hero.pet = { petId: pet.id, hero: heroName, ...pet, id: undefined };
+					}
+					if (groups.eq1) {
+						const eq = requireEquipmentByClashID(parseInt(groups.eq1, 10), ctx);
+						if (eq.hero !== heroName) {
+							throw new Error(`Hero mismatch "${eq.hero}" and "${heroName}"`);
+						}
+						hero.eq1 = { equipmentId: eq.id, ...eq, id: undefined };
+					}
+					if (groups.eq2) {
+						const eq = requireEquipmentByClashID(parseInt(groups.eq2, 10), ctx);
+						if (eq.hero !== heroName) {
+							throw new Error(`Hero mismatch "${eq.hero}" and "${heroName}"`);
+						}
+						hero.eq2 = { equipmentId: eq.id, ...eq, id: undefined };
+					}
+					heroes[heroName] = hero;
+				}
+				// Reset lastIndex of regex otherwise you get random `null` results from the `exec`.
+				ARMY_LINK_HERO_PATTERN.lastIndex = 0;
+			}
+		} else if (match.groups?.castle_units) {
+			const parsed = parseUnits(match.groups.castle_units).map((unit) => mapUnit(unit, 'Troop', true));
+			ccUnits.push(...parsed);
+		} else if (match.groups?.castle_spells) {
+			const parsed = parseUnits(match.groups.castle_spells).map((unit) => mapUnit(unit, 'Spell', true));
+			ccUnits.push(...parsed);
+		} else if (match.groups?.units) {
+			const parsed = parseUnits(match.groups.units).map((unit) => mapUnit(unit, 'Troop'));
+			units.push(...parsed);
+		} else if (match.groups?.spells) {
+			const parsed = parseUnits(match.groups.spells).map((unit) => mapUnit(unit, 'Spell'));
+			units.push(...parsed);
 		}
-		if (!spellId || Number.isNaN(+spellId)) {
-			throw new Error('Invalid spell ID');
-		}
-		const appSpell = ctx.units.find((u) => {
-			const objectId = String(u.objectId);
-			const prefix = String(OBJECT_ID_PREFIXES.Spells);
-			return objectId.startsWith(prefix) && +objectId.slice(prefix.length) === +spellId;
-		});
-		if (!appSpell) {
-			throw new Error(`Spell with ID "${spellId}" couldn't be found`);
-		}
-		units.push({
-			unitId: appSpell.id,
-			home: 'armyCamp',
-			amount: +amount,
-			...appSpell,
-			id: undefined,
-		});
 	}
 
-	return units;
+	// TODO: support multiple CCs in armies
+	const firstSiege = units.find((u) => u.type === 'Siege');
+	if (firstSiege) {
+		units = units.filter((u) => u.type !== 'Siege' || u === firstSiege);
+		firstSiege.amount = 1;
+	}
+
+	return { units, ccUnits, heroes };
 }
 
 export function openLink(href: string, openInNewTab = true) {
 	window.open(href, openInNewTab ? '_blank' : undefined, 'rel="noreferrer"');
 }
 
-export async function copyLink(units: ArmyUnit[], app: AppState) {
-	const link = generateLink(units);
+export async function copyLink(units: ArmyUnit[], ccUnits: ArmyUnit[], equipment: ArmyEquipment[], pets: ArmyPet[], app: AppState) {
+	const link = generateLink(units, ccUnits, equipment, pets);
 	await copy(link);
 	app.notify({ title: 'Copied army!', description: 'Successfully copied army link to clipboard', theme: 'success' });
 }
@@ -161,8 +237,8 @@ async function copy(text: string) {
 	}
 }
 
-export function openInGame(units: ArmyUnit[]) {
-	const link = generateLink(units);
+export function openInGame(units: ArmyUnit[], ccUnits: ArmyUnit[], equipment: ArmyEquipment[], pets: ArmyPet[]) {
+	const link = generateLink(units, ccUnits, equipment, pets);
 	openLink(link);
 }
 

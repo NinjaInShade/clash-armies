@@ -19,7 +19,7 @@
 		<img src="/clash/ui/clan-castle.png" alt="Clash of clans clan castle" />
 	</div>
 	{#if ccUnlocked}
-		<h2>Add recommended clan castle</h2>
+		<h2>Add clan castle</h2>
 		<button class="add-cc-btn" onclick={onClick} aria-label="Displays the clan castle editor">
 			<svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
 				<path

@@ -55,7 +55,7 @@ export async function getArmies(opts: GetArmiesParams) {
 					'amount', au.amount,
 					'name', un.name,
 					'type', un.type,
-					'objectId', un.objectId,
+					'clashId', un.clashId,
 					'housingSpace', un.housingSpace,
 					'productionBuilding', un.productionBuilding,
 					'isSuper', un.isSuper,
@@ -79,6 +79,7 @@ export async function getArmies(opts: GetArmiesParams) {
 					'equipmentId', eq.id,
 					'hero', eq.hero,
 					'name', eq.name,
+					'clashId', eq.clashId,
 					'epic', eq.epic
 				)) AS equipment
 			FROM armies a
@@ -95,7 +96,8 @@ export async function getArmies(opts: GetArmiesParams) {
 					'hero', ap.hero,
 					'armyId', a.id,
 					'petId', p.id,
-					'name', p.name
+					'name', p.name,
+					'clashId', p.clashId
 				)) AS pets
 			FROM armies a
 			LEFT JOIN army_pets ap ON ap.armyId = a.id
@@ -237,7 +239,7 @@ export async function getUnits(opts: GetUnitsParams = {}) {
 			u.id,
 			u.type,
 			u.name,
-			u.objectId,
+			u.clashId,
 			u.housingSpace,
 			u.productionBuilding,
 			u.isSuper,
@@ -286,6 +288,7 @@ export async function getEquipment() {
 			eq.id,
 			eq.hero,
 			eq.name,
+			eq.clashId,
 			eq.epic,
 			JSON_ARRAYAGG(JSON_OBJECT(
 				'id', eql.id,
@@ -314,6 +317,7 @@ export async function getPets() {
 		SELECT
 			p.id,
 			p.name,
+			p.clashId,
 			JSON_ARRAYAGG(JSON_OBJECT(
 				'id', pl.id,
 				'petId', pl.petId,

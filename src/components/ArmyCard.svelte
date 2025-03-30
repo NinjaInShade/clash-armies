@@ -89,7 +89,7 @@
 			{/if}
 		</div>
 		<div>
-			<ActionButton ghost onclick={() => copyLink(units, app)} disabled={!units.length} title={getCopyBtnTitle(units)}>
+			<ActionButton ghost onclick={() => copyLink(units, ccUnits, army.equipment, army.pets, app)} disabled={!units.length} title={getCopyBtnTitle(units)}>
 				<svg width="16" height="17" viewBox="0 0 16 17" fill="none" xmlns="http://www.w3.org/2000/svg">
 					<path
 						d="M3.4 3.4V0.849999C3.4 0.624565 3.48955 0.408365 3.64896 0.248959C3.80836 0.0895532 4.02456 0 4.25 0H14.45C14.6754 0 14.8916 0.0895532 15.051 0.248959C15.2104 0.408365 15.3 0.624565 15.3 0.849999V12.75C15.3 12.9754 15.2104 13.1916 15.051 13.351C14.8916 13.5104 14.6754 13.6 14.45 13.6H11.9V16.15C11.9 16.6192 11.5175 17 11.044 17H0.855949C0.743857 17.0007 0.632737 16.9792 0.528974 16.9368C0.42521 16.8944 0.330848 16.8319 0.25131 16.7529C0.171771 16.6739 0.108624 16.58 0.0654961 16.4765C0.0223682 16.373 0.000109968 16.2621 0 16.15L0.00255002 4.25C0.00255002 3.7808 0.38505 3.4 0.857649 3.4H3.4ZM1.7017 5.1L1.7 15.3H10.2V5.1H1.7017ZM5.1 3.4H11.9V11.9H13.6V1.7H5.1V3.4ZM3.4 7.64999H8.49999V9.34999H3.4V7.64999ZM3.4 11.05H8.49999V12.75H3.4V11.05Z"
@@ -98,7 +98,7 @@
 				</svg>
 				Copy link
 			</ActionButton>
-			<ActionButton ghost onclick={() => openInGame(units)} disabled={!units.length} title={getOpenBtnTitle(units)}>
+			<ActionButton ghost onclick={() => openInGame(units, ccUnits, army.equipment, army.pets)} disabled={!units.length} title={getOpenBtnTitle(units)}>
 				<svg width="18" height="12" viewBox="0 0 18 12" fill="none" xmlns="http://www.w3.org/2000/svg">
 					<path
 						fill-rule="evenodd"
