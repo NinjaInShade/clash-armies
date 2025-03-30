@@ -3,7 +3,11 @@
 	import type { AppState, Optional, ArmyUnit } from '$types';
 	import { validateUnits } from '$shared/validation';
 	import { parseLink } from '$client/army';
-	import C from '$components';
+	import Button from './Button.svelte';
+	import Modal from './Modal.svelte';
+	import Errors from './Errors.svelte';
+	import Fieldset from './Fieldset.svelte';
+	import Input from './Input.svelte';
 
 	type Props = {
 		/** Function that closes the modal */
@@ -45,22 +49,22 @@
 
 {#snippet controls()}
 	<div class="controls">
-		<C.Button onClick={() => close()}>Cancel</C.Button>
-		<C.Button onClick={importUnits} disabled={!link.length}>Import</C.Button>
+		<Button onClick={() => close()}>Cancel</Button>
+		<Button onClick={importUnits} disabled={!link.length}>Import</Button>
 	</div>
 {/snippet}
 
-<C.Modal title="Import units from link" {close} {controls}>
+<Modal title="Import units from link" {close} {controls}>
 	{#if error}
 		<div class="errors-container">
-			<C.Errors errors={error} />
+			<Errors errors={error} />
 		</div>
 	{/if}
 
-	<C.Fieldset label="Import link" htmlName="importLink" style="margin-bottom: 1em" --input-width="100%">
-		<C.Input bind:value={link} name="importLink" placeholder="https://link.clashofclans.com/..." />
-	</C.Fieldset>
-</C.Modal>
+	<Fieldset label="Import link" htmlName="importLink" style="margin-bottom: 1em" --input-width="100%">
+		<Input bind:value={link} name="importLink" placeholder="https://link.clashofclans.com/..." />
+	</Fieldset>
+</Modal>
 
 <style>
 	.errors-container {

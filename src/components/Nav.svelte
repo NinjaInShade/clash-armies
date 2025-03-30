@@ -1,7 +1,9 @@
 <script lang="ts">
 	import { getContext } from 'svelte';
 	import type { AppState } from '$types';
-	import C from '$components';
+	import Logo from './Logo.svelte';
+	import NotificationsMenu from './NotificationsMenu.svelte';
+	import Button from './Button.svelte';
 
 	const app = getContext<AppState>('app');
 
@@ -32,7 +34,7 @@
 <nav>
 	<div class="container">
 		<div class="left">
-			<C.Logo />
+			<Logo />
 			<ul class="links">
 				<li>
 					<a class="body focus-grey" href="/armies">Armies</a>
@@ -72,14 +74,14 @@
 							<div class="notifications-count"></div>
 						{/if}
 					</button>
-					<C.NotificationsMenu bind:open={notificationsOpen} elRef={notificationsBtn} />
+					<NotificationsMenu bind:open={notificationsOpen} elRef={notificationsBtn} />
 				</li>
 			{/if}
 			<li class="control">
 				{#if app.user}
-					<C.Button asLink href="/logout">Log out</C.Button>
+					<Button asLink href="/logout">Log out</Button>
 				{:else}
-					<C.Button asLink href="/login">Log in</C.Button>
+					<Button asLink href="/login">Log in</Button>
 				{/if}
 			</li>
 		</ul>
@@ -103,7 +105,7 @@
 							<div class="notifications-count"></div>
 						{/if}
 					</button>
-					<C.NotificationsMenu bind:open={notificationsOpenMobile} elRef={notificationsBtnMobile} />
+					<NotificationsMenu bind:open={notificationsOpenMobile} elRef={notificationsBtnMobile} />
 				</li>
 			{/if}
 			<button class="navbar-hamburger focus-grey" type="button" aria-label="Sidebar toggle" onclick={toggleSidebar}>
@@ -193,9 +195,9 @@
 			</li>
 			<li class="sidebar-link">
 				{#if app.user}
-					<C.Button asLink href="/logout" style="width: 100%;" onClick={toggleSidebar}>Log out</C.Button>
+					<Button asLink href="/logout" style="width: 100%;" onClick={toggleSidebar}>Log out</Button>
 				{:else}
-					<C.Button asLink href="/login" style="width: 100%;" onClick={toggleSidebar}>Log in</C.Button>
+					<Button asLink href="/login" style="width: 100%;" onClick={toggleSidebar}>Log in</Button>
 				{/if}
 			</li>
 		</ul>

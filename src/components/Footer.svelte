@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { getContext } from 'svelte';
 	import type { AppState } from '$types';
-	import C from '$components';
+	import Logo from './Logo.svelte';
 
 	const app = getContext<AppState>('app');
 </script>
@@ -10,7 +10,7 @@
 	<div class="container">
 		<div class="top">
 			<div class="left">
-				<C.Logo />
+				<Logo />
 				<p class="desc">The number one tool to find, create, learn and share the best armies in clash of clans!</p>
 				<ul class="social-links">
 					<li>

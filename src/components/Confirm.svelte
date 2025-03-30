@@ -1,5 +1,6 @@
 <script lang="ts">
-	import C from '$components';
+	import Button from './Button.svelte';
+	import Modal from './Modal.svelte';
 
 	type Props = {
 		/** Function that closes the modal */
@@ -20,14 +21,14 @@
 
 {#snippet controls()}
 	<div class="controls">
-		<C.Button onClick={cancel}>Cancel</C.Button>
-		<C.Button onClick={confirm} theme="danger">Confirm</C.Button>
+		<Button onClick={cancel}>Cancel</Button>
+		<Button onClick={confirm} theme="danger">Confirm</Button>
 	</div>
 {/snippet}
 
-<C.Modal title="Confirm action" {close} {controls}>
+<Modal title="Confirm action" {close} {controls}>
 	<p>{confirmText}</p>
-</C.Modal>
+</Modal>
 
 <style>
 	p {

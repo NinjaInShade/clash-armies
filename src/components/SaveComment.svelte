@@ -3,7 +3,8 @@
 	import type { AppState, Comment } from '$types';
 	import { MAX_COMMENT_LENGTH } from '$shared/utils';
 	import { invalidateAll } from '$app/navigation';
-	import C from '$components';
+	import TextArea from './TextArea.svelte';
+	import ActionButton from './ActionButton.svelte';
 
 	type Props = {
 		armyId: number;
@@ -52,14 +53,14 @@
 </script>
 
 <div class="textarea-container">
-	<C.TextArea
+	<TextArea
 		bind:value={commentText}
 		placeholder={comment ? undefined : replyTo !== undefined ? 'Add your reply...' : 'Add your comment...'}
 		maxlength={MAX_COMMENT_LENGTH}
 		--input-width="100%"
 		--input-min-height="5em"
 	/>
-	<C.ActionButton class="add-comment-btn" disabled={!commentText?.length} onclick={saveComment}>{comment ? 'Save' : 'Add'}</C.ActionButton>
+	<ActionButton class="add-comment-btn" disabled={!commentText?.length} onclick={saveComment}>{comment ? 'Save' : 'Add'}</ActionButton>
 </div>
 
 <style>

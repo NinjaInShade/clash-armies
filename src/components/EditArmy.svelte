@@ -16,7 +16,22 @@
 		hasHero,
 	} from '$shared/utils';
 	import type { Optional, AppState, Army, ArmyUnit, ArmyEquipment, ArmyPet, Banner, FetchErrors, HeroType } from '$types';
-	import C from '$components';
+	import ImportFromLink from './ImportFromLink.svelte';
+	import EditBanner from './EditBanner.svelte';
+	import Fieldset from './Fieldset.svelte';
+	import Input from './Input.svelte';
+	import TownHall from './TownHall.svelte';
+	import ActionButton from './ActionButton.svelte';
+	import UnitTotals from './UnitTotals.svelte';
+	import UnitsList from './UnitsList.svelte';
+	import UnitsPicker from './UnitsPicker.svelte';
+	import OfferClanCastle from './AddClanCastle.svelte';
+	import OfferHeroes from './AddHeroes.svelte';
+	import OfferGuide from './AddGuide.svelte';
+	import HeroPicker from './HeroPicker.svelte';
+	import GuideEditor from './GuideEditor.svelte';
+	import Errors from './Errors.svelte';
+	import Button from './Button.svelte';
 
 	type Props = { army?: Army };
 
@@ -103,7 +118,7 @@
 	}
 
 	async function importUnits() {
-		const importedUnits = await app.openModalAsync<Optional<ArmyUnit, 'id'>[]>(C.ImportFromLink, { selectedUnits: units, selectedTownHall: townHall });
+		const importedUnits = await app.openModalAsync<Optional<ArmyUnit, 'id'>[]>(ImportFromLink, { selectedUnits: units, selectedTownHall: townHall });
 		if (!importedUnits) return;
 		units = importedUnits;
 	}
@@ -112,7 +127,7 @@
 		const onSave = (newBanner: Banner) => {
 			banner = newBanner;
 		};
-		app.openModal(C.EditBanner, { banner, onSave });
+		app.openModal(EditBanner, { banner, onSave });
 	}
 
 	async function setTownHall(value: number) {
@@ -200,18 +215,18 @@
 <section class="dashed details">
 	<div>
 		<h2>Army details</h2>
-		<C.Fieldset label="Army name*:" htmlName="name" style="padding: 0 8px" --input-width="250px">
-			<C.Input bind:value={name} maxlength={25} />
-		</C.Fieldset>
-		<C.Fieldset label="Town hall:" htmlName="town-all" style="padding: 0 8px; margin-top: 16px;" --input-width="100%">
+		<Fieldset label="Army name*:" htmlName="name" style="padding: 0 8px" --input-width="250px">
+			<Input bind:value={name} maxlength={25} />
+		</Fieldset>
+		<Fieldset label="Town hall:" htmlName="town-all" style="padding: 0 8px; margin-top: 16px;" --input-width="100%">
 			<div class="town-halls-grid">
 				{#each app.townHalls as th}
 					{@const isSelected = townHall === th.level}
 					{@const btnAttributes = { title: isSelected ? `Town hall ${th.level} is already selected` : `Town hall ${th.level}`, disabled: isSelected }}
-					<C.TownHall onclick={() => setTownHall(th.level)} level={th.level} {...btnAttributes} --width="100%" />
+					<TownHall onclick={() => setTownHall(th.level)} level={th.level} {...btnAttributes} --width="100%" />
 				{/each}
 			</div>
-		</C.Fieldset>
+		</Fieldset>
 	</div>
 </section>
 
@@ -221,7 +236,7 @@
 			<h2>
 				<img src="/clash/ui/army-camp.png" alt="Clash of clans army camp" />
 				Unit selector
-				<C.ActionButton theme="primary-dark" onclick={importUnits} class="title-action-btn">
+				<ActionButton theme="primary-dark" onclick={importUnits} class="title-action-btn">
 					<svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
 						<path
 							fill-rule="evenodd"
@@ -231,22 +246,22 @@
 						/>
 					</svg>
 					Import
-				</C.ActionButton>
+				</ActionButton>
 			</h2>
-			<C.UnitTotals used={housingSpaceUsed} {capacity} />
+			<UnitTotals used={housingSpaceUsed} {capacity} />
 		</div>
-		<C.UnitsList bind:selectedUnits={units} unitsRemovable />
+		<UnitsList bind:selectedUnits={units} unitsRemovable />
 		<div class="picker-container">
-			<C.UnitsPicker type="Troop" {capacity} {getUnitLevel} bind:selectedUnits={units} housedIn="armyCamp" selectedTownHall={townHall} />
+			<UnitsPicker type="Troop" {capacity} {getUnitLevel} bind:selectedUnits={units} housedIn="armyCamp" selectedTownHall={townHall} />
 		</div>
 		{#if capacity.spells > 0}
 			<div class="picker-container">
-				<C.UnitsPicker type="Spell" {capacity} {getUnitLevel} bind:selectedUnits={units} housedIn="armyCamp" selectedTownHall={townHall} />
+				<UnitsPicker type="Spell" {capacity} {getUnitLevel} bind:selectedUnits={units} housedIn="armyCamp" selectedTownHall={townHall} />
 			</div>
 		{/if}
 		{#if capacity.sieges > 0}
 			<div class="picker-container">
-				<C.UnitsPicker type="Siege" {capacity} {getUnitLevel} bind:selectedUnits={units} housedIn="armyCamp" selectedTownHall={townHall} />
+				<UnitsPicker type="Siege" {capacity} {getUnitLevel} bind:selectedUnits={units} housedIn="armyCamp" selectedTownHall={townHall} />
 			</div>
 		{/if}
 	</div>
@@ -259,13 +274,13 @@
 				<h2>
 					<img src="/clash/ui/clan-castle.png" alt="Clash of clans clan castle" />
 					Clan castle
-					<C.ActionButton theme="danger" onclick={removeClanCastle} class="title-action-btn">Remove</C.ActionButton>
+					<ActionButton theme="danger" onclick={removeClanCastle} class="title-action-btn">Remove</ActionButton>
 				</h2>
-				<C.UnitTotals used={ccHousingSpaceUsed} capacity={ccCapacity} showTime={false} />
+				<UnitTotals used={ccHousingSpaceUsed} capacity={ccCapacity} showTime={false} />
 			</div>
-			<C.UnitsList bind:selectedUnits={ccUnits} unitsRemovable />
+			<UnitsList bind:selectedUnits={ccUnits} unitsRemovable />
 			<div class="picker-container">
-				<C.UnitsPicker
+				<UnitsPicker
 					type="Troop"
 					capacity={ccCapacity}
 					getUnitLevel={getCcUnitLevel}
@@ -276,7 +291,7 @@
 			</div>
 			{#if ccCapacity.spells > 0}
 				<div class="picker-container">
-					<C.UnitsPicker
+					<UnitsPicker
 						type="Spell"
 						capacity={ccCapacity}
 						getUnitLevel={getCcUnitLevel}
@@ -288,7 +303,7 @@
 			{/if}
 			{#if ccCapacity.sieges > 0}
 				<div class="picker-container">
-					<C.UnitsPicker
+					<UnitsPicker
 						type="Siege"
 						capacity={ccCapacity}
 						getUnitLevel={getCcUnitLevel}
@@ -300,7 +315,7 @@
 			{/if}
 		</div>
 	{:else}
-		<C.AddClanCastle onClick={addClanCastle} selectedTownHall={townHall} />
+		<OfferClanCastle onClick={addClanCastle} selectedTownHall={townHall} />
 	{/if}
 </section>
 
@@ -311,13 +326,13 @@
 				<h2>
 					<img src="/clash/heroes/Barbarian King.png" alt="Clash of clans barbarian king hero" />
 					Heroes
-					<C.ActionButton theme="danger" onclick={removeHeroes} class="title-action-btn">Remove</C.ActionButton>
+					<ActionButton theme="danger" onclick={removeHeroes} class="title-action-btn">Remove</ActionButton>
 				</h2>
 			</div>
 			{#each VALID_HEROES as hero}
 				{#if thData && getHeroLevel(hero, { th: thData }) !== -1}
 					<div class="hero-picker-container">
-						<C.HeroPicker
+						<HeroPicker
 							{hero}
 							bind:shownHeroes
 							bind:selectedEquipment={equipment}
@@ -331,7 +346,7 @@
 			{/each}
 		</div>
 	{:else}
-		<C.AddHeroes onClick={addHeroes} selectedTownHall={townHall} />
+		<OfferHeroes onClick={addHeroes} selectedTownHall={townHall} />
 	{/if}
 </section>
 
@@ -342,30 +357,30 @@
 				<h2>
 					<img src="/clash/ui/bb-duel.png" alt="Clash of clans builder base swords" />
 					Guide
-					<C.ActionButton theme="danger" onclick={removeGuide} class="title-action-btn">Remove</C.ActionButton>
+					<ActionButton theme="danger" onclick={removeGuide} class="title-action-btn">Remove</ActionButton>
 				</h2>
 			</div>
 			<div class="guide-edit">
-				<C.GuideEditor bind:text={guideText} charLimit={GUIDE_TEXT_CHAR_LIMIT} mode="edit" />
-				<C.Fieldset label="Video guide" htmlName="youtubeUrl" style="margin-top: 1em">
-					<C.Input bind:value={guideYoutubeUrl} placeholder="https://youtube.com/..." />
-				</C.Fieldset>
+				<GuideEditor bind:text={guideText} charLimit={GUIDE_TEXT_CHAR_LIMIT} mode="edit" />
+				<Fieldset label="Video guide" htmlName="youtubeUrl" style="margin-top: 1em">
+					<Input bind:value={guideYoutubeUrl} placeholder="https://youtube.com/..." />
+				</Fieldset>
 			</div>
 		</div>
 	{:else}
-		<C.AddGuide onClick={addGuide} />
+		<OfferGuide onClick={addGuide} />
 	{/if}
 </section>
 
 {#if errors}
 	<div class="errors">
-		<C.Errors {errors} />
+		<Errors {errors} />
 	</div>
 {/if}
 
 <div class="army-controls">
-	<C.Button asLink href={army ? `/armies/${army.id}` : '/armies'}>Cancel</C.Button>
-	<C.Button onClick={saveArmy} disabled={saveDisabled}>{army ? 'Save' : 'Create'}</C.Button>
+	<Button asLink href={army ? `/armies/${army.id}` : '/armies'}>Cancel</Button>
+	<Button onClick={saveArmy} disabled={saveDisabled}>{army ? 'Save' : 'Create'}</Button>
 </div>
 
 <style>

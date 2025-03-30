@@ -3,7 +3,8 @@
 	import { getContext } from 'svelte';
 	import { intlFormatDistance } from 'date-fns';
 	import { invalidateAll, goto } from '$app/navigation';
-	import C from '$components';
+	import Menu from './Menu.svelte';
+	import FocusTrap from './FocusTrap.svelte';
 
 	type Props = {
 		open: boolean;
@@ -53,8 +54,8 @@
 	}
 </script>
 
-<C.Menu bind:open {elRef}>
-	<C.FocusTrap>
+<Menu bind:open {elRef}>
+	<FocusTrap>
 		<div class="menu-container">
 			<header>
 				<h3>Notifications {notifications.length ? `(${notifications.length})` : ''}</h3>
@@ -86,8 +87,8 @@
 				<p class="no-notifications">You have no new notifications warrior</p>
 			{/each}
 		</div>
-	</C.FocusTrap>
-</C.Menu>
+	</FocusTrap>
+</Menu>
 
 <style>
 	.menu-container {

@@ -17,7 +17,9 @@
 	import { getContext } from 'svelte';
 	import { getTags } from '$client/army';
 	import { mkParamStore } from '$client/utils';
-	import C from '$components';
+	import FiltersPopup from './FiltersPopup.svelte';
+	import Input from './Input.svelte';
+	import Menu from './Menu.svelte';
 
 	type Props = {
 		/** The full list of armies */
@@ -173,7 +175,7 @@
 	}
 
 	async function openFiltersPopup() {
-		const newFilters = await app.openModalAsync<Filters>(C.FiltersPopup, { filters });
+		const newFilters = await app.openModalAsync<Filters>(FiltersPopup, { filters });
 		if (newFilters === undefined) {
 			return;
 		}
@@ -212,7 +214,7 @@
 
 <div class="filters">
 	<div class="left">
-		<C.Input
+		<Input
 			value={$search}
 			onChange={(value) => {
 				$search = value ?? undefined;
@@ -233,7 +235,7 @@
 				TH{$townHall}
 			{/if}
 		</button>
-		<C.Menu bind:open={thMenuShow} elRef={thMenuEl}>
+		<Menu bind:open={thMenuShow} elRef={thMenuEl}>
 			<ul class="menu th-menu">
 				{#each [...app.townHalls].reverse() as th}
 					{@const isSelected = $townHall === th.level}
@@ -260,7 +262,7 @@
 					</li>
 				{/each}
 			</ul>
-		</C.Menu>
+		</Menu>
 		<button class="filter-btn" class:active={filtersLength > 0} type="button" onclick={openFiltersPopup}>
 			<svg width="14" height="12" viewBox="0 0 14 12" fill="none" xmlns="http://www.w3.org/2000/svg">
 				<path
@@ -305,7 +307,7 @@
 			</svg>
 			{$sort !== undefined ? $sort : 'Sort'}
 		</button>
-		<C.Menu bind:open={sortMenuShow} elRef={sortMenuEl}>
+		<Menu bind:open={sortMenuShow} elRef={sortMenuEl}>
 			<ul class="menu sort-menu">
 				{#each sortOptions as option}
 					<li>
@@ -327,7 +329,7 @@
 					</li>
 				{/each}
 			</ul>
-		</C.Menu>
+		</Menu>
 	</div>
 </div>
 

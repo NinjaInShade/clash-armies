@@ -2,7 +2,11 @@
 	import { getContext } from 'svelte';
 	import type { Optional, AppState, HeroType, Equipment, ArmyEquipment, Pet, ArmyPet, TownHall } from '$types';
 	import { getHeroLevel } from '$shared/utils';
-	import C from '$components';
+	import HeroDisplay from './HeroDisplay.svelte';
+	import ActionButton from './ActionButton.svelte';
+	import EquipmentDisplay from './EquipmentDisplay.svelte';
+	import PetDisplay from './PetDisplay.svelte';
+	import AddHero from './AddHero.svelte';
 
 	type Props = {
 		hero: HeroType;
@@ -129,8 +133,8 @@
 <div class="hero {hero.replaceAll(' ', '-').toLowerCase()}" class:shown>
 	{#if shown}
 		<div class="hero-container">
-			<C.HeroDisplay name={hero} level={getHeroLevel(hero, { th: thData })} />
-			<C.ActionButton style="margin-top: 8px" theme="danger" onclick={removeHero}>Remove</C.ActionButton>
+			<HeroDisplay name={hero} level={getHeroLevel(hero, { th: thData })} />
+			<ActionButton style="margin-top: 8px" theme="danger" onclick={removeHero}>Remove</ActionButton>
 		</div>
 		<div class="vertical-separator"></div>
 	{/if}
@@ -143,7 +147,7 @@
 						{#if selected}
 							<li>
 								<button type="button" onclick={() => removeEquipment(selected.name)}>
-									<C.EquipmentDisplay {...selected} amount={1} />
+									<EquipmentDisplay {...selected} amount={1} />
 								</button>
 							</li>
 						{:else}
@@ -161,7 +165,7 @@
 								disabled={_selectedEquipment.length >= 2 || equipmentEquipped(equipment.name, _selectedEquipment) || level === -1}
 								onclick={() => addEquipment(equipment)}
 							>
-								<C.EquipmentDisplay {...equipment} {level} {title} />
+								<EquipmentDisplay {...equipment} {level} {title} />
 							</button>
 						</li>
 					{/each}
@@ -173,7 +177,7 @@
 						{#if _selectedPets[0]}
 							<li>
 								<button type="button" onclick={() => removePet(_selectedPets[0].name)}>
-									<C.PetDisplay {..._selectedPets[0]} amount={1} />
+									<PetDisplay {..._selectedPets[0]} amount={1} />
 								</button>
 							</li>
 						{:else}
@@ -193,7 +197,7 @@
 									disabled={!equippedOnDifferentHero && (_selectedPets.length >= 1 || petEquipped(pet.name, selectedPets) || level === -1)}
 									onclick={() => (equippedOnDifferentHero ? replacePet(pet.name) : addPet(pet))}
 								>
-									<C.PetDisplay {...pet} {level} {title} />
+									<PetDisplay {...pet} {level} {title} />
 								</button>
 								{#if _selectedPets.length === 0 && equippedOnDifferentHero}
 									<button type="button" class="replace-pet" onclick={() => replacePet(pet.name)} aria-label="Replace pet">
@@ -212,7 +216,7 @@
 			{/if}
 		{:else}
 			{@const maxHeroesSelected = shownHeroes.length >= 4}
-			<C.AddHero
+			<AddHero
 				{hero}
 				onClick={addHero}
 				disabled={maxHeroesSelected}

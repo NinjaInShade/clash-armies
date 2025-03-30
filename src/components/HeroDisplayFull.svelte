@@ -1,7 +1,9 @@
 <script lang="ts">
 	import type { AppState, HeroType, ArmyEquipment, ArmyPet } from '$types';
 	import { getContext } from 'svelte';
-	import C from '$components';
+	import HeroDisplay from './HeroDisplay.svelte';
+	import EquipmentDisplay from './EquipmentDisplay.svelte';
+	import PetDisplay from './PetDisplay.svelte';
 
 	type Props = {
 		hero: HeroType;
@@ -21,13 +23,13 @@
 </script>
 
 <div class="hero-display-full">
-	<C.HeroDisplay name={hero} />
+	<HeroDisplay name={hero} />
 	<div class="equipped">
 		<div class="equipment">
 			{#each new Array(2) as _, index}
 				{@const selected = _selectedEquipment[index]}
 				{#if selected}
-					<C.EquipmentDisplay {...selected} />
+					<EquipmentDisplay {...selected} />
 				{:else}
 					<div class="selected-placeholder" title="No equipment selected for this slot"></div>
 				{/if}
@@ -36,7 +38,7 @@
 		{#if thData && thData.maxPetHouse !== null}
 			<div class="pet">
 				{#if _selectedPets[0]}
-					<C.PetDisplay {..._selectedPets[0]} />
+					<PetDisplay {..._selectedPets[0]} />
 				{:else}
 					<div class="selected-placeholder" title="No pet selected"></div>
 				{/if}

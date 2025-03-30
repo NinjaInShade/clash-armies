@@ -2,7 +2,7 @@
 	import type { Snippet } from 'svelte';
 	import { HOLD_REMOVE_SPEED } from '$shared/utils';
 	import type { Optional, Unit, ArmyUnit } from '$types';
-	import C from '$components';
+	import UnitDisplay from './UnitDisplay.svelte';
 
 	type Props = {
 		selectedUnits: Optional<ArmyUnit, 'id'>[];
@@ -82,7 +82,7 @@
 				}}
 				tabindex={unitsRemovable ? undefined : -1}
 			>
-				<C.UnitDisplay {...unit} {...rest} />
+				<UnitDisplay {...unit} {...rest} />
 			</button>
 		</li>
 	{/each}

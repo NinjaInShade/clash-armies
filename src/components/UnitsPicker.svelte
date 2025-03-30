@@ -2,7 +2,7 @@
 	import { getContext } from 'svelte';
 	import { getTotals, HOLD_ADD_SPEED, requireUnit } from '$shared/utils';
 	import type { Optional, AppState, Unit, SaveUnit, ArmyUnit, UnitType, TownHall, Totals } from '$types';
-	import C from '$components';
+	import UnitDisplay from './UnitDisplay.svelte';
 
 	type TitleOptions = {
 		level: number;
@@ -117,7 +117,7 @@
 					add(unit);
 				}}
 			>
-				<C.UnitDisplay {...unit} {level} {title} />
+				<UnitDisplay {...unit} {level} {title} />
 			</button>
 		</li>
 	{/each}

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { Snippet, Component } from 'svelte';
-	import C from '$components';
+	import FocusTrap from './FocusTrap.svelte';
 
 	type ComponentRendering = {
 		/** Sets the component the modal renders. Uses children as fallback */
@@ -32,7 +32,7 @@
 
 <svelte:window onkeydown={onKeyDown} />
 
-<C.FocusTrap>
+<FocusTrap>
 	<div class="modal">
 		<div class="modal-header">
 			<h2 class="modal-title">{title ?? ''}</h2>
@@ -56,7 +56,7 @@
 			{/if}
 		</div>
 	</div>
-</C.FocusTrap>
+</FocusTrap>
 
 <style>
 	.modal {

@@ -2,7 +2,10 @@
 	import { onDestroy } from 'svelte';
 	import { Editor } from '@tiptap/core';
 	import { getExtensions } from '$shared/guideEditor';
-	import C from '$components';
+	import Menu from './Menu.svelte';
+	import FocusTrap from './FocusTrap.svelte';
+	import Input from './Input.svelte';
+	import ActionButton from './ActionButton.svelte';
 
 	type Props = {
 		text: string | null;
@@ -338,14 +341,14 @@
 					/>
 				</svg>
 			</button>
-			<C.Menu bind:open={linkMenuOpen} elRef={linkRef} onClose={setLink}>
-				<C.FocusTrap>
+			<Menu bind:open={linkMenuOpen} elRef={linkRef} onClose={setLink}>
+				<FocusTrap>
 					<div class="menu">
-						<C.Input bind:value={linkInput} onkeydown={(ev) => ev.key === 'Enter' && setLink()} placeholder="https://example.com" />
-						<C.ActionButton onclick={setLink} theme="grey">Set</C.ActionButton>
+						<Input bind:value={linkInput} onkeydown={(ev) => ev.key === 'Enter' && setLink()} placeholder="https://example.com" />
+						<ActionButton onclick={setLink} theme="grey">Set</ActionButton>
 					</div>
-				</C.FocusTrap>
-			</C.Menu>
+				</FocusTrap>
+			</Menu>
 		</div>
 		<div class="separator"></div>
 		<div class="controls-group">
