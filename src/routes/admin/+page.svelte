@@ -5,7 +5,6 @@
 	import UnitTableDisplay from './units/UnitTableDisplay.svelte';
 	import EditTownHall from './townhalls/EditTownHall.svelte';
 	import EditUnit from './units/EditUnit.svelte';
-	import { formatTime } from '$client/army';
 	import type { Unit, TownHall, AppState } from '$types';
 	import C from '$components';
 
@@ -49,7 +48,6 @@
 		{ key: 'type', label: 'Type', width: '100px' },
 		{ key: 'name', label: 'Name' },
 		{ key: 'objectId', label: 'Object ID', width: '120px' },
-		{ key: 'trainingTime', label: 'Training time', render: (row: Unit) => formatTime(row.trainingTime * 1000), width: '165px' },
 		{ key: 'housingSpace', label: 'Housing space', width: '165px' },
 		{
 			key: 'maxLevel',

@@ -109,25 +109,19 @@ export const YOUTUBE_URL_REGEX = /^(?:https:\/\/)?(?:www\.)?youtube\.com\/watch\
 export const MAX_COMMENT_LENGTH = 256;
 
 /**
- * Given the passed in units, calculates how much housing space
- * has been used and how long it will take to train the army.
+ * Given the passed in units, calculates how much housing space has been used.
  */
-export function getTotals(units: { type: UnitType; housingSpace: number; trainingTime: number; amount: number }[]) {
+export function getTotals(units: { type: UnitType; housingSpace: number; amount: number }[]) {
 	if (!units.length) {
-		return { troops: 0, sieges: 0, spells: 0, time: 0 };
+		return { troops: 0, sieges: 0, spells: 0 };
 	}
-	// These types can train at the same time.
-	// The total time to train then is the max out of them all.
-	const ParallelTimeCount = { troops: 0, spells: 0, sieges: 0 };
 	return units.reduce(
 		(prev, curr) => {
-			const key = (curr.type.toLowerCase() + 's') as keyof typeof ParallelTimeCount;
-			ParallelTimeCount[key] += curr.trainingTime * curr.amount;
+			const key = (curr.type.toLowerCase() + 's') as 'troops' | 'sieges' | 'spells';
 			prev[key] += curr.housingSpace * curr.amount;
-			prev.time = Math.max(...Object.values(ParallelTimeCount));
 			return prev;
 		},
-		{ troops: 0, sieges: 0, spells: 0, time: 0 }
+		{ troops: 0, sieges: 0, spells: 0 }
 	);
 }
 

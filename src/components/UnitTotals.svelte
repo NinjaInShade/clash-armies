@@ -1,16 +1,13 @@
 <script lang="ts">
-	import { formatTime } from '$client/army';
 	import type { Totals } from '$types';
 
 	type Props = {
 		used: Totals;
 		capacity: Omit<Totals, 'time'>;
-		/** @default true */
-		showTime?: boolean;
 		class?: string;
 	};
 
-	const { used, capacity, showTime = true, class: _class }: Props = $props();
+	const { used, capacity, class: _class }: Props = $props();
 </script>
 
 <div class="totals {_class ?? ''}">
@@ -28,12 +25,6 @@
 		<small class="total">
 			<img src="/clash/ui/sieges.png" alt="Clash of clans siege machine capacity" />
 			{used.sieges}/{capacity.sieges}
-		</small>
-	{/if}
-	{#if showTime}
-		<small class="total">
-			<img src="/clash/ui/clock.png" alt="Clash of clans clock (time to train army)" />
-			{formatTime(used.time * 1000)}
 		</small>
 	{/if}
 </div>

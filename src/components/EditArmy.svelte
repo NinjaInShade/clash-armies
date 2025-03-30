@@ -276,7 +276,7 @@
 					Clan castle
 					<ActionButton theme="danger" onclick={removeClanCastle} class="title-action-btn">Remove</ActionButton>
 				</h2>
-				<UnitTotals used={ccHousingSpaceUsed} capacity={ccCapacity} showTime={false} />
+				<UnitTotals used={ccHousingSpaceUsed} capacity={ccCapacity} />
 			</div>
 			<UnitsList bind:selectedUnits={ccUnits} unitsRemovable />
 			<div class="picker-container">

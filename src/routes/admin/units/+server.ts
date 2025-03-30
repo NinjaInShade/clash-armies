@@ -25,7 +25,6 @@ const unitSchema = z.object({
 	name: z.string().max(45),
 	objectId: z.number(),
 	housingSpace: z.number(),
-	trainingTime: z.number(),
 	productionBuilding: z.enum(['Barrack', 'Dark Elixir Barrack', 'Siege Workshop', 'Spell Factory', 'Dark Spell Factory']),
 	isSuper: z.boolean(),
 	isFlying: z.boolean(),
@@ -63,7 +62,7 @@ export const POST: RequestHandler = async (event) => {
 
 		if (!data.id) {
 			// Creating unit
-			const { type, name, objectId, housingSpace, trainingTime, productionBuilding, isSuper, isFlying, isJumper, airTargets, groundTargets, levels, image } =
+			const { type, name, objectId, housingSpace, productionBuilding, isSuper, isFlying, isJumper, airTargets, groundTargets, levels, image } =
 				unitSchemaCreating.parse(data);
 			await db.transaction(async (tx) => {
 				const insertId = await tx.insertOne('units', {
@@ -71,7 +70,6 @@ export const POST: RequestHandler = async (event) => {
 					name,
 					objectId,
 					housingSpace,
-					trainingTime,
 					productionBuilding,
 					isSuper,
 					isFlying,
@@ -93,22 +91,8 @@ export const POST: RequestHandler = async (event) => {
 			});
 		} else {
 			// Updating existing unit
-			const {
-				id,
-				type,
-				name,
-				objectId,
-				housingSpace,
-				trainingTime,
-				productionBuilding,
-				isSuper,
-				isFlying,
-				isJumper,
-				airTargets,
-				groundTargets,
-				levels,
-				image,
-			} = unitSchema.parse(data);
+			const { id, type, name, objectId, housingSpace, productionBuilding, isSuper, isFlying, isJumper, airTargets, groundTargets, levels, image } =
+				unitSchema.parse(data);
 			await db.transaction(async (tx) => {
 				const existingUnit = await tx.getRow<Unit>('units', { id });
 				await tx.query(
@@ -118,7 +102,6 @@ export const POST: RequestHandler = async (event) => {
                         name = ?,
                         objectId = ?,
                         housingSpace = ?,
-                        trainingTime = ?,
                         productionBuilding = ?,
                         isSuper = ?,
                         isFlying = ?,
@@ -127,7 +110,7 @@ export const POST: RequestHandler = async (event) => {
                         groundTargets = ?
                     WHERE id = ?
                 `,
-					[type, name, objectId, housingSpace, trainingTime, productionBuilding, isSuper, isFlying, isJumper, airTargets, groundTargets, id]
+					[type, name, objectId, housingSpace, productionBuilding, isSuper, isFlying, isJumper, airTargets, groundTargets, id]
 				);
 				await fs.rename(`${STATIC_BASE_PATH}/clash/units/${existingUnit.name}.png`, `${STATIC_BASE_PATH}/clash/units/${name}.png`);
 

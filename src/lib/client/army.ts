@@ -198,35 +198,6 @@ export function getTags(army: Army) {
 	return tags;
 }
 
-/**
- * @param time: the time to format in miliseconds
- * @returns formatted time string e.g. '1m 20s'
- */
-export function formatTime(time: number) {
-	const parts: string[] = [];
-
-	if (time >= HOUR) {
-		const hours = Math.floor(time / HOUR);
-		parts.push(`${hours}h`);
-		time -= hours * HOUR;
-	}
-	if (time >= MINUTE) {
-		const mins = Math.floor(time / MINUTE);
-		parts.push(`${mins}m`);
-		time -= mins * MINUTE;
-	}
-	if (time >= SECOND) {
-		const secs = Math.floor(time / SECOND);
-		parts.push(`${secs}s`);
-		time -= secs * SECOND;
-	}
-	if (time > 0) {
-		throw new Error(`Unexpected time left over after formatting: "${time}"`);
-	}
-
-	return parts.length ? parts.join(' ') : '0s';
-}
-
 export function getCopyBtnTitle(units: ArmyUnit[]) {
 	if (units.length) {
 		return "Copies an army link to your clipboard for sharing.\nNote: may not work in game if the army isn't at full capacity";

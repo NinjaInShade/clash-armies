@@ -139,7 +139,6 @@ export type Unit = {
 	name: string;
 	objectId: number;
 	housingSpace: number;
-	trainingTime: number;
 	productionBuilding: string;
 	isSuper: boolean;
 	isFlying: boolean;

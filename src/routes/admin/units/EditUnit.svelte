@@ -21,7 +21,6 @@
 	let name = $state<string | null>(null);
 	let objectId = $state<number | null>(null);
 	let housingSpace = $state<number | null>(null);
-	let trainingTime = $state<number | null>(null);
 	let productionBuilding = $state<string | null>(null);
 	let isSuper = $state<boolean>(false);
 	let isFlying = $state<boolean>(false);
@@ -61,7 +60,6 @@
 		name = unit.name;
 		objectId = unit.objectId;
 		housingSpace = unit.housingSpace;
-		trainingTime = unit.trainingTime;
 		productionBuilding = unit.productionBuilding;
 		isSuper = unit.isSuper;
 		isFlying = unit.isFlying;
@@ -93,7 +91,6 @@
 			type,
 			objectId,
 			housingSpace,
-			trainingTime,
 			productionBuilding,
 			isSuper,
 			isFlying,
@@ -188,9 +185,6 @@
 	<div class="row">
 		<C.Fieldset label="Housing space" htmlName="housingSpace" style="flex: 1 0 0px;" --input-width="100%">
 			<C.Input bind:value={housingSpace} type="number" />
-		</C.Fieldset>
-		<C.Fieldset label="Training time" htmlName="trainingTime" style="flex: 1 0 0px;" --input-width="100%">
-			<C.Input bind:value={trainingTime} type="number" />
 		</C.Fieldset>
 	</div>
 

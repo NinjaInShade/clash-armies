@@ -498,4 +498,8 @@ export default function migration(runStep: MigrationFn) {
             await db.insertMany('army_notifications', notifications)
         }
     });
+    runStep(36, `
+        ALTER TABLE units
+        DROP COLUMN trainingTime
+    `);
 }

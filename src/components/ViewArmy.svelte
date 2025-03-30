@@ -153,7 +153,7 @@
 					<img src="/clash/ui/clan-castle.png" alt="Clash of clans clan castle" />
 					Clan castle
 				</h2>
-				<UnitTotals used={ccHousingSpaceUsed} capacity={ccCapacity} showTime={false} />
+				<UnitTotals used={ccHousingSpaceUsed} capacity={ccCapacity} />
 			</div>
 			<UnitsList selectedUnits={ccUnits} />
 		</div>
