@@ -1,5 +1,5 @@
 <script lang="ts" module>
-	import type { AppState, Army, Unit, Equipment, Pet } from '$types';
+	import type { AppState, Unit, Equipment, Pet } from '$types';
 	export type PickUnit = (Unit & { pickType: 'unit' }) | (Equipment & { pickType: 'equipment' }) | (Pet & { pickType: 'pet' });
 	export type Filters = {
 		hasGuide?: true;
@@ -14,18 +14,19 @@
 </script>
 
 <script lang="ts">
-	import { getContext } from 'svelte';
+	import { getContext, untrack } from 'svelte';
 	import { getTags } from '$client/army';
 	import { mkParamStore } from '$client/utils';
+	import type { ArmyModel } from '$models';
 	import FiltersPopup from './FiltersPopup.svelte';
 	import Input from './Input.svelte';
 	import Menu from './Menu.svelte';
 
 	type Props = {
 		/** The full list of armies */
-		armies: Army[];
+		armies: ArmyModel[];
 		/** The bound list of armies that have been filtered and sorted */
-		filteredArmies: Army[] | null;
+		filteredArmies: ArmyModel[] | null;
 	};
 
 	let { armies, filteredArmies = $bindable() }: Props = $props();
@@ -116,7 +117,7 @@
 		filteredArmies = filtered;
 	});
 
-	function filterFn(army: Army) {
+	function filterFn(army: ArmyModel) {
 		const tags = getTags(army);
 		const units = army.units.filter((unit) => unit.home === 'armyCamp');
 		const ccUnits = army.units.filter((unit) => unit.home === 'clanCastle');
@@ -132,13 +133,13 @@
 		if (filters.attackType !== undefined && !tags.map((t) => t.label).includes(filters.attackType)) {
 			return false;
 		}
-		if (filters.noSuperTroops === true && units.some((u) => u.isSuper)) {
+		if (filters.noSuperTroops === true && units.some((u) => u.info.isSuper)) {
 			return false;
 		}
 		if (filters.hasClanCastle !== undefined && (filters.hasClanCastle === true ? ccUnits.length < 1 : ccUnits.length > 0)) {
 			return false;
 		}
-		if (filters.noEpicEquipment === true && army.equipment.some((eq) => eq.epic)) {
+		if (filters.noEpicEquipment === true && army.equipment.some((eq) => eq.info.epic)) {
 			return false;
 		}
 		if (filters.hasEquipment !== undefined && (filters.hasEquipment === true ? army.equipment.length < 1 : army.equipment.length > 0)) {
@@ -163,7 +164,7 @@
 		return true;
 	}
 
-	function sortFn(a: Army, b: Army) {
+	function sortFn(a: ArmyModel, b: ArmyModel) {
 		if ($sort === 'Newest') {
 			return +b.createdTime - +a.createdTime;
 		}

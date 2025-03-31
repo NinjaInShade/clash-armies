@@ -174,110 +174,11 @@ export type Guide = {
 	updatedTime: Date;
 };
 
-/**
- * The following `SaveFoo` types are the bare minimum data required for army creation/saving
- */
-export type SaveUnit = {
-	id?: number;
-	/** ID of the unit in the `units` table */
-	unitId: number;
-	home: UnitHome;
-	amount: number;
-};
-export type SaveEquipment = {
-	id?: number;
-	/** ID of the equipment in the `equipment` table */
-	equipmentId: number;
-};
-export type SavePet = {
-	id?: number;
-	/** ID of the pet in the `pets` table */
-	petId: number;
-	hero: HeroType;
-};
-export type SaveGuide = Optional<Omit<Guide, 'createdTime' | 'updatedTime' | 'armyId'>, 'id'>;
-
-/**
- * The following `ArmyFoo` types is the complete data `getArmy` will return for convenience
- */
-export type ArmyUnit = (SaveUnit & Omit<Unit, 'levels'>) & {
-	/** ID of the unit in the `army_units` table */
-	id: number;
-};
-export type ArmyEquipment = (SaveEquipment & Omit<Equipment, 'levels'>) & {
-	/** ID of the equipment in the `army_equipment` table */
-	id: number;
-};
-export type ArmyPet = (SavePet & Omit<Pet, 'levels'>) & {
-	/** ID of the pet in the `army_pets` table */
-	id: number;
-};
-export type ArmyGuide = SaveGuide & {
-	/** ID of the guide in the `army_guides` table */
-	id: number;
-};
-
-export type UnsavedUnit = Optional<ArmyUnit, 'id'>;
-export type UnsavedEquipment = Optional<ArmyEquipment, 'id'>;
-export type UnsavedPet = Optional<ArmyPet, 'id'>;
-
-export type ImportedUnit = UnsavedUnit;
-export type ImportedHero = { pet?: UnsavedPet; eq1?: UnsavedEquipment; eq2?: UnsavedEquipment };
-
-/** The bare minimum data required for army creation/saving */
-export type SaveArmy = {
-	/** If this is defined, we are saving an existing army, else we are creating a new army */
-	id?: number;
-	name: string;
-	townHall: number;
-	banner: Banner;
-	units: SaveUnit[];
-	equipment: SaveEquipment[];
-	pets: SavePet[];
-	guide: SaveGuide | null;
-};
-/** A complete saved army, as returned by `getArmy` */
-export type Army = Omit<SaveArmy, 'units' | 'equipment' | 'pets' | 'guide'> & {
-	/** ID is now required */
-	id: number;
-	units: ArmyUnit[];
-	equipment: ArmyEquipment[];
-	pets: ArmyPet[];
-	guide: ArmyGuide | null;
-	comments: Comment[];
-	createdBy: number;
-	createdTime: Date;
-	updatedTime: Date;
-	votes: number;
-	username: string;
-	userVote: number;
-	userBookmarked: boolean;
-};
-
-export type Totals = {
-	troops: number;
-	sieges: number;
-	spells: number;
-	time: number;
-};
-
-export type SaveComment = {
-	id?: number;
-	armyId: number;
-	comment: string;
-	replyTo: number | null;
-};
-
-export type Comment = SaveComment & {
-	id: number;
-	username: string;
-	createdBy: number;
-	createdTime: Date;
-	updatedTime: Date;
-};
-
-export type StructuredComment = Comment & {
-	replies: StructuredComment[];
+export type ArmyCtx = {
+	units: Unit[];
+	townHalls: TownHall[];
+	equipment: Equipment[];
+	pets: Pet[];
 };
 
 type UserUtils = {

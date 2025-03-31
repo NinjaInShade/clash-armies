@@ -1,7 +1,8 @@
 <script lang="ts">
-	import { getContext } from 'svelte';
-	import { getTotals, HOLD_ADD_SPEED, requireUnit } from '$shared/utils';
-	import type { Optional, AppState, Unit, SaveUnit, ArmyUnit, UnitType, TownHall, Totals } from '$types';
+	import { getContext, untrack } from 'svelte';
+	import { HOLD_ADD_SPEED } from '$shared/utils';
+	import type { AppState, Unit, UnitType, UnitHome } from '$types';
+	import { ArmyModel, UnitModel } from '$models';
 	import UnitDisplay from './UnitDisplay.svelte';
 
 	type TitleOptions = {
@@ -11,47 +12,47 @@
 		reachedSuperLimit?: boolean;
 	};
 	type Props = {
+		model: ArmyModel;
 		type: UnitType;
-		capacity: Omit<Totals, 'time'>;
-		getUnitLevel(name: string, type: UnitType, ctx: { th: TownHall; units: Unit[] }): number;
-		selectedUnits: Optional<ArmyUnit, 'id'>[];
-		selectedTownHall: number;
-		housedIn: ArmyUnit['home'];
+		housedIn: UnitHome;
 	};
-	const { type, capacity, getUnitLevel, selectedUnits = $bindable(), selectedTownHall, housedIn }: Props = $props();
+	const { model, type, housedIn }: Props = $props();
 	const app = getContext<AppState>('app');
 
-	const thData = $derived(app.townHalls.find((th) => th.level === selectedTownHall));
+	const selectedUnits = $derived(housedIn === 'armyCamp' ? model.units : model.ccUnits);
+	const capacity = $derived(housedIn === 'armyCamp' ? model.capacity : model.ccCapacity);
 	const allUnits = $derived(app.units.filter((u) => u.type === type));
 	const sortedUnits = $derived([...allUnits.filter((u) => !u.isSuper), ...allUnits.filter((u) => u.isSuper)]);
 	const heading = $derived(`Select ${type === 'Troop' ? 'troops' : type === 'Siege' ? 'siege machine' : 'spells'}`);
 
 	let holdInterval: ReturnType<typeof setInterval> | null = null;
 
-	function shouldDisableSuper(unit: Unit, selected: SaveUnit[]) {
+	function shouldDisableSuper(unit: Unit, selected: UnitModel[]) {
 		if (housedIn !== 'armyCamp') {
 			return;
 		}
 		// Disable if reached max unique super limit and this troop isn't one already selected
-		const superTroops = selected.filter((u) => {
-			const appUnit = requireUnit(u.unitId, { units: app.units });
-			return appUnit.isSuper;
-		});
+		const superTroops = selected.filter((u) => u.info.isSuper);
 		return unit.isSuper && !selected.find((u) => u.unitId === unit.id) && superTroops.length >= 2;
 	}
 
 	function willOverflowHousingSpace(unit: Unit) {
-		const copy: ArmyUnit[] = JSON.parse(JSON.stringify(selectedUnits));
-		const preview = add(unit, copy);
-		const previewFull = preview.map((u) => ({ ...requireUnit(u.unitId, { units: app.units }), amount: u.amount }));
-		const { troops, sieges, spells } = getTotals(previewFull);
-		return troops > capacity.troops || sieges > capacity.sieges || spells > capacity.spells;
+		// Register selected units and amount as reactive deps
+		for (const selected of selectedUnits) {
+			selected.amount;
+		}
+		return untrack(() => {
+			const copy = selectedUnits.map((u) => new UnitModel(model.ctx, u));
+			const preview = add(unit, copy);
+			const { troops, sieges, spells } = UnitModel.getTotals(preview);
+			return troops > capacity.troops || sieges > capacity.sieges || spells > capacity.spells;
+		});
 	}
 
 	function getTitle(opts: TitleOptions) {
 		const { level, type, reachedMaxAmount, reachedSuperLimit } = opts;
 		if (level === -1) {
-			return `This ${type.toLowerCase()} is unable to be used at town hall ${selectedTownHall}!`;
+			return `This ${type.toLowerCase()} is unable to be used at town hall ${model.townHall}!`;
 		}
 		if (reachedMaxAmount) {
 			return `There is no space left to house this ${type.toLowerCase()} warrior!`;
@@ -88,9 +89,18 @@
 		if (existing) {
 			existing.amount += 1;
 		} else {
-			arr.push({ unitId: unit.id, home: housedIn, amount: 1, ...unit, id: undefined });
+			const newUnit = new UnitModel(model.ctx, { unitId: unit.id, home: housedIn, amount: 1 });
+			arr.push(newUnit);
 		}
 		return arr;
+	}
+
+	function getLevel(unit: Unit) {
+		if (housedIn === 'armyCamp') {
+			return UnitModel.getMaxLevel(unit, model.townHall, model.ctx);
+		} else {
+			return UnitModel.getMaxCcLevel(unit, model.townHall, model.ctx);
+		}
 	}
 </script>
 
@@ -101,7 +111,7 @@
 <ul class="picker-list">
 	{#each sortedUnits as unit}
 		{@const disableSuper = shouldDisableSuper(unit, selectedUnits)}
-		{@const level = thData ? getUnitLevel(unit.name, unit.type, { th: thData, units: app.units }) : -1}
+		{@const level = getLevel(unit)}
 		{@const reachedMaxAmount = willOverflowHousingSpace(unit)}
 		{@const title = getTitle({ level, type, reachedMaxAmount, reachedSuperLimit: disableSuper })}
 		<li>
@@ -117,7 +127,7 @@
 					add(unit);
 				}}
 			>
-				<UnitDisplay {...unit} {level} {title} />
+				<UnitDisplay {unit} {level} {title} />
 			</button>
 		</li>
 	{/each}

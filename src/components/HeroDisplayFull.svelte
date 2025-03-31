@@ -1,25 +1,19 @@
 <script lang="ts">
-	import type { AppState, HeroType, ArmyEquipment, ArmyPet } from '$types';
-	import { getContext } from 'svelte';
+	import type { HeroType } from '$types';
 	import HeroDisplay from './HeroDisplay.svelte';
 	import EquipmentDisplay from './EquipmentDisplay.svelte';
 	import PetDisplay from './PetDisplay.svelte';
+	import type { ArmyModel } from '$models';
 
 	type Props = {
 		hero: HeroType;
-		/** All selected equipment across all heroes */
-		selectedEquipment: ArmyEquipment[];
-		/** All selected pets across all heroes */
-		selectedPets: ArmyPet[];
-		selectedTownHall: number;
+		model: ArmyModel;
 	};
-	const { hero, selectedEquipment, selectedPets, selectedTownHall }: Props = $props();
+	const { hero, model }: Props = $props();
 
 	// Selected equipment/pets just for this hero
-	const app = getContext<AppState>('app');
-	const _selectedEquipment = $derived(selectedEquipment.filter((eq) => eq.hero === hero));
-	const _selectedPets = $derived(selectedPets.filter((p) => p.hero === hero));
-	const thData = $derived(app.townHalls.find((th) => th.level === selectedTownHall));
+	const _selectedEquipment = $derived(model.equipment.filter((eq) => eq.info.hero === hero));
+	const _selectedPets = $derived(model.pets.filter((p) => p.hero === hero));
 </script>
 
 <div class="hero-display-full">
@@ -29,16 +23,16 @@
 			{#each new Array(2) as _, index}
 				{@const selected = _selectedEquipment[index]}
 				{#if selected}
-					<EquipmentDisplay {...selected} />
+					<EquipmentDisplay name={selected.info.name} />
 				{:else}
 					<div class="selected-placeholder" title="No equipment selected for this slot"></div>
 				{/if}
 			{/each}
 		</div>
-		{#if thData && thData.maxPetHouse !== null}
+		{#if model.thData.maxPetHouse !== null}
 			<div class="pet">
 				{#if _selectedPets[0]}
-					<PetDisplay {..._selectedPets[0]} />
+					<PetDisplay name={_selectedPets[0].info.name} />
 				{:else}
 					<div class="selected-placeholder" title="No pet selected"></div>
 				{/if}

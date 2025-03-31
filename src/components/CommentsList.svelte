@@ -3,25 +3,25 @@
 </script>
 
 <script lang="ts">
-	import type { StructuredComment } from '$types';
 	import CommentCard from './Comment.svelte';
 	import Self from './CommentsList.svelte';
+	import type { ArmyModel, StructuredArmyComment } from '$models';
 
 	type Props = {
-		armyId: number;
-		comments: StructuredComment[];
+		model: ArmyModel;
+		comments: StructuredArmyComment[];
 		depth?: number;
 	};
-	const { armyId, comments, depth = 0 }: Props = $props();
+	const { model, comments, depth = 0 }: Props = $props();
 
-	const sortedComments = $derived([...comments].sort((a, b) => +a.createdTime - +b.createdTime));
+	const sortedComments = $derived(comments.toSorted((a, b) => +a.createdTime - +b.createdTime));
 </script>
 
 <ul class="comments-list" class:nested={depth > 0 && depth <= MAX_DEPTH} style="--nest-depth: {depth === 0 || depth > MAX_DEPTH ? 0 : 1};">
 	{#each sortedComments as comment (comment.id)}
-		<CommentCard {armyId} {comment} />
+		<CommentCard {model} {comment} />
 		{#if comment.replies.length}
-			<Self {armyId} comments={comment.replies} depth={depth + 1} />
+			<Self {model} comments={comment.replies} depth={depth + 1} />
 		{/if}
 	{/each}
 </ul>

@@ -1,16 +1,23 @@
 <script lang="ts">
 	import type { PageData } from './$types';
-	import type { Army } from '$types';
+	import type { AppState } from '$types';
+	import { ArmyModel } from '$models';
+	import { getContext, untrack } from 'svelte';
 	import C from '$components';
 
 	const { data }: { data: PageData } = $props();
-	const { armies } = $derived(data);
+	const app = getContext<AppState>('app');
+	const armies = $derived(
+		data.armies.map((army) => {
+			return untrack(() => new ArmyModel(app, army));
+		})
+	);
 
 	const ENTRIES_PER_PAGE = 25;
 	let page = $state<number>(1);
 
 	let armyFiltersRef = $state<C.ArmyFilters>();
-	let filteredArmies = $state<Army[] | null>(null);
+	let filteredArmies = $state<ArmyModel[] | null>(null);
 	let displayArmies = $derived((filteredArmies ?? []).slice(0, page * ENTRIES_PER_PAGE));
 
 	function resetFilters() {
@@ -36,8 +43,8 @@
 			</div>
 		{:else}
 			<ul class="armies-grid">
-				{#each displayArmies as army (army.id)}
-					<C.ArmyCard {army} />
+				{#each displayArmies as model (model.id)}
+					<C.ArmyCard {model} />
 				{/each}
 			</ul>
 			{#if displayArmies.length && displayArmies.length < filteredArmies.length}

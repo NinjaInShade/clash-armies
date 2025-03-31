@@ -1,10 +1,11 @@
 <script lang="ts">
 	import { getContext } from 'svelte';
-	import type { AppState, Army, User } from '$types';
+	import type { AppState, User } from '$types';
+	import type { ArmyModel } from '$models';
 	import C from '$components';
 
 	type Props = {
-		savedArmies: Army[];
+		savedArmies: ArmyModel[];
 		user: User;
 	};
 	const { savedArmies, user }: Props = $props();
@@ -17,8 +18,8 @@
 <h2 class="title">Saved armies</h2>
 {#if savedArmies.length}
 	<ul class="armies-list">
-		{#each savedArmies as army (army.id)}
-			<C.ArmyCard {army} showBookmark={app.user?.id === user.id} />
+		{#each savedArmies as model (model.id)}
+			<C.ArmyCard {model} showBookmark={app.user?.id === user.id} />
 		{/each}
 	</ul>
 {:else}

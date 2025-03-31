@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { Snippet, Component } from 'svelte';
 	import FocusTrap from './FocusTrap.svelte';
+	import Button from './Button.svelte';
 
 	type ComponentRendering = {
 		/** Sets the component the modal renders. Uses children as fallback */
@@ -52,7 +53,7 @@
 			{#if controls}
 				{@render controls()}
 			{:else}
-				<C.Button onClick={() => close()}>Close</C.Button>
+				<Button onClick={() => close()}>Close</Button>
 			{/if}
 		</div>
 	</div>

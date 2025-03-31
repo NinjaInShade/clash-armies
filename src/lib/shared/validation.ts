@@ -1,23 +1,6 @@
-import type { SaveArmy, TownHall, Unit, Equipment, Pet, SaveUnit, SaveEquipment, SavePet, SaveGuide, HeroType } from '$types';
-import {
-	BANNERS,
-	VALID_UNIT_HOME,
-	VALID_HEROES,
-	getTotals,
-	getUnitLevel,
-	getCcUnitLevel,
-	getHeroLevel,
-	getEquipmentLevel,
-	getPetLevel,
-	requireTh,
-	requireUnit,
-	requireEquipment,
-	requirePet,
-	countCharacters,
-	GUIDE_TEXT_CHAR_LIMIT,
-	YOUTUBE_URL_REGEX,
-	MAX_COMMENT_LENGTH,
-} from './utils';
+import type { HeroType, ArmyCtx } from '$types';
+import { BANNERS, VALID_UNIT_HOME, VALID_HEROES, GUIDE_TEXT_CHAR_LIMIT, YOUTUBE_URL_REGEX, MAX_COMMENT_LENGTH } from './utils';
+import { ArmyModel, UnitModel, PetModel, EquipmentModel, GuideModel } from '$models';
 import { parseHTML } from 'zeed-dom';
 import z from 'zod';
 
@@ -60,137 +43,131 @@ export const commentSchema = z.object({
 	replyTo: numberSchema.nullable(),
 });
 
-export type Ctx = { townHalls: TownHall[]; units: Unit[]; equipment: Equipment[]; pets: Pet[] };
-
 /**
- * Validates data for so it conforms to the `SaveArmy` type.
+ * Validates data for a saved or unsaved army, returning a validated, ready for saving to the db, `ArmyModel`, if successful.
  * Also validates business logic rules such as making sure units are unlocked for the town hall etc...
  */
-export function validateArmy(data: unknown, ctx: Ctx): SaveArmy {
+export function validateArmy(data: unknown, ctx: ArmyCtx): ArmyModel {
 	const army = armySchema.parse(data);
+	const model = new ArmyModel(ctx, army);
 
-	const units = army.units.filter((unit) => unit.home === 'armyCamp');
-	const ccUnits = army.units.filter((unit) => unit.home === 'clanCastle');
-	const equipment = army.equipment;
-	const pets = army.pets;
-
-	const heroesUsed = VALID_HEROES.filter((hero) => hasHero(hero, army, ctx)).length;
+	const heroesUsed = VALID_HEROES.filter((hero) => hasHero(hero, model)).length;
 	if (heroesUsed > 4) {
 		throw new Error('Cannot use more than 4 heroes');
 	}
 
-	validateUnits(units, army.townHall, ctx);
-	validateCcUnits(ccUnits, army.townHall, ctx);
-	validateEquipment(equipment, army.townHall, ctx);
-	validatePets(pets, army.townHall, ctx);
-	validateGuide(army.guide);
+	validateUnits(model);
+	validateCcUnits(model);
+	validateEquipment(model);
+	validatePets(model);
+	if (model.guide) {
+		validateGuide(model.guide);
+	}
 
-	return army;
+	return model;
 }
 
-export function validateUnits(units: SaveUnit[], townHall: number, ctx: Pick<Ctx, 'units' | 'townHalls'>) {
-	const thData = requireTh(townHall, ctx);
-	const unitsData = units.map((u) => ({ ...requireUnit(u.unitId, ctx), amount: u.amount }));
+export function validateUnits(model: ArmyModel) {
+	const { units, housingSpaceUsed, thData } = model;
 
 	// Check for duplicate units
 	const duplicateUnits = findDuplicateUnits(units);
 	if (duplicateUnits.length) {
-		const unitData = requireUnit(duplicateUnits[0], ctx);
+		const unitData = UnitModel.require(duplicateUnits[0], model.ctx);
 		throw new Error(`Duplicate unit "${unitData.name}" found`);
 	}
 
 	// Check totals don't overflow max town hall capacity
-	const totals = getTotals(unitsData);
-	if (totals.troops > thData.troopCapacity) {
-		throw new Error(`Town hall ${thData.level} has a max troop capacity of ${thData.troopCapacity}, but this army exceeded that with ${totals.troops}`);
+	if (housingSpaceUsed.troops > thData.troopCapacity) {
+		throw new Error(
+			`Town hall ${thData.level} has a max troop capacity of ${thData.troopCapacity}, but this army exceeded that with ${housingSpaceUsed.troops}`
+		);
 	}
-	if (totals.spells > thData.spellCapacity) {
-		throw new Error(`Town hall ${thData.level} has a max spell capacity of ${thData.spellCapacity}, but this army exceeded that with ${totals.spells}`);
+	if (housingSpaceUsed.spells > thData.spellCapacity) {
+		throw new Error(
+			`Town hall ${thData.level} has a max spell capacity of ${thData.spellCapacity}, but this army exceeded that with ${housingSpaceUsed.spells}`
+		);
 	}
-	if (totals.sieges > thData.siegeCapacity) {
-		throw new Error(`Town hall ${thData.level} has a max siege machine capacity of ${thData.siegeCapacity}, but this army exceeded that with ${totals.sieges}`);
+	if (housingSpaceUsed.sieges > thData.siegeCapacity) {
+		throw new Error(
+			`Town hall ${thData.level} has a max siege machine capacity of ${thData.siegeCapacity}, but this army exceeded that with ${housingSpaceUsed.sieges}`
+		);
 	}
 
 	// Check we haven't exceeded the super limit (max 2 unique super troops per army)
-	if (unitsData.filter((u) => u.isSuper).length > 2) {
+	if (units.filter((u) => u.info.isSuper).length > 2) {
 		throw new Error(`An army can have a maximum of two unique super troops`);
 	}
 
 	// Check units can all be selected
-	for (const unit of unitsData) {
-		if (getUnitLevel(unit.name, unit.type, { ...ctx, th: thData }) === -1) {
-			throw new Error(`Unit "${unit.name}" isn't available at town hall ${townHall}`);
+	for (const unit of units) {
+		if (UnitModel.getMaxLevel(unit.info, model.townHall, model.ctx) === -1) {
+			throw new Error(`Unit "${unit.info.name}" isn't available at town hall ${model.townHall}`);
 		}
 	}
 }
 
-export function validateCcUnits(ccUnits: SaveUnit[], townHall: number, ctx: Pick<Ctx, 'units' | 'townHalls'>) {
-	const thData = requireTh(townHall, ctx);
-	const ccUnitsData = ccUnits.map((u) => ({ ...requireUnit(u.unitId, ctx), amount: u.amount }));
+export function validateCcUnits(model: ArmyModel) {
+	const { ccUnits, ccHousingSpaceUsed, thData } = model;
 
 	// Check for duplicate clan castle units
 	const duplicateCcUnits = findDuplicateUnits(ccUnits);
 	if (duplicateCcUnits.length) {
-		const unitData = requireUnit(duplicateCcUnits[0], ctx);
+		const unitData = UnitModel.require(duplicateCcUnits[0], model.ctx);
 		throw new Error(`Duplicate clan castle unit "${unitData.name}" found`);
 	}
 
 	// Check clan castle totals don't overflow max town hall cc capacity
-	const ccTotals = getTotals(ccUnitsData);
-	if (ccTotals.troops > thData.ccTroopCapacity) {
+	if (ccHousingSpaceUsed.troops > thData.ccTroopCapacity) {
 		throw new Error(
-			`Town hall ${thData.level} has a max clan castle troop capacity of ${thData.ccTroopCapacity}, but this army exceeded that with ${ccTotals.troops}`
+			`Town hall ${thData.level} has a max clan castle troop capacity of ${thData.ccTroopCapacity}, but this army exceeded that with ${ccHousingSpaceUsed.troops}`
 		);
 	}
-	if (ccTotals.spells > thData.ccSpellCapacity) {
+	if (ccHousingSpaceUsed.spells > thData.ccSpellCapacity) {
 		throw new Error(
-			`Town hall ${thData.level} has a max clan castle spell capacity of ${thData.ccSpellCapacity}, but this army exceeded that with ${ccTotals.spells}`
+			`Town hall ${thData.level} has a max clan castle spell capacity of ${thData.ccSpellCapacity}, but this army exceeded that with ${ccHousingSpaceUsed.spells}`
 		);
 	}
-	if (ccTotals.sieges > thData.ccSiegeCapacity) {
+	if (ccHousingSpaceUsed.sieges > thData.ccSiegeCapacity) {
 		throw new Error(
-			`Town hall ${thData.level} has a max clan castle siege machine capacity of ${thData.ccSiegeCapacity}, but this army exceeded that with ${ccTotals.sieges}`
+			`Town hall ${thData.level} has a max clan castle siege machine capacity of ${thData.ccSiegeCapacity}, but this army exceeded that with ${ccHousingSpaceUsed.sieges}`
 		);
 	}
 
 	// Check clan castle units can all be selected
-	for (const unit of ccUnitsData) {
-		if (getCcUnitLevel(unit.name, unit.type, { ...ctx, th: thData }) === -1) {
-			throw new Error(`Clan castle unit "${unit.name}" isn't available at town hall ${townHall}`);
+	for (const unit of ccUnits) {
+		if (UnitModel.getMaxCcLevel(unit.info, model.townHall, model.ctx) === -1) {
+			throw new Error(`Clan castle unit "${unit.info.name}" isn't available at town hall ${model.townHall}`);
 		}
 	}
 }
 
-export function validateEquipment(equipment: SaveEquipment[], townHall: number, ctx: Pick<Ctx, 'equipment' | 'townHalls'>) {
-	const thData = requireTh(townHall, ctx);
-	const equipmentData = equipment.map((eq) => requireEquipment(eq.equipmentId, ctx));
+export function validateEquipment(model: ArmyModel) {
 	const heroToEquipment: Record<string, string[]> = {};
 
-	for (const eq of equipmentData) {
-		const hero = eq.hero.toLowerCase();
-		const stashedEquipment = heroToEquipment[eq.hero] ?? [];
-		if (stashedEquipment.includes(eq.name)) {
-			throw new Error(`Duplicate equipment "${eq.name}" on ${hero}`);
+	for (const eq of model.equipment) {
+		const hero = eq.info.hero.toLowerCase();
+		const stashedEquipment = heroToEquipment[eq.info.hero] ?? [];
+		if (stashedEquipment.includes(eq.info.name)) {
+			throw new Error(`Duplicate equipment "${eq.info.name}" on ${hero}`);
 		}
 		if (stashedEquipment.length === 2) {
 			throw new Error(`Hero ${hero} cannot have more than two pieces of equipment`);
 		}
-		if (getHeroLevel(eq.hero, { th: thData }) === -1) {
-			throw new Error(`Equipment "${eq.name}" can't be used as the ${hero} isn't unlocked at town hall ${townHall}`);
+		if (ArmyModel.getMaxHeroLevel(eq.info.hero, model.townHall, model.ctx) === -1) {
+			throw new Error(`Equipment "${eq.info.name}" can't be used as the ${hero} isn't unlocked at town hall ${model.townHall}`);
 		}
-		if (getEquipmentLevel(eq.name, { ...ctx, th: thData }) === -1) {
-			throw new Error(`Equipment "${eq.name}" isn't available at town hall ${townHall}`);
+		if (EquipmentModel.getMaxLevel(eq.info.name, model.townHall, model.ctx) === -1) {
+			throw new Error(`Equipment "${eq.info.name}" isn't available at town hall ${model.townHall}`);
 		}
-		heroToEquipment[eq.hero] = [...stashedEquipment, eq.name];
+		heroToEquipment[eq.info.hero] = [...stashedEquipment, eq.info.name];
 	}
 }
 
-export function validatePets(pets: SavePet[], townHall: number, ctx: Pick<Ctx, 'pets' | 'townHalls'>) {
-	const thData = requireTh(townHall, ctx);
-	const petsData = pets.map((p) => ({ ...requirePet(p.petId, ctx), hero: p.hero }));
+export function validatePets(model: ArmyModel) {
 	const heroToPets: Record<string, string[]> = {};
 
-	for (const pet of petsData) {
+	for (const pet of model.pets) {
 		const hero = pet.hero.toLowerCase();
 		const stashedPets = heroToPets[pet.hero] ?? [];
 		if (stashedPets.length === 1) {
@@ -199,23 +176,21 @@ export function validatePets(pets: SavePet[], townHall: number, ctx: Pick<Ctx, '
 		if (
 			Object.values(heroToPets)
 				.flatMap((p) => p)
-				.includes(pet.name)
+				.includes(pet.info.name)
 		) {
-			throw new Error(`Pet "${pet.name}" has already been assigned to another hero`);
+			throw new Error(`Pet "${pet.info.name}" has already been assigned to another hero`);
 		}
-		if (getHeroLevel(pet.hero, { th: thData }) === -1) {
-			throw new Error(`Pet "${pet.name}" can't be used as the ${hero} isn't unlocked at town hall ${townHall}`);
+		if (ArmyModel.getMaxHeroLevel(pet.hero, model.townHall, model.ctx) === -1) {
+			throw new Error(`Pet "${pet.info.name}" can't be used as the ${hero} isn't unlocked at town hall ${model.townHall}`);
 		}
-		if (getPetLevel(pet.name, { ...ctx, th: thData }) === -1) {
-			throw new Error(`Pet "${pet.name}" isn't available at town hall ${townHall}`);
+		if (PetModel.getMaxLevel(pet.info.name, model.townHall, model.ctx) === -1) {
+			throw new Error(`Pet "${pet.info.name}" isn't available at town hall ${model.townHall}`);
 		}
-		heroToPets[pet.hero] = [...stashedPets, pet.name];
+		heroToPets[pet.hero] = [...stashedPets, pet.info.name];
 	}
 }
 
-function validateGuide(guide: SaveGuide | null) {
-	if (!guide) return;
-
+function validateGuide(guide: GuideModel) {
 	const { textContent, youtubeUrl } = guide;
 
 	if (!textContent && !youtubeUrl) {
@@ -231,7 +206,7 @@ function validateGuide(guide: SaveGuide | null) {
 		// schema.nodeFromJSON(json).check();
 
 		const doc = parseHTML(textContent);
-		const charsLength = countCharacters(doc);
+		const charsLength = GuideModel.countCharacters(doc);
 
 		// Validate not over the char limit
 		if (charsLength > GUIDE_TEXT_CHAR_LIMIT) {
@@ -244,7 +219,7 @@ function validateGuide(guide: SaveGuide | null) {
 	}
 }
 
-function findDuplicateUnits(units: SaveUnit[]) {
+function findDuplicateUnits(units: UnitModel[]) {
 	const seen = new Set<number>();
 	const duplicates = new Set<number>();
 	for (const obj of units) {
@@ -261,14 +236,13 @@ function findDuplicateUnits(units: SaveUnit[]) {
  * Achieves the same function as the shared `hasHero` that takes in a fully saved `Army` type.
  * Unlike that function, this one can take in a `SaveArmy` so useful for validating a new/edited army.
  */
-export function hasHero(hero: HeroType, army: SaveArmy, ctx: Ctx) {
-	for (const equipment of army.equipment) {
-		const eqHero = requireEquipment(equipment.equipmentId, ctx).hero;
-		if (eqHero === hero) {
+export function hasHero(hero: HeroType, model: ArmyModel) {
+	for (const equipment of model.equipment) {
+		if (equipment.info.hero === hero) {
 			return hero;
 		}
 	}
-	for (const pet of army.pets) {
+	for (const pet of model.pets) {
 		if (pet.hero === hero) {
 			return true;
 		}

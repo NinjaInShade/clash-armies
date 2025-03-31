@@ -18,14 +18,15 @@ import {
 	requirePet,
 } from '../testutil';
 import type { UnitType } from '$types';
-import { validateArmy, type Ctx } from '$shared/validation';
+import { validateArmy } from '$shared/validation';
+import type { ArmyCtx } from '$types';
 import { GUIDE_TEXT_CHAR_LIMIT } from '$shared/utils';
 import { getArmies, saveArmy, saveComment } from '$server/army';
 import { getNotifications, acknowledgeNotifications } from '$server/notifications';
 import type { MySQL } from '@ninjalib/sql';
 
 let db: MySQL;
-let ctx: Ctx;
+let ctx: ArmyCtx;
 
 before(async function () {
 	db = await createDB();

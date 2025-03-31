@@ -1,19 +1,30 @@
 <script lang="ts">
 	import C from '$components';
-	import { USER_MAX_ARMIES } from '$shared/utils';
-	import { getContext } from 'svelte';
+	import { getContext, untrack } from 'svelte';
 	import type { AppState } from '$types';
 	import type { PageData } from './$types';
+	import { ArmyModel } from '$models';
 	import EditUser from './EditUser.svelte';
 	import CreatedArmiesTab from './CreatedArmiesTab.svelte';
 	import SavedArmiesTab from './SavedArmiesTab.svelte';
 
 	const { data }: { data: PageData } = $props();
-	const { armies, savedArmies, user } = $derived(data);
+	const { user } = $derived(data);
 
 	const app = getContext<AppState>('app');
 	const username = $derived(user.username);
 	const currentUser = $derived(app.user ? app.user.username : null);
+
+	const savedArmies = $derived(
+		data.savedArmies.map((army) => {
+			return untrack(() => new ArmyModel(app, army));
+		})
+	);
+	const armies = $derived(
+		data.armies.map((army) => {
+			return untrack(() => new ArmyModel(app, army));
+		})
+	);
 
 	function editUser() {
 		app.openModal(EditUser, { user });

@@ -1,36 +1,9 @@
 <script lang="ts">
 	import { getContext } from 'svelte';
 	import { invalidateAll, goto } from '$app/navigation';
-	import {
-		VALID_HEROES,
-		getTotals,
-		getCapacity,
-		getCcCapacity,
-		BANNERS,
-		getUnitLevel,
-		getCcUnitLevel,
-		getEquipmentLevel,
-		getPetLevel,
-		getHeroLevel,
-		GUIDE_TEXT_CHAR_LIMIT,
-		hasHero,
-	} from '$shared/utils';
-	import type {
-		Optional,
-		AppState,
-		Army,
-		ArmyUnit,
-		ArmyEquipment,
-		ArmyPet,
-		Banner,
-		FetchErrors,
-		HeroType,
-		UnsavedUnit,
-		UnsavedEquipment,
-		UnsavedPet,
-		ImportedUnit,
-		ImportedHero,
-	} from '$types';
+	import { VALID_HEROES, GUIDE_TEXT_CHAR_LIMIT } from '$shared/utils';
+	import type { AppState, Banner, FetchErrors } from '$types';
+	import { ArmyModel, type Army } from '$models';
 	import ImportFromLink from './ImportFromLink.svelte';
 	import EditBanner from './EditBanner.svelte';
 	import Fieldset from './Fieldset.svelte';
@@ -52,170 +25,116 @@
 
 	const { army }: Props = $props();
 	const app = getContext<AppState>('app');
-
-	// Army state
-	let townHall = $state(army?.townHall ?? 17);
-	let banner = $state(army?.banner ?? BANNERS[Math.floor(Math.random() * BANNERS.length)]);
-	let name = $state(army?.name ?? null);
-	let units = $state<UnsavedUnit[]>(army?.units?.filter((unit) => unit.home === 'armyCamp') ?? []);
-	let ccUnits = $state<UnsavedUnit[]>(getCcUnits());
-	let equipment = $state<UnsavedEquipment[]>(army?.equipment ?? []);
-	let pets = $state<UnsavedPet[]>(army?.pets ?? []);
-	let guideText = $state(army?.guide?.textContent ?? null);
-	let guideYoutubeUrl = $state(army?.guide?.youtubeUrl ?? null);
+	const model = new ArmyModel(app, army);
 
 	// Other state
 	let errors = $state<FetchErrors | null>(null);
-	let saveDisabled = $derived(!name || name.length < 2 || name.length > 25 || !units.length);
-	let showClanCastle = $state(getCcUnits().length > 0);
-	let shownHeroes = $state(army ? VALID_HEROES.filter((hero) => hasHero(hero, army)) : null);
-	let showGuide = $state(typeof army?.guide?.id === 'number');
-
-	const thData = $derived(app.townHalls.find((th) => th.level === townHall));
-	const capacity = $derived.by(() => getCapacity(thData));
-	const ccCapacity = $derived.by(() => getCcCapacity(thData));
-	const housingSpaceUsed = $derived.by(() => getTotals(units));
-	const ccHousingSpaceUsed = $derived.by(() => getTotals(ccUnits));
-
-	function getCcUnits() {
-		return army?.units?.filter((unit) => unit.home === 'clanCastle') ?? [];
-	}
+	let saveDisabled = $derived(!model.name || model.name.length < 2 || model.name.length > 25 || !model.units.length);
+	let showClanCastle = $state(model.ccUnits.length > 0);
+	let shownHeroes = $state(model.id ? VALID_HEROES.filter((hero) => model.hasHero(hero)) : null);
 
 	function addClanCastle() {
 		showClanCastle = true;
 	}
 
 	function addHeroes() {
-		shownHeroes = getDefaultHeroes(townHall);
+		shownHeroes = getDefaultHeroes(model.townHall);
 	}
 
 	function addGuide() {
-		showGuide = true;
+		model.addGuide();
 	}
 
 	function getDefaultHeroes(thLvl: number) {
 		return VALID_HEROES.filter((hero) => {
-			const thData = app.townHalls.find((th) => th.level === thLvl);
-			if (!thData) {
-				return false;
-			}
-			return getHeroLevel(hero, { th: thData }) !== -1;
+			return ArmyModel.getMaxHeroLevel(hero, thLvl, app) !== -1;
 		}).slice(0, 4);
 	}
 
 	async function removeClanCastle() {
-		if (ccUnits.length) {
+		if (model.ccUnits.length) {
 			const confirmed = await app.confirm('Removing the clan castle will clear all clan castle units. Remove anyway?');
 			if (!confirmed) return;
 		}
-		ccUnits = [];
+		model.ccUnits = [];
 		showClanCastle = false;
 	}
 
 	async function removeHeroes() {
-		if (equipment.length || pets.length) {
+		if (model.equipment.length || model.pets.length) {
 			const confirmed = await app.confirm('Removing heroes will clear all equipment and pets. Remove anyway?');
 			if (!confirmed) return;
 		}
-		equipment = [];
-		pets = [];
+		model.equipment = [];
+		model.pets = [];
 		shownHeroes = null;
 	}
 
 	async function removeGuide() {
-		if (guideText || guideYoutubeUrl) {
+		if (!model.guide) {
+			return;
+		}
+		if (model.guide.textContent || model.guide.youtubeUrl) {
 			const confirmed = await app.confirm('Removing the guide will clear already written text and youtube URL. Remove anyway?');
 			if (!confirmed) return;
 		}
-		guideText = null;
-		guideYoutubeUrl = null;
-		showGuide = false;
+		model.removeGuide();
 	}
 
 	async function importUnits() {
-		const imported = await app.openModalAsync<{ units: ImportedUnit[]; ccUnits: ImportedUnit[]; heroes: Record<string, ImportedHero> }>(ImportFromLink, {
-			selectedUnits: units,
-			selectedCCUnits: ccUnits,
-			selectedEquipment: equipment,
-			selectedPets: pets,
-			selectedTownHall: townHall,
-		});
-		if (!imported) return;
+		const importedModel = await app.openModalAsync<ArmyModel>(ImportFromLink);
+		if (!importedModel) return;
 
-		units = imported.units;
-		ccUnits = imported.ccUnits;
-
-		if (imported.ccUnits.length) {
-			showClanCastle = true;
+		if (model.units.length || model.ccUnits.length || model.equipment.length || model.pets.length) {
+			const confirmed = await app.confirm('Importing these units will clear existing ones. Import anyway?');
+			if (!confirmed) return;
 		}
 
-		const heroes = Object.entries(imported.heroes);
-		if (heroes.length) {
-			const newShownHeroes: HeroType[] = [];
-			const newEquipment: UnsavedEquipment[] = [];
-			const newPets: UnsavedPet[] = [];
-			for (const [name, hero] of heroes) {
-				newShownHeroes.push(name);
-				newEquipment.push(...(hero.eq1 ? [hero.eq1] : []));
-				newEquipment.push(...(hero.eq2 ? [hero.eq2] : []));
-				newPets.push(...(hero.pet ? [hero.pet] : []));
-			}
-			shownHeroes = newShownHeroes;
-			equipment = newEquipment;
-			pets = newPets;
+		model.units = importedModel.units;
+		model.ccUnits = importedModel.ccUnits;
+		model.pets = importedModel.pets;
+		model.equipment = importedModel.equipment;
+
+		showClanCastle = importedModel.ccUnits.length > 0;
+
+		const importedHeroes = VALID_HEROES.filter((hero) => importedModel.hasHero(hero));
+		if (importedHeroes.length) {
+			shownHeroes = importedHeroes;
 		} else {
 			shownHeroes = null;
 		}
 	}
 
 	function editBanner() {
-		const onSave = (newBanner: Banner) => {
-			banner = newBanner;
-		};
-		app.openModal(EditBanner, { banner, onSave });
+		app.openModal(EditBanner, {
+			banner: model.banner,
+			onSave(newBanner: Banner) {
+				model.banner = newBanner;
+			},
+		});
 	}
 
 	async function setTownHall(value: number) {
 		if (typeof value !== 'number' || value < 1 || value > app.townHalls.length) {
 			throw new Error(`Town hall ${value} doesn't exist`);
 		}
-		if (value < townHall && (units.length || ccUnits.length || equipment.length || pets.length)) {
+		if (value < model.townHall && (model.units.length || model.ccUnits.length || model.equipment.length || model.pets.length)) {
 			const confirmed = await app.confirm('You are selecting a lower town hall, all selections will be cleared. Select anyway?');
 			if (confirmed) {
-				units = [];
-				ccUnits = [];
-				equipment = [];
-				pets = [];
+				model.units = [];
+				model.ccUnits = [];
+				model.equipment = [];
+				model.pets = [];
 				shownHeroes = shownHeroes ? getDefaultHeroes(value) : null;
 			} else {
 				return;
 			}
 		}
-		townHall = value;
+		model.townHall = value;
 	}
 
 	async function saveArmy() {
-		const guide = {
-			id: army?.guide?.id,
-			textContent: guideText,
-			youtubeUrl: guideYoutubeUrl,
-		};
-		const data = {
-			id: army?.id,
-			name,
-			banner,
-			townHall,
-			units: [...units, ...ccUnits].map((u) => {
-				return { id: u.id, unitId: u.unitId, home: u.home, amount: u.amount };
-			}),
-			equipment: equipment.map((eq) => {
-				return { id: eq.id, equipmentId: eq.equipmentId };
-			}),
-			pets: pets.map((p) => {
-				return { id: p.id, petId: p.petId, hero: p.hero };
-			}),
-			guide: guideText || guideYoutubeUrl ? guide : null,
-		};
+		const data = model.getSaveData();
 		const response = await fetch('/armies', {
 			method: 'POST',
 			body: JSON.stringify(data),
@@ -227,13 +146,13 @@
 			return;
 		}
 		if (response.status === 200) {
-			if (!army) {
+			if (!model.id) {
 				// Redirect to created army
 				goto(`/armies/${result.id}`);
 			} else {
 				// Back out of editing mode
 				await invalidateAll();
-				goto(`/armies/${army.id}`);
+				goto(`/armies/${model.id}`);
 			}
 		} else {
 			errors = `${response.status} error`;
@@ -242,11 +161,11 @@
 </script>
 
 <svelte:head>
-	<title>ClashArmies • {army ? 'Edit' : 'Create'} Army</title>
+	<title>ClashArmies • {model.id ? 'Edit' : 'Create'} Army</title>
 </svelte:head>
 
 <section class="banner">
-	<img class="banner-img" src="/clash/banners/{banner}.webp" alt="Clash of clans banner artwork" />
+	<img class="banner-img" src="/clash/banners/{model.banner}.webp" alt="Clash of clans banner artwork" />
 	<button class="banner-select-btn" type="button" onclick={editBanner} aria-label="Opens up army banner selection modal">
 		<svg width="27" height="27" viewBox="0 0 27 27" fill="none" xmlns="http://www.w3.org/2000/svg">
 			<path
@@ -261,12 +180,12 @@
 	<div>
 		<h2>Army details</h2>
 		<Fieldset label="Army name*:" htmlName="name" style="padding: 0 8px" --input-width="250px">
-			<Input bind:value={name} maxlength={25} />
+			<Input bind:value={model.name} maxlength={25} />
 		</Fieldset>
 		<Fieldset label="Town hall:" htmlName="town-all" style="padding: 0 8px; margin-top: 16px;" --input-width="100%">
 			<div class="town-halls-grid">
 				{#each app.townHalls as th}
-					{@const isSelected = townHall === th.level}
+					{@const isSelected = model.townHall === th.level}
 					{@const btnAttributes = { title: isSelected ? `Town hall ${th.level} is already selected` : `Town hall ${th.level}`, disabled: isSelected }}
 					<TownHall onclick={() => setTownHall(th.level)} level={th.level} {...btnAttributes} --width="100%" />
 				{/each}
@@ -293,27 +212,27 @@
 					Import
 				</ActionButton>
 			</h2>
-			<UnitTotals used={housingSpaceUsed} {capacity} />
+			<UnitTotals {model} housedIn="armyCamp" />
 		</div>
-		<UnitsList bind:selectedUnits={units} unitsRemovable />
+		<UnitsList {model} housedIn="armyCamp" unitsRemovable />
 		<div class="picker-container">
-			<UnitsPicker type="Troop" {capacity} {getUnitLevel} bind:selectedUnits={units} housedIn="armyCamp" selectedTownHall={townHall} />
+			<UnitsPicker {model} type="Troop" housedIn="armyCamp" />
 		</div>
-		{#if capacity.spells > 0}
+		{#if model.capacity.spells > 0}
 			<div class="picker-container">
-				<UnitsPicker type="Spell" {capacity} {getUnitLevel} bind:selectedUnits={units} housedIn="armyCamp" selectedTownHall={townHall} />
+				<UnitsPicker {model} type="Spell" housedIn="armyCamp" />
 			</div>
 		{/if}
-		{#if capacity.sieges > 0}
+		{#if model.capacity.sieges > 0}
 			<div class="picker-container">
-				<UnitsPicker type="Siege" {capacity} {getUnitLevel} bind:selectedUnits={units} housedIn="armyCamp" selectedTownHall={townHall} />
+				<UnitsPicker {model} type="Siege" housedIn="armyCamp" />
 			</div>
 		{/if}
 	</div>
 </section>
 
 <section class="dashed units cc">
-	{#if thData && thData.maxCc !== null && showClanCastle}
+	{#if model.thData && model.thData.maxCc !== null && showClanCastle}
 		<div>
 			<div class="title">
 				<h2>
@@ -321,51 +240,30 @@
 					Clan castle
 					<ActionButton theme="danger" onclick={removeClanCastle} class="title-action-btn">Remove</ActionButton>
 				</h2>
-				<UnitTotals used={ccHousingSpaceUsed} capacity={ccCapacity} />
+				<UnitTotals {model} housedIn="clanCastle" />
 			</div>
-			<UnitsList bind:selectedUnits={ccUnits} unitsRemovable />
+			<UnitsList {model} housedIn="clanCastle" unitsRemovable />
 			<div class="picker-container">
-				<UnitsPicker
-					type="Troop"
-					capacity={ccCapacity}
-					getUnitLevel={getCcUnitLevel}
-					bind:selectedUnits={ccUnits}
-					housedIn="clanCastle"
-					selectedTownHall={townHall}
-				/>
+				<UnitsPicker {model} type="Troop" housedIn="clanCastle" />
 			</div>
-			{#if ccCapacity.spells > 0}
+			{#if model.ccCapacity.spells > 0}
 				<div class="picker-container">
-					<UnitsPicker
-						type="Spell"
-						capacity={ccCapacity}
-						getUnitLevel={getCcUnitLevel}
-						bind:selectedUnits={ccUnits}
-						housedIn="clanCastle"
-						selectedTownHall={townHall}
-					/>
+					<UnitsPicker {model} type="Spell" housedIn="clanCastle" />
 				</div>
 			{/if}
-			{#if ccCapacity.sieges > 0}
+			{#if model.ccCapacity.sieges > 0}
 				<div class="picker-container">
-					<UnitsPicker
-						type="Siege"
-						capacity={ccCapacity}
-						getUnitLevel={getCcUnitLevel}
-						bind:selectedUnits={ccUnits}
-						housedIn="clanCastle"
-						selectedTownHall={townHall}
-					/>
+					<UnitsPicker {model} type="Siege" housedIn="clanCastle" />
 				</div>
 			{/if}
 		</div>
 	{:else}
-		<OfferClanCastle onClick={addClanCastle} selectedTownHall={townHall} />
+		<OfferClanCastle {model} onClick={addClanCastle} />
 	{/if}
 </section>
 
 <section class="dashed units heroes">
-	{#if thData && thData.maxBarbarianKing !== null && shownHeroes}
+	{#if model.thData && model.thData.maxBarbarianKing !== null && shownHeroes}
 		<div>
 			<div class="title">
 				<h2>
@@ -375,28 +273,20 @@
 				</h2>
 			</div>
 			{#each VALID_HEROES as hero}
-				{#if thData && getHeroLevel(hero, { th: thData }) !== -1}
+				{#if model.thData && ArmyModel.getMaxHeroLevel(hero, model.townHall, model.ctx) !== -1}
 					<div class="hero-picker-container">
-						<HeroPicker
-							{hero}
-							bind:shownHeroes
-							bind:selectedEquipment={equipment}
-							bind:selectedPets={pets}
-							selectedTownHall={townHall}
-							{getEquipmentLevel}
-							{getPetLevel}
-						/>
+						<HeroPicker {model} {hero} bind:shownHeroes />
 					</div>
 				{/if}
 			{/each}
 		</div>
 	{:else}
-		<OfferHeroes onClick={addHeroes} selectedTownHall={townHall} />
+		<OfferHeroes {model} onClick={addHeroes} />
 	{/if}
 </section>
 
 <section class="dashed units guide">
-	{#if showGuide}
+	{#if model.guide}
 		<div>
 			<div class="title">
 				<h2>
@@ -406,9 +296,9 @@
 				</h2>
 			</div>
 			<div class="guide-edit">
-				<GuideEditor bind:text={guideText} charLimit={GUIDE_TEXT_CHAR_LIMIT} mode="edit" />
+				<GuideEditor bind:text={model.guide.textContent} charLimit={GUIDE_TEXT_CHAR_LIMIT} mode="edit" />
 				<Fieldset label="Video guide" htmlName="youtubeUrl" style="margin-top: 1em">
-					<Input bind:value={guideYoutubeUrl} placeholder="https://youtube.com/..." />
+					<Input bind:value={model.guide.youtubeUrl} placeholder="https://youtube.com/..." />
 				</Fieldset>
 			</div>
 		</div>
@@ -424,8 +314,8 @@
 {/if}
 
 <div class="army-controls">
-	<Button asLink href={army ? `/armies/${army.id}` : '/armies'}>Cancel</Button>
-	<Button onClick={saveArmy} disabled={saveDisabled}>{army ? 'Save' : 'Create'}</Button>
+	<Button asLink href={model.id ? `/armies/${model.id}` : '/armies'}>Cancel</Button>
+	<Button onClick={saveArmy} disabled={saveDisabled}>{model.id ? 'Save' : 'Create'}</Button>
 </div>
 
 <style>

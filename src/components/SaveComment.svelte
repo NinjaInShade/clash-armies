@@ -1,18 +1,19 @@
 <script lang="ts">
 	import { getContext } from 'svelte';
-	import type { AppState, Comment } from '$types';
+	import type { AppState } from '$types';
 	import { MAX_COMMENT_LENGTH } from '$shared/utils';
 	import { invalidateAll } from '$app/navigation';
 	import TextArea from './TextArea.svelte';
 	import ActionButton from './ActionButton.svelte';
+	import type { ArmyModel, ArmyComment } from '$models';
 
 	type Props = {
-		armyId: number;
-		comment?: Comment;
+		model: ArmyModel;
+		comment?: ArmyComment;
 		replyTo?: number | null;
 		onSave?: () => void;
 	};
-	const { armyId, comment, replyTo, onSave = () => {} }: Props = $props();
+	const { model, comment, replyTo, onSave = () => {} }: Props = $props();
 
 	const app = getContext<AppState>('app');
 
@@ -23,7 +24,7 @@
 			id: comment?.id,
 			comment: commentText,
 			replyTo: replyTo ?? null,
-			armyId,
+			armyId: model.id,
 		};
 		const response = await fetch('/armies/comments', {
 			method: 'POST',
@@ -60,7 +61,9 @@
 		--input-width="100%"
 		--input-min-height="5em"
 	/>
-	<ActionButton class="add-comment-btn" disabled={!commentText?.length} onclick={saveComment}>{comment ? 'Save' : 'Add'}</ActionButton>
+	<div class="save-button">
+		<ActionButton disabled={!commentText?.length} onclick={saveComment}>{comment ? 'Save' : 'Add'}</ActionButton>
+	</div>
 </div>
 
 <style>
@@ -72,7 +75,7 @@
 		padding-bottom: 42px;
 	}
 
-	:global(.add-comment-btn) {
+	.save-button {
 		position: absolute;
 		bottom: 10px;
 		right: 10px;

@@ -1,17 +1,17 @@
 <script lang="ts">
 	import { getContext } from 'svelte';
 	import type { AppState } from '$types';
-	import { getHeroLevel } from '$shared/utils';
+	import { ArmyModel } from '$models';
 
 	type Props = {
+		model: ArmyModel;
 		onClick: () => void;
-		selectedTownHall: number;
 	};
-	const { onClick, selectedTownHall }: Props = $props();
+	const { model, onClick }: Props = $props();
 
 	const app = getContext<AppState>('app');
 	const requiredThLvl = $derived.by(() => {
-		const kingThsLevel = app.townHalls.filter((th) => getHeroLevel('Barbarian King', { th }) !== -1).map((th) => th.level);
+		const kingThsLevel = app.townHalls.filter((th) => ArmyModel.getMaxHeroLevel('Barbarian King', th.level, app) !== -1).map((th) => th.level);
 		return Math.min(...kingThsLevel);
 	});
 </script>
@@ -23,7 +23,7 @@
 		<img src="/clash/heroes/Grand Warden.png" alt="Clash of clans grand warden hero" />
 		<img src="/clash/heroes/Royal Champion.png" alt="Clash of clans royal champion hero" />
 	</div>
-	{#if selectedTownHall >= requiredThLvl}
+	{#if model.townHall >= requiredThLvl}
 		<h2>Add hero pets/equipment</h2>
 		<button class="add-cc-btn" onclick={onClick} aria-label="Displays the hero equipment/pets editor">
 			<svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">

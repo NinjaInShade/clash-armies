@@ -1,46 +1,31 @@
 <script lang="ts">
 	import { getContext } from 'svelte';
-	import type { Optional, AppState, HeroType, Equipment, ArmyEquipment, Pet, ArmyPet, TownHall } from '$types';
-	import { getHeroLevel } from '$shared/utils';
+	import type { AppState, HeroType, Pet } from '$types';
 	import HeroDisplay from './HeroDisplay.svelte';
 	import ActionButton from './ActionButton.svelte';
 	import EquipmentDisplay from './EquipmentDisplay.svelte';
 	import PetDisplay from './PetDisplay.svelte';
 	import AddHero from './AddHero.svelte';
+	import { EquipmentModel, ArmyModel, PetModel } from '$models';
 
 	type Props = {
+		model: ArmyModel;
 		hero: HeroType;
 		shownHeroes: HeroType[];
-		/** All selected equipment across all heroes */
-		selectedEquipment: Optional<ArmyEquipment, 'id'>[];
-		/** All selected pets across all heroes */
-		selectedPets: Optional<ArmyPet, 'id'>[];
-		selectedTownHall: number;
-		getEquipmentLevel(name: string, ctx: { th: TownHall; equipment: Equipment[] }): number;
-		getPetLevel(name: string, ctx: { th: TownHall; pets: Pet[] }): number;
 	};
-	const {
-		hero,
-		shownHeroes = $bindable(),
-		selectedEquipment = $bindable(),
-		selectedPets = $bindable(),
-		selectedTownHall,
-		getEquipmentLevel,
-		getPetLevel,
-	}: Props = $props();
+	const { model, hero, shownHeroes = $bindable() }: Props = $props();
 	const app = getContext<AppState>('app');
 
 	// Selected equipment/pets just for this hero
-	const _selectedEquipment = $derived(selectedEquipment.filter((eq) => eq.hero === hero));
-	const _selectedPets = $derived(selectedPets.filter((p) => p.hero === hero));
+	const _selectedEquipment = $derived(model.equipment.filter((eq) => eq.info.hero === hero));
+	const _selectedPets = $derived(model.pets.filter((p) => p.hero === hero));
 	const allEquipment = $derived(app.equipment.filter((eq) => eq.hero === hero));
 	const sortedEquipment = $derived([...allEquipment.filter((eq) => !eq.epic), ...allEquipment.filter((eq) => eq.epic)]);
-	const thData = $derived(app.townHalls.find((th) => th.level === selectedTownHall));
 	const shown = $derived(shownHeroes.includes(hero));
 
-	function getEquipmentTitle(level: number, name: string, selected: Optional<ArmyEquipment, 'id'>[]) {
+	function getEquipmentTitle(level: number, name: string, selected: EquipmentModel[]) {
 		if (level === -1) {
-			return `This equipment is unable to to be used at town hall ${selectedTownHall}`;
+			return `This equipment is unable to to be used at town hall ${model.townHall}`;
 		}
 		if (selected.length >= 2) {
 			return `All available equipment slots have been used up for the ${hero.toLowerCase()}`;
@@ -51,61 +36,29 @@
 		return undefined;
 	}
 
-	function getPetTitle(level: number, name: string, selected: Optional<ArmyPet, 'id'>[]) {
+	function getPetTitle(level: number, name: string, selected: PetModel[]) {
 		if (level === -1) {
-			return `This pet is unable to be used at town hall ${selectedTownHall}`;
+			return `This pet is unable to be used at town hall ${model.townHall}`;
 		}
 		const _selected = selected.filter((p) => p.hero === hero);
 		if (_selected.length >= 1) {
 			return `All available pet slots have been equipped for the ${hero.toLowerCase()}`;
 		}
 		if (petEquipped(name, selected)) {
-			const equippedHero = selected.find((p) => p.name === name)?.hero ?? '';
+			const equippedHero = selected.find((p) => p.info.name === name)?.hero ?? '';
 			return `This pet has already been equipped on the ${equippedHero.toLowerCase()}.\n\nClicking the replace button (bottom right) will clear it from that hero and equip it on this one.`;
 		}
 		return undefined;
 	}
 
 	/** Returns if this equipment is equipped for this hero */
-	function equipmentEquipped(name: string, selected: Optional<ArmyEquipment, 'id'>[]) {
-		return selected.find((eq) => eq.name === name) !== undefined;
+	function equipmentEquipped(name: string, selected: EquipmentModel[]) {
+		return selected.find((eq) => eq.info.name === name) !== undefined;
 	}
 
 	/** Returns true if this pet is equipped across *all* heroes */
-	function petEquipped(name: string, selected: Optional<ArmyPet, 'id'>[]) {
-		return selected.find((p) => p.name === name) !== undefined;
-	}
-
-	function addEquipment(equipment: Equipment) {
-		selectedEquipment.push({ equipmentId: equipment.id, ...equipment, id: undefined });
-	}
-
-	function removeEquipment(name: string) {
-		const existingIndex = selectedEquipment.findIndex((eq) => eq.name === name);
-		selectedEquipment.splice(existingIndex, 1);
-	}
-
-	function addPet(pet: Pet) {
-		selectedPets.push({ hero, petId: pet.id, ...pet, id: undefined });
-	}
-
-	function removePet(name: string) {
-		const existingIndex = selectedPets.findIndex((p) => p.name === name);
-		selectedPets.splice(existingIndex, 1);
-	}
-
-	async function replacePet(name: string) {
-		const selectedPet = selectedPets.find((p) => p.name === name);
-		if (!selectedPet) {
-			throw new Error('Expected to find the hero this pet is equipped on');
-		}
-		const confirmed = await app.confirm(
-			`Do you wish to move the ${name.toLowerCase()} pet (currently equipped on the ${selectedPet.hero.toLowerCase()}) to this hero?`
-		);
-		if (!confirmed) {
-			return;
-		}
-		selectedPet.hero = hero;
+	function petEquipped(name: string, selected: PetModel[]) {
+		return selected.find((p) => p.info.name === name) !== undefined;
 	}
 
 	function addHero() {
@@ -113,27 +66,40 @@
 	}
 
 	async function removeHero() {
-		const removeEq = selectedEquipment.filter((eq) => eq.hero === hero).map((eq) => eq.name);
-		const removePets = selectedPets.filter((pet) => pet.hero === hero).map((pet) => pet.name);
+		const removeEq = model.equipment.filter((eq) => eq.info.hero === hero).map((eq) => eq.info.name);
+		const removePets = model.pets.filter((pet) => pet.hero === hero).map((pet) => pet.info.name);
 		if (removeEq.length || removePets.length) {
 			const confirmed = await app.confirm("Removing this hero will clear it's equipment and pets. Remove anyway?");
 			if (!confirmed) return;
 		}
 		for (const eq of removeEq) {
-			removeEquipment(eq);
+			model.removeEquipment(eq);
 		}
 		for (const pet of removePets) {
-			removePet(pet);
+			model.removePet(pet);
 		}
 		const heroIndex = shownHeroes.findIndex((h) => h === hero);
 		shownHeroes.splice(heroIndex, 1);
+	}
+
+	async function replacePet(pet: Pet) {
+		const nameLower = pet.name.toLowerCase();
+		const selectedPetHero = model.pets.find((p) => p.info.name === pet.name)?.hero.toLowerCase();
+		if (!selectedPetHero) {
+			throw new Error(`Pet "${pet.name}" does not exist in this army`);
+		}
+		const confirmed = await app.confirm(`Do you wish to move the ${nameLower} pet (currently equipped on the ${selectedPetHero}) to this hero?`);
+		if (!confirmed) {
+			return;
+		}
+		model.replacePet(pet.name, hero);
 	}
 </script>
 
 <div class="hero {hero.replaceAll(' ', '-').toLowerCase()}" class:shown>
 	{#if shown}
 		<div class="hero-container">
-			<HeroDisplay name={hero} level={getHeroLevel(hero, { th: thData })} />
+			<HeroDisplay name={hero} level={ArmyModel.getMaxHeroLevel(hero, model.townHall, app)} />
 			<ActionButton style="margin-top: 8px" theme="danger" onclick={removeHero}>Remove</ActionButton>
 		</div>
 		<div class="vertical-separator"></div>
@@ -146,8 +112,8 @@
 						{@const selected = _selectedEquipment[index]}
 						{#if selected}
 							<li>
-								<button type="button" onclick={() => removeEquipment(selected.name)}>
-									<EquipmentDisplay {...selected} amount={1} />
+								<button type="button" onclick={() => model.removeEquipment(selected.info.name)}>
+									<EquipmentDisplay name={selected.info.name} amount={1} />
 								</button>
 							</li>
 						{:else}
@@ -157,27 +123,27 @@
 				</ul>
 				<ul class="picker-list">
 					{#each sortedEquipment as equipment}
-						{@const level = thData ? getEquipmentLevel(equipment.name, { th: thData, equipment: app.equipment }) : -1}
+						{@const level = EquipmentModel.getMaxLevel(equipment.name, model.townHall, model.ctx)}
 						{@const title = getEquipmentTitle(level, equipment.name, _selectedEquipment)}
 						<li>
 							<button
 								type="button"
 								disabled={_selectedEquipment.length >= 2 || equipmentEquipped(equipment.name, _selectedEquipment) || level === -1}
-								onclick={() => addEquipment(equipment)}
+								onclick={() => model.addEquipment(equipment)}
 							>
-								<EquipmentDisplay {...equipment} {level} {title} />
+								<EquipmentDisplay name={equipment.name} {level} {title} />
 							</button>
 						</li>
 					{/each}
 				</ul>
 			</div>
-			{#if thData && thData.maxPetHouse !== null}
+			{#if model.thData && model.thData.maxPetHouse !== null}
 				<div class="pets">
 					<div class="selected-pet">
 						{#if _selectedPets[0]}
 							<li>
-								<button type="button" onclick={() => removePet(_selectedPets[0].name)}>
-									<PetDisplay {..._selectedPets[0]} amount={1} />
+								<button type="button" onclick={() => model.removePet(_selectedPets[0].info.name)}>
+									<PetDisplay name={_selectedPets[0].info.name} amount={1} />
 								</button>
 							</li>
 						{:else}
@@ -186,21 +152,21 @@
 					</div>
 					<ul class="picker-list">
 						{#each app.pets as pet}
-							{@const level = thData ? getPetLevel(pet.name, { th: thData, pets: app.pets }) : -1}
-							{@const title = getPetTitle(level, pet.name, selectedPets)}
-							{@const equippedHero = selectedPets.find((p) => p.name === pet.name)?.hero}
+							{@const level = PetModel.getMaxLevel(pet.name, model.townHall, model.ctx)}
+							{@const title = getPetTitle(level, pet.name, model.pets)}
+							{@const equippedHero = model.pets.find((p) => p.info.name === pet.name)?.hero}
 							{@const equippedOnDifferentHero = equippedHero !== undefined && equippedHero !== hero}
 							<li>
 								<button
 									type="button"
 									class:visually-disabled={equippedOnDifferentHero}
-									disabled={!equippedOnDifferentHero && (_selectedPets.length >= 1 || petEquipped(pet.name, selectedPets) || level === -1)}
-									onclick={() => (equippedOnDifferentHero ? replacePet(pet.name) : addPet(pet))}
+									disabled={!equippedOnDifferentHero && (_selectedPets.length >= 1 || petEquipped(pet.name, model.pets) || level === -1)}
+									onclick={() => (equippedOnDifferentHero ? replacePet(pet) : model.addPet(pet, hero))}
 								>
-									<PetDisplay {...pet} {level} {title} />
+									<PetDisplay name={pet.name} {level} {title} />
 								</button>
 								{#if _selectedPets.length === 0 && equippedOnDifferentHero}
-									<button type="button" class="replace-pet" onclick={() => replacePet(pet.name)} aria-label="Replace pet">
+									<button type="button" class="replace-pet" onclick={() => replacePet(pet)} aria-label="Replace pet">
 										<svg width="14" height="10" viewBox="0 0 13 9" fill="none" xmlns="http://www.w3.org/2000/svg">
 											<path
 												d="M2.08936 4.39634L0.101876 6.39097C-0.0339588 6.53395 -0.0339588 6.75558 0.101876 6.89856L2.08936 8.89319C2.31098 9.12197 2.69704 8.95754 2.69704 8.64297V7.35611H6.99372C7.38693 7.35611 7.70864 7.0344 7.70864 6.64119C7.70864 6.24798 7.38693 5.92627 6.99372 5.92627H2.69704V4.64656C2.69704 4.32484 2.31098 4.16756 2.08936 4.39634ZM12.4629 2.10144L10.4754 0.106805C10.2538 -0.121969 9.86771 0.0424625 9.86771 0.357028V1.63674H5.56388C5.17067 1.63674 4.84896 1.95845 4.84896 2.35166C4.84896 2.74487 5.17067 3.06658 5.56388 3.06658H9.86056V4.34629C9.86056 4.66801 10.2466 4.82529 10.4682 4.59651L12.4557 2.60188C12.5987 2.46605 12.5987 2.23727 12.4629 2.10144Z"

@@ -5,16 +5,17 @@
 
 <script lang="ts">
 	import { getContext } from 'svelte';
-	import type { AppState, Comment } from '$types';
+	import type { AppState } from '$types';
 	import { intlFormatDistance } from 'date-fns';
 	import { invalidateAll } from '$app/navigation';
 	import SaveComment from './SaveComment.svelte';
+	import type { ArmyModel, ArmyComment } from '$models';
 
 	type Props = {
-		armyId: number;
-		comment: Comment;
+		model: ArmyModel;
+		comment: ArmyComment;
 	};
-	const { armyId, comment }: Props = $props();
+	const { model, comment }: Props = $props();
 
 	const app = getContext<AppState>('app');
 
@@ -109,7 +110,7 @@
 
 	{#if editing}
 		<div class="comment">
-			<SaveComment {armyId} {comment} replyTo={comment.replyTo} onSave={() => (editingComment = null)} />
+			<SaveComment {model} {comment} replyTo={comment.replyTo} onSave={() => (editingComment = null)} />
 		</div>
 	{:else}
 		<p class="comment">{comment.comment}</p>
@@ -119,7 +120,7 @@
 </li>
 
 {#if replying}
-	<SaveComment {armyId} replyTo={comment.id} onSave={() => (addingReplyTo = null)} />
+	<SaveComment {model} replyTo={comment.id} onSave={() => (addingReplyTo = null)} />
 {/if}
 
 <style>

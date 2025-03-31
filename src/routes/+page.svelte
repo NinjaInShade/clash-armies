@@ -1,17 +1,25 @@
 <script lang="ts">
 	import C from '$components';
+	import { getContext, untrack } from 'svelte';
 	import type { PageData } from './$types';
+	import type { AppState } from '$types';
+	import { ArmyModel } from '$models';
 
 	const { data }: { data: PageData } = $props();
-	const { armies } = $derived(data);
+	const app = getContext<AppState>('app');
+	const armies = $derived(
+		data.armies.map((army) => {
+			return untrack(() => new ArmyModel(app, army));
+		})
+	);
 
 	const ENTRIES_PER_PAGE = 10;
 
 	let page = $state<number>(1);
 
 	let displayArmies = $derived.by(() => {
-		return [...armies]
-			.sort((a, b) => {
+		return armies
+			.toSorted((a, b) => {
 				return b.votes - a.votes;
 			})
 			.slice(0, page * ENTRIES_PER_PAGE);
@@ -52,8 +60,8 @@
 			Top armies
 		</h2>
 		<ul class="armies-list">
-			{#each displayArmies as army (army.id)}
-				<C.ArmyCard {army} />
+			{#each displayArmies as model (model.id)}
+				<C.ArmyCard {model} />
 			{/each}
 		</ul>
 		{#if displayArmies.length && displayArmies.length < armies.length}

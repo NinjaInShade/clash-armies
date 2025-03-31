@@ -11,11 +11,12 @@
 		title?: string;
 		amount?: number;
 		level?: number;
-		epic?: boolean;
 	};
-	const { name, amount, level, title, epic = false }: Props = $props();
+	const { name, amount, level, title }: Props = $props();
 	const app = getContext<AppState>('app');
-	const levels = $derived(app.equipment.find((eq) => eq.name === name)?.levels ?? []);
+	const appEq = $derived(app.equipment.find((eq) => eq.name === name));
+	const epic = $derived(appEq?.epic ?? false);
+	const levels = $derived(appEq?.levels ?? []);
 	const isMaxLevel = $derived(level === Math.max(...levels.map((x) => x.level)));
 </script>
 

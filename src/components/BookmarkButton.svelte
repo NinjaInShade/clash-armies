@@ -1,15 +1,16 @@
 <script lang="ts">
 	import { getContext } from 'svelte';
-	import type { Army, AppState } from '$types';
+	import type { AppState } from '$types';
+	import type { ArmyModel } from '$models';
 	import { invalidate } from '$app/navigation';
 
 	type Props = {
-		army: Army;
+		model: ArmyModel;
 	};
-	const { army }: Props = $props();
+	const { model }: Props = $props();
 	const app = getContext<AppState>('app');
 
-	let bookmarked = $state<boolean>(army.userBookmarked);
+	let bookmarked = $state<boolean>(model.userBookmarked);
 	let savingBookmark = $state<boolean>(false);
 
 	async function saveBookmark(removing: boolean) {
@@ -17,7 +18,7 @@
 		try {
 			const response = await fetch('/armies/bookmarks', {
 				method: removing ? 'DELETE' : 'POST',
-				body: JSON.stringify({ armyId: army.id }),
+				body: JSON.stringify({ armyId: model.id }),
 				headers: { 'Content-Type': 'application/json' },
 			});
 			const result = await response.json();
@@ -38,7 +39,7 @@
 			}
 			bookmarked = !bookmarked;
 			if (!removing) {
-				app.notify({ title: `Saved army "${army.name}"`, description: 'View saved armies on your account page', theme: 'success' });
+				app.notify({ title: `Saved army "${model.name}"`, description: 'View saved armies on your account page', theme: 'success' });
 			}
 			await invalidate('ca:savedArmies');
 		} finally {

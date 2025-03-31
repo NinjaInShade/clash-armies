@@ -203,7 +203,7 @@
 					}}
 				>
 					{#if unit.pickType === 'unit'}
-						<UnitDisplay {...unit} title={picker ? title : undefined} />
+						<UnitDisplay {unit} title={picker ? title : undefined} />
 					{:else if unit.pickType === 'equipment'}
 						<EquipmentDisplay {...unit} title={picker ? title : undefined} />
 					{:else}

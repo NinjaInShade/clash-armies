@@ -1,9 +1,10 @@
 <script lang="ts">
-	import { getContext } from 'svelte';
+	import { getContext, untrack } from 'svelte';
 	import { goto } from '$app/navigation';
-	import { VALID_HEROES, getTotals, getCapacity, getCcCapacity, hasHero, YOUTUBE_URL_REGEX } from '$shared/utils';
+	import { VALID_HEROES, YOUTUBE_URL_REGEX } from '$shared/utils';
 	import { copyLink, openInGame, getTags, getCopyBtnTitle, getOpenBtnTitle } from '$client/army';
-	import type { Army, AppState, FetchErrors } from '$types';
+	import type { AppState, FetchErrors } from '$types';
+	import { ArmyModel, type Army } from '$models';
 	import { invalidateAll } from '$app/navigation';
 	import UnitTotals from './UnitTotals.svelte';
 	import Votes from './Votes.svelte';
@@ -20,25 +21,15 @@
 	const { army }: Props = $props();
 
 	const app = getContext<AppState>('app');
+	const model = $derived.by(() => {
+		void army;
+		return untrack(() => new ArmyModel(app, army));
+	});
 
-	const thData = $derived(app.townHalls.find((th) => th.level === army.townHall));
-	const units = $derived(army.units.filter((unit) => unit.home === 'armyCamp'));
-	const ccUnits = $derived.by(() => getCcUnits());
-	const capacity = $derived.by(() => getCapacity(thData));
-	const ccCapacity = $derived.by(() => getCcCapacity(thData));
-	const housingSpaceUsed = $derived.by(() => getTotals(units));
-	const ccHousingSpaceUsed = $derived.by(() => getTotals(ccUnits));
-	const showClanCastle = $state<boolean>(getCcUnits().length > 0);
-	const showHeroes = $state<boolean>(VALID_HEROES.some((hero) => hasHero(hero, army)));
-	const showGuide = $state(army.guide !== null);
+	const showClanCastle = $derived<boolean>(model.ccUnits.length > 0);
+	const showHeroes = $state<boolean>(VALID_HEROES.some((hero) => model.hasHero(hero)));
 
 	let errors = $state<FetchErrors | null>(null);
-	let votes = $state<number>(army.votes);
-	let userVote = $state<number>(army.userVote ?? 0);
-
-	function getCcUnits() {
-		return army.units.filter((unit) => unit.home === 'clanCastle');
-	}
 
 	function getYoutubeEmbedSrc(url: string) {
 		const match = url.match(YOUTUBE_URL_REGEX);
@@ -50,14 +41,13 @@
 	}
 
 	async function deleteArmy() {
-		if (!army) return;
 		const confirmed = await app.confirm('Are you sure you want to delete this army warrior? This cannot be undone!');
 		if (!confirmed) {
 			return;
 		}
 		const response = await fetch('/armies', {
 			method: 'DELETE',
-			body: JSON.stringify(army.id),
+			body: JSON.stringify(model.id),
 			headers: { 'Content-Type': 'application/json' },
 		});
 		const result = await response.json();
@@ -75,24 +65,24 @@
 </script>
 
 <svelte:head>
-	<title>ClashArmies • Army • {army.name}</title>
+	<title>ClashArmies • Army • {model.name}</title>
 </svelte:head>
 
 <section class="banner">
-	<img class="banner-img" src="/clash/banners/{army.banner}.webp" alt="Clash of clans banner artwork" />
+	<img class="banner-img" src="/clash/banners/{model.banner}.webp" alt="Clash of clans banner artwork" />
 	<div class="banner-overlay"></div>
 	<div class="banner-content">
 		<div class="left">
 			<div class="title-container">
-				<img src="/clash/town-halls/{army.townHall}.png" alt="Town hall {army.townHall}" class="town-hall" />
-				<h1>{army.name}</h1>
+				<img src="/clash/town-halls/{model.townHall}.png" alt="Town hall {model.townHall}" class="town-hall" />
+				<h1>{model.name}</h1>
 			</div>
-			<p class="author">Assembled by <a href="/users/{army.username}">@{army.username}</a></p>
+			<p class="author">Assembled by <a href="/users/{model.username}">@{model.username}</a></p>
 			<ul class="tags">
-				{#each getTags(army) as tag}
+				{#each getTags(model) as tag}
 					<li>
 						{#if tag.icon}
-							<tag.icon />
+							<tag.icon></tag.icon>
 						{/if}
 						{tag.label}
 					</li>
@@ -100,13 +90,13 @@
 			</ul>
 		</div>
 		<div class="right">
-			<UnitTotals used={housingSpaceUsed} {capacity} />
+			<UnitTotals {model} housedIn="armyCamp" />
 			<div class="separator"></div>
 			<div class="actions">
-				<Votes bind:votes bind:userVote armyId={army.id} allowEdit={app.user !== null} />
+				<Votes {model} allowEdit={app.user !== null} />
 				{#if app.user}
 					<div class="separator"></div>
-					<BookmarkButton {army} />
+					<BookmarkButton {model} />
 				{/if}
 			</div>
 		</div>
@@ -119,10 +109,15 @@
 			<img src="/clash/ui/army-camp.png" alt="Clash of clans army camp" />
 			Army units
 		</h2>
-		<UnitsList selectedUnits={units} />
+		<UnitsList {model} housedIn="armyCamp" />
 	</div>
 	<div class="controls">
-		<ActionButton ghost onclick={() => copyLink(units, ccUnits, army.equipment, army.pets, app)} disabled={!units.length} title={getCopyBtnTitle(units)}>
+		<ActionButton
+			ghost
+			onclick={() => copyLink(model, app)}
+			disabled={!model.units.length && !model.ccUnits.length && !model.pets.length && !model.equipment.length}
+			title={getCopyBtnTitle(model)}
+		>
 			<svg width="16" height="17" viewBox="0 0 16 17" fill="none" xmlns="http://www.w3.org/2000/svg">
 				<path
 					d="M3.4 3.4V0.849999C3.4 0.624565 3.48955 0.408365 3.64896 0.248959C3.80836 0.0895532 4.02456 0 4.25 0H14.45C14.6754 0 14.8916 0.0895532 15.051 0.248959C15.2104 0.408365 15.3 0.624565 15.3 0.849999V12.75C15.3 12.9754 15.2104 13.1916 15.051 13.351C14.8916 13.5104 14.6754 13.6 14.45 13.6H11.9V16.15C11.9 16.6192 11.5175 17 11.044 17H0.855949C0.743857 17.0007 0.632737 16.9792 0.528974 16.9368C0.42521 16.8944 0.330848 16.8319 0.25131 16.7529C0.171771 16.6739 0.108624 16.58 0.0654961 16.4765C0.0223682 16.373 0.000109968 16.2621 0 16.15L0.00255002 4.25C0.00255002 3.7808 0.38505 3.4 0.857649 3.4H3.4ZM1.7017 5.1L1.7 15.3H10.2V5.1H1.7017ZM5.1 3.4H11.9V11.9H13.6V1.7H5.1V3.4ZM3.4 7.64999H8.49999V9.34999H3.4V7.64999ZM3.4 11.05H8.49999V12.75H3.4V11.05Z"
@@ -131,7 +126,12 @@
 			</svg>
 			Copy link
 		</ActionButton>
-		<ActionButton ghost onclick={() => openInGame(units, ccUnits, army.equipment, army.pets)} disabled={!units.length} title={getOpenBtnTitle(units)}>
+		<ActionButton
+			ghost
+			onclick={() => openInGame(model)}
+			disabled={!model.units.length && !model.ccUnits.length && !model.pets.length && !model.equipment.length}
+			title={getOpenBtnTitle(model)}
+		>
 			<svg width="18" height="12" viewBox="0 0 18 12" fill="none" xmlns="http://www.w3.org/2000/svg">
 				<path
 					fill-rule="evenodd"
@@ -153,9 +153,9 @@
 					<img src="/clash/ui/clan-castle.png" alt="Clash of clans clan castle" />
 					Clan castle
 				</h2>
-				<UnitTotals used={ccHousingSpaceUsed} capacity={ccCapacity} />
+				<UnitTotals {model} housedIn="clanCastle" />
 			</div>
-			<UnitsList selectedUnits={ccUnits} />
+			<UnitsList {model} housedIn="clanCastle" />
 		</div>
 	</section>
 {/if}
@@ -171,8 +171,8 @@
 			</div>
 			<div class="heroes-list">
 				{#each VALID_HEROES as hero}
-					{#if hasHero(hero, army)}
-						<HeroDisplayFull {hero} selectedEquipment={army.equipment} selectedPets={army.pets} selectedTownHall={army.townHall} />
+					{#if model.hasHero(hero)}
+						<HeroDisplayFull {hero} {model} />
 					{/if}
 				{/each}
 			</div>
@@ -180,7 +180,7 @@
 	</section>
 {/if}
 
-{#if showGuide}
+{#if model.guide}
 	<section class="dashed guide">
 		<div class="top">
 			<div class="title">
@@ -189,19 +189,19 @@
 					Guide
 				</h2>
 			</div>
-			{#if army.guide?.textContent}
+			{#if model.guide.textContent}
 				<div class="guide-editor-container">
-					<GuideEditor text={army.guide.textContent} mode="view" />
+					<GuideEditor text={model.guide.textContent} mode="view" />
 				</div>
 			{/if}
-			{#if army.guide?.youtubeUrl}
+			{#if model.guide.youtubeUrl}
 				<div class="guide-youtube-container">
 					<h2 class="video-guide-title">
 						<img src="/icons/youtube-coloured.png" alt="Youtube icon" />
 						Video guide
 					</h2>
 					<iframe
-						src={getYoutubeEmbedSrc(army.guide.youtubeUrl)}
+						src={getYoutubeEmbedSrc(model.guide.youtubeUrl)}
 						allowfullscreen={true}
 						autoplay={false}
 						disablekbcontrols={false}
@@ -228,15 +228,15 @@
 {/if}
 
 <div class="army-controls">
-	{#if app.user && (app.user.id === army.createdBy || app.user.hasRoles('admin'))}
+	{#if app.user && (app.user.id === model.createdBy || app.user.hasRoles('admin'))}
 		<Button onClick={deleteArmy} theme="danger">Delete</Button>
-		<Button asLink href="/armies/edit/{army.id}">Edit</Button>
+		<Button asLink href="/armies/edit/{model.id}">Edit</Button>
 	{/if}
 </div>
 
-{#if app.user || (!app.user && army.comments.length)}
+{#if app.user || (!app.user && model.comments.length)}
 	<div class="comments-feed" id="comments">
-		<Comments armyId={army.id} comments={army.comments} />
+		<Comments {model} />
 	</div>
 {/if}
 

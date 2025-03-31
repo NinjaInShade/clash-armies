@@ -1,16 +1,16 @@
 <script lang="ts">
 	import { getContext } from 'svelte';
 	import type { AppState } from '$types';
+	import type { ArmyModel } from '$models';
 
 	type Props = {
+		model: ArmyModel;
 		onClick: () => void;
-		selectedTownHall: number;
 	};
-	const { onClick, selectedTownHall }: Props = $props();
+	const { model, onClick }: Props = $props();
 
 	const app = getContext<AppState>('app');
-	const thData = $derived(app.townHalls.find((th) => th.level === selectedTownHall));
-	const ccUnlocked = $derived(thData && thData.maxCc !== null);
+	const ccUnlocked = $derived(model.thData.maxCc !== null);
 	const ccMinThLevel = $derived(Math.min(...app.townHalls.filter((th) => th.maxCc !== null).map((th) => th.level)));
 </script>
 

@@ -1,35 +1,16 @@
 <script lang="ts">
 	import { getContext } from 'svelte';
-	import type { AppState, Comment, StructuredComment } from '$types';
+	import type { AppState } from '$types';
 	import CommentsList from './CommentsList.svelte';
 	import SaveComment from './SaveComment.svelte';
+	import type { ArmyModel } from '$models';
 
 	type Props = {
-		armyId: number;
-		comments: Comment[];
+		model: ArmyModel;
 	};
-	const { armyId, comments }: Props = $props();
+	const { model }: Props = $props();
 
 	const app = getContext<AppState>('app');
-	const structuredComments = $derived(structureComments(comments));
-
-	function structureComments(comments: Comment[]) {
-		const map: Record<string, StructuredComment> = {};
-		const structured: StructuredComment[] = [];
-		for (const comment of comments) {
-			map[comment.id] = { ...comment, replies: [] };
-		}
-		for (const comment of comments) {
-			if (comment.replyTo === null) {
-				// Top-level comment
-				structured.push(map[comment.id]);
-			} else if (map[comment.replyTo]) {
-				// A reply, so add it to the replies of the parent comment
-				map[comment.replyTo].replies.push(map[comment.id]);
-			}
-		}
-		return structured;
-	}
 </script>
 
 <h2 class="title">
@@ -39,17 +20,17 @@
 			fill="#EFEFEF"
 		/>
 	</svg>
-	{comments.length}
-	{comments.length === 1 ? 'comment' : 'comments'}
+	{model.comments.length}
+	{model.comments.length === 1 ? 'comment' : 'comments'}
 </h2>
 
 <div class="comments-list-container">
-	<CommentsList {armyId} comments={structuredComments} />
+	<CommentsList {model} comments={model.structuredComments} />
 </div>
 
 {#if app.user}
 	<div class="add-comment">
-		<SaveComment {armyId} />
+		<SaveComment {model} />
 	</div>
 {/if}
 

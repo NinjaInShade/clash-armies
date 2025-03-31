@@ -106,5 +106,33 @@ export function createAppState(initial: Omit<AppState, 'modals' | 'notifications
 			const confirmed = await this.openModalAsync<boolean>(C.Confirm, { confirmText });
 			return Boolean(confirmed);
 		},
+		// async action(endpoint: string, options: RequestInit = {}) {
+
+		// },
+		async post(endpoint: string, data?: unknown, options: ActionOptions = {}) {
+			try {
+				const response = await fetch(endpoint, {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify(data),
+				});
+				const result = await response.json();
+				if (!response.ok || result.errors) {
+					console.error('API error', { status: response.status, errors: result.errors });
+					this.notify({
+						title: 'Failed action',
+						description: options.errorMessage ?? 'If this problem persists, get in touch on discord',
+						theme: 'failure',
+					});
+				}
+				return result;
+			} catch (err: any) {
+				//
+			}
+		},
 	};
 }
+
+type ActionOptions = {
+	errorMessage?: string;
+};

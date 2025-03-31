@@ -1,26 +1,25 @@
 <script lang="ts">
 	import { getContext } from 'svelte';
-	import type { AppState, UnitType } from '$types';
+	import type { AppState, Unit } from '$types';
 
 	type Props = {
-		name: string;
-		type: UnitType;
-		isSuper: boolean;
+		unit: Unit;
 		/**
 		 * Title to use for the card
 		 * @default props.name
 		 */
 		title?: string;
-		amount?: number;
 		/**
 		 * Whether to display card as inline or a block style
 		 * @default 'inline'
 		 */
 		display?: 'inline' | 'block';
 		level?: number;
+		amount?: number;
 	};
-	const { type, name, isSuper, amount, display, level, title }: Props = $props();
+	const { unit, display, level, amount, title }: Props = $props();
 	const app = getContext<AppState>('app');
+	const { name, type, isSuper } = $derived(unit);
 	const levels = $derived(app.units.find((u) => u.name === name)?.levels ?? []);
 	const isMaxLevel = $derived(level === Math.max(...levels.map((x) => x.level)));
 </script>

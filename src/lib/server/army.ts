@@ -1,6 +1,7 @@
-import type { SaveArmy, Army, TownHall, Unit, Equipment, Pet, UnitType, Comment, SaveComment } from '$types';
+import type { TownHall, Unit, Equipment, Pet, UnitType } from '$types';
 import { db } from '$server/db';
-import { USER_MAX_ARMIES, mergeAdjacentEmptyTags } from '$shared/utils';
+import type { Army, ArmyComment } from '$models';
+import { USER_MAX_ARMIES } from '$shared/utils';
 import { validateArmy, numberSchema, commentSchema } from '$shared/validation';
 import z from 'zod';
 import type { RequestEvent } from '@sveltejs/kit';
@@ -8,6 +9,7 @@ import type { Request } from '~/app';
 import { generateJSON, generateHTML } from '@tiptap/html';
 import { getExtensions } from '$shared/guideEditor';
 import { parseHTML } from 'zeed-dom';
+import { GuideModel } from '$models/Guide.svelte';
 
 type GetArmiesParams = {
 	req: Request;
@@ -340,7 +342,7 @@ export async function getPets() {
 	return pets;
 }
 
-export async function saveArmy(event: RequestEvent, data: SaveArmy): Promise<number> {
+export async function saveArmy(event: RequestEvent, data: unknown): Promise<number> {
 	const user = event.locals.requireAuth();
 	const ctx = {
 		units: await getUnits(),
@@ -349,22 +351,23 @@ export async function saveArmy(event: RequestEvent, data: SaveArmy): Promise<num
 		pets: await getPets(),
 	};
 
-	if (data.guide && typeof data.guide.textContent === 'string') {
+	const model = validateArmy(data, ctx);
+	const units = [...model.units, ...model.ccUnits];
+	const { equipment, pets, guide } = model;
+
+	if (guide && typeof guide.textContent === 'string') {
 		// Escapes/sanitizes the HTML for security reasons (converting to JSON and back to HTML achieves this)
 		const extensions = getExtensions();
-		const sanitized = generateHTML(generateJSON(data.guide.textContent, extensions), extensions);
+		const sanitized = generateHTML(generateJSON(guide.textContent, extensions), extensions);
 
 		// Merge empty lines (empty tags) into one
 		const doc = parseHTML(sanitized);
-		const merged = mergeAdjacentEmptyTags(doc).trim();
+		const merged = GuideModel.mergeAdjacentEmptyTags(doc).trim();
 
-		data.guide.textContent = merged;
+		guide.textContent = merged;
 	}
 
-	const army = validateArmy(data, ctx);
-	const { units, equipment, pets, guide } = army;
-
-	if (!data.id) {
+	if (!model.id) {
 		// Creating army
 		const userArmies = await db.getRows('armies', { createdBy: user.id });
 		if (userArmies.length === USER_MAX_ARMIES) {
@@ -372,9 +375,9 @@ export async function saveArmy(event: RequestEvent, data: SaveArmy): Promise<num
 		}
 		return db.transaction(async (tx) => {
 			const armyId = await tx.insertOne('armies', {
-				name: army.name,
-				townHall: army.townHall,
-				banner: army.banner,
+				name: model.name,
+				townHall: model.townHall,
+				banner: model.banner,
 				createdBy: user.id,
 			});
 			const armyUnits = units.map((unit) => {
@@ -413,7 +416,7 @@ export async function saveArmy(event: RequestEvent, data: SaveArmy): Promise<num
 	}
 
 	// Updating existing army
-	const armyId = numberSchema.parse(army.id);
+	const armyId = numberSchema.parse(model.id);
 	const existing = await db.getRow<Army, null>('armies', { id: armyId });
 	if (!existing) {
 		throw new Error("This army doesn't exist");
@@ -433,7 +436,7 @@ export async function saveArmy(event: RequestEvent, data: SaveArmy): Promise<num
 					banner = ?
 				WHERE id = ?
 		`;
-		await tx.query(updateQuery, [army.name, army.townHall, army.banner, armyId]);
+		await tx.query(updateQuery, [model.name, model.townHall, model.banner, armyId]);
 		// Remove deleted units
 		await tx.query('DELETE FROM army_units WHERE armyId = ? AND id NOT IN (?)', [armyId, units.map((u) => u.id ?? null)]);
 		// Upsert units
@@ -510,7 +513,7 @@ export async function saveVote(event: RequestEvent, data: SaveVoteParams) {
 	}
 }
 
-export async function saveComment(event: RequestEvent, data: SaveComment) {
+export async function saveComment(event: RequestEvent, data: unknown) {
 	const user = event.locals.requireAuth();
 	const comment = commentSchema.parse(data);
 	const army = await getArmy(event.locals, comment.armyId);
@@ -534,7 +537,7 @@ export async function saveComment(event: RequestEvent, data: SaveComment) {
 				commentId,
 			};
 			if (comment.replyTo) {
-				const parentComment = await tx.getRow<Comment, null>('army_comments', { id: comment.replyTo });
+				const parentComment = await tx.getRow<ArmyComment, null>('army_comments', { id: comment.replyTo });
 				if (!parentComment) {
 					throw new Error('Parent comment does not exist');
 				}
@@ -556,7 +559,7 @@ export async function saveComment(event: RequestEvent, data: SaveComment) {
 		});
 	}
 	const commentId = numberSchema.parse(comment.id);
-	const existing = await db.getRow<Comment, null>('army_comments', { id: commentId });
+	const existing = await db.getRow<ArmyComment, null>('army_comments', { id: commentId });
 	if (!existing) {
 		throw new Error("This comment doesn't exist");
 	}
@@ -583,7 +586,7 @@ export async function saveComment(event: RequestEvent, data: SaveComment) {
 export async function deleteComment(event: RequestEvent, commentId: number) {
 	const { id } = z.object({ id: z.number() }).parse({ id: commentId });
 	const user = event.locals.requireAuth();
-	const existing = await db.getRow<Comment, null>('army_comments', { id });
+	const existing = await db.getRow<ArmyComment, null>('army_comments', { id });
 	if (!existing) {
 		throw new Error("This comment doesn't exist");
 	}

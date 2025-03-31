@@ -1,6 +1,6 @@
 import { getUnits, getTownHalls, getEquipment, getPets } from '$server/army';
-import type { SaveArmy, Army, User } from '$types';
-import type { Ctx } from '$shared/validation';
+import type { User, ArmyCtx } from '$types';
+import type { Army } from '$models';
 import { BANNERS } from '$shared/utils';
 import { migration } from '$server/migration';
 import { db } from '$server/db';
@@ -8,6 +8,13 @@ import * as chai from 'chai';
 import chaiSubset from 'chai-subset';
 import type { RequestEvent } from '@sveltejs/kit';
 import { hasAuth, requireAuth, hasRoles, requireRoles } from '$server/auth/utils';
+
+type $State = typeof globalThis.$state;
+// TODO: properly hack
+const $stateShim: $State = (initial) => {
+	return initial;
+};
+globalThis.$state = $stateShim;
 
 chai.use(chaiSubset);
 
@@ -83,7 +90,7 @@ export async function destroyDB() {
 }
 
 export async function getCtx() {
-	const ctx: Ctx = {
+	const ctx: ArmyCtx = {
 		units: await getUnits(),
 		townHalls: await getTownHalls(),
 		equipment: await getEquipment(),
@@ -94,10 +101,10 @@ export async function getCtx() {
 
 /** Returns an army, defaulting certain fields with dummy data for convenience */
 export function makeData(data: Record<string, unknown>) {
-	return { units: [], equipment: [], pets: [], guide: null, banner: BANNERS[0], ...data } as unknown as SaveArmy;
+	return { units: [], equipment: [], pets: [], guide: null, banner: BANNERS[0], ...data };
 }
 
-export function assertArmies(actual: Army[], expected: SaveArmy[]) {
+export function assertArmies(actual: Army[], expected: Record<string, any>[]) {
 	assert.lengthOf(actual, expected.length);
 	for (const army of actual) {
 		// Army names should be unique when testing to make the assertion easier
@@ -123,7 +130,7 @@ export function assertArmies(actual: Army[], expected: SaveArmy[]) {
 	}
 }
 
-export function requireTh(level: number, ctx: Ctx) {
+export function requireTh(level: number, ctx: ArmyCtx) {
 	const th = ctx.townHalls.find((th) => th.level === level);
 	if (!th) {
 		throw new Error(`Expected town hall "${level}"`);
@@ -131,7 +138,7 @@ export function requireTh(level: number, ctx: Ctx) {
 	return th;
 }
 
-export function requireUnit(name: string, ctx: Ctx) {
+export function requireUnit(name: string, ctx: ArmyCtx) {
 	const unit = ctx.units.find((u) => u.name === name);
 	if (!unit) {
 		throw new Error(`Expected unit "${name}"`);
@@ -139,7 +146,7 @@ export function requireUnit(name: string, ctx: Ctx) {
 	return unit;
 }
 
-export function requireEquipment(name: string, ctx: Ctx) {
+export function requireEquipment(name: string, ctx: ArmyCtx) {
 	const eq = ctx.equipment.find((eq) => eq.name === name);
 	if (!eq) {
 		throw new Error(`Expected equipment "${name}"`);
@@ -147,7 +154,7 @@ export function requireEquipment(name: string, ctx: Ctx) {
 	return eq;
 }
 
-export function requirePet(name: string, ctx: Ctx) {
+export function requirePet(name: string, ctx: ArmyCtx) {
 	const pet = ctx.pets.find((p) => p.name === name);
 	if (!pet) {
 		throw new Error(`Expected pet "${name}"`);

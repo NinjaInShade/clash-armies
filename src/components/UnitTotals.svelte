@@ -1,16 +1,18 @@
 <script lang="ts">
-	import type { Totals } from '$types';
+	import type { UnitHome } from '$types';
+	import type { ArmyModel } from '$models';
 
 	type Props = {
-		used: Totals;
-		capacity: Omit<Totals, 'time'>;
-		class?: string;
+		model: ArmyModel;
+		housedIn: UnitHome;
 	};
 
-	const { used, capacity, class: _class }: Props = $props();
+	const { model, housedIn }: Props = $props();
+	const used = $derived(housedIn === 'armyCamp' ? model.housingSpaceUsed : model.ccHousingSpaceUsed);
+	const capacity = $derived(housedIn === 'armyCamp' ? model.capacity : model.ccCapacity);
 </script>
 
-<div class="totals {_class ?? ''}">
+<div class="totals">
 	<small class="total">
 		<img src="/clash/ui/troops.png" alt="Clash of clans troop capacity" />
 		{used.troops}/{capacity.troops}

@@ -19,6 +19,7 @@ const config = {
 			'~': 'src',
 			'$types': 'src/lib/shared/types',
 			'$components': 'src/components',
+			'$models': 'src/lib/models',
 			'$client': 'src/lib/client',
 			'$server': 'src/lib/server',
 			'$shared': 'src/lib/shared',

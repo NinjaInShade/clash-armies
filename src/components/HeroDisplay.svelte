@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { AppState, HeroType } from '$types';
 	import { getContext } from 'svelte';
-	import { getHeroLevel } from '$shared/utils';
+	import { ArmyModel } from '$models';
 
 	type Props = {
 		name: HeroType;
@@ -10,7 +10,7 @@
 	const { name, level }: Props = $props();
 
 	const app = getContext<AppState>('app');
-	const levels = $derived(app.townHalls.map((th) => getHeroLevel(name, { th })));
+	const levels = $derived(app.townHalls.map((th) => ArmyModel.getMaxHeroLevel(name, th.level, app)));
 	const isMaxLevel = $derived(level === Math.max(...levels));
 </script>
 
