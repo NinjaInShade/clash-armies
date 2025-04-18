@@ -1,25 +1,8 @@
-import { describe, it, before, after, afterEach } from 'node:test';
-import {
-	assert,
-	EVENT,
-	REQ,
-	USER,
-	USER_2,
-	ADMIN_USER,
-	createEvent,
-	getCtx,
-	createDB,
-	destroyDB,
-	makeData,
-	assertArmies,
-	requireTh,
-	requireUnit,
-	requireEquipment,
-	requirePet,
-} from '../testutil';
-import type { UnitType } from '$types';
+import { describe, it, beforeAll, afterAll, afterEach } from 'vitest';
+import { assert, EVENT, REQ, USER, USER_2, ADMIN_USER, createEvent, getCtx, createDB, destroyDB, makeData, assertArmies } from '../testutil';
+import type { UnitType, ArmyCtx } from '$types';
+import { ArmyModel, UnitModel, PetModel, EquipmentModel } from '$models';
 import { validateArmy } from '$shared/validation';
-import type { ArmyCtx } from '$types';
 import { GUIDE_TEXT_CHAR_LIMIT } from '$shared/utils';
 import { getArmies, saveArmy, saveComment } from '$server/army';
 import { getNotifications, acknowledgeNotifications } from '$server/notifications';
@@ -28,12 +11,12 @@ import type { MySQL } from '@ninjalib/sql';
 let db: MySQL;
 let ctx: ArmyCtx;
 
-before(async function () {
+beforeAll(async function () {
 	db = await createDB();
 	ctx = await getCtx();
 });
 
-after(async function () {
+afterAll(async function () {
 	await destroyDB();
 });
 
@@ -48,8 +31,8 @@ describe('Saving', function () {
 				name: 'test',
 				townHall: 16,
 				units: [
-					{ home: 'armyCamp', unitId: requireUnit('Barbarian', ctx).id, amount: 10 },
-					{ home: 'armyCamp', unitId: requireUnit('Archer', ctx).id, amount: 10 },
+					{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Barbarian', ctx).id, amount: 10 },
+					{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Archer', ctx).id, amount: 10 },
 				],
 			});
 			await saveArmy(EVENT, data);
@@ -62,10 +45,10 @@ describe('Saving', function () {
 				name: 'test',
 				townHall: 16,
 				units: [
-					{ home: 'armyCamp', unitId: requireUnit('Barbarian', ctx).id, amount: 10 },
-					{ home: 'armyCamp', unitId: requireUnit('Archer', ctx).id, amount: 10 },
-					{ home: 'clanCastle', unitId: requireUnit('Barbarian', ctx).id, amount: 10 },
-					{ home: 'clanCastle', unitId: requireUnit('Archer', ctx).id, amount: 10 },
+					{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Barbarian', ctx).id, amount: 10 },
+					{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Archer', ctx).id, amount: 10 },
+					{ home: 'clanCastle', unitId: UnitModel.requireTroopByName('Barbarian', ctx).id, amount: 10 },
+					{ home: 'clanCastle', unitId: UnitModel.requireTroopByName('Archer', ctx).id, amount: 10 },
 				],
 			});
 			await saveArmy(EVENT, data);
@@ -78,12 +61,15 @@ describe('Saving', function () {
 				name: 'test',
 				townHall: 16,
 				units: [
-					{ home: 'armyCamp', unitId: requireUnit('Barbarian', ctx).id, amount: 10 },
-					{ home: 'armyCamp', unitId: requireUnit('Archer', ctx).id, amount: 10 },
-					{ home: 'clanCastle', unitId: requireUnit('Barbarian', ctx).id, amount: 10 },
-					{ home: 'clanCastle', unitId: requireUnit('Archer', ctx).id, amount: 10 },
+					{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Barbarian', ctx).id, amount: 10 },
+					{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Archer', ctx).id, amount: 10 },
+					{ home: 'clanCastle', unitId: UnitModel.requireTroopByName('Barbarian', ctx).id, amount: 10 },
+					{ home: 'clanCastle', unitId: UnitModel.requireTroopByName('Archer', ctx).id, amount: 10 },
 				],
-				equipment: [{ equipmentId: requireEquipment('Barbarian Puppet', ctx).id }, { equipmentId: requireEquipment('Rage Vial', ctx).id }],
+				equipment: [
+					{ equipmentId: EquipmentModel.requireByName('Barbarian Puppet', ctx).id },
+					{ equipmentId: EquipmentModel.requireByName('Rage Vial', ctx).id },
+				],
 			});
 			await saveArmy(EVENT, data);
 			const armies = await getArmies(REQ);
@@ -95,15 +81,18 @@ describe('Saving', function () {
 				name: 'test',
 				townHall: 16,
 				units: [
-					{ home: 'armyCamp', unitId: requireUnit('Barbarian', ctx).id, amount: 10 },
-					{ home: 'armyCamp', unitId: requireUnit('Archer', ctx).id, amount: 10 },
-					{ home: 'clanCastle', unitId: requireUnit('Barbarian', ctx).id, amount: 10 },
-					{ home: 'clanCastle', unitId: requireUnit('Archer', ctx).id, amount: 10 },
+					{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Barbarian', ctx).id, amount: 10 },
+					{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Archer', ctx).id, amount: 10 },
+					{ home: 'clanCastle', unitId: UnitModel.requireTroopByName('Barbarian', ctx).id, amount: 10 },
+					{ home: 'clanCastle', unitId: UnitModel.requireTroopByName('Archer', ctx).id, amount: 10 },
 				],
-				equipment: [{ equipmentId: requireEquipment('Barbarian Puppet', ctx).id }, { equipmentId: requireEquipment('Rage Vial', ctx).id }],
+				equipment: [
+					{ equipmentId: EquipmentModel.requireByName('Barbarian Puppet', ctx).id },
+					{ equipmentId: EquipmentModel.requireByName('Rage Vial', ctx).id },
+				],
 				pets: [
-					{ hero: 'Barbarian King', petId: requirePet('Lassi', ctx).id },
-					{ hero: 'Archer Queen', petId: requirePet('Spirit Fox', ctx).id },
+					{ hero: 'Barbarian King', petId: PetModel.requireByName('Lassi', ctx).id },
+					{ hero: 'Archer Queen', petId: PetModel.requireByName('Spirit Fox', ctx).id },
 				],
 			});
 			await saveArmy(EVENT, data);
@@ -115,7 +104,7 @@ describe('Saving', function () {
 			const data = makeData({
 				name: 'test',
 				townHall: 16,
-				units: [{ home: 'armyCamp', unitId: requireUnit('Barbarian', ctx).id, amount: 10 }],
+				units: [{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Barbarian', ctx).id, amount: 10 }],
 				guide: {
 					textContent: '<p>Guide!</p>',
 					youtubeUrl: null,
@@ -130,7 +119,7 @@ describe('Saving', function () {
 			const data = makeData({
 				name: 'test',
 				townHall: 16,
-				units: [{ home: 'armyCamp', unitId: requireUnit('Barbarian', ctx).id, amount: 10 }],
+				units: [{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Barbarian', ctx).id, amount: 10 }],
 				guide: {
 					textContent: `
 						<p></p>
@@ -155,21 +144,21 @@ describe('Saving', function () {
 				name: 'test',
 				townHall: 16,
 				units: [
-					{ home: 'armyCamp', unitId: requireUnit('Barbarian', ctx).id, amount: 10 },
-					{ home: 'clanCastle', unitId: requireUnit('Barbarian', ctx).id, amount: 10 },
+					{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Barbarian', ctx).id, amount: 10 },
+					{ home: 'clanCastle', unitId: UnitModel.requireTroopByName('Barbarian', ctx).id, amount: 10 },
 				],
-				equipment: [{ equipmentId: requireEquipment('Barbarian Puppet', ctx).id }],
-				pets: [{ hero: 'Barbarian King', petId: requirePet('Lassi', ctx).id }],
+				equipment: [{ equipmentId: EquipmentModel.requireByName('Barbarian Puppet', ctx).id }],
+				pets: [{ hero: 'Barbarian King', petId: PetModel.requireByName('Lassi', ctx).id }],
 			});
 			await saveArmy(EVENT, data);
 			const army = (await getArmies(REQ))[0];
 			// Add units
 			army.units.push(
-				{ home: 'armyCamp', unitId: requireUnit('Archer', ctx).id, amount: 5 },
-				{ home: 'clanCastle', unitId: requireUnit('Archer', ctx).id, amount: 5 }
+				{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Archer', ctx).id, amount: 5 },
+				{ home: 'clanCastle', unitId: UnitModel.requireTroopByName('Archer', ctx).id, amount: 5 }
 			);
-			army.equipment.push({ equipmentId: requireEquipment('Rage Vial', ctx).id });
-			army.pets.push({ hero: 'Archer Queen', petId: requirePet('Spirit Fox', ctx).id });
+			army.equipment.push({ equipmentId: EquipmentModel.requireByName('Rage Vial', ctx).id });
+			army.pets.push({ hero: 'Archer Queen', petId: PetModel.requireByName('Spirit Fox', ctx).id });
 			await saveArmy(EVENT, army);
 			const armySaved = (await getArmies(REQ))[0];
 			assertArmies([armySaved], [army]);
@@ -180,15 +169,18 @@ describe('Saving', function () {
 				name: 'test',
 				townHall: 16,
 				units: [
-					{ home: 'armyCamp', unitId: requireUnit('Barbarian', ctx).id, amount: 10 },
-					{ home: 'clanCastle', unitId: requireUnit('Barbarian', ctx).id, amount: 10 },
-					{ home: 'armyCamp', unitId: requireUnit('Archer', ctx).id, amount: 5 },
-					{ home: 'clanCastle', unitId: requireUnit('Archer', ctx).id, amount: 5 },
+					{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Barbarian', ctx).id, amount: 10 },
+					{ home: 'clanCastle', unitId: UnitModel.requireTroopByName('Barbarian', ctx).id, amount: 10 },
+					{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Archer', ctx).id, amount: 5 },
+					{ home: 'clanCastle', unitId: UnitModel.requireTroopByName('Archer', ctx).id, amount: 5 },
 				],
-				equipment: [{ equipmentId: requireEquipment('Barbarian Puppet', ctx).id }, { equipmentId: requireEquipment('Rage Vial', ctx).id }],
+				equipment: [
+					{ equipmentId: EquipmentModel.requireByName('Barbarian Puppet', ctx).id },
+					{ equipmentId: EquipmentModel.requireByName('Rage Vial', ctx).id },
+				],
 				pets: [
-					{ hero: 'Barbarian King', petId: requirePet('Lassi', ctx).id },
-					{ hero: 'Archer Queen', petId: requirePet('Spirit Fox', ctx).id },
+					{ hero: 'Barbarian King', petId: PetModel.requireByName('Lassi', ctx).id },
+					{ hero: 'Archer Queen', petId: PetModel.requireByName('Spirit Fox', ctx).id },
 				],
 			});
 			await saveArmy(EVENT, data);
@@ -206,7 +198,7 @@ describe('Saving', function () {
 			const data = makeData({
 				name: 'test',
 				townHall: 16,
-				units: [{ home: 'armyCamp', unitId: requireUnit('Barbarian', ctx).id, amount: 10 }],
+				units: [{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Barbarian', ctx).id, amount: 10 }],
 			});
 			await saveArmy(EVENT, data);
 			const army = (await getArmies(REQ))[0];
@@ -221,7 +213,7 @@ describe('Saving', function () {
 			const data = makeData({
 				name: 'test',
 				townHall: 16,
-				units: [{ home: 'armyCamp', unitId: requireUnit('Barbarian', ctx).id, amount: 10 }],
+				units: [{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Barbarian', ctx).id, amount: 10 }],
 				guide: {
 					textContent: '<p>Guide!</p>',
 					youtubeUrl: null,
@@ -248,15 +240,18 @@ describe('Fetching', function () {
 			name: 'test',
 			townHall: 16,
 			units: [
-				{ home: 'armyCamp', unitId: requireUnit('Barbarian', ctx).id, amount: 10 },
-				{ home: 'armyCamp', unitId: requireUnit('Archer', ctx).id, amount: 10 },
-				{ home: 'clanCastle', unitId: requireUnit('Barbarian', ctx).id, amount: 10 },
-				{ home: 'clanCastle', unitId: requireUnit('Archer', ctx).id, amount: 10 },
+				{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Barbarian', ctx).id, amount: 10 },
+				{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Archer', ctx).id, amount: 10 },
+				{ home: 'clanCastle', unitId: UnitModel.requireTroopByName('Barbarian', ctx).id, amount: 10 },
+				{ home: 'clanCastle', unitId: UnitModel.requireTroopByName('Archer', ctx).id, amount: 10 },
 			],
-			equipment: [{ equipmentId: requireEquipment('Barbarian Puppet', ctx).id }, { equipmentId: requireEquipment('Rage Vial', ctx).id }],
+			equipment: [
+				{ equipmentId: EquipmentModel.requireByName('Barbarian Puppet', ctx).id },
+				{ equipmentId: EquipmentModel.requireByName('Rage Vial', ctx).id },
+			],
 			pets: [
-				{ hero: 'Barbarian King', petId: requirePet('Lassi', ctx).id },
-				{ hero: 'Archer Queen', petId: requirePet('Spirit Fox', ctx).id },
+				{ hero: 'Barbarian King', petId: PetModel.requireByName('Lassi', ctx).id },
+				{ hero: 'Archer Queen', petId: PetModel.requireByName('Spirit Fox', ctx).id },
 			],
 		});
 		const data2 = { ...data, name: 'test2' };
@@ -273,17 +268,17 @@ describe('Army comments', function () {
 	let armyId: number;
 	let armyId2: number;
 
-	before(async function () {
+	beforeAll(async function () {
 		// Create test armies for saving comments
 		const data = makeData({
 			name: 'test',
 			townHall: 1,
-			units: [{ home: 'armyCamp', unitId: requireUnit('Barbarian', ctx).id, amount: 5 }],
+			units: [{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Barbarian', ctx).id, amount: 5 }],
 		});
 		const data2 = makeData({
 			name: 'test2',
 			townHall: 1,
-			units: [{ home: 'armyCamp', unitId: requireUnit('Barbarian', ctx).id, amount: 5 }],
+			units: [{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Barbarian', ctx).id, amount: 5 }],
 		});
 		armyId = await saveArmy(EVENT, data);
 		armyId2 = await saveArmy(EVENT, data2);
@@ -383,7 +378,7 @@ describe('Army comments', function () {
 			const USER_2_EVENT = createEvent(USER_2);
 			await saveComment(USER_2_EVENT, { ...data, id, comment: 'Updated ' });
 			assert.fail('Expected error');
-		} catch (err) {
+		} catch (err: any) {
 			assert.equal(err.body.message, "You don't have permission to do this warrior!");
 			// Assert comment was not changed
 			const comment = await db.getRow('army_comments', { id });
@@ -405,11 +400,11 @@ describe('Army notifications', function () {
 
 	let armyId: number;
 
-	before(async function () {
+	beforeAll(async function () {
 		const data = makeData({
 			name: 'test',
 			townHall: 1,
-			units: [{ home: 'armyCamp', unitId: requireUnit('Barbarian', ctx).id, amount: 5 }],
+			units: [{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Barbarian', ctx).id, amount: 5 }],
 		});
 		armyId = await saveArmy(USER_1_EVENT, data);
 	});
@@ -500,11 +495,11 @@ describe('Army notifications', function () {
 			}, "Cannot acknowledge notifications that aren't yours");
 
 			// Should not have changed if the notification has been acknowledged
-			assert.isNull((await getNotifications(USER.id))[0]?.seen);
+			assert.strictEqual((await getNotifications(USER.id))[0]?.seen, null);
 
 			// Admin should be able to acknowledge
 			await acknowledgeNotifications(ADMIN_EVENT, [notificationId]);
-			assert.isNotNull((await getNotifications(USER.id))[0]?.seen);
+			assert.instanceOf((await getNotifications(USER.id))[0]?.seen, Date);
 		});
 	});
 });
@@ -512,7 +507,7 @@ describe('Army notifications', function () {
 describe('Validation', function () {
 	function testCapacity(type: UnitType, clanCastle: boolean) {
 		function _testCapacity(overflow: boolean) {
-			const th = requireTh(16, ctx);
+			const th = ArmyModel.requireTownHall(16, ctx);
 			const longType = type === 'Siege' ? 'siege machine' : type.toLowerCase();
 			const maxCapacity = clanCastle ? th[`cc${type}Capacity`] : th[`${type.toLowerCase()}Capacity`];
 			const data = makeData({
@@ -541,8 +536,8 @@ describe('Validation', function () {
 			name: 'test',
 			townHall: 16,
 			units: [
-				{ home, unitId: requireUnit('Barbarian', ctx).id, amount: 1 },
-				{ home, unitId: requireUnit('Barbarian', ctx).id, amount: 1 },
+				{ home, unitId: UnitModel.requireTroopByName('Barbarian', ctx).id, amount: 1 },
+				{ home, unitId: UnitModel.requireTroopByName('Barbarian', ctx).id, amount: 1 },
 			],
 		});
 		assert.throws(
@@ -558,20 +553,20 @@ describe('Validation', function () {
 		const data = makeData({
 			name: 'test',
 			townHall: 6,
-			units: [{ home: 'armyCamp', unitId: requireUnit('Barbarian', ctx).id, amount: 1 }],
+			units: [{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Barbarian', ctx).id, amount: 1 }],
 			equipment: [
 				// Barbarian King equipment
-				{ equipmentId: requireEquipment('Barbarian Puppet', ctx).id },
+				{ equipmentId: EquipmentModel.requireByName('Barbarian Puppet', ctx).id },
 				// Archer Queen equipment
-				{ equipmentId: requireEquipment('Archer Puppet', ctx).id },
+				{ equipmentId: EquipmentModel.requireByName('Archer Puppet', ctx).id },
 				// Royal Champion equipment
-				{ equipmentId: requireEquipment('Rocket Spear', ctx).id },
+				{ equipmentId: EquipmentModel.requireByName('Rocket Spear', ctx).id },
 				// Grand Warden equipment
-				{ equipmentId: requireEquipment('Eternal Tome', ctx).id },
+				{ equipmentId: EquipmentModel.requireByName('Eternal Tome', ctx).id },
 			],
 			pets: [
 				// Minion Prince
-				{ hero: 'Minion Prince', petId: requirePet('Lassi', ctx).id },
+				{ hero: 'Minion Prince', petId: PetModel.requireByName('Lassi', ctx).id },
 			],
 		});
 		assert.throws(function () {
@@ -595,9 +590,9 @@ describe('Validation', function () {
 				name: 'test',
 				townHall: 16,
 				units: [
-					{ home: 'armyCamp', unitId: requireUnit('Super Barbarian', ctx).id, amount: 1 },
-					{ home: 'armyCamp', unitId: requireUnit('Super Archer', ctx).id, amount: 1 },
-					{ home: 'armyCamp', unitId: requireUnit('Super Miner', ctx).id, amount: 1 },
+					{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Super Barbarian', ctx).id, amount: 1 },
+					{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Super Archer', ctx).id, amount: 1 },
+					{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Super Miner', ctx).id, amount: 1 },
 				],
 			});
 			// Should throw with 3 unique super troops
@@ -613,7 +608,7 @@ describe('Validation', function () {
 			const data = makeData({
 				name: 'test',
 				townHall: 10,
-				units: [{ home: 'armyCamp', unitId: requireUnit('Super Barbarian', ctx).id, amount: 1 }],
+				units: [{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Super Barbarian', ctx).id, amount: 1 }],
 			});
 			// Should throw at town hall 10
 			assert.throws(function () {
@@ -628,7 +623,7 @@ describe('Validation', function () {
 			const data = makeData({
 				name: 'test',
 				townHall: 4,
-				units: [{ home: 'armyCamp', unitId: requireUnit('Lightning', ctx).id, amount: 1 }],
+				units: [{ home: 'armyCamp', unitId: UnitModel.requireSpellByName('Lightning', ctx).id, amount: 1 }],
 			});
 			// Should throw at town hall 4
 			assert.throws(function () {
@@ -643,7 +638,7 @@ describe('Validation', function () {
 			const data = makeData({
 				name: 'test',
 				townHall: 11,
-				units: [{ home: 'armyCamp', unitId: requireUnit('Wall Wrecker', ctx).id, amount: 1 }],
+				units: [{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Wall Wrecker', ctx).id, amount: 1 }],
 			});
 			// Should throw at town hall 11
 			assert.throws(function () {
@@ -671,9 +666,9 @@ describe('Validation', function () {
 				name: 'test',
 				townHall: 16,
 				units: [
-					{ home: 'clanCastle', unitId: requireUnit('Super Barbarian', ctx).id, amount: 1 },
-					{ home: 'clanCastle', unitId: requireUnit('Super Archer', ctx).id, amount: 1 },
-					{ home: 'clanCastle', unitId: requireUnit('Super Miner', ctx).id, amount: 1 },
+					{ home: 'clanCastle', unitId: UnitModel.requireTroopByName('Super Barbarian', ctx).id, amount: 1 },
+					{ home: 'clanCastle', unitId: UnitModel.requireTroopByName('Super Archer', ctx).id, amount: 1 },
+					{ home: 'clanCastle', unitId: UnitModel.requireTroopByName('Super Miner', ctx).id, amount: 1 },
 				],
 			});
 			// Should not throw even with more than 2 unique super troops
@@ -690,7 +685,7 @@ describe('Validation', function () {
 			const data = makeData({
 				name: 'test',
 				townHall: thLabLvl9.level,
-				units: [{ home: 'clanCastle', unitId: requireUnit('Super Valkyrie', ctx).id, amount: 1 }],
+				units: [{ home: 'clanCastle', unitId: UnitModel.requireTroopByName('Super Valkyrie', ctx).id, amount: 1 }],
 			});
 			// Should throw when lab is level 9
 			assert.throws(function () {
@@ -710,7 +705,7 @@ describe('Validation', function () {
 			const data = makeData({
 				name: 'test',
 				townHall: thCcLvl8.level,
-				units: [{ home: 'clanCastle', unitId: requireUnit('Battle Drill', ctx).id, amount: 1 }],
+				units: [{ home: 'clanCastle', unitId: UnitModel.requireTroopByName('Battle Drill', ctx).id, amount: 1 }],
 			});
 			// Should throw when clan castle is level 8
 			assert.throws(function () {
@@ -727,8 +722,8 @@ describe('Validation', function () {
 			const data = makeData({
 				name: 'test',
 				townHall: 6,
-				units: [{ home: 'armyCamp', unitId: requireUnit('Barbarian', ctx).id, amount: 1 }],
-				equipment: [{ equipmentId: requireEquipment('Barbarian Puppet', ctx).id }],
+				units: [{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Barbarian', ctx).id, amount: 1 }],
+				equipment: [{ equipmentId: EquipmentModel.requireByName('Barbarian Puppet', ctx).id }],
 			});
 			// Should throw at town hall level 6 as king isn't unlocked yet
 			assert.throws(function () {
@@ -743,8 +738,11 @@ describe('Validation', function () {
 			const data = makeData({
 				name: 'test',
 				townHall: 16,
-				units: [{ home: 'armyCamp', unitId: requireUnit('Barbarian', ctx).id, amount: 1 }],
-				equipment: [{ equipmentId: requireEquipment('Barbarian Puppet', ctx).id }, { equipmentId: requireEquipment('Barbarian Puppet', ctx).id }],
+				units: [{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Barbarian', ctx).id, amount: 1 }],
+				equipment: [
+					{ equipmentId: EquipmentModel.requireByName('Barbarian Puppet', ctx).id },
+					{ equipmentId: EquipmentModel.requireByName('Barbarian Puppet', ctx).id },
+				],
 			});
 			assert.throws(function () {
 				validateArmy(data, ctx);
@@ -755,11 +753,11 @@ describe('Validation', function () {
 			const data = makeData({
 				name: 'test',
 				townHall: 16,
-				units: [{ home: 'armyCamp', unitId: requireUnit('Barbarian', ctx).id, amount: 1 }],
+				units: [{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Barbarian', ctx).id, amount: 1 }],
 				equipment: [
-					{ equipmentId: requireEquipment('Barbarian Puppet', ctx).id },
-					{ equipmentId: requireEquipment('Rage Vial', ctx).id },
-					{ equipmentId: requireEquipment('Earthquake Boots', ctx).id },
+					{ equipmentId: EquipmentModel.requireByName('Barbarian Puppet', ctx).id },
+					{ equipmentId: EquipmentModel.requireByName('Rage Vial', ctx).id },
+					{ equipmentId: EquipmentModel.requireByName('Earthquake Boots', ctx).id },
 				],
 			});
 			assert.throws(function () {
@@ -773,10 +771,10 @@ describe('Validation', function () {
 			const data = makeData({
 				name: 'test',
 				townHall: 16,
-				units: [{ home: 'armyCamp', unitId: requireUnit('Barbarian', ctx).id, amount: 1 }],
+				units: [{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Barbarian', ctx).id, amount: 1 }],
 				pets: [
-					{ hero: 'Barbarian King', petId: requirePet('Lassi', ctx).id },
-					{ hero: 'Barbarian King', petId: requirePet('Spirit Fox', ctx).id },
+					{ hero: 'Barbarian King', petId: PetModel.requireByName('Lassi', ctx).id },
+					{ hero: 'Barbarian King', petId: PetModel.requireByName('Spirit Fox', ctx).id },
 				],
 			});
 			assert.throws(function () {
@@ -788,10 +786,10 @@ describe('Validation', function () {
 			const data = makeData({
 				name: 'test',
 				townHall: 16,
-				units: [{ home: 'armyCamp', unitId: requireUnit('Barbarian', ctx).id, amount: 1 }],
+				units: [{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Barbarian', ctx).id, amount: 1 }],
 				pets: [
-					{ hero: 'Barbarian King', petId: requirePet('Mighty Yak', ctx).id },
-					{ hero: 'Archer Queen', petId: requirePet('Mighty Yak', ctx).id },
+					{ hero: 'Barbarian King', petId: PetModel.requireByName('Mighty Yak', ctx).id },
+					{ hero: 'Archer Queen', petId: PetModel.requireByName('Mighty Yak', ctx).id },
 				],
 			});
 			assert.throws(function () {
@@ -805,7 +803,7 @@ describe('Validation', function () {
 			const data = makeData({
 				name: 'test',
 				townHall: 16,
-				units: [{ home: 'armyCamp', unitId: requireUnit('Barbarian', ctx).id, amount: 10 }],
+				units: [{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Barbarian', ctx).id, amount: 10 }],
 				guide: {
 					textContent: null,
 					youtubeUrl: null,
@@ -820,7 +818,7 @@ describe('Validation', function () {
 			const data = makeData({
 				name: 'test',
 				townHall: 16,
-				units: [{ home: 'armyCamp', unitId: requireUnit('Barbarian', ctx).id, amount: 10 }],
+				units: [{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Barbarian', ctx).id, amount: 10 }],
 				guide: {
 					textContent: null,
 					youtubeUrl: 'https://www.youtube.com/invalid-url',
@@ -854,7 +852,7 @@ describe('Validation', function () {
 			const data = makeData({
 				name: 'test',
 				townHall: 16,
-				units: [{ home: 'armyCamp', unitId: requireUnit('Barbarian', ctx).id, amount: 10 }],
+				units: [{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Barbarian', ctx).id, amount: 10 }],
 				guide: {
 					textContent: '',
 					youtubeUrl: null,
@@ -869,7 +867,7 @@ describe('Validation', function () {
 			const data = makeData({
 				name: 'test',
 				townHall: 16,
-				units: [{ home: 'armyCamp', unitId: requireUnit('Barbarian', ctx).id, amount: 10 }],
+				units: [{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Barbarian', ctx).id, amount: 10 }],
 				guide: {
 					textContent: `<p>${'a'.repeat(GUIDE_TEXT_CHAR_LIMIT + 1)}</p>`,
 					youtubeUrl: null,

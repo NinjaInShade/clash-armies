@@ -12,3 +12,4 @@ vite.config.ts.timestamp-*
 dist
 copy.sh
 scripts
+coverage

@@ -4,19 +4,12 @@ import type { Army } from '$models';
 import { BANNERS } from '$shared/utils';
 import { migration } from '$server/migration';
 import { db } from '$server/db';
-import * as chai from 'chai';
 import chaiSubset from 'chai-subset';
 import type { RequestEvent } from '@sveltejs/kit';
 import { hasAuth, requireAuth, hasRoles, requireRoles } from '$server/auth/utils';
+import * as vitest from 'vitest';
 
-type $State = typeof globalThis.$state;
-// TODO: properly hack
-const $stateShim: $State = (initial) => {
-	return initial;
-};
-globalThis.$state = $stateShim;
-
-chai.use(chaiSubset);
+vitest.chai.use(chaiSubset);
 
 export const USER = {
 	id: 1,
@@ -100,7 +93,7 @@ export async function getCtx() {
 }
 
 /** Returns an army, defaulting certain fields with dummy data for convenience */
-export function makeData(data: Record<string, unknown>) {
+export function makeData(data: Record<string, unknown>): Record<string, any> {
 	return { units: [], equipment: [], pets: [], guide: null, banner: BANNERS[0], ...data };
 }
 
@@ -130,38 +123,6 @@ export function assertArmies(actual: Army[], expected: Record<string, any>[]) {
 	}
 }
 
-export function requireTh(level: number, ctx: ArmyCtx) {
-	const th = ctx.townHalls.find((th) => th.level === level);
-	if (!th) {
-		throw new Error(`Expected town hall "${level}"`);
-	}
-	return th;
-}
-
-export function requireUnit(name: string, ctx: ArmyCtx) {
-	const unit = ctx.units.find((u) => u.name === name);
-	if (!unit) {
-		throw new Error(`Expected unit "${name}"`);
-	}
-	return unit;
-}
-
-export function requireEquipment(name: string, ctx: ArmyCtx) {
-	const eq = ctx.equipment.find((eq) => eq.name === name);
-	if (!eq) {
-		throw new Error(`Expected equipment "${name}"`);
-	}
-	return eq;
-}
-
-export function requirePet(name: string, ctx: ArmyCtx) {
-	const pet = ctx.pets.find((p) => p.name === name);
-	if (!pet) {
-		throw new Error(`Expected pet "${name}"`);
-	}
-	return pet;
-}
-
 const throwsAsync = async function (fn: (...args: unknown[]) => Promise<unknown>, pattern?: string | RegExp) {
 	let error: unknown;
 	try {
@@ -169,11 +130,11 @@ const throwsAsync = async function (fn: (...args: unknown[]) => Promise<unknown>
 	} catch (err) {
 		error = err;
 	}
-	chai.assert.throws(() => {
+	vitest.assert.throws(() => {
 		if (error) {
 			throw error;
 		}
 	}, pattern);
 };
-const assert = { ...chai.assert, throwsAsync };
+const assert = { ...vitest.assert, throwsAsync };
 export { assert };
