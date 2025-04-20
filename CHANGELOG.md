@@ -1,3 +1,7 @@
+## [0.3.1] - 2025-04-20
+
+- Fix login button not closing sidebar
+
 ## [0.3.0] - 2025-04-20
 
 - Add import/export/copy link support for clan castle & heroes
