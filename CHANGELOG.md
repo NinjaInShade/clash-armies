@@ -1,4 +1,14 @@
-## [Unreleased]
+## [0.3.0] - 2025-04-20
+
+- Add import/export/copy link support for clan castle & heroes
+- Add fine-grained hero selection (along with Minion Prince support)
+- Add comment notifications
+- Remove training time
+- Remove max armies display text
+- Fix scrolling position bug when navigating
+- Add all new troops/spells/pets/equipment and new levels
+- (internal) refactor codebase for easier expansion
+- (internal) update to latest packages
 
 ## [0.2.0] - 2024-09-07
 
