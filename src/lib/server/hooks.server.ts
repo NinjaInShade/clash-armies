@@ -12,18 +12,31 @@ util.Logger.showDate = !dev;
 
 export const log = util.logger('clash-armies:server');
 
-const hourlyTask = new CronJob('0 0 * * * *', async function () {
+async function hourlyTask() {
+	log.info('Deleting expired sessions...');
 	await lucia.deleteExpiredSessions();
+	log.info('Successfully deleted expired sessions');
+
+	log.info('Deleting old notifications...');
+	const deletedNotifications = (await db.query('DELETE FROM army_notifications WHERE timestamp < NOW() - INTERVAL 3 MONTH'))?.affectedRows ?? '<unknown>';
+	log.info(`Deleted ${deletedNotifications} old notification${deletedNotifications !== 1 ? 's' : ''}`);
+}
+
+const hourlyTaskJob = new CronJob('0 0 * * * *', async function () {
+	log.info('Running hourly task...');
+	await hourlyTask();
+	log.info('Finished hourly task');
 });
 
 const serverInit = (async () => {
 	await db.connect();
 	await db.migrate(migration);
-	hourlyTask.start();
+	await hourlyTask();
+	hourlyTaskJob.start();
 })();
 
 const serverDispose = async () => {
-	hourlyTask.stop();
+	hourlyTaskJob.stop();
 	await db.dispose();
 };
 
