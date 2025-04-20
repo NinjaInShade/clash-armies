@@ -31,7 +31,7 @@
 </script>
 
 {#if asLink}
-	<a class="btn {theme}" {...rest}>
+	<a class="btn {theme}" onclick={onClick} {...rest}>
 		<span>
 			{@render children()}
 		</span>
