@@ -1,5 +1,9 @@
 ## [0.3.2] - 2025-05-12
 
+- Add ads.txt file
+
+## [0.3.2] - 2025-05-12
+
 - Fix bugs with importing from army link
 
 ## [0.3.1] - 2025-04-20
