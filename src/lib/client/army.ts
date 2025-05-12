@@ -182,6 +182,11 @@ export function parseLink(fullLink: string, ctx: ArmyCtx) {
 
 	// Ensure imported data is valid
 	const modelData = model.getSaveData();
+
+	// TODO: validateArmy() validates *everything* whereas here we only care
+	// about certain things like units, so we end up having to "stub" some properties
+	modelData.name = 'stub';
+
 	validateArmy(modelData, ctx);
 
 	return model;
