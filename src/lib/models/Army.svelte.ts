@@ -196,20 +196,24 @@ export class ArmyModel {
 		const newUnit = new UnitModel(this.ctx, { unitId: unit.id, amount: 1, home: housedIn });
 		const units = housedIn === 'clanCastle' ? this.ccUnits : this.units;
 		units.push(newUnit);
+		return newUnit;
 	}
 
 	public addPet(pet: Pet, hero: HeroType) {
 		const newPet = new PetModel(this.ctx, { hero, petId: pet.id });
 		this.pets.push(newPet);
+		return newPet;
 	}
 
 	public addEquipment(equipment: Equipment) {
 		const newEquipment = new EquipmentModel(this.ctx, { equipmentId: equipment.id });
 		this.equipment.push(newEquipment);
+		return newEquipment;
 	}
 
 	public addGuide() {
 		this.guide = new GuideModel(this.ctx);
+		return this.guide;
 	}
 
 	public removeUnit(name: string, housedIn: UnitHome) {

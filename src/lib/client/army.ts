@@ -123,10 +123,12 @@ export function parseLink(fullLink: string, ctx: ArmyCtx) {
 	function addUnit(data: { id: number; amount: number }, type: 'Troop' | 'Spell', housedIn: UnitHome) {
 		if (type === 'Troop') {
 			const unit = UnitModel.requireTroopByClashID(data.id, ctx);
-			model.addUnit(unit, housedIn);
+			const modelUnit = model.addUnit(unit, housedIn);
+			modelUnit.amount = data.amount;
 		} else if (type === 'Spell') {
 			const unit = UnitModel.requireSpellByClashID(data.id, ctx);
-			model.addUnit(unit, housedIn);
+			const modelUnit = model.addUnit(unit, housedIn);
+			modelUnit.amount = data.amount;
 		}
 	}
 
