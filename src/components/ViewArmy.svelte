@@ -347,8 +347,9 @@
 	}
 	.banner-content .right .separator {
 		background-color: var(--grey-500);
-		height: 22px;
-		width: 1px;
+		border-radius: 50%;
+		width: 5px;
+		height: 5px;
 	}
 
 	:global(.bookmark svg) {

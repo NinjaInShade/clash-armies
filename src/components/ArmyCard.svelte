@@ -194,8 +194,9 @@
 	}
 	.header .right .separator {
 		background-color: var(--grey-500);
-		height: 22px;
-		width: 1px;
+		border-radius: 50%;
+		height: 5px;
+		width: 5px;
 	}
 	.header .right :global(.card-votes b) {
 		font-size: 14px;

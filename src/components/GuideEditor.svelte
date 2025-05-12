@@ -402,6 +402,7 @@
 	.controls {
 		display: flex;
 		flex-flow: row wrap;
+		align-items: center;
 		gap: 10px;
 		padding-bottom: 8px;
 		margin-bottom: 16px;
@@ -414,7 +415,9 @@
 	}
 	.separator {
 		background-color: var(--grey-600);
-		width: 1px;
+		border-radius: 50%;
+		width: 5px;
+		height: 5px;
 	}
 	.controls button {
 		display: flex;
