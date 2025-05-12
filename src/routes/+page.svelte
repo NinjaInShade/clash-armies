@@ -17,12 +17,13 @@
 
 	let page = $state<number>(1);
 
-	let displayArmies = $derived.by(() => {
-		return armies
-			.toSorted((a, b) => {
+	const displayArmies = $derived.by(() => {
+		const sorted = untrack(() =>
+			armies.toSorted((a, b) => {
 				return b.votes - a.votes;
 			})
-			.slice(0, page * ENTRIES_PER_PAGE);
+		);
+		return sorted.slice(0, page * ENTRIES_PER_PAGE);
 	});
 
 	function loadMore() {
