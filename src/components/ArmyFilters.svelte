@@ -31,7 +31,7 @@
 
 	let { armies, filteredArmies = $bindable() }: Props = $props();
 	const app = getContext<AppState>('app');
-	const sortOptions = ['Newest', 'Name', 'Votes'] as const;
+	const sortOptions = ['Name', 'Votes'];
 
 	const search = mkParamStore('search', 'string');
 	const townHall = mkParamStore('townHall', 'number');
@@ -117,6 +117,12 @@
 		filteredArmies = filtered;
 	});
 
+	$effect(() => {
+		if ($sort && !sortOptions.includes($sort)) {
+			$sort = undefined;
+		}
+	});
+
 	function filterFn(army: ArmyModel) {
 		const tags = getTags(army);
 		const units = army.units.filter((unit) => unit.home === 'armyCamp');
@@ -165,14 +171,14 @@
 	}
 
 	function sortFn(a: ArmyModel, b: ArmyModel) {
-		if ($sort === 'Newest') {
-			return +b.createdTime - +a.createdTime;
-		}
 		if ($sort === 'Votes') {
 			return b.votes - a.votes;
 		}
-		// Default sorting (a-z|A-Z)
-		return a.name.localeCompare(b.name);
+		if ($sort === 'Name') {
+			return a.name.localeCompare(b.name);
+		}
+		// Default sorting (newest first)
+		return +b.createdTime - +a.createdTime;
 	}
 
 	async function openFiltersPopup() {
