@@ -607,4 +607,7 @@ export default function migration(runStep: MigrationFn) {
             { equipmentId: afId, level: 27, blacksmithLevel: 9 },
         ]);
     });
+    runStep(39, async (db: MySQL) => {
+        await db.query('UPDATE equipment SET clashId = ? WHERE name = ?', [9, 'Hog Rider Doll']);
+    });
 }
