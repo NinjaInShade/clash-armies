@@ -290,11 +290,9 @@ a:focus {
 	outline: var(--grey-400) dotted 1.5px;
 }
 
-button:disabled {
-	cursor: not-allowed;
-}
 button:disabled,
 button.visually-disabled {
+	cursor: not-allowed;
 	opacity: 0.5;
 }
 

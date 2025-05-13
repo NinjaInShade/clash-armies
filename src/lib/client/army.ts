@@ -218,6 +218,7 @@ async function copy(text: string) {
 	Object.assign(textarea.style, { position: 'fixed', top: '0', left: '0', opacity: '0' });
 	textarea.value = text;
 	document.body.appendChild(textarea);
+	const prevFocused = document.activeElement;
 	textarea.focus();
 	textarea.select();
 	let success = false;
@@ -227,6 +228,9 @@ async function copy(text: string) {
 		console.error('Failed to copy with execCommand.', err);
 	} finally {
 		document.body.removeChild(textarea);
+		if (prevFocused instanceof HTMLElement) {
+			prevFocused.focus();
+		}
 	}
 	if (!success) {
 		throw new Error('Failed to copy text');

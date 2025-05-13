@@ -12,21 +12,15 @@
 
 	let { children, theme, asLink, onClick, ...rest }: Props = $props();
 
-	let ref = $state<HTMLButtonElement | undefined>(undefined);
-	let _loading = $state<boolean>(false);
+	let running = $state<boolean>(false);
 
 	async function _onClick(ev: MouseEvent | KeyboardEvent) {
-		if (!onClick || _loading) {
+		if (!onClick || running) {
 			return;
 		}
-		_loading = true;
+		running = true;
 		await onClick(ev);
-		_loading = false;
-		if (ref) {
-			// Prevents losing focus on keyboard enter
-			await tick();
-			ref.focus();
-		}
+		running = false;
 	}
 </script>
 
@@ -37,11 +31,11 @@
 		</span>
 	</a>
 {:else}
-	<button class="btn {theme}" type="button" bind:this={ref} disabled={rest.disabled || _loading} onclick={_onClick} {...rest}>
+	<button class="btn {theme}" type="button" class:visually-disabled={running} onclick={_onClick} {...rest}>
 		<span>
 			{@render children()}
 		</span>
-		{#if _loading}
+		{#if running}
 			<div class="spinner-container">
 				<span class="spinner"></span>
 			</div>
@@ -59,11 +53,14 @@
 		display: inline-flex;
 		justify-content: center;
 		align-items: center;
-		cursor: pointer;
 		padding: 10px 18px;
 		background-color: var(--primary-500);
 		border-radius: 8px;
 		gap: 10px;
+
+		&:not(:disabled):not(.visually-disabled) {
+			cursor: pointer;
+		}
 	}
 
 	.btn,
@@ -101,12 +98,12 @@
 		top: 4px;
 	}
 
-	.btn:hover:not(:disabled),
+	.btn:hover:not(:disabled):not(.visually-disabled),
 	.btn:focus-visible {
 		background-color: var(--primary-600);
 	}
 
-	.btn:hover:not(:disabled)::before {
+	.btn:hover:not(:disabled):not(.visually-disabled)::before {
 		background-color: var(--primary-500);
 	}
 
@@ -120,10 +117,10 @@
 	.btn.danger::before {
 		background-color: hsl(0, 45%, 45%);
 	}
-	.btn.danger:hover:not(:disabled)::before {
+	.btn.danger:hover:not(:disabled):not(.visually-disabled)::before {
 		background-color: hsl(0, 45%, 40%);
 	}
-	.btn.danger:hover:not(:disabled),
+	.btn.danger:hover:not(:disabled):not(.visually-disabled),
 	.btn.danger:focus-visible {
 		background-color: hsl(0, 45%, 33%);
 	}
