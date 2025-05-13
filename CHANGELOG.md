@@ -1,3 +1,7 @@
+## [0.3.6] - 2025-05-13
+
+- Change default sort order on armies page to newest first
+
 ## [0.3.5] - 2025-05-13
 
 - Fix hog rider doll equipment incorrect clash id
