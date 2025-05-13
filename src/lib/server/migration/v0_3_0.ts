@@ -574,4 +574,37 @@ export default function migration(runStep: MigrationFn) {
             return db.query('UPDATE equipment SET clashId = ? WHERE name = ?', [id, name]);
         }));
     });
+    runStep(38, async (db: MySQL) => {
+        // Action Figure (AK)
+        const afId = await db.insertOne('equipment', { hero: 'Archer Queen', name: 'Action Figure', clashId: 48, epic: true });
+        await db.insertMany('equipment_levels', [
+            { equipmentId: afId, level: 1, blacksmithLevel: 1 },
+            { equipmentId: afId, level: 2, blacksmithLevel: 1 },
+            { equipmentId: afId, level: 3, blacksmithLevel: 1 },
+            { equipmentId: afId, level: 4, blacksmithLevel: 1 },
+            { equipmentId: afId, level: 5, blacksmithLevel: 1 },
+            { equipmentId: afId, level: 6, blacksmithLevel: 1 },
+            { equipmentId: afId, level: 7, blacksmithLevel: 1 },
+            { equipmentId: afId, level: 8, blacksmithLevel: 1 },
+            { equipmentId: afId, level: 9, blacksmithLevel: 1 },
+            { equipmentId: afId, level: 10, blacksmithLevel: 1 },
+            { equipmentId: afId, level: 11, blacksmithLevel: 1 },
+            { equipmentId: afId, level: 12, blacksmithLevel: 1 },
+            { equipmentId: afId, level: 13, blacksmithLevel: 3 },
+            { equipmentId: afId, level: 14, blacksmithLevel: 3 },
+            { equipmentId: afId, level: 15, blacksmithLevel: 3 },
+            { equipmentId: afId, level: 16, blacksmithLevel: 5 },
+            { equipmentId: afId, level: 17, blacksmithLevel: 5 },
+            { equipmentId: afId, level: 18, blacksmithLevel: 5 },
+            { equipmentId: afId, level: 19, blacksmithLevel: 7 },
+            { equipmentId: afId, level: 20, blacksmithLevel: 7 },
+            { equipmentId: afId, level: 21, blacksmithLevel: 7 },
+            { equipmentId: afId, level: 22, blacksmithLevel: 8 },
+            { equipmentId: afId, level: 23, blacksmithLevel: 8 },
+            { equipmentId: afId, level: 24, blacksmithLevel: 8 },
+            { equipmentId: afId, level: 25, blacksmithLevel: 9 },
+            { equipmentId: afId, level: 26, blacksmithLevel: 9 },
+            { equipmentId: afId, level: 27, blacksmithLevel: 9 },
+        ]);
+    });
 }
