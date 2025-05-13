@@ -1,3 +1,7 @@
+## [0.3.7] - 2025-05-13
+
+- Fix page scrolling every time you click load more armies
+
 ## [0.3.6] - 2025-05-13
 
 - Change default sort order on armies page to newest first
