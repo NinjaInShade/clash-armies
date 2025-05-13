@@ -1,3 +1,7 @@
+## [0.3.8] - 2025-05-13
+
+- Sort armies by most recent on the homepage
+
 ## [0.3.7] - 2025-05-13
 
 - Fix page scrolling every time you click load more armies
