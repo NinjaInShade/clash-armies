@@ -1,4 +1,11 @@
-## [0.3.2] - 2025-05-12
+## [0.3.4] - 2025-05-13
+
+- Add action figure equipment
+- Fix voting on army shifting ordering live
+- Show only the upvote icon if not logged-in
+- Change UI separators to be circular
+
+## [0.3.3] - 2025-05-12
 
 - Add ads.txt file
 
