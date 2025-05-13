@@ -157,6 +157,7 @@ export async function getArmies(opts: GetArmiesParams) {
 
 	query += `
         GROUP BY a.id
+		ORDER BY a.createdTime DESC
     `;
 
 	const armies = await db.query<Army>(query, args);

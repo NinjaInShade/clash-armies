@@ -18,12 +18,7 @@
 	let page = $state<number>(1);
 
 	const displayArmies = $derived.by(() => {
-		const sorted = untrack(() =>
-			armies.toSorted((a, b) => {
-				return b.votes - a.votes;
-			})
-		);
-		return sorted.slice(0, page * ENTRIES_PER_PAGE);
+		return armies.slice(0, page * ENTRIES_PER_PAGE);
 	});
 
 	function loadMore() {
