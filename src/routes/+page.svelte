@@ -28,12 +28,16 @@
 
 <svelte:head>
 	<title>ClashArmies • Home</title>
+	<meta
+		name="description"
+		content="Discover the best Clash of Clans armies - ranked, curated, and constantly updated. Explore top picks for CWL, trending strategies, rising comps, and more to dominate every attack."
+	/>
 </svelte:head>
 
 <header>
 	<div class="container">
 		<h1>Find the best<br /> armies <span>EVER!</span></h1>
-		<p class="body">The number one tool to find, create, learn and share the best armies in clash of clans</p>
+		<p class="body">The number one tool to find, create, learn and share the best armies in Clash of Clans</p>
 		<div class="buttons">
 			<C.Button asLink href="/armies">Find armies</C.Button>
 			<C.Button asLink href="/create">Create army</C.Button>

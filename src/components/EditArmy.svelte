@@ -161,7 +161,7 @@
 </script>
 
 <svelte:head>
-	<title>ClashArmies • {model.id ? 'Edit' : 'Create'} Army</title>
+	<title>ClashArmies • Army creator</title>
 </svelte:head>
 
 <section class="banner">

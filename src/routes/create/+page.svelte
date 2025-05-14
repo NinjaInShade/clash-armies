@@ -2,6 +2,13 @@
 	import C from '$components';
 </script>
 
+<svelte:head>
+	<meta
+		name="description"
+		content="Build your own Clash of Clans army with our simple and intuitive builder. Choose troops, spells, heroes, and write a guide to share with the community— or just plan your perfect attack."
+	/>
+</svelte:head>
+
 <section class="army">
 	<div class="container">
 		<C.EditArmy />
