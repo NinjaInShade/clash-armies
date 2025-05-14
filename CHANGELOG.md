@@ -1,3 +1,7 @@
+## [0.3.9] - 2025-05-13
+
+- Add misc SEO tags
+
 ## [0.3.8] - 2025-05-13
 
 - Sort armies by most recent on the homepage
