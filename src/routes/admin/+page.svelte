@@ -58,6 +58,7 @@
 
 <svelte:head>
 	<title>ClashArmies • Admin panel</title>
+	<!-- Note: this route shouldn't be indexable so no point in meta:description/canonical tags -->
 </svelte:head>
 
 <header>

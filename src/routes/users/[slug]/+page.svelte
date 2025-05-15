@@ -32,7 +32,12 @@
 </script>
 
 <svelte:head>
-	<title>ClashArmies • {currentUser === username ? 'Account' : `Users • ${user.username}`}</title>
+	<title>ClashArmies • {currentUser === username ? 'Account' : `Users • ${username}`}</title>
+	<meta
+		name="description"
+		content="View Clash of Clans armies and strategies shared by {username}. Discover top-rated builds, guides, and user contributions."
+	/>
+	<link rel="canonical" href="https://clasharmies.com/users/{username}" />
 </svelte:head>
 
 <header>

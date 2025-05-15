@@ -5,7 +5,12 @@
 </script>
 
 <svelte:head>
-	<title>ClashArmies • Login</title>
+	<title>ClashArmies • Login • Save & Create Clash of Clans Armies</title>
+	<meta
+		name="description"
+		content="Log in to create powerful Clash of Clans armies, vote on top strategies, save your favorites, and view your Clash profile stats. Join the community!"
+	/>
+	<link rel="canonical" href="https://clasharmies.com/login" />
 </svelte:head>
 
 <section>

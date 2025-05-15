@@ -27,11 +27,12 @@
 </script>
 
 <svelte:head>
-	<title>ClashArmies • Home</title>
+	<title>ClashArmies • Best Clash of CLans Armies & Strategies • Home</title>
 	<meta
 		name="description"
-		content="Discover the best Clash of Clans armies - ranked, curated, and constantly updated. Explore top picks for CWL, trending strategies, rising comps, and more to dominate every attack."
+		content="Discover the best Clash of Clans armies - ranked, curated, and constantly updated. Explore top picks for CWL, trending, in-meta strategies, rising comps, and more to dominate every attack."
 	/>
+	<link rel="canonical" href="https://clasharmies.com" />
 </svelte:head>
 
 <header>

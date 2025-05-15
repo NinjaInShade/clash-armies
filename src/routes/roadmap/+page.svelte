@@ -1,5 +1,7 @@
 <svelte:head>
 	<title>ClashArmies • Roadmap</title>
+	<meta name="description" content="Explore upcoming features and planned improvements to the Clash Armies tool. See what's next and help shape the future." />
+	<link rel="canonical" href="https://clasharmies.com/roadmap" />
 </svelte:head>
 
 <section>
