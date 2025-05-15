@@ -65,7 +65,7 @@
 </script>
 
 <svelte:head>
-	<title>ClashArmies • Army • {model.name}</title>
+	<title>ClashArmies • {model.name} • TH{model.townHall} army attack strategy</title>
 </svelte:head>
 
 <section class="banner">

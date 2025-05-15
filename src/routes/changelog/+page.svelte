@@ -17,7 +17,12 @@
 </script>
 
 <svelte:head>
-	<title>ClashArmies • Changelog</title>
+	<title>ClashArmies • Changelog • See latest updates</title>
+	<meta
+		name="description"
+		content="Stay up to date with the latest improvements to the best Clash of Clans army finder & builder tool. New features, fixes, and upgrades — all in one place."
+	/>
+	<link rel="canonical" href="https://clasharmies.com/changelog" />
 </svelte:head>
 
 <section>

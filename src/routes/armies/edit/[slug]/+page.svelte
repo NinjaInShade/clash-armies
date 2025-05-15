@@ -10,6 +10,11 @@
 	const app = getContext<AppState>('app');
 </script>
 
+<svelte:head>
+	<!-- Note: title tag lives within the EditArmy component -->
+	<!-- Note: this route shouldn't be indexable so no point in meta:description/canonical tags -->
+</svelte:head>
+
 <section class="army">
 	<div class="container">
 		{#if army.createdBy === app.user?.id || app.user?.hasRoles('admin')}
