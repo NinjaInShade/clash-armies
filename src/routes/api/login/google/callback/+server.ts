@@ -58,10 +58,10 @@ export async function GET(event: RequestEvent): Promise<Response> {
 				await db.transaction(async (tx) => {
 					// prettier-ignore
 					await tx.query(`
-						UPDATE users
-						SET googleEmail = ?
-						WHERE id = ?
-					`, [existingUser.id, googleUser.email ?? null])
+                        UPDATE users
+                        SET googleEmail = ?
+                        WHERE id = ?
+                    `, [existingUser.id, googleUser.email ?? null])
 				});
 			}
 			const session = await lucia.createSession(existingUser.id, {});

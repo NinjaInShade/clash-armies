@@ -26,7 +26,7 @@
 			replyTo: replyTo ?? null,
 			armyId: model.id,
 		};
-		const response = await fetch('/armies/comments', {
+		const response = await fetch('/api/armies/comments', {
 			method: 'POST',
 			body: JSON.stringify(data),
 			headers: { 'Content-Type': 'application/json' },

@@ -79,7 +79,7 @@
 			{/if}
 			<li class="control">
 				{#if app.user}
-					<Button asLink href="/logout">Log out</Button>
+					<Button asLink href="/api/logout">Log out</Button>
 				{:else}
 					<Button asLink href="/login">Log in</Button>
 				{/if}

@@ -34,7 +34,7 @@ export const lucia = new Lucia(adapter, {
 	},
 });
 
-export const google = new Google(GOOGLE_AUTH_CLIENT_ID, GOOGLE_AUTH_SECRET, `${BASE_APP_URL}/login/google/callback`);
+export const google = new Google(GOOGLE_AUTH_CLIENT_ID, GOOGLE_AUTH_SECRET, `${BASE_APP_URL}/api/login/google/callback`);
 
 declare module 'lucia' {
 	interface Register {

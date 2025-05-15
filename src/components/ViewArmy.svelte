@@ -45,7 +45,7 @@
 		if (!confirmed) {
 			return;
 		}
-		const response = await fetch('/armies', {
+		const response = await fetch('/api/armies', {
 			method: 'DELETE',
 			body: JSON.stringify(model.id),
 			headers: { 'Content-Type': 'application/json' },

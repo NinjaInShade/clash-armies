@@ -18,7 +18,7 @@
 		saving = true;
 		try {
 			const data = { armyId: model.id, vote: model.userVote };
-			const response = await fetch('/armies/votes', {
+			const response = await fetch('/api/armies/votes', {
 				method: 'POST',
 				body: JSON.stringify(data),
 				headers: { 'Content-Type': 'application/json' },
