@@ -1,17 +1,12 @@
 <script lang="ts">
-	import { getContext } from 'svelte';
 	import type { PageData } from './$types';
-	import THWidgetDisplay from './townhalls/THWidgetDisplay.svelte';
-	import UnitTableDisplay from './units/UnitTableDisplay.svelte';
-	import EditTownHall from './townhalls/EditTownHall.svelte';
-	import EditUnit from './units/EditUnit.svelte';
-	import type { Unit, TownHall, AppState } from '$types';
+	import THWidgetDisplay from './THWidgetDisplay.svelte';
+	import UnitTableDisplay from './UnitTableDisplay.svelte';
+	import type { Unit, TownHall } from '$types';
 	import C from '$components';
 
 	const { data }: { data: PageData } = $props();
 	const { units, townHalls } = $derived(data);
-
-	const app = getContext<AppState>('app');
 
 	let selectedTHs = $state<number[]>([]);
 	const thColumns = [
@@ -59,26 +54,6 @@
 			},
 		},
 	];
-
-	function addTownHall() {
-		app.openModal(EditTownHall);
-	}
-
-	function editTownHall() {
-		const selected = selectedTHs[0];
-		if (!selected) return;
-		app.openModal(EditTownHall, { townHall: townHalls.find((th) => th.level === selected) });
-	}
-
-	function addUnit() {
-		app.openModal(EditUnit);
-	}
-
-	function editUnit() {
-		const selected = selectedUnits[0];
-		if (!selected) return;
-		app.openModal(EditUnit, { unit: units.find((th) => th.id === selected) });
-	}
 </script>
 
 <svelte:head>
@@ -105,12 +80,9 @@
 		<div class="table-above">
 			<div>
 				<h2>Town halls</h2>
-				<p class="body">Add & edit town hall data</p>
+				<p class="body">Town hall data</p>
 			</div>
-			<div class="actions">
-				<C.Button class="btn btn-sm" onClick={addTownHall}>Add</C.Button>
-				<C.Button class="btn btn-sm" onClick={editTownHall} disabled={!selectedTHs.length}>Edit</C.Button>
-			</div>
+			<div class="actions"></div>
 		</div>
 		<C.Table data={townHalls} columns={thColumns} bind:selectedKeys={selectedTHs} defaultSortKey="level" selectable />
 	</div>
@@ -121,12 +93,9 @@
 		<div class="table-above">
 			<div>
 				<h2>Units</h2>
-				<p class="body">Add & edit unit data</p>
+				<p class="body">Unit data</p>
 			</div>
-			<div class="actions">
-				<C.Button class="btn btn-sm" onClick={addUnit}>Add</C.Button>
-				<C.Button class="btn btn-sm" onClick={editUnit} disabled={!selectedUnits.length}>Edit</C.Button>
-			</div>
+			<div class="actions"></div>
 		</div>
 		<C.Table data={units} columns={unitColumns} bind:selectedKeys={selectedUnits} defaultSortKey="type" selectable />
 	</div>
