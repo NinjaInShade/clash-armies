@@ -32,11 +32,11 @@
 
 <svelte:head>
 	<title>ClashArmies • Find Armies</title>
+	<link rel="canonical" href="https://clasharmies.com/armies" />
 	<meta
 		name="description"
 		content="Browse hundreds of user-created Clash of Clans armies. Filter by town hall, strategy, troop types, and more to find the perfect attack for any war or farming goal."
 	/>
-	<link rel="canonical" href="https://clasharmies.com/armies" />
 </svelte:head>
 
 <section class="armies">
