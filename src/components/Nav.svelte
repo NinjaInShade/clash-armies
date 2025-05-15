@@ -79,7 +79,7 @@
 			{/if}
 			<li class="control">
 				{#if app.user}
-					<Button asLink href="/logout">Log out</Button>
+					<Button asLink href="/api/logout">Log out</Button>
 				{:else}
 					<Button asLink href="/login">Log in</Button>
 				{/if}
@@ -195,7 +195,7 @@
 			</li>
 			<li class="sidebar-link">
 				{#if app.user}
-					<Button asLink href="/logout" style="width: 100%;" onClick={toggleSidebar}>Log out</Button>
+					<Button asLink href="/api/logout" style="width: 100%;" onClick={toggleSidebar}>Log out</Button>
 				{:else}
 					<Button asLink href="/login" style="width: 100%;" onClick={toggleSidebar}>Log in</Button>
 				{/if}

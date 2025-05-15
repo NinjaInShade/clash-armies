@@ -27,7 +27,7 @@ cd clash-armies
 The first setup step before being able to run the app and have it function is to create a google oAuth project and generate a client id and secret which are needed for the login to work. This is totally free. These are the steps:
 
 - Go to the [Google API dashboard](https://console.cloud.google.com/apis/dashboard)
-- Go to `credentials` and create an oAuth client id/secret. In the setup wizard add `http://localhost:5173` as an authorized javascript origin, and `http://localhost:5173/login/google/callback` as an authorized redirect URI.
+- Go to `credentials` and create an oAuth client id/secret. In the setup wizard add `http://localhost:5173` as an authorized javascript origin, and `http://localhost:5173/api/login/google/callback` as an authorized redirect URI.
 - Go to `oAuth consent screen` and customize the oAuth consent screen to your liking
 
 Next thing you will need to do is create a `.env` file at the root of the project with the following vars:

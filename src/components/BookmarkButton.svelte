@@ -16,7 +16,7 @@
 	async function saveBookmark(removing: boolean) {
 		savingBookmark = true;
 		try {
-			const response = await fetch('/armies/bookmarks', {
+			const response = await fetch('/api/armies/bookmarks', {
 				method: removing ? 'DELETE' : 'POST',
 				body: JSON.stringify({ armyId: model.id }),
 				headers: { 'Content-Type': 'application/json' },

@@ -20,7 +20,7 @@
 	async function saveUser() {
 		const trimmedUsername = username.trim();
 		const data = { id: user.id, username: trimmedUsername };
-		const response = await fetch('/users', {
+		const response = await fetch('/api/users', {
 			method: 'POST',
 			body: JSON.stringify(data),
 			headers: { 'Content-Type': 'application/json' },

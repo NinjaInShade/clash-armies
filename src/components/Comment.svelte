@@ -31,7 +31,7 @@
 	async function deleteComment() {
 		const confirmed = await app.confirm('Are you sure you want to delete this comment?');
 		if (!confirmed) return;
-		const response = await fetch('/armies/comments', {
+		const response = await fetch('/api/armies/comments', {
 			method: 'DELETE',
 			body: JSON.stringify(comment.id),
 			headers: { 'Content-Type': 'application/json' },

@@ -16,7 +16,7 @@
 	const notifications = $derived(app.user?.notifications ?? []);
 
 	async function markAsRead(notificationIds: number[]) {
-		const response = await fetch('/notifications', {
+		const response = await fetch('/api/notifications', {
 			method: 'POST',
 			body: JSON.stringify(notificationIds),
 			headers: { 'Content-Type': 'application/json' },

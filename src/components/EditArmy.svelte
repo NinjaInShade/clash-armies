@@ -135,7 +135,7 @@
 
 	async function saveArmy() {
 		const data = model.getSaveData();
-		const response = await fetch('/armies', {
+		const response = await fetch('/api/armies', {
 			method: 'POST',
 			body: JSON.stringify(data),
 			headers: { 'Content-Type': 'application/json' },

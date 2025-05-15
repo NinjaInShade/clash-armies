@@ -21,7 +21,7 @@
 			...notification,
 			seen: true,
 		};
-		const response = await fetch('/notifications', {
+		const response = await fetch('/api/notifications', {
 			method: 'POST',
 			body: JSON.stringify(data),
 			headers: { 'Content-Type': 'application/json' },
