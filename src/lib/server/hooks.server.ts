@@ -3,6 +3,7 @@ import { db } from '$server/db';
 import { migration } from '$server/migration';
 import { lucia } from '$server/auth/lucia';
 import { hasAuth, requireAuth, hasRoles, requireRoles } from '$server/auth/utils';
+import { v4 as uuidv4 } from 'uuid';
 import { CronJob } from 'cron';
 import { dev } from '$app/environment';
 import util from '@ninjalib/util';
@@ -42,10 +43,12 @@ const serverDispose = async () => {
 
 export function getRequestInfo(event: RequestEvent) {
 	const { request, locals } = event;
-	const { user } = locals;
+	const { user, uuid } = locals;
+	const { method, url } = request;
 	return {
-		method: request.method,
-		url: request.url,
+		uuid,
+		method,
+		url,
 		userId: user?.id,
 		username: user?.username,
 		ip: event.getClientAddress(),
@@ -53,10 +56,32 @@ export function getRequestInfo(event: RequestEvent) {
 	};
 }
 
+function getResponseInfo(request: ReturnType<typeof getRequestInfo>, response: Response) {
+	const { uuid, method } = request;
+	const { status } = response;
+	return { requestId: uuid, method, status };
+}
+
 export const handle: Handle = async ({ event, resolve }) => {
+	async function handleWithLogging() {
+		const start = Date.now();
+		const requestInfo = getRequestInfo(event);
+		log.info('Request:', requestInfo);
+
+		// Runs the request handler
+		const response = await resolve(event);
+
+		const requestDuration = Date.now() - start;
+		const responseInfo = getResponseInfo(requestInfo, response);
+		log.info('Response:', { ...responseInfo, duration: `${requestDuration}ms` });
+
+		return response;
+	}
+
 	// One-time setup upon starting the server
 	await serverInit;
 
+	event.locals.uuid = uuidv4();
 	event.locals.hasAuth = () => hasAuth(event);
 	event.locals.requireAuth = () => requireAuth(event);
 	event.locals.hasRoles = (...roles: string[]) => hasRoles(event, ...roles);
@@ -66,8 +91,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 	if (!sessionId) {
 		event.locals.user = null;
 		event.locals.session = null;
-		log.info('Incoming request:', getRequestInfo(event));
-		return resolve(event);
+		return handleWithLogging();
 	}
 
 	const { session, user } = await lucia.validateSession(sessionId);
@@ -88,10 +112,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 
 	event.locals.user = user;
 	event.locals.session = session;
-
-	log.info('Incoming request:', getRequestInfo(event));
-
-	return resolve(event);
+	return handleWithLogging();
 };
 
 process.on('sveltekit:shutdown', async (reason: 'SIGINT' | 'SIGTERM' | 'IDLE') => {

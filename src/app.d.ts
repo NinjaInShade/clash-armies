@@ -16,6 +16,10 @@ declare global {
 
 export interface Request {
 	/**
+	 * Unique identifier for this request.
+	 */
+	uuid: string;
+	/**
 	 * Returns true if user is authenticated.
 	 */
 	hasAuth: () => boolean;

@@ -1,3 +1,7 @@
+## [0.3.11] - 2025-05-15
+
+- Improve req/res/error logging
+
 ## [0.3.10] - 2025-05-15
 
 - Add robots.txt file

@@ -1,7 +1,7 @@
 import type { FetchErrors } from '$types';
 import z from 'zod';
 import { json, type RequestEvent } from '@sveltejs/kit';
-import { log, getRequestInfo } from '$server/hooks.server';
+import { log } from '$server/hooks.server';
 import { dev } from '$app/environment';
 
 export const STATIC_BASE_PATH = dev ? 'static' : 'client';
@@ -22,7 +22,10 @@ export async function middleware(event: RequestEvent, fn: () => Promise<Response
 		} else {
 			body = { errors: 'Invalid error' };
 		}
-		log.error('API error:', getRequestInfo(event), err);
+		log.error('API error:', {
+			requestId: event.locals.uuid,
+			error: err,
+		});
 		return json(body, { status: 400 });
 	}
 }
