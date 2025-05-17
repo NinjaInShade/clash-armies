@@ -7,25 +7,34 @@ import { dev } from '$app/environment';
 export const STATIC_BASE_PATH = dev ? 'static' : 'client';
 
 /**
- * Wrapper function for API endpoints to ensure errors come back to the client in an expected format
+ * Wrapper function for API endpoints to ensure
+ * errors come back to the client in an expected format
+ *
+ * TODO: you do lose local SvelteKit RequestHandler inference for
+ * route params and id but it's not that big of a deal right now
  */
-export async function middleware(req: RequestEvent, fn: () => Promise<Response>) {
-	try {
-		const result = await fn();
-		return result;
-	} catch (err) {
-		let body: { errors: FetchErrors };
-		if (err instanceof z.ZodError) {
-			body = { errors: err.flatten().fieldErrors };
-		} else if (err instanceof Error) {
-			body = { errors: err.message };
-		} else {
-			body = { errors: 'Invalid error' };
+export function endpoint(action: (req: RequestEvent) => Promise<Response>) {
+	return async (req: RequestEvent) => {
+		try {
+			const result = await action(req);
+			return result;
+		} catch (err) {
+			let errors: FetchErrors;
+			if (err instanceof z.ZodError) {
+				const { formErrors, fieldErrors } = err.flatten();
+				errors = { form: formErrors, ...fieldErrors };
+			} else if (err instanceof Error) {
+				errors = err.message;
+			} else {
+				errors = 'Internal server error';
+			}
+
+			log.error('API error:', {
+				requestId: req.locals.uuid,
+				error: err,
+			});
+
+			return json({ errors }, { status: 400 });
 		}
-		log.error('API error:', {
-			requestId: req.locals.uuid,
-			error: err,
-		});
-		return json(body, { status: 400 });
-	}
+	};
 }

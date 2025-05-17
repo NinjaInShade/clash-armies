@@ -216,4 +216,4 @@ export type AppState = {
 
 export type Banner = (typeof BANNERS)[number];
 
-export type FetchErrors = Record<string | number | symbol, string[] | undefined> | string;
+export type FetchErrors = Record<string, string[] | undefined> | string;
