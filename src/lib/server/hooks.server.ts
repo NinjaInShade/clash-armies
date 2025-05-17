@@ -1,11 +1,13 @@
-import type { Handle, RequestEvent } from '@sveltejs/kit';
+import type { Handle, HandleServerError, RequestEvent } from '@sveltejs/kit';
 import { db } from '$server/db';
 import { migration } from '$server/migration';
 import { lucia } from '$server/auth/lucia';
+import { getDisplayZodError } from '$server/utils';
 import { hasAuth, requireAuth, hasRoles, requireRoles } from '$server/auth/utils';
 import { v4 as uuidv4 } from 'uuid';
 import { CronJob } from 'cron';
 import { dev } from '$app/environment';
+import z from 'zod';
 import util from '@ninjalib/util';
 
 util.Logger.showTimestamp = true;
@@ -113,6 +115,16 @@ export const handle: Handle = async ({ event: req, resolve }) => {
 	req.locals.user = user;
 	req.locals.session = session;
 	return handleWithLogging();
+};
+
+export const handleError: HandleServerError = async ({ event: req, error, status, message }) => {
+	log.error('SvelteKit error:', {
+		requestId: req.locals.uuid,
+		error,
+	});
+
+	// Fallback to default behaviour
+	return undefined;
 };
 
 process.on('sveltekit:shutdown', async (reason: 'SIGINT' | 'SIGTERM' | 'IDLE') => {

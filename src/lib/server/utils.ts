@@ -21,8 +21,7 @@ export function endpoint(action: (req: RequestEvent) => Promise<Response>) {
 		} catch (err) {
 			let errors: FetchErrors;
 			if (err instanceof z.ZodError) {
-				const { formErrors, fieldErrors } = err.flatten();
-				errors = { form: formErrors, ...fieldErrors };
+				errors = getDisplayZodError(err);
 			} else if (err instanceof Error) {
 				errors = err.message;
 			} else {
@@ -37,4 +36,13 @@ export function endpoint(action: (req: RequestEvent) => Promise<Response>) {
 			return json({ errors }, { status: 400 });
 		}
 	};
+}
+
+/**
+ * Gives you a standardised format that is nicer to work with on the client.
+ * NOTE: don't use this for logging as it hides the error stack.
+ */
+export function getDisplayZodError(error: z.ZodError) {
+	const { formErrors, fieldErrors } = error.flatten();
+	return { form: formErrors, ...fieldErrors };
 }
