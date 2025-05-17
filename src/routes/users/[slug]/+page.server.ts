@@ -4,12 +4,12 @@ import { getArmies, getSavedArmies } from '$server/army';
 import { getUser } from '$server/user';
 import z from 'zod';
 
-export const load: PageServerLoad = async (ev) => {
-	ev.depends('ca:savedArmies');
-	const { username } = z.object({ username: z.string() }).parse({ username: ev.params.slug });
-	const armies = await getArmies({ req: ev.locals, username });
-	const savedArmies = await getSavedArmies({ req: ev.locals, username });
-	const user = await getUser(ev.locals, username);
+export const load: PageServerLoad = async (req) => {
+	req.depends('ca:savedArmies');
+	const { username } = z.object({ username: z.string() }).parse({ username: req.params.slug });
+	const armies = await getArmies(req, { username });
+	const savedArmies = await getSavedArmies(req, { username });
+	const user = await getUser(req, username);
 	if (!user) {
 		return error(404, `Could not find user "${username}"`);
 	}

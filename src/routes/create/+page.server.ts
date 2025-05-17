@@ -1,5 +1,5 @@
 import type { PageServerLoad } from './$types';
 
-export const load: PageServerLoad = async (event) => {
-	event.locals.requireAuth();
+export const load: PageServerLoad = async (req) => {
+	req.locals.requireAuth();
 };

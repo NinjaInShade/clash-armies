@@ -28,8 +28,8 @@ export async function getNotifications(userId: number) {
 	return db.query<ArmyNotification>(query, [userId]);
 }
 
-export async function acknowledgeNotifications(event: RequestEvent, notificationIds: number[]) {
-	const user = event.locals.requireAuth();
+export async function acknowledgeNotifications(req: RequestEvent, notificationIds: number[]) {
+	const user = req.locals.requireAuth();
 
 	const { ids } = z.object({ ids: z.array(z.number()) }).parse({ ids: notificationIds });
 
@@ -40,7 +40,7 @@ export async function acknowledgeNotifications(event: RequestEvent, notification
 	`;
 	const unacknowledged = await db.query(query, [ids]);
 
-	if (event.locals.hasRoles('admin')) {
+	if (req.locals.hasRoles('admin')) {
 		// Can acknowledge all notifications
 	} else {
 		if (unacknowledged.some((notif) => notif.recipientId !== user.id)) {

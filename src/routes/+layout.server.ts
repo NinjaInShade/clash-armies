@@ -4,12 +4,12 @@ import { getTownHalls, getUnits, getEquipment, getPets } from '$server/army';
 import { getUser } from '$server/user';
 import { getNotifications } from '$server/notifications';
 
-export const load: LayoutServerLoad = async (ev) => {
+export const load: LayoutServerLoad = async (req) => {
 	let user: User | null = null;
 	let userNotifications: ArmyNotification[] | null = null;
 
-	if (ev.locals.user) {
-		user = await getUser(ev.locals, ev.locals.user.username);
+	if (req.locals.user) {
+		user = await getUser(req, req.locals.user.username);
 	}
 	if (user) {
 		userNotifications = await getNotifications(user.id);

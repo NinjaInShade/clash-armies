@@ -9,7 +9,7 @@ export const STATIC_BASE_PATH = dev ? 'static' : 'client';
 /**
  * Wrapper function for API endpoints to ensure errors come back to the client in an expected format
  */
-export async function middleware(event: RequestEvent, fn: () => Promise<Response>) {
+export async function middleware(req: RequestEvent, fn: () => Promise<Response>) {
 	try {
 		const result = await fn();
 		return result;
@@ -23,7 +23,7 @@ export async function middleware(event: RequestEvent, fn: () => Promise<Response
 			body = { errors: 'Invalid error' };
 		}
 		log.error('API error:', {
-			requestId: event.locals.uuid,
+			requestId: req.locals.uuid,
 			error: err,
 		});
 		return json(body, { status: 400 });

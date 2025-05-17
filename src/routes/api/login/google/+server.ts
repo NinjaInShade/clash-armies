@@ -4,11 +4,11 @@ import { generateCodeVerifier } from 'arctic';
 import { google } from '$server/auth/lucia';
 import { dev } from '$app/environment';
 
-export async function GET(event: RequestEvent): Promise<Response> {
-	const redirectQuery = event.url.searchParams.get('r');
+export async function GET(req: RequestEvent): Promise<Response> {
+	const redirectQuery = req.url.searchParams.get('r');
 	const decodedRedirect = decodeURIComponent(redirectQuery || '/');
 
-	if (event.locals.user) {
+	if (req.locals.user) {
 		// already logged in
 		redirect(302, decodedRedirect);
 	}
@@ -20,7 +20,7 @@ export async function GET(event: RequestEvent): Promise<Response> {
 		scopes: ['email'],
 	});
 
-	event.cookies.set('google_oauth_state', state, {
+	req.cookies.set('google_oauth_state', state, {
 		path: '/',
 		secure: !dev,
 		httpOnly: true,
@@ -28,7 +28,7 @@ export async function GET(event: RequestEvent): Promise<Response> {
 		sameSite: 'lax',
 	});
 
-	event.cookies.set('google_oauth_code_verifier', codeVerifier, {
+	req.cookies.set('google_oauth_code_verifier', codeVerifier, {
 		path: '/',
 		secure: !dev,
 		httpOnly: true,

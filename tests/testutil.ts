@@ -27,7 +27,7 @@ export const USER_2 = {
 	playerTag: null,
 	level: null,
 };
-export const ADMIN_USER = {
+export const USER_ADMIN = {
 	id: 3,
 	googleId: '123',
 	username: 'admin-test',
@@ -35,20 +35,17 @@ export const ADMIN_USER = {
 	playerTag: null,
 	level: null,
 };
-export const EVENT = createEvent(USER);
-export const ADMIN_EVENT = createEvent(ADMIN_USER);
-export const REQ = { req: EVENT.locals };
 
 /**
- * Sveltekit event object shim
+ * Sveltekit request object shim
  */
-export function createEvent(user: User) {
-	const event = {
+export function createReq(user: User) {
+	const req = {
 		locals: {
-			hasAuth: () => hasAuth(event),
-			requireAuth: () => requireAuth(event),
-			hasRoles: (...roles: string[]) => hasRoles(event, ...roles),
-			requireRoles: (...roles: string[]) => requireRoles(event, ...roles),
+			hasAuth: () => hasAuth(req),
+			requireAuth: () => requireAuth(req),
+			hasRoles: (...roles: string[]) => hasRoles(req, ...roles),
+			requireRoles: (...roles: string[]) => requireRoles(req, ...roles),
 			user,
 			session: {
 				id: '1',
@@ -58,7 +55,7 @@ export function createEvent(user: User) {
 			},
 		},
 	} as unknown as RequestEvent;
-	return event;
+	return req;
 }
 
 export async function createDB() {
@@ -66,7 +63,7 @@ export async function createDB() {
 	await db.connect();
 	await db.migrate(migration);
 	// Create test users
-	const users = [USER, USER_2, ADMIN_USER];
+	const users = [USER, USER_2, USER_ADMIN];
 	await db.insertMany(
 		'users',
 		users.map((user) => ({ username: user.username, googleId: user.googleId }))
