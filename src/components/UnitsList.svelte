@@ -55,7 +55,7 @@
 		if (!unitsRemovable) {
 			return;
 		}
-		model.removeUnit(name, housedIn);
+		model.decrementUnitAmount(name, housedIn);
 	}
 </script>
 

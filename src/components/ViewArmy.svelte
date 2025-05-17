@@ -25,6 +25,7 @@
 		void army;
 		return untrack(() => new ArmyModel(app, army));
 	});
+	const stats = $derived(model.getStats());
 
 	const showClanCastle = $derived<boolean>(model.ccUnits.length > 0);
 	const showHeroes = $state<boolean>(VALID_HEROES.some((hero) => model.hasHero(hero)));
@@ -65,7 +66,7 @@
 </script>
 
 <svelte:head>
-	<title>ClashArmies • {model.name} • TH{model.townHall} army attack strategy</title>
+	<title>ClashArmies • {model.name} • TH{model.townHall} {stats.type} army attack strategy</title>
 </svelte:head>
 
 <section class="banner">

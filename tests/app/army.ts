@@ -882,3 +882,90 @@ describe('Validation', function () {
 		});
 	});
 });
+
+describe('Army model', function () {
+	describe('getStats()', function () {
+		it('should correctly report if we have a clan castle', function () {
+			const model = new ArmyModel(ctx);
+
+			// Should be false for empty army
+			assert.equal(model.getStats().hasClanCastle, false);
+
+			// Add non-cc troop, should still be false
+			const unit = UnitModel.requireTroopByName('Barbarian', ctx);
+			model.addUnit(unit, 'armyCamp');
+			assert.equal(model.getStats().hasClanCastle, false);
+
+			// Add cc troop, should now be true
+			const ccUnit = UnitModel.requireTroopByName('Barbarian', ctx);
+			model.addUnit(ccUnit, 'clanCastle');
+			assert.equal(model.getStats().hasClanCastle, true);
+		});
+
+		it('should correctly report if we have heroes', function () {
+			const model = new ArmyModel(ctx);
+
+			// Should be false for empty army
+			assert.equal(model.getStats().hasHeroes, false);
+
+			// Should be true if hero is added (note heroes are ephemeral, so we have one if any equipment/pets for that hero are present)
+			const equipment = EquipmentModel.requireByName('Eternal Tome', ctx);
+			model.addEquipment(equipment);
+			assert.equal(model.getStats().hasHeroes, true);
+		});
+
+		it('should correctly report if we have a guide', function () {
+			const model = new ArmyModel(ctx);
+
+			// Should be false for empty army
+			assert.equal(model.getStats().hasGuide, false);
+
+			// Should be true if we make a guide
+			model.addGuide();
+			assert.equal(model.getStats().hasGuide, true);
+		});
+
+		it('should correctly report the type of army', function () {
+			const model = new ArmyModel(ctx);
+
+			// Empty army technically will never exist, there will always be some units (in practice) so no
+			// point even testing what it chooses, but we can test it at least doesn't error because why not
+			model.getStats();
+
+			// Should be hybrid if equal ground+air units with same housing space
+			model.addUnit(UnitModel.requireTroopByName('Giant', ctx), 'armyCamp');
+			model.addUnit(UnitModel.requireTroopByName('Balloon', ctx), 'armyCamp');
+			assert.equal(model.getStats().type, 'Hybrid');
+			model.remove('Giant', 'armyCamp');
+			model.remove('Balloon', 'armyCamp');
+
+			// Should be air if equal ground+air units but air has higher housing space
+			model.addUnit(UnitModel.requireTroopByName('Giant', ctx), 'armyCamp');
+			model.addUnit(UnitModel.requireTroopByName('Baby Dragon', ctx), 'armyCamp');
+			assert.equal(model.getStats().type, 'Air');
+			model.remove('Giant', 'armyCamp');
+			model.remove('Baby Dragon', 'armyCamp');
+
+			// Should be ground if equal ground+air units but ground has higher housing space
+			model.addUnit(UnitModel.requireTroopByName('Golem', ctx), 'armyCamp');
+			model.addUnit(UnitModel.requireTroopByName('Balloon', ctx), 'armyCamp');
+			assert.equal(model.getStats().type, 'Ground');
+			model.remove('Golem', 'armyCamp');
+			model.remove('Balloon', 'armyCamp');
+
+			// Should be ground if more ground units but same housing space as air units
+			model.addUnit(UnitModel.requireTroopByName('Giant', ctx), 'armyCamp', 2);
+			model.addUnit(UnitModel.requireTroopByName('Balloon', ctx), 'armyCamp', 1);
+			assert.equal(model.getStats().type, 'Ground');
+			model.remove('Giant', 'armyCamp');
+			model.remove('Balloon', 'armyCamp');
+
+			// Should be air if more air units but same housing space as ground units
+			model.addUnit(UnitModel.requireTroopByName('Giant', ctx), 'armyCamp', 1);
+			model.addUnit(UnitModel.requireTroopByName('Balloon', ctx), 'armyCamp', 2);
+			assert.equal(model.getStats().type, 'Air');
+			model.remove('Giant', 'armyCamp');
+			model.remove('Balloon', 'armyCamp');
+		});
+	});
+});

@@ -158,16 +158,16 @@ export class ArmyModel {
 			id: this.id,
 			name: this.name,
 			townHall: this.townHall,
-			units: [
-				// prettier-ignore
-				...this.units.map((unit) => unit.getSaveData()),
-				...this.ccUnits.map((unit) => unit.getSaveData()),
-			],
+			units: this.allUnits.map((unit) => unit.getSaveData()),
 			pets: this.pets.map((pet) => pet.getSaveData()),
 			equipment: this.equipment.map((equipment) => equipment.getSaveData()),
 			guide: this.guide ? this.guide.getSaveData() : null,
 			banner: this.banner,
 		};
+	}
+
+	public get allUnits() {
+		return [...this.units, ...this.ccUnits];
 	}
 
 	public get capacity() {
@@ -192,9 +192,9 @@ export class ArmyModel {
 		return ArmyModel.requireTownHall(this.townHall, this.ctx);
 	}
 
-	public addUnit(unit: Unit, housedIn: UnitHome) {
-		const newUnit = new UnitModel(this.ctx, { unitId: unit.id, amount: 1, home: housedIn });
-		const units = housedIn === 'clanCastle' ? this.ccUnits : this.units;
+	public addUnit(unit: Unit, home: UnitHome, amount = 1) {
+		const newUnit = new UnitModel(this.ctx, { unitId: unit.id, amount, home });
+		const units = home === 'clanCastle' ? this.ccUnits : this.units;
 		units.push(newUnit);
 		return newUnit;
 	}
@@ -216,7 +216,7 @@ export class ArmyModel {
 		return this.guide;
 	}
 
-	public removeUnit(name: string, housedIn: UnitHome) {
+	public decrementUnitAmount(name: string, housedIn: UnitHome) {
 		const units = housedIn === 'clanCastle' ? this.ccUnits : this.units;
 		const idx = units.findIndex((unit) => unit.info.name === name);
 		if (idx === -1) {
@@ -227,6 +227,15 @@ export class ArmyModel {
 		} else {
 			units[idx].amount -= 1;
 		}
+	}
+
+	public remove(name: string, housedIn: UnitHome) {
+		const units = housedIn === 'clanCastle' ? this.ccUnits : this.units;
+		const idx = units.findIndex((unit) => unit.info.name === name);
+		if (idx === -1) {
+			throw new Error(`Unit "${name}" does not exist in this army`);
+		}
+		units.splice(idx, 1);
 	}
 
 	public removePet(name: string) {
@@ -265,6 +274,42 @@ export class ArmyModel {
 			return true;
 		}
 		return false;
+	}
+
+	public getStats() {
+		return {
+			type: this.getArmyType(),
+			hasClanCastle: this.ccUnits.length > 0,
+			hasHeroes: VALID_HEROES.some((hero) => this.hasHero(hero)),
+			hasGuide: this.guide !== null,
+		};
+	}
+
+	private getArmyType() {
+		let airTotal = 0;
+		let groundTotal = 0;
+
+		// Do we want to exclude clan castle units?
+		for (const unit of this.allUnits) {
+			if (unit.info.type === 'Spell') {
+				continue;
+			}
+			const weight = unit.amount * unit.info.housingSpace;
+			if (unit.info.isFlying) {
+				airTotal += weight;
+			} else {
+				groundTotal += weight;
+			}
+		}
+
+		// 0 is possible if for some reason user just made a spell-only army (not recommended...)
+		const total = airTotal + groundTotal;
+		const airRatio = total === 0 ? 0 : airTotal / total;
+
+		// Type is air or ground if stat dominates by more than 60%
+		if (airRatio > 0.6) return 'Air';
+		if (airRatio < 0.4) return 'Ground';
+		return 'Hybrid';
 	}
 
 	public static getMaxHeroLevel(hero: HeroType, townHall: number, ctx: ArmyCtx) {
