@@ -1,4 +1,5 @@
 import type { AppState, Modal, ToastNotification } from '$types';
+import { HTTPApi } from '$shared/http';
 import C from '$components';
 
 const TOAST_DEFAULT_DURATION = 2500;
@@ -11,7 +12,9 @@ export function requireHTML() {
 	return html;
 }
 
-export function createAppState(initial: Omit<AppState, 'modals' | 'notifications' | 'openModal' | 'openModalAsync' | 'notify' | 'confirm'>) {
+export function createAppState(initial: Pick<AppState, 'units' | 'townHalls' | 'equipment' | 'pets' | 'user'>) {
+	const http = new HTTPApi();
+
 	let units = $state<AppState['units']>(initial.units);
 	let townHalls = $state<AppState['townHalls']>(initial.townHalls);
 	let equipment = $state<AppState['equipment']>(initial.equipment);
@@ -21,6 +24,7 @@ export function createAppState(initial: Omit<AppState, 'modals' | 'notifications
 	let notifications = $state<AppState['notifications']>([]);
 
 	return {
+		http,
 		get townHalls() {
 			return townHalls;
 		},
@@ -106,33 +110,5 @@ export function createAppState(initial: Omit<AppState, 'modals' | 'notifications
 			const confirmed = await this.openModalAsync<boolean>(C.Confirm, { confirmText });
 			return Boolean(confirmed);
 		},
-		// async action(endpoint: string, options: RequestInit = {}) {
-
-		// },
-		async post(endpoint: string, data?: unknown, options: ActionOptions = {}) {
-			try {
-				const response = await fetch(endpoint, {
-					method: 'POST',
-					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify(data),
-				});
-				const result = await response.json();
-				if (!response.ok || result.errors) {
-					console.error('API error', { status: response.status, errors: result.errors });
-					this.notify({
-						title: 'Failed action',
-						description: options.errorMessage ?? 'If this problem persists, get in touch on discord',
-						theme: 'failure',
-					});
-				}
-				return result;
-			} catch (err: any) {
-				//
-			}
-		},
 	};
 }
-
-type ActionOptions = {
-	errorMessage?: string;
-};

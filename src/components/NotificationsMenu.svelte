@@ -16,21 +16,18 @@
 	const notifications = $derived(app.user?.notifications ?? []);
 
 	async function markAsRead(notificationIds: number[]) {
-		const response = await fetch('/api/notifications', {
-			method: 'POST',
-			body: JSON.stringify(notificationIds),
-			headers: { 'Content-Type': 'application/json' },
-		});
-		const result = await response.json();
-		if (result.errors || !response.ok) {
+		try {
+			await app.http.post('/api/notifications', notificationIds);
+		} catch {
 			app.notify({
 				title: 'Failed action',
 				description: `There was a problem acknowledging this notification`,
 				theme: 'failure',
 			});
-		} else {
-			await invalidateAll();
+			return;
 		}
+
+		await invalidateAll();
 	}
 
 	function markAllAsRead() {

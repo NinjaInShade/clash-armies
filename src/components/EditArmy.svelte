@@ -2,7 +2,8 @@
 	import { getContext } from 'svelte';
 	import { invalidateAll, goto } from '$app/navigation';
 	import { VALID_HEROES, GUIDE_TEXT_CHAR_LIMIT } from '$shared/utils';
-	import type { AppState, Banner, FetchErrors } from '$types';
+	import { HTTPError, type APIErrors } from '$shared/http';
+	import type { AppState, Banner } from '$types';
 	import { ArmyModel, type Army } from '$models';
 	import ImportFromLink from './ImportFromLink.svelte';
 	import EditBanner from './EditBanner.svelte';
@@ -28,7 +29,7 @@
 	const model = new ArmyModel(app, army);
 
 	// Other state
-	let errors = $state<FetchErrors | null>(null);
+	let errors = $state<APIErrors | null>(null);
 	let saveDisabled = $derived(!model.name || model.name.length < 2 || model.name.length > 25 || !model.units.length);
 	let showClanCastle = $state(model.ccUnits.length > 0);
 	let shownHeroes = $state(model.id ? VALID_HEROES.filter((hero) => model.hasHero(hero)) : null);
@@ -146,27 +147,24 @@
 
 	async function saveArmy() {
 		const data = model.getSaveData();
-		const response = await fetch('/api/armies', {
-			method: 'POST',
-			body: JSON.stringify(data),
-			headers: { 'Content-Type': 'application/json' },
-		});
-		const result = await response.json();
-		if (result.errors) {
-			errors = result.errors as FetchErrors;
+
+		let id: number;
+		try {
+			id = await app.http.post<number>('/api/armies', data);
+		} catch (err) {
+			if (err instanceof HTTPError) {
+				errors = err.errors ?? err.message;
+			}
 			return;
 		}
-		if (response.status === 200) {
-			if (!model.id) {
-				// Redirect to created army
-				goto(`/armies/${result.id}`);
-			} else {
-				// Back out of editing mode
-				await invalidateAll();
-				goto(`/armies/${model.id}`);
-			}
+
+		if (!model.id) {
+			// Redirect to created army
+			await goto(`/armies/${id}`);
 		} else {
-			errors = `${response.status} error`;
+			// Back out of editing mode
+			await invalidateAll();
+			await goto(`/armies/${model.id}`);
 		}
 	}
 </script>
@@ -320,11 +318,9 @@
 	{/if}
 </section>
 
-{#if errors}
-	<div class="errors">
-		<Errors {errors} />
-	</div>
-{/if}
+<div class="errors">
+	<Errors {errors} />
+</div>
 
 <div class="army-controls">
 	<Button asLink href={model.id ? `/armies/${model.id}` : '/armies'}>Cancel</Button>
@@ -441,7 +437,7 @@
 	}
 
 	/* ERRORS */
-	.errors {
+	.errors:not(:empty) {
 		margin-top: 24px;
 	}
 
@@ -515,7 +511,7 @@
 			--unit-amount-size: 14px;
 			--unit-lvl-size: 11px;
 		}
-		.errors {
+		.errors:not(:empty) {
 			margin-top: 16px;
 		}
 		.army-controls {

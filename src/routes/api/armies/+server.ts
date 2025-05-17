@@ -6,7 +6,7 @@ import { saveArmy, deleteArmy } from '$server/army';
 export const POST: RequestHandler = endpoint(async (req) => {
 	const army = await req.request.json();
 	const id = await saveArmy(req, army);
-	return json({ id }, { status: 200 });
+	return json(id, { status: 200 });
 });
 
 export const DELETE: RequestHandler = endpoint(async (req) => {

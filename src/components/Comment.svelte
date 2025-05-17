@@ -31,27 +31,18 @@
 	async function deleteComment() {
 		const confirmed = await app.confirm('Are you sure you want to delete this comment?');
 		if (!confirmed) return;
-		const response = await fetch('/api/armies/comments', {
-			method: 'DELETE',
-			body: JSON.stringify(comment.id),
-			headers: { 'Content-Type': 'application/json' },
-		});
-		const result = await response.json();
-		if (result.errors || response.status !== 200) {
+
+		try {
+			await app.http.delete('/api/armies/comments', comment.id);
+		} catch {
 			app.notify({
 				title: 'Failed action',
 				description: `There was a problem deleting this comment`,
 				theme: 'failure',
 			});
-		}
-		if (result.errors) {
-			console.error(`Error:`, result.errors);
 			return;
 		}
-		if (response.status !== 200) {
-			console.error(`${response.status} error`);
-			return;
-		}
+
 		await invalidateAll();
 	}
 

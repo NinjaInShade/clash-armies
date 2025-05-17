@@ -17,31 +17,19 @@
 	const alerts = [];
 
 	async function ackArmyNotification(notification: ArmyNotification) {
-		const data = {
-			...notification,
-			seen: true,
-		};
-		const response = await fetch('/api/notifications', {
-			method: 'POST',
-			body: JSON.stringify(data),
-			headers: { 'Content-Type': 'application/json' },
-		});
-		const result = await response.json();
-		if (result.errors || response.status !== 200) {
+		try {
+			const data = { ...notification, seen: true };
+			await appState.http.post('/api/notifications', data);
+		} catch {
 			appState.notify({
 				title: 'Failed action',
 				description: 'There was a problem acknowledging this notification',
 				theme: 'failure',
 			});
-			if (result.errors) {
-				console.error(`Error:`, result.errors);
-			}
-			if (response.status !== 200) {
-				console.error(`${response.status} error`);
-			}
-		} else {
-			await invalidateAll();
+			return;
 		}
+
+		await invalidateAll();
 	}
 
 	/** Extends user to include properties AppState needs */

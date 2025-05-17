@@ -18,27 +18,13 @@
 		saving = true;
 		try {
 			const data = { armyId: model.id, vote: model.userVote };
-			const response = await fetch('/api/armies/votes', {
-				method: 'POST',
-				body: JSON.stringify(data),
-				headers: { 'Content-Type': 'application/json' },
+			await app.http.post('/api/armies/votes', data);
+		} catch {
+			app.notify({
+				title: 'Failed action',
+				description: `There was a problem saving your vote`,
+				theme: 'failure',
 			});
-			const result = await response.json();
-			if (result.errors || response.status !== 200) {
-				app.notify({
-					title: 'Failed action',
-					description: `There was a problem saving your vote`,
-					theme: 'failure',
-				});
-			}
-			if (result.errors) {
-				console.error(`Error:`, result.errors);
-				return;
-			}
-			if (response.status !== 200) {
-				console.error(`${response.status} error`);
-				return;
-			}
 		} finally {
 			saving = false;
 		}

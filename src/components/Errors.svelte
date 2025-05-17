@@ -1,7 +1,8 @@
 <script lang="ts">
-	import type { FetchErrors } from '$types';
+	import type { APIErrors } from '$shared/http';
 
 	type Props = {
+		errors: APIErrors | null;
 		/**
 		 * Whether to auto scroll the errors into view when they are rendered
 		 * @default true

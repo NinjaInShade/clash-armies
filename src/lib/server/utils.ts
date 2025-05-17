@@ -1,4 +1,4 @@
-import type { FetchErrors } from '$types';
+import type { APIErrors } from '$shared/http';
 import z from 'zod';
 import { json, type RequestEvent } from '@sveltejs/kit';
 import { log } from '$server/hooks.server';
@@ -19,7 +19,7 @@ export function endpoint(action: (req: RequestEvent) => Promise<Response>) {
 			const result = await action(req);
 			return result;
 		} catch (err) {
-			let errors: FetchErrors;
+			let errors: APIErrors;
 			if (err instanceof z.ZodError) {
 				errors = getDisplayZodError(err);
 			} else if (err instanceof Error) {

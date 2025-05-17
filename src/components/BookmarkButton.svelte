@@ -16,35 +16,27 @@
 	async function saveBookmark(removing: boolean) {
 		savingBookmark = true;
 		try {
-			const response = await fetch('/api/armies/bookmarks', {
-				method: removing ? 'DELETE' : 'POST',
-				body: JSON.stringify({ armyId: model.id }),
-				headers: { 'Content-Type': 'application/json' },
+			if (removing) {
+				await app.http.delete('/api/armies/bookmarks', { armyId: model.id });
+			} else {
+				await app.http.post('/api/armies/bookmarks', { armyId: model.id });
+			}
+		} catch {
+			app.notify({
+				title: 'Failed action',
+				description: `There was a problem ${removing ? 'unsaving' : 'saving'} this army`,
+				theme: 'failure',
 			});
-			const result = await response.json();
-			if (result.errors || response.status !== 200) {
-				app.notify({
-					title: 'Failed action',
-					description: `There was a problem ${removing ? 'removing this army from saved' : 'saving this army'}`,
-					theme: 'failure',
-				});
-			}
-			if (result.errors) {
-				console.error(`Error:`, result.errors);
-				return;
-			}
-			if (response.status !== 200) {
-				console.error(`${response.status} error`);
-				return;
-			}
-			bookmarked = !bookmarked;
-			if (!removing) {
-				app.notify({ title: `Saved army "${model.name}"`, description: 'View saved armies on your account page', theme: 'success' });
-			}
-			await invalidate('ca:savedArmies');
+			return;
 		} finally {
 			savingBookmark = false;
 		}
+
+		bookmarked = !bookmarked;
+		if (!removing) {
+			app.notify({ title: `Saved army`, description: 'View saved armies on your account page', theme: 'success' });
+		}
+		await invalidate('ca:savedArmies');
 	}
 </script>
 

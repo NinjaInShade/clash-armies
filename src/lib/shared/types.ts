@@ -1,4 +1,5 @@
 import type { Component, ComponentProps } from 'svelte';
+import type { HTTPApi } from '$shared/http';
 import { BANNERS, VALID_UNIT_HOME, VALID_HEROES } from '$shared/utils';
 
 export type Optional<T, K extends keyof T> = Pick<Partial<T>, K> & Omit<T, K>;
@@ -190,6 +191,7 @@ type UserUtils = {
 };
 
 export type AppState = {
+	http: HTTPApi;
 	// Frequently used data (cache)
 	units: Unit[];
 	townHalls: TownHall[];
@@ -215,5 +217,3 @@ export type AppState = {
 };
 
 export type Banner = (typeof BANNERS)[number];
-
-export type FetchErrors = Record<string, string[] | undefined> | string;

@@ -3,7 +3,8 @@
 	import { goto } from '$app/navigation';
 	import { VALID_HEROES, YOUTUBE_URL_REGEX } from '$shared/utils';
 	import { copyLink, openInGame, getTags, getCopyBtnTitle, getOpenBtnTitle } from '$client/army';
-	import type { AppState, FetchErrors } from '$types';
+	import { HTTPError, type APIErrors } from '$shared/http';
+	import type { AppState } from '$types';
 	import { ArmyModel, type Army } from '$models';
 	import { invalidateAll } from '$app/navigation';
 	import UnitTotals from './UnitTotals.svelte';
@@ -30,7 +31,7 @@
 	const showClanCastle = $derived<boolean>(model.ccUnits.length > 0);
 	const showHeroes = $state<boolean>(VALID_HEROES.some((hero) => model.hasHero(hero)));
 
-	let errors = $state<FetchErrors | null>(null);
+	let errors = $state<APIErrors | null>(null);
 
 	function getYoutubeEmbedSrc(url: string) {
 		const match = url.match(YOUTUBE_URL_REGEX);
@@ -46,22 +47,18 @@
 		if (!confirmed) {
 			return;
 		}
-		const response = await fetch('/api/armies', {
-			method: 'DELETE',
-			body: JSON.stringify(model.id),
-			headers: { 'Content-Type': 'application/json' },
-		});
-		const result = await response.json();
-		if (result.errors) {
-			errors = result.errors as FetchErrors;
+
+		try {
+			await app.http.delete('/api/armies', model.id);
+		} catch (err) {
+			if (err instanceof HTTPError) {
+				errors = err.errors ?? err.message;
+			}
 			return;
 		}
+
 		await invalidateAll();
-		if (response.status === 200) {
-			goto(`/armies`);
-		} else {
-			errors = `${response.status} error`;
-		}
+		await goto(`/armies`);
 	}
 </script>
 

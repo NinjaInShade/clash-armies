@@ -26,27 +26,18 @@
 			replyTo: replyTo ?? null,
 			armyId: model.id,
 		};
-		const response = await fetch('/api/armies/comments', {
-			method: 'POST',
-			body: JSON.stringify(data),
-			headers: { 'Content-Type': 'application/json' },
-		});
-		const result = await response.json();
-		if (result.errors || response.status !== 200) {
+
+		try {
+			await app.http.post('/api/armies/comments', data);
+		} catch {
 			app.notify({
 				title: 'Failed action',
-				description: `There was a problem saving comment`,
+				description: `There was a problem saving this comment`,
 				theme: 'failure',
 			});
-		}
-		if (result.errors) {
-			console.error(`Error:`, result.errors);
 			return;
 		}
-		if (response.status !== 200) {
-			console.error(`${response.status} error`);
-			return;
-		}
+
 		await invalidateAll();
 		commentText = null;
 		onSave();
