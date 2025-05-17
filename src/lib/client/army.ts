@@ -114,10 +114,13 @@ export function parseLink(fullLink: string, ctx: ArmyCtx) {
 	const model = new ArmyModel(ctx);
 
 	function parseUnits(data: string) {
-		return data.split('-').map((item) => {
-			const [amount, id] = item.split('x').map(Number);
-			return { id, amount };
-		});
+		return data
+			.split('-')
+			.filter(Boolean)
+			.map((item) => {
+				const [amount, id] = item.split('x').map(Number);
+				return { id, amount };
+			});
 	}
 
 	function addUnit(data: { id: number; amount: number }, type: 'Troop' | 'Spell', housedIn: UnitHome) {
@@ -134,7 +137,7 @@ export function parseLink(fullLink: string, ctx: ArmyCtx) {
 
 	for (const match of link.matchAll(ARMY_LINK_SEPARATOR)) {
 		if (match.groups?.heroes) {
-			for (const hero of match.groups.heroes.split('-')) {
+			for (const hero of match.groups.heroes.split('-').filter(Boolean)) {
 				const m = ARMY_LINK_HERO_PATTERN.exec(hero);
 				const groups = m?.groups;
 				if (groups) {
