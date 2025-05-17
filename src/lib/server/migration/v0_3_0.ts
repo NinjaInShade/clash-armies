@@ -610,4 +610,26 @@ export default function migration(runStep: MigrationFn) {
     runStep(39, async (db: MySQL) => {
         await db.query('UPDATE equipment SET clashId = ? WHERE name = ?', [9, 'Hog Rider Doll']);
     });
+    runStep(40, async (db: MySQL) => {
+        // Add new "Super Yeti" troop
+        const syId = await db.insertOne('units', {
+            type: 'Troop',
+            name: 'Super Yeti',
+            clashId: '147',
+            housingSpace: 35,
+            productionBuilding: 'Barrack',
+            isSuper: true,
+            isFlying: false,
+            isJumper: false,
+            airTargets: false,
+            groundTargets: true,
+        });
+        await db.insertMany('unit_levels', [
+            { unitId: syId, level: 3, barrackLevel: 14, laboratoryLevel: 1 },
+            { unitId: syId, level: 4, barrackLevel: 14, laboratoryLevel: 1 },
+            { unitId: syId, level: 5, barrackLevel: 14, laboratoryLevel: 1 },
+            { unitId: syId, level: 6, barrackLevel: 14, laboratoryLevel: 1 },
+            { unitId: syId, level: 7, barrackLevel: 14, laboratoryLevel: 1 },
+        ]);
+    });
 }

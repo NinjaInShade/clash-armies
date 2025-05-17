@@ -19,6 +19,7 @@ export const SUPER_TO_REGULAR: Record<string, string> = {
 	'Super Bowler': 'Bowler',
 	'Super Miner': 'Miner',
 	'Super Hog Rider': 'Hog Rider',
+	'Super Yeti': 'Yeti',
 };
 
 export const ARMY_EDIT_FILLER = 14;
