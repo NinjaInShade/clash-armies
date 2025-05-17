@@ -3,18 +3,18 @@ import type { RequestHandler } from './$types';
 import { middleware } from '$server/utils';
 import { saveArmy, deleteArmy } from '$server/army';
 
-export const POST: RequestHandler = async (event) => {
-	return middleware(event, async function () {
-		const army = await event.request.json();
-		const id = await saveArmy(event, army);
+export const POST: RequestHandler = async (req) => {
+	return middleware(req, async function () {
+		const army = await req.request.json();
+		const id = await saveArmy(req, army);
 		return json({ id }, { status: 200 });
 	});
 };
 
-export const DELETE: RequestHandler = async (event) => {
-	return middleware(event, async function () {
-		const id = await event.request.json();
-		await deleteArmy(event, id);
+export const DELETE: RequestHandler = async (req) => {
+	return middleware(req, async function () {
+		const id = await req.request.json();
+		await deleteArmy(req, id);
 		return json({}, { status: 200 });
 	});
 };

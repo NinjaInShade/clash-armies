@@ -3,18 +3,18 @@ import type { RequestHandler } from './$types';
 import { middleware } from '$server/utils';
 import { saveComment, deleteComment } from '$server/army';
 
-export const POST: RequestHandler = async (event) => {
-	return middleware(event, async function () {
-		const comment = await event.request.json();
-		const id = await saveComment(event, comment);
+export const POST: RequestHandler = async (req) => {
+	return middleware(req, async function () {
+		const comment = await req.request.json();
+		const id = await saveComment(req, comment);
 		return json({ id }, { status: 200 });
 	});
 };
 
-export const DELETE: RequestHandler = async (event) => {
-	return middleware(event, async function () {
-		const id = await event.request.json();
-		await deleteComment(event, id);
+export const DELETE: RequestHandler = async (req) => {
+	return middleware(req, async function () {
+		const id = await req.request.json();
+		await deleteComment(req, id);
 		return json({}, { status: 200 });
 	});
 };

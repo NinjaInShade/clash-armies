@@ -1,15 +1,24 @@
-import { describe, it, beforeAll, afterAll, afterEach } from 'vitest';
-import { assert, EVENT, REQ, USER, USER_2, ADMIN_USER, createEvent, getCtx, createDB, destroyDB, makeData, assertArmies } from '../testutil';
-import type { UnitType, ArmyCtx } from '$types';
+import { describe, it, beforeEach, beforeAll, afterAll, afterEach } from 'vitest';
+import { assert, createReq, USER, USER_2, USER_ADMIN, getCtx, createDB, destroyDB, makeData, assertArmies } from '../testutil';
+import type { User, UnitType, ArmyCtx } from '$types';
 import { ArmyModel, UnitModel, PetModel, EquipmentModel } from '$models';
 import { validateArmy } from '$shared/validation';
 import { GUIDE_TEXT_CHAR_LIMIT } from '$shared/utils';
 import { getArmies, saveArmy, saveComment } from '$server/army';
 import { getNotifications, acknowledgeNotifications } from '$server/notifications';
+import type { RequestEvent } from '@sveltejs/kit';
 import type { MySQL } from '@ninjalib/sql';
 
 let db: MySQL;
 let ctx: ArmyCtx;
+
+let req: RequestEvent;
+let req2: RequestEvent;
+let reqAdmin: RequestEvent;
+
+let reqUser: User;
+let req2User: User;
+let reqAdminUser: User;
 
 beforeAll(async function () {
 	db = await createDB();
@@ -18,6 +27,19 @@ beforeAll(async function () {
 
 afterAll(async function () {
 	await destroyDB();
+});
+
+beforeEach(async function () {
+	req = createReq(USER);
+	req2 = createReq(USER_2);
+	reqAdmin = createReq(USER_ADMIN);
+
+	// @ts-expect-error
+	reqUser = req.locals.requireAuth();
+	// @ts-expect-error
+	req2User = req2.locals.requireAuth();
+	// @ts-expect-error
+	reqAdminUser = reqAdmin.locals.requireAuth();
 });
 
 describe('Saving', function () {
@@ -35,8 +57,8 @@ describe('Saving', function () {
 					{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Archer', ctx).id, amount: 10 },
 				],
 			});
-			await saveArmy(EVENT, data);
-			const armies = await getArmies(REQ);
+			await saveArmy(req, data);
+			const armies = await getArmies(req);
 			assertArmies(armies, [data]);
 		});
 
@@ -51,8 +73,8 @@ describe('Saving', function () {
 					{ home: 'clanCastle', unitId: UnitModel.requireTroopByName('Archer', ctx).id, amount: 10 },
 				],
 			});
-			await saveArmy(EVENT, data);
-			const armies = await getArmies(REQ);
+			await saveArmy(req, data);
+			const armies = await getArmies(req);
 			assertArmies(armies, [data]);
 		});
 
@@ -71,8 +93,8 @@ describe('Saving', function () {
 					{ equipmentId: EquipmentModel.requireByName('Rage Vial', ctx).id },
 				],
 			});
-			await saveArmy(EVENT, data);
-			const armies = await getArmies(REQ);
+			await saveArmy(req, data);
+			const armies = await getArmies(req);
 			assertArmies(armies, [data]);
 		});
 
@@ -95,8 +117,8 @@ describe('Saving', function () {
 					{ hero: 'Archer Queen', petId: PetModel.requireByName('Spirit Fox', ctx).id },
 				],
 			});
-			await saveArmy(EVENT, data);
-			const armies = await getArmies(REQ);
+			await saveArmy(req, data);
+			const armies = await getArmies(req);
 			assertArmies(armies, [data]);
 		});
 
@@ -110,8 +132,8 @@ describe('Saving', function () {
 					youtubeUrl: null,
 				},
 			});
-			await saveArmy(EVENT, data);
-			const armies = await getArmies(REQ);
+			await saveArmy(req, data);
+			const armies = await getArmies(req);
 			assertArmies(armies, [data]);
 		});
 
@@ -130,8 +152,8 @@ describe('Saving', function () {
 					youtubeUrl: null,
 				},
 			});
-			await saveArmy(EVENT, data);
-			const armies = await getArmies(REQ);
+			await saveArmy(req, data);
+			const armies = await getArmies(req);
 			// Expect one empty tag
 			data.guide.textContent = '<p></p>';
 			assertArmies(armies, [data]);
@@ -150,8 +172,8 @@ describe('Saving', function () {
 				equipment: [{ equipmentId: EquipmentModel.requireByName('Barbarian Puppet', ctx).id }],
 				pets: [{ hero: 'Barbarian King', petId: PetModel.requireByName('Lassi', ctx).id }],
 			});
-			await saveArmy(EVENT, data);
-			const army = (await getArmies(REQ))[0];
+			await saveArmy(req, data);
+			const army = (await getArmies(req))[0];
 			// Add units
 			army.units.push(
 				{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Archer', ctx).id, amount: 5 },
@@ -159,8 +181,8 @@ describe('Saving', function () {
 			);
 			army.equipment.push({ equipmentId: EquipmentModel.requireByName('Rage Vial', ctx).id });
 			army.pets.push({ hero: 'Archer Queen', petId: PetModel.requireByName('Spirit Fox', ctx).id });
-			await saveArmy(EVENT, army);
-			const armySaved = (await getArmies(REQ))[0];
+			await saveArmy(req, army);
+			const armySaved = (await getArmies(req))[0];
 			assertArmies([armySaved], [army]);
 		});
 
@@ -183,14 +205,14 @@ describe('Saving', function () {
 					{ hero: 'Archer Queen', petId: PetModel.requireByName('Spirit Fox', ctx).id },
 				],
 			});
-			await saveArmy(EVENT, data);
-			const army = (await getArmies(REQ))[0];
+			await saveArmy(req, data);
+			const army = (await getArmies(req))[0];
 			// Remove units
 			army.units = army.units.filter((u) => u.name !== 'Archer');
 			army.equipment = army.equipment.filter((eq) => eq.name !== 'Rage Vial');
 			army.pets = army.pets.filter((p) => p.name !== 'Spirit Fox');
-			await saveArmy(EVENT, army);
-			const armySaved = (await getArmies(REQ))[0];
+			await saveArmy(req, army);
+			const armySaved = (await getArmies(req))[0];
 			assertArmies([armySaved], [army]);
 		});
 
@@ -208,11 +230,11 @@ describe('Saving', function () {
 				equipment: [equipment],
 				pets: [pet],
 			});
-			const armyId = await saveArmy(EVENT, data);
+			const armyId = await saveArmy(req, data);
 
 			// Simulate removing and re-adding by ensuring id is undefined (which data above already had, but that was for creating, now we're editing an existing army)
 			data.id = armyId;
-			await saveArmy(EVENT, data);
+			await saveArmy(req, data);
 
 			// Ensure no duplicates were entered into the db
 			const unitsCount = await db.getRows('army_units');
@@ -238,17 +260,17 @@ describe('Saving', function () {
 					{ home: 'clanCastle', unitId: UnitModel.requireTroopByName('Archer', ctx).id, amount: 1 },
 				],
 			});
-			await saveArmy(EVENT, data);
+			await saveArmy(req, data);
 
-			const army = (await getArmies(REQ))[0];
+			const army = (await getArmies(req))[0];
 			// Delete home unit from the army
 			army.units = army.units.filter((u) => u.home === 'clanCastle' || u.name !== 'Archer');
 			// Simulate removing and re-adding the clan castle unit by ensuring id is undefined
 			const ccUnit = army.units.find((u) => u.home === 'clanCastle');
 			ccUnit.id = undefined;
 
-			await saveArmy(EVENT, army);
-			const armyAfter = (await getArmies(REQ))[0];
+			await saveArmy(req, army);
+			const armyAfter = (await getArmies(req))[0];
 
 			// Assert home unit was deleted
 			const homeUnits = armyAfter.units.filter((u) => u.home === 'armyCamp');
@@ -265,12 +287,12 @@ describe('Saving', function () {
 				townHall: 16,
 				units: [{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Barbarian', ctx).id, amount: 10 }],
 			});
-			await saveArmy(EVENT, data);
-			const army = (await getArmies(REQ))[0];
+			await saveArmy(req, data);
+			const army = (await getArmies(req))[0];
 			// Update amount
 			army.units[0].amount = 20;
-			await saveArmy(EVENT, army);
-			const armySaved = (await getArmies(REQ))[0];
+			await saveArmy(req, army);
+			const armySaved = (await getArmies(req))[0];
 			assertArmies([armySaved], [army]);
 		});
 
@@ -284,12 +306,12 @@ describe('Saving', function () {
 					youtubeUrl: null,
 				},
 			});
-			await saveArmy(EVENT, data);
-			const army = (await getArmies(REQ))[0];
+			await saveArmy(req, data);
+			const army = (await getArmies(req))[0];
 			// Remove guide
 			army.guide = null;
-			await saveArmy(EVENT, army);
-			const armySaved = (await getArmies(REQ))[0];
+			await saveArmy(req, army);
+			const armySaved = (await getArmies(req))[0];
 			assertArmies([armySaved], [army]);
 		});
 	});
@@ -321,10 +343,10 @@ describe('Fetching', function () {
 		});
 		const data2 = { ...data, name: 'test2' };
 		// Create two armies
-		await saveArmy(EVENT, data);
-		await saveArmy(EVENT, data2);
+		await saveArmy(req, data);
+		await saveArmy(req, data2);
 		// Assert  units/equipment/pets length matches for each army (assertArmies handles this)
-		const armies = await getArmies(REQ);
+		const armies = await getArmies(req);
 		assertArmies(armies, [data, data2]);
 	});
 });
@@ -345,8 +367,8 @@ describe('Army comments', function () {
 			townHall: 1,
 			units: [{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Barbarian', ctx).id, amount: 5 }],
 		});
-		armyId = await saveArmy(EVENT, data);
-		armyId2 = await saveArmy(EVENT, data2);
+		armyId = await saveArmy(req, data);
+		armyId2 = await saveArmy(req, data2);
 	});
 
 	afterEach(async function () {
@@ -359,13 +381,13 @@ describe('Army comments', function () {
 			comment: 'Test comment',
 			replyTo: null,
 		};
-		const id = await saveComment(EVENT, data);
+		const id = await saveComment(req, data);
 		const comment = await db.getRow('army_comments', { id });
 		assert.include(comment, {
 			armyId,
 			comment: 'Test comment',
 			replyTo: null,
-			createdBy: USER.id,
+			createdBy: reqUser.id,
 		});
 	});
 
@@ -375,15 +397,15 @@ describe('Army comments', function () {
 			comment: 'Test comment',
 			replyTo: null,
 		};
-		const id = await saveComment(EVENT, data);
+		const id = await saveComment(req, data);
 		const newData = { ...data, id, comment: 'Test comment updated' };
-		await saveComment(EVENT, newData);
+		await saveComment(req, newData);
 		const comment = await db.getRow('army_comments', { id });
 		assert.include(comment, {
 			armyId,
 			comment: 'Test comment updated',
 			replyTo: null,
-			createdBy: USER.id,
+			createdBy: reqUser.id,
 		});
 	});
 
@@ -393,18 +415,18 @@ describe('Army comments', function () {
 			comment: 'Test comment',
 			replyTo: null,
 		};
-		const id = await saveComment(EVENT, data);
+		const id = await saveComment(req, data);
 
 		// Ensure changing armyId throws
 		await assert.throwsAsync(async function () {
 			const newData = { ...data, id, armyId: armyId2 };
-			await saveComment(EVENT, newData);
+			await saveComment(req, newData);
 		}, 'Moving comments is not allowed');
 
 		// Ensure changing replyTo throws
 		await assert.throwsAsync(async function () {
 			const newData = { ...data, id, replyTo: 1 };
-			await saveComment(EVENT, newData);
+			await saveComment(req, newData);
 		}, 'Moving comments is not allowed');
 	});
 
@@ -414,19 +436,19 @@ describe('Army comments', function () {
 			comment: 'Test comment',
 			replyTo: null,
 		};
-		const id = await saveComment(EVENT, data);
+		const id = await saveComment(req, data);
 		const replyingData = {
 			armyId,
 			comment: 'Replying',
 			replyTo: id,
 		};
-		const replyId = await saveComment(EVENT, replyingData);
+		const replyId = await saveComment(req, replyingData);
 		const comment = await db.getRow('army_comments', { id: replyId });
 		assert.include(comment, {
 			armyId,
 			comment: 'Replying',
 			replyTo: id,
-			createdBy: USER.id,
+			createdBy: reqUser.id,
 		});
 	});
 
@@ -436,33 +458,27 @@ describe('Army comments', function () {
 			comment: 'Test comment',
 			replyTo: null,
 		};
-		const id = await saveComment(EVENT, data);
+		const id = await saveComment(req, data);
 
 		try {
 			// Saving this comment with another non-admin user should throw
-			const USER_2_EVENT = createEvent(USER_2);
-			await saveComment(USER_2_EVENT, { ...data, id, comment: 'Updated ' });
+			await saveComment(req2, { ...data, id, comment: 'Updated ' });
 			assert.fail('Expected error');
 		} catch (err: any) {
 			assert.equal(err.body.message, "You don't have permission to do this warrior!");
 			// Assert comment was not changed
 			const comment = await db.getRow('army_comments', { id });
-			assert.include(comment, { ...data, createdBy: USER.id });
+			assert.include(comment, { ...data, createdBy: reqUser.id });
 		}
 
 		// Admin should be able to save any comment
-		const ADMIN_EVENT = createEvent(ADMIN_USER);
-		await saveComment(ADMIN_EVENT, { ...data, id, comment: 'Updated ' });
+		await saveComment(reqAdmin, { ...data, id, comment: 'Updated ' });
 		const comment = await db.getRow('army_comments', { id });
-		assert.include(comment, { ...data, createdBy: USER.id, comment: 'Updated' });
+		assert.include(comment, { ...data, createdBy: reqUser.id, comment: 'Updated' });
 	});
 });
 
 describe('Army notifications', function () {
-	const USER_1_EVENT = createEvent(USER);
-	const USER_2_EVENT = createEvent(USER_2);
-	const ADMIN_EVENT = createEvent(ADMIN_USER);
-
 	let armyId: number;
 
 	beforeAll(async function () {
@@ -471,7 +487,7 @@ describe('Army notifications', function () {
 			townHall: 1,
 			units: [{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Barbarian', ctx).id, amount: 5 }],
 		});
-		armyId = await saveArmy(USER_1_EVENT, data);
+		armyId = await saveArmy(req, data);
 	});
 
 	afterEach(async function () {
@@ -482,16 +498,16 @@ describe('Army notifications', function () {
 	describe('Comment', function () {
 		it('should notify army creator if someone comments', async function () {
 			const data = { armyId, comment: 'Comment...', replyTo: null };
-			const commentId = await saveComment(USER_2_EVENT, data);
-			const notifications = await getNotifications(USER.id);
+			const commentId = await saveComment(req2, data);
+			const notifications = await getNotifications(reqUser.id);
 			assert.lengthOf(notifications, 1);
-			assert.include(notifications[0], { armyId, commentId, type: 'comment', recipientId: USER.id, triggeringUserId: USER_2.id });
+			assert.include(notifications[0], { armyId, commentId, type: 'comment', recipientId: reqUser.id, triggeringUserId: req2User.id });
 		});
 
 		it('should not notify army creator if they comment on their own army', async function () {
 			const data = { armyId, comment: 'Comment...', replyTo: null };
-			await saveComment(USER_1_EVENT, data);
-			const notifications = await getNotifications(USER.id);
+			await saveComment(req, data);
+			const notifications = await getNotifications(reqUser.id);
 			assert.lengthOf(notifications, 0);
 		});
 	});
@@ -500,50 +516,50 @@ describe('Army notifications', function () {
 		it('should notify commenter if someone replies', async function () {
 			// Comment on own army (should not notify)
 			const data = { armyId, comment: 'Comment...', replyTo: null };
-			const commentId = await saveComment(USER_1_EVENT, data);
+			const commentId = await saveComment(req, data);
 
 			// Another user replies (should notify, but with type "comment-reply")
 			const data2 = { armyId, comment: 'Comment reply...', replyTo: commentId };
-			const commentId2 = await saveComment(USER_2_EVENT, data2);
+			const commentId2 = await saveComment(req2, data2);
 
-			const notifications = await getNotifications(USER.id);
+			const notifications = await getNotifications(reqUser.id);
 			assert.lengthOf(notifications, 1);
-			assert.include(notifications[0], { armyId, commentId: commentId2, type: 'comment-reply', recipientId: USER.id, triggeringUserId: USER_2.id });
+			assert.include(notifications[0], { armyId, commentId: commentId2, type: 'comment-reply', recipientId: reqUser.id, triggeringUserId: req2User.id });
 		});
 
 		it('should not notify commenter if they reply to themselves', async function () {
 			// Comment on user army
 			const data = { armyId, comment: 'Comment...', replyTo: null };
-			const commentId = await saveComment(USER_2_EVENT, data);
+			const commentId = await saveComment(req2, data);
 
 			// Reply to self
 			const data2 = { armyId, comment: 'Comment reply...', replyTo: commentId };
-			await saveComment(USER_2_EVENT, data2);
+			await saveComment(req2, data2);
 
 			// Should be 2 notifications, but only to the army creator of 2 new comments
-			const notifications = await getNotifications(USER.id);
+			const notifications = await getNotifications(reqUser.id);
 			assert.lengthOf(notifications, 2);
-			assert.include(notifications[0], { armyId, type: 'comment', recipientId: USER.id, triggeringUserId: USER_2.id });
-			assert.include(notifications[1], { armyId, type: 'comment', recipientId: USER.id, triggeringUserId: USER_2.id });
+			assert.include(notifications[0], { armyId, type: 'comment', recipientId: reqUser.id, triggeringUserId: req2User.id });
+			assert.include(notifications[1], { armyId, type: 'comment', recipientId: reqUser.id, triggeringUserId: req2User.id });
 		});
 
 		it('should not notify army creator if they reply to someone else', async function () {
 			// Comment on user army
 			const data = { armyId, comment: 'Comment...', replyTo: null };
-			const commentId = await saveComment(USER_2_EVENT, data);
+			const commentId = await saveComment(req2, data);
 
 			// Reply to comment as the army creator
 			const data2 = { armyId, comment: 'Comment reply...', replyTo: commentId };
-			await saveComment(USER_1_EVENT, data2);
+			await saveComment(req, data2);
 
 			// Should be 2 notifications, one to the creator that someone commented, and another to the commenter as the creator replied
-			const notificationsCreator = await getNotifications(USER.id);
+			const notificationsCreator = await getNotifications(reqUser.id);
 			assert.lengthOf(notificationsCreator, 1);
-			assert.include(notificationsCreator[0], { armyId, type: 'comment', recipientId: USER.id, triggeringUserId: USER_2.id });
+			assert.include(notificationsCreator[0], { armyId, type: 'comment', recipientId: reqUser.id, triggeringUserId: req2User.id });
 
-			const notificationsCommenter = await getNotifications(USER_2.id);
+			const notificationsCommenter = await getNotifications(req2User.id);
 			assert.lengthOf(notificationsCommenter, 1);
-			assert.include(notificationsCommenter[0], { armyId, type: 'comment-reply', recipientId: USER_2.id, triggeringUserId: USER.id });
+			assert.include(notificationsCommenter[0], { armyId, type: 'comment-reply', recipientId: req2User.id, triggeringUserId: reqUser.id });
 		});
 	});
 
@@ -551,20 +567,20 @@ describe('Army notifications', function () {
 		it("should not allow user to acknowledge other users' notifications, unless admin", async function () {
 			// Comment on user army
 			const data = { armyId, comment: 'Comment...', replyTo: null };
-			await saveComment(USER_2_EVENT, data);
-			const notificationId = (await getNotifications(USER.id))[0]?.id;
+			await saveComment(req2, data);
+			const notificationId = (await getNotifications(reqUser.id))[0]?.id;
 
 			await assert.throwsAsync(async () => {
 				// Acknowledging the notification with a different non-admin user should throw
-				await acknowledgeNotifications(USER_2_EVENT, [notificationId]);
+				await acknowledgeNotifications(req2, [notificationId]);
 			}, "Cannot acknowledge notifications that aren't yours");
 
 			// Should not have changed if the notification has been acknowledged
-			assert.strictEqual((await getNotifications(USER.id))[0]?.seen, null);
+			assert.strictEqual((await getNotifications(reqUser.id))[0]?.seen, null);
 
 			// Admin should be able to acknowledge
-			await acknowledgeNotifications(ADMIN_EVENT, [notificationId]);
-			assert.instanceOf((await getNotifications(USER.id))[0]?.seen, Date);
+			await acknowledgeNotifications(reqAdmin, [notificationId]);
+			assert.instanceOf((await getNotifications(reqUser.id))[0]?.seen, Date);
 		});
 	});
 });

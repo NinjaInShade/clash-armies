@@ -15,12 +15,12 @@ function isObject(obj: unknown): obj is Record<string, unknown> {
 	return typeof obj === 'object' && !Array.isArray(obj) && obj !== null;
 }
 
-export async function GET(event: RequestEvent): Promise<Response> {
-	const code = event.url.searchParams.get('code');
-	const state = event.url.searchParams.get('state');
+export async function GET(req: RequestEvent): Promise<Response> {
+	const code = req.url.searchParams.get('code');
+	const state = req.url.searchParams.get('state');
 
-	const storedState = event.cookies.get('google_oauth_state') ?? null;
-	const storedCodeVerifier = event.cookies.get('google_oauth_code_verifier') ?? null;
+	const storedState = req.cookies.get('google_oauth_state') ?? null;
+	const storedCodeVerifier = req.cookies.get('google_oauth_code_verifier') ?? null;
 
 	if (!code || !storedState || !storedCodeVerifier || state !== storedState) {
 		return new Response(null, {
@@ -66,7 +66,7 @@ export async function GET(event: RequestEvent): Promise<Response> {
 			}
 			const session = await lucia.createSession(existingUser.id, {});
 			const sessionCookie = lucia.createSessionCookie(session.id);
-			event.cookies.set(sessionCookie.name, sessionCookie.value, {
+			req.cookies.set(sessionCookie.name, sessionCookie.value, {
 				path: '.',
 				...sessionCookie.attributes,
 			});
@@ -96,7 +96,7 @@ export async function GET(event: RequestEvent): Promise<Response> {
 
 			const session = await lucia.createSession(userId, {});
 			const sessionCookie = lucia.createSessionCookie(session.id);
-			event.cookies.set(sessionCookie.name, sessionCookie.value, {
+			req.cookies.set(sessionCookie.name, sessionCookie.value, {
 				path: '.',
 				...sessionCookie.attributes,
 			});

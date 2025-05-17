@@ -41,8 +41,8 @@ const serverDispose = async () => {
 	await db.dispose();
 };
 
-export function getRequestInfo(event: RequestEvent) {
-	const { request, locals } = event;
+export function getRequestInfo(req: RequestEvent) {
+	const { request, locals } = req;
 	const { user, uuid } = locals;
 	const { method, url } = request;
 	return {
@@ -51,7 +51,7 @@ export function getRequestInfo(event: RequestEvent) {
 		url,
 		userId: user?.id,
 		username: user?.username,
-		ip: event.getClientAddress(),
+		ip: req.getClientAddress(),
 		userAgent: request.headers.get('User-Agent'),
 	};
 }
@@ -62,14 +62,14 @@ function getResponseInfo(request: ReturnType<typeof getRequestInfo>, response: R
 	return { requestId: uuid, method, status };
 }
 
-export const handle: Handle = async ({ event, resolve }) => {
+export const handle: Handle = async ({ event: req, resolve }) => {
 	async function handleWithLogging() {
 		const start = Date.now();
-		const requestInfo = getRequestInfo(event);
+		const requestInfo = getRequestInfo(req);
 		log.info('Request:', requestInfo);
 
 		// Runs the request handler
-		const response = await resolve(event);
+		const response = await resolve(req);
 
 		const requestDuration = Date.now() - start;
 		const responseInfo = getResponseInfo(requestInfo, response);
@@ -81,37 +81,37 @@ export const handle: Handle = async ({ event, resolve }) => {
 	// One-time setup upon starting the server
 	await serverInit;
 
-	event.locals.uuid = uuidv4();
-	event.locals.hasAuth = () => hasAuth(event);
-	event.locals.requireAuth = () => requireAuth(event);
-	event.locals.hasRoles = (...roles: string[]) => hasRoles(event, ...roles);
-	event.locals.requireRoles = (...roles: string[]) => requireRoles(event, ...roles);
+	req.locals.uuid = uuidv4();
+	req.locals.hasAuth = () => hasAuth(req);
+	req.locals.requireAuth = () => requireAuth(req);
+	req.locals.hasRoles = (...roles: string[]) => hasRoles(req, ...roles);
+	req.locals.requireRoles = (...roles: string[]) => requireRoles(req, ...roles);
 
-	const sessionId = event.cookies.get(lucia.sessionCookieName);
+	const sessionId = req.cookies.get(lucia.sessionCookieName);
 	if (!sessionId) {
-		event.locals.user = null;
-		event.locals.session = null;
+		req.locals.user = null;
+		req.locals.session = null;
 		return handleWithLogging();
 	}
 
 	const { session, user } = await lucia.validateSession(sessionId);
 	if (session && session.fresh) {
 		const sessionCookie = lucia.createSessionCookie(session.id);
-		event.cookies.set(sessionCookie.name, sessionCookie.value, {
+		req.cookies.set(sessionCookie.name, sessionCookie.value, {
 			path: '.',
 			...sessionCookie.attributes,
 		});
 	}
 	if (!session) {
 		const sessionCookie = lucia.createBlankSessionCookie();
-		event.cookies.set(sessionCookie.name, sessionCookie.value, {
+		req.cookies.set(sessionCookie.name, sessionCookie.value, {
 			path: '.',
 			...sessionCookie.attributes,
 		});
 	}
 
-	event.locals.user = user;
-	event.locals.session = session;
+	req.locals.user = user;
+	req.locals.session = session;
 	return handleWithLogging();
 };
 

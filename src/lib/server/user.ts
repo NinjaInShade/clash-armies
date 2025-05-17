@@ -2,15 +2,13 @@ import type { User } from '$types';
 import { db } from '$server/db';
 import z from 'zod';
 import type { RequestEvent } from '@sveltejs/kit';
-import type { Request } from '~/app';
 
 type GetUsersParams = {
-	req: Request;
 	username?: string;
 };
 
-export async function getUsers(opts: GetUsersParams) {
-	const { req, username } = opts;
+export async function getUsers(req: RequestEvent, opts: GetUsersParams) {
+	const { username } = opts;
 
 	const args: (number | string)[] = [];
 	let query = `
@@ -44,16 +42,16 @@ export async function getUsers(opts: GetUsersParams) {
 		// TODO: fetch player level (and other stats if added) from clash of clans API if player tag is defined
 		user.level = null;
 
-		if (!req.hasRoles('admin') || req.user?.id !== user.id) {
+		if (!req.locals.hasRoles('admin') || req.locals.user?.id !== user.id) {
 			delete user.googleId;
 		}
 	}
 	return users;
 }
 
-export async function getUser(req: Request, username: string) {
+export async function getUser(req: RequestEvent, username: string) {
 	z.object({ username: z.string() }).parse({ username });
-	const users = await getUsers({ req, username });
+	const users = await getUsers(req, { username });
 	if (!users.length) {
 		return null;
 	}
@@ -65,8 +63,8 @@ const userSchema = z.object({
 	username: z.string().trim().min(3).max(30),
 });
 
-export async function saveUser(event: RequestEvent, userData: Partial<User>) {
-	const authUser = event.locals.requireAuth();
+export async function saveUser(req: RequestEvent, userData: Partial<User>) {
+	const authUser = req.locals.requireAuth();
 	const user = userSchema.parse(userData);
 	const { username } = user;
 
@@ -90,7 +88,7 @@ export async function saveUser(event: RequestEvent, userData: Partial<User>) {
 		// allow user to save his own details
 	} else {
 		// otherwise must be an admin to save someone elses details
-		event.locals.requireRoles('admin');
+		req.locals.requireRoles('admin');
 	}
 
 	const query = `

@@ -5,14 +5,12 @@ import { USER_MAX_ARMIES } from '$shared/utils';
 import { validateArmy, numberSchema, commentSchema } from '$shared/validation';
 import z from 'zod';
 import type { RequestEvent } from '@sveltejs/kit';
-import type { Request } from '~/app';
 import { generateJSON, generateHTML } from '@tiptap/html';
 import { getExtensions } from '$shared/guideEditor';
 import { parseHTML } from 'zeed-dom';
 import { GuideModel } from '$models/Guide.svelte';
 
 type GetArmiesParams = {
-	req: Request;
 	/** Returns the army with this ID */
 	id?: number | number[];
 	/** Returns the armies for the user with this username */
@@ -23,9 +21,9 @@ type GetUnitsParams = {
 	type?: UnitType;
 };
 
-export async function getArmies(opts: GetArmiesParams) {
-	const { req, id, username } = opts;
-	const userId = req.user?.id ?? null;
+export async function getArmies(req: RequestEvent, opts: GetArmiesParams = {}) {
+	const { id, username } = opts;
+	const userId = req.locals.user?.id ?? null;
 
 	const args: (number | number[] | string | null)[] = [userId, userId];
 	let query = `
@@ -190,13 +188,12 @@ export async function getArmies(opts: GetArmiesParams) {
 }
 
 type GetSavedArmiesParams = {
-	req: Request;
 	/** Will return all saved armies for the user with this username */
 	username: string;
 };
 
-export async function getSavedArmies(opts: GetSavedArmiesParams) {
-	const { req, username } = opts;
+export async function getSavedArmies(req: RequestEvent, opts: GetSavedArmiesParams) {
+	const { username } = opts;
 	const savedArmyIds = (
 		await db.query(
 			`
@@ -211,12 +208,12 @@ export async function getSavedArmies(opts: GetSavedArmiesParams) {
 	if (!savedArmyIds.length) {
 		return [];
 	}
-	return getArmies({ req, id: savedArmyIds });
+	return getArmies(req, { id: savedArmyIds });
 }
 
-export async function getArmy(req: Request, id: number) {
+export async function getArmy(req: RequestEvent, id: number) {
 	z.object({ id: z.number() }).parse({ id });
-	const armies = await getArmies({ req, id });
+	const armies = await getArmies(req, { id });
 	if (!armies.length) {
 		return null;
 	}
@@ -343,8 +340,8 @@ export async function getPets() {
 	return pets;
 }
 
-export async function saveArmy(event: RequestEvent, data: unknown): Promise<number> {
-	const user = event.locals.requireAuth();
+export async function saveArmy(req: RequestEvent, data: unknown): Promise<number> {
+	const user = req.locals.requireAuth();
 	const ctx = {
 		units: await getUnits(),
 		townHalls: await getTownHalls(),
@@ -425,7 +422,7 @@ export async function saveArmy(event: RequestEvent, data: unknown): Promise<numb
 		// allow user to edit his own army
 	} else {
 		// otherwise must be an admin to edit someone elses army
-		event.locals.requireRoles('admin');
+		req.locals.requireRoles('admin');
 	}
 	await db.transaction(async (tx) => {
 		// Update army
@@ -480,9 +477,9 @@ export async function saveArmy(event: RequestEvent, data: unknown): Promise<numb
 	return armyId;
 }
 
-export async function deleteArmy(event: RequestEvent, armyId: number) {
+export async function deleteArmy(req: RequestEvent, armyId: number) {
 	const { id } = z.object({ id: z.number() }).parse({ id: armyId });
-	const user = event.locals.requireAuth();
+	const user = req.locals.requireAuth();
 	const existing = await db.getRow<Army, null>('armies', { id });
 	if (!existing) {
 		throw new Error("This army doesn't exist");
@@ -491,7 +488,7 @@ export async function deleteArmy(event: RequestEvent, armyId: number) {
 		// allow user to delete his own army
 	} else {
 		// otherwise must be an admin to delete someone elses army
-		event.locals.requireRoles('admin');
+		req.locals.requireRoles('admin');
 	}
 	await db.query('DELETE FROM armies WHERE id = ?', [id]);
 }
@@ -501,8 +498,8 @@ type SaveVoteParams = {
 	vote: number | null;
 };
 
-export async function saveVote(event: RequestEvent, data: SaveVoteParams) {
-	const user = event.locals.requireAuth();
+export async function saveVote(req: RequestEvent, data: SaveVoteParams) {
+	const user = req.locals.requireAuth();
 	const { armyId, vote } = z
 		.object({
 			armyId: z.number(),
@@ -512,7 +509,7 @@ export async function saveVote(event: RequestEvent, data: SaveVoteParams) {
 	if (![-1, 0, 1].includes(vote)) {
 		throw new Error('Invalid vote');
 	}
-	const army = await getArmy(event.locals, armyId);
+	const army = await getArmy(req, armyId);
 	if (!army) {
 		throw new Error('Could not find army');
 	}
@@ -523,10 +520,10 @@ export async function saveVote(event: RequestEvent, data: SaveVoteParams) {
 	}
 }
 
-export async function saveComment(event: RequestEvent, data: unknown) {
-	const user = event.locals.requireAuth();
+export async function saveComment(req: RequestEvent, data: unknown) {
+	const user = req.locals.requireAuth();
 	const comment = commentSchema.parse(data);
-	const army = await getArmy(event.locals, comment.armyId);
+	const army = await getArmy(req, comment.armyId);
 
 	if (!army) {
 		throw new Error('Invalid army');
@@ -577,7 +574,7 @@ export async function saveComment(event: RequestEvent, data: unknown) {
 		// allow user to delete his own comment
 	} else {
 		// otherwise must be an admin to delete someone elses comment
-		event.locals.requireRoles('admin');
+		req.locals.requireRoles('admin');
 	}
 	if (existing.armyId !== comment.armyId || existing.replyTo !== comment.replyTo) {
 		throw new Error('Moving comments is not allowed');
@@ -593,9 +590,9 @@ export async function saveComment(event: RequestEvent, data: unknown) {
 	return commentId;
 }
 
-export async function deleteComment(event: RequestEvent, commentId: number) {
+export async function deleteComment(req: RequestEvent, commentId: number) {
 	const { id } = z.object({ id: z.number() }).parse({ id: commentId });
-	const user = event.locals.requireAuth();
+	const user = req.locals.requireAuth();
 	const existing = await db.getRow<ArmyComment, null>('army_comments', { id });
 	if (!existing) {
 		throw new Error("This comment doesn't exist");
@@ -604,23 +601,23 @@ export async function deleteComment(event: RequestEvent, commentId: number) {
 		// allow user to delete his own comment
 	} else {
 		// otherwise must be an admin to delete someone elses comment
-		event.locals.requireRoles('admin');
+		req.locals.requireRoles('admin');
 	}
 	await db.delete('army_comments', { id });
 }
 
-export async function bookmarkArmy(event: RequestEvent, data: { armyId: number }) {
-	const user = event.locals.requireAuth();
+export async function bookmarkArmy(req: RequestEvent, data: { armyId: number }) {
+	const user = req.locals.requireAuth();
 	const { armyId } = z.object({ armyId: z.number() }).parse(data);
-	const army = await getArmy(event.locals, armyId);
+	const army = await getArmy(req, armyId);
 	if (!army) {
 		throw new Error('Could not find army');
 	}
 	await db.insertOne('saved_armies', { armyId, userId: user.id });
 }
 
-export async function removeBookmark(event: RequestEvent, data: { armyId: number }) {
-	const user = event.locals.requireAuth();
+export async function removeBookmark(req: RequestEvent, data: { armyId: number }) {
+	const user = req.locals.requireAuth();
 	const { armyId } = z.object({ armyId: z.number() }).parse(data);
 	await db.query('DELETE FROM saved_armies WHERE armyId = ? AND userId = ?', [armyId, user.id]);
 }
