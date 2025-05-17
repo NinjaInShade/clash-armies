@@ -1,7 +1,7 @@
 import type { AppState, Modal, ToastNotification } from '$types';
 import C from '$components';
 
-const TOAST_DEFAULT_DURATION = 1000;
+const TOAST_DEFAULT_DURATION = 2500;
 
 export function requireHTML() {
 	const html = document.querySelector('html');
