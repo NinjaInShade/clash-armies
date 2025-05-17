@@ -194,6 +194,71 @@ describe('Saving', function () {
 			assertArmies([armySaved], [army]);
 		});
 
+		// When you remove and then add again on the UI, you technically are just making a new "blank" unit, so the previous database "id" field is now undefined.
+		// However, the system shouldn't care about IDs and still handle this correctly as if you just did nothing.
+		// This tests a bug where the system actually just inserted a duplicate unit in the DB since the upsert didn't detect collision with the PK (since id is now undefined)
+		it('Should not create duplicate unit db records if unit was removed then re-added', async function () {
+			const unit = { id: undefined, home: 'armyCamp', unitId: UnitModel.requireTroopByName('Barbarian', ctx).id, amount: 1 };
+			const equipment = { id: undefined, equipmentId: EquipmentModel.requireByName('Barbarian Puppet', ctx).id };
+			const pet = { id: undefined, hero: 'Barbarian King', petId: PetModel.requireByName('Lassi', ctx).id };
+			const data = makeData({
+				name: 'test',
+				townHall: 16,
+				units: [unit],
+				equipment: [equipment],
+				pets: [pet],
+			});
+			const armyId = await saveArmy(EVENT, data);
+
+			// Simulate removing and re-adding by ensuring id is undefined (which data above already had, but that was for creating, now we're editing an existing army)
+			data.id = armyId;
+			await saveArmy(EVENT, data);
+
+			// Ensure no duplicates were entered into the db
+			const unitsCount = await db.getRows('army_units');
+			const equipmentCount = await db.getRows('army_equipment');
+			const petsCount = await db.getRows('army_pets');
+			assert.equal(unitsCount.length, 1);
+			assert.equal(equipmentCount.length, 1);
+			assert.equal(petsCount.length, 1);
+		});
+
+		// This is loosely related to the bug with duplicating unit db records if unit wa removed then re-added.
+		// Basically, make sure that if you delete a home unit, and at the same time remove and re-add the same type of
+		// unit in the clan castle, that the home unit definitely gets deleted, as there was a bug where it was kept.
+		it('should delete home unit if deleted and cc unit removed then re-added at the same time', async function () {
+			const data = makeData({
+				name: 'test',
+				townHall: 16,
+				units: [
+					// Just so we always have one unit in the home camp otherwise you can't save empty army
+					{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Barbarian', ctx).id, amount: 1 },
+					// Same unit types but one for home camp, and one for clan castle
+					{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Archer', ctx).id, amount: 1 },
+					{ home: 'clanCastle', unitId: UnitModel.requireTroopByName('Archer', ctx).id, amount: 1 },
+				],
+			});
+			await saveArmy(EVENT, data);
+
+			const army = (await getArmies(REQ))[0];
+			// Delete home unit from the army
+			army.units = army.units.filter((u) => u.home === 'clanCastle' || u.name !== 'Archer');
+			// Simulate removing and re-adding the clan castle unit by ensuring id is undefined
+			const ccUnit = army.units.find((u) => u.home === 'clanCastle');
+			ccUnit.id = undefined;
+
+			await saveArmy(EVENT, army);
+			const armyAfter = (await getArmies(REQ))[0];
+
+			// Assert home unit was deleted
+			const homeUnits = armyAfter.units.filter((u) => u.home === 'armyCamp');
+			assert.equal(homeUnits.length, 1);
+			assert.equal(homeUnits[0].name, 'Barbarian');
+			// This shouldn't have changed
+			const ccUnits = armyAfter.units.filter((u) => u.home === 'clanCastle');
+			assert.equal(ccUnits.length, 1);
+		});
+
 		it('Should save different unit amount', async function () {
 			const data = makeData({
 				name: 'test',

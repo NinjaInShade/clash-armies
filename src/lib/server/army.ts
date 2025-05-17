@@ -353,8 +353,7 @@ export async function saveArmy(event: RequestEvent, data: unknown): Promise<numb
 	};
 
 	const model = validateArmy(data, ctx);
-	const units = [...model.units, ...model.ccUnits];
-	const { equipment, pets, guide } = model;
+	const { equipment, pets, guide, units, ccUnits, allUnits } = model;
 
 	if (guide && typeof guide.textContent === 'string') {
 		// Escapes/sanitizes the HTML for security reasons (converting to JSON and back to HTML achieves this)
@@ -381,7 +380,7 @@ export async function saveArmy(event: RequestEvent, data: unknown): Promise<numb
 				banner: model.banner,
 				createdBy: user.id,
 			});
-			const armyUnits = units.map((unit) => {
+			const armyUnits = allUnits.map((unit) => {
 				return {
 					armyId,
 					home: unit.home,
@@ -438,29 +437,39 @@ export async function saveArmy(event: RequestEvent, data: unknown): Promise<numb
 				WHERE id = ?
 		`;
 		await tx.query(updateQuery, [model.name, model.townHall, model.banner, armyId]);
-		// Remove deleted units
-		await tx.query('DELETE FROM army_units WHERE armyId = ? AND id NOT IN (?)', [armyId, units.map((u) => u.id ?? null)]);
-		// Upsert units
-		const unitsData = units.map((u) => ({ id: u.id ?? null, armyId, home: u.home, unitId: u.unitId, amount: u.amount }));
+
+		// Remove deleted home units
+		if (units.length) {
+			const unitIds = units.map((u) => u.unitId);
+			await tx.query('DELETE FROM army_units WHERE armyId = ? AND unitId NOT IN (?) AND home = ?', [armyId, unitIds, 'armyCamp']);
+		}
+		// Remove deleted clan castle units
+		if (ccUnits.length) {
+			const unitIds = ccUnits.map((u) => u.unitId);
+			await tx.query('DELETE FROM army_units WHERE armyId = ? AND unitId NOT IN (?) AND home = ?', [armyId, unitIds, 'clanCastle']);
+		}
+		// Upsert units - UNIQUE(armyId, unitId, home) means if unit was removed+added and id is undefined it will still update correctly
+		const unitsData = allUnits.map((u) => ({ id: u.id ?? null, armyId, home: u.home, unitId: u.unitId, amount: u.amount }));
 		await tx.upsert('army_units', unitsData);
+
+		// Remove deleted equipment
 		if (equipment.length) {
-			// Remove deleted equipment
-			await tx.query('DELETE FROM army_equipment WHERE armyId = ? AND id NOT IN (?)', [armyId, equipment.map((eq) => eq.id ?? null)]);
-			// Upsert equipment
-			const equipmentData = equipment.map((eq) => ({ id: eq.id ?? null, armyId, equipmentId: eq.equipmentId }));
-			await tx.upsert('army_equipment', equipmentData);
-		} else {
-			await tx.delete('army_equipment', { armyId });
+			const equipmentIds = equipment.map((eq) => eq.equipmentId);
+			await tx.query('DELETE FROM army_equipment WHERE armyId = ? AND equipmentId NOT IN (?)', [armyId, equipmentIds]);
 		}
+		// Upsert equipment - UNIQUE(armyId, equipmentId) means if equipment was removed+added and id is undefined it will still update correctly
+		const equipmentData = equipment.map((eq) => ({ id: eq.id ?? null, armyId, equipmentId: eq.equipmentId }));
+		await tx.upsert('army_equipment', equipmentData);
+
+		// Remove deleted pets
 		if (pets.length) {
-			// Remove deleted pets
-			await tx.query('DELETE FROM army_pets WHERE armyId = ? AND id NOT IN (?)', [armyId, pets.map((p) => p.id ?? null)]);
-			// Upsert pets
-			const petsData = pets.map((p) => ({ id: p.id ?? null, armyId, petId: p.petId, hero: p.hero }));
-			await tx.upsert('army_pets', petsData);
-		} else {
-			await tx.delete('army_pets', { armyId });
+			const petIds = pets.map((p) => p.petId);
+			await tx.query('DELETE FROM army_pets WHERE armyId = ? AND petId NOT IN (?)', [armyId, petIds]);
 		}
+		// Upsert pets - UNIQUE(armyId, petId, hero) means if pet was removed+added and id is undefined it will still update correctly
+		const petsData = pets.map((p) => ({ id: p.id ?? null, armyId, petId: p.petId, hero: p.hero }));
+		await tx.upsert('army_pets', petsData);
+
 		if (guide) {
 			const guideData = [{ id: guide.id ?? null, armyId, textContent: guide.textContent, youtubeUrl: guide.youtubeUrl }];
 			await tx.upsert('army_guides', guideData);
