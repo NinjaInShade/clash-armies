@@ -238,6 +238,7 @@
 					{@render filterBtn('Has guide', filters.hasGuide === true, () => setHasGuide(!filters.hasGuide))}
 					{@render filterBtn('Ground', filters.attackType === 'Ground', () => setAttackType(filters.attackType === 'Ground' ? undefined : 'Ground'))}
 					{@render filterBtn('Air', filters.attackType === 'Air', () => setAttackType(filters.attackType === 'Air' ? undefined : 'Air'))}
+					{@render filterBtn('Hybrid', filters.attackType === 'Hybrid', () => setAttackType(filters.attackType === 'Hybrid' ? undefined : 'Hybrid'))}
 				</div>
 			</section>
 

@@ -243,32 +243,17 @@ export function openInGame(army: ArmyModel) {
 }
 
 export function getTags(army: ArmyModel) {
+	const armyStats = army.getStats();
 	const tags: { label: string; icon?: Component }[] = [];
 	tags.push({ label: `TH${army.townHall}` });
-	const typeData = army.units.reduce(
-		(prev, curr) => {
-			if (curr.info.type === 'Spell') {
-				return prev;
-			}
-			if (curr.info.isFlying) {
-				prev.air += curr.amount;
-			} else {
-				prev.ground += curr.amount;
-			}
-			return prev;
-		},
-		{ air: 0, ground: 0 }
-	);
-	tags.push({ label: typeData.ground > typeData.air ? 'Ground' : 'Air' });
-	const hasClanCastle = army.units.filter((unit) => unit.home === 'clanCastle').length > 0;
-	if (hasClanCastle) {
+	tags.push({ label: armyStats.type });
+	if (armyStats.hasClanCastle) {
 		tags.push({ label: 'Clan castle', icon: C.IconTagsClanCastle });
 	}
-	const hasHeroes = VALID_HEROES.some((hero) => army.hasHero(hero));
-	if (hasHeroes) {
+	if (armyStats.hasHeroes) {
 		tags.push({ label: 'Heroes', icon: C.IconTagsHeroes });
 	}
-	if (army.guide?.id) {
+	if (armyStats.hasGuide) {
 		tags.push({ label: 'Guide' });
 	}
 	return tags;

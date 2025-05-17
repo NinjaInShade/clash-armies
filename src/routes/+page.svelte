@@ -27,7 +27,7 @@
 </script>
 
 <svelte:head>
-	<title>ClashArmies • Best Clash of Clans Armies & Strategies • Home</title>
+	<title>ClashArmies • Best Clash of Clans Armies & Strategies</title>
 	<meta
 		name="description"
 		content="Discover the best Clash of Clans armies - ranked, curated, and constantly updated. Explore top picks for CWL, trending, in-meta strategies, rising comps, and more to dominate every attack."
