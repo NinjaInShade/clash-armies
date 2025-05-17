@@ -133,6 +133,17 @@
 		model.townHall = value;
 	}
 
+	async function onKeyDown(ev: KeyboardEvent) {
+		const key = ev.key.toLowerCase();
+		const mod = ev.ctrlKey || ev.metaKey;
+		if (mod && key === 's') {
+			ev.preventDefault();
+			if (!saveDisabled) {
+				await saveArmy();
+			}
+		}
+	}
+
 	async function saveArmy() {
 		const data = model.getSaveData();
 		const response = await fetch('/api/armies', {
@@ -163,6 +174,8 @@
 <svelte:head>
 	<title>ClashArmies • Army creator</title>
 </svelte:head>
+
+<svelte:window onkeydown={onKeyDown} />
 
 <section class="banner">
 	<img class="banner-img" src="/clash/banners/{model.banner}.webp" alt="Clash of clans banner artwork" />
