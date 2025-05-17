@@ -2,13 +2,25 @@
 	import type { FetchErrors } from '$types';
 
 	type Props = {
-		errors: FetchErrors | null;
+		/**
+		 * Whether to auto scroll the errors into view when they are rendered
+		 * @default true
+		 */
+		scrollOnErrors?: boolean;
 	};
-	const { errors }: Props = $props();
+	const { errors, scrollOnErrors = true }: Props = $props();
+
+	let containerRef = $state<HTMLUListElement | undefined>(undefined);
+
+	$effect(() => {
+		if (containerRef && scrollOnErrors && errors) {
+			containerRef.scrollIntoView({ block: 'center' });
+		}
+	});
 </script>
 
 {#if errors}
-	<ul class="errors">
+	<ul class="errors" bind:this={containerRef}>
 		{#if typeof errors === 'string'}
 			<li>{errors}</li>
 		{:else}
