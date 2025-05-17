@@ -3,6 +3,7 @@ import { OAuth2RequestError } from 'arctic';
 import type { User } from '$types';
 import { google, lucia } from '$server/auth/lucia';
 import { db } from '$server/db';
+import { log } from '$server/auth/utils';
 
 type GoogleUser = {
 	sub: string;
@@ -108,7 +109,11 @@ export async function GET(req: RequestEvent): Promise<Response> {
 			});
 		}
 	} catch (err) {
-		console.log('Error whilst authenticating:', err);
+		log.error('Failed authentication:', {
+			requestId: req.locals.uuid,
+			error: err,
+		});
+
 		if (err instanceof OAuth2RequestError) {
 			// invalid code
 			return new Response(null, {

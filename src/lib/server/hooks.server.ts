@@ -2,12 +2,10 @@ import type { Handle, HandleServerError, RequestEvent } from '@sveltejs/kit';
 import { db } from '$server/db';
 import { migration } from '$server/migration';
 import { lucia } from '$server/auth/lucia';
-import { getDisplayZodError } from '$server/utils';
 import { hasAuth, requireAuth, hasRoles, requireRoles } from '$server/auth/utils';
 import { v4 as uuidv4 } from 'uuid';
 import { CronJob } from 'cron';
 import { dev } from '$app/environment';
-import z from 'zod';
 import util from '@ninjalib/util';
 
 util.Logger.showTimestamp = true;
@@ -128,7 +126,7 @@ export const handleError: HandleServerError = async ({ event: req, error, status
 };
 
 process.on('sveltekit:shutdown', async (reason: 'SIGINT' | 'SIGTERM' | 'IDLE') => {
-	console.warn(`Server will be shutting down for reason "${reason}"...`);
+	log.warn(`Server will be shutting down for reason "${reason}"...`);
 	await serverDispose();
-	console.warn('Server disposed, shutting down now...');
+	log.warn('Server disposed, shutting down now...');
 });
