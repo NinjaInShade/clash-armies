@@ -610,4 +610,8 @@ export default function migration(runStep: MigrationFn) {
     runStep(39, async (db: MySQL) => {
         await db.query('UPDATE equipment SET clashId = ? WHERE name = ?', [9, 'Hog Rider Doll']);
     });
+    runStep(40, `
+        ALTER TABLE army_comments
+        MODIFY comment TEXT DEFAULT NULL
+    `);
 }
