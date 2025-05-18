@@ -45,7 +45,7 @@
 	"dependencies": {
 		"@floating-ui/dom": "^1.6.10",
 		"@ninjalib/sql": "^0.5.1",
-		"@ninjalib/util": "0.5.0",
+		"@ninjalib/util": "0.5.4",
 		"@tiptap/core": "^2.6.4",
 		"@tiptap/extension-character-count": "^2.6.4",
 		"@tiptap/extension-link": "^2.6.4",
