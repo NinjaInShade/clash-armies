@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { PageData } from './$types';
+	import { page } from '$app/state';
 	import { getContext, untrack } from 'svelte';
 	import type { AppState } from '$types';
 	import { getTags } from '$client/army';
@@ -52,6 +53,7 @@
 	<meta name="description" content={metaDescription} />
 	<meta property="og:title" content={ogTitle} />
 	<meta property="og:description" content={ogDescription} />
+	<link rel="canonical" href="https://clasharmies.com/armies/{page.params.slug}" />
 </svelte:head>
 
 <section class="army">
