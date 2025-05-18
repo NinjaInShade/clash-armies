@@ -1,3 +1,7 @@
+## [0.3.17] - 2025-05-18
+
+- Add canonical tag for specific army pages
+
 ## [0.3.16] - 2025-05-18
 
 - Add Super Yeti troop
