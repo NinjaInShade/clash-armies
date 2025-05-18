@@ -1,4 +1,8 @@
-## [0.3.11] - 2025-05-15
+## [0.3.16] - 2025-05-18
+
+- Add Super Yeti troop
+
+## [0.3.14] - 2025-05-15
 
 - Improve req/res/error logging
 
