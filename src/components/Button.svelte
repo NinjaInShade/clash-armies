@@ -25,6 +25,7 @@
 </script>
 
 {#if asLink}
+	<!-- svelte-ignore a11y_no_static_element_interactions -->
 	<a class="btn {theme}" onclick={onClick} {...rest}>
 		<span>
 			{@render children()}
