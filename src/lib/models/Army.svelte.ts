@@ -1,4 +1,4 @@
-import type { Unit, UnitHome, HeroType, Banner, ArmyCtx, Pet, Equipment } from '$types';
+import type { Unit, UnitHome, HeroType, Banner, StaticGameData, Pet, Equipment } from '$types';
 import { BANNERS, VALID_HEROES } from '$shared/utils';
 import { UnitModel } from './Unit.svelte';
 import { PetModel } from './Pet.svelte';
@@ -61,7 +61,7 @@ export type StructuredArmyComment = ArmyComment & {
 };
 
 export class ArmyModel {
-	public ctx: ArmyCtx;
+	public ctx: StaticGameData;
 
 	/**
 	 * Corresponding id in the armies table.
@@ -87,7 +87,7 @@ export class ArmyModel {
 	public userVote = $state(0);
 	public userBookmarked = $state(false);
 
-	constructor(ctx: ArmyCtx, data?: Partial<Army>) {
+	constructor(ctx: StaticGameData, data?: Partial<Army>) {
 		this.ctx = ctx;
 
 		// Set initial data. Normally I'd like to `this.foo = initial ?? default` but the default has
@@ -312,7 +312,7 @@ export class ArmyModel {
 		return 'Hybrid';
 	}
 
-	public static getMaxHeroLevel(hero: HeroType, townHall: number, ctx: ArmyCtx) {
+	public static getMaxHeroLevel(hero: HeroType, townHall: number, ctx: StaticGameData) {
 		const thData = ArmyModel.requireTownHall(townHall, ctx);
 		if (!VALID_HEROES.includes(hero)) {
 			return -1;
@@ -336,7 +336,7 @@ export class ArmyModel {
 		return -1;
 	}
 
-	public static requireTownHall(level: number, ctx: ArmyCtx) {
+	public static requireTownHall(level: number, ctx: StaticGameData) {
 		const th = ctx.townHalls.find((th) => th.level === level);
 		if (!th) {
 			throw new Error(`Expected town hall ${level}`);

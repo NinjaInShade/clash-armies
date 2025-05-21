@@ -1,7 +1,7 @@
 import type { PageServerLoad } from './$types';
-import { getArmies } from '$server/army';
 
 export const load: PageServerLoad = async (req) => {
-	const armies = await getArmies(req);
+	const server = req.locals.server;
+	const armies = await server.army.getArmies(req);
 	return { armies };
 };

@@ -1,8 +1,8 @@
-import type { Equipment, Optional, ArmyCtx } from '$types';
+import type { Equipment, Optional, StaticGameData } from '$types';
 import { ArmyModel, type ArmyEquipment } from './Army.svelte';
 
 export class EquipmentModel {
-	public ctx: ArmyCtx;
+	public ctx: StaticGameData;
 
 	/**
 	 * Corresponding id in the army_equipment table.
@@ -13,7 +13,7 @@ export class EquipmentModel {
 
 	public info: Equipment;
 
-	constructor(ctx: ArmyCtx, data: Optional<ArmyEquipment, 'id'>) {
+	constructor(ctx: StaticGameData, data: Optional<ArmyEquipment, 'id'>) {
 		this.ctx = ctx;
 
 		this.id = data.id;
@@ -29,7 +29,7 @@ export class EquipmentModel {
 		};
 	}
 
-	public static require(equipmentId: number, ctx: ArmyCtx) {
+	public static require(equipmentId: number, ctx: StaticGameData) {
 		const eq = ctx.equipment.find((eq) => eq.id === equipmentId);
 		if (!eq) {
 			throw new Error(`Expected equipment "${equipmentId}"`);
@@ -37,7 +37,7 @@ export class EquipmentModel {
 		return eq;
 	}
 
-	public static requireByName(name: string, ctx: ArmyCtx) {
+	public static requireByName(name: string, ctx: StaticGameData) {
 		const eq = ctx.equipment.find((p) => p.name === name);
 		if (!eq) {
 			throw new Error(`Expected equipment "${name}"`);
@@ -45,7 +45,7 @@ export class EquipmentModel {
 		return eq;
 	}
 
-	public static requireByClashID(clashId: number, ctx: ArmyCtx) {
+	public static requireByClashID(clashId: number, ctx: StaticGameData) {
 		const eq = ctx.equipment.find((eq) => eq.clashId === clashId);
 		if (!eq) {
 			throw new Error(`Expected equipment "${clashId}"`);
@@ -59,7 +59,7 @@ export class EquipmentModel {
 	 *
 	 * @returns highest available equipment level or -1 if player hasn't unlocked it at all
 	 */
-	public static getMaxLevel(name: string, townHall: number, ctx: ArmyCtx) {
+	public static getMaxLevel(name: string, townHall: number, ctx: StaticGameData) {
 		const thData = ArmyModel.requireTownHall(townHall, ctx);
 		const appEquipment = EquipmentModel.requireByName(name, ctx);
 		if (ArmyModel.getMaxHeroLevel(appEquipment.hero, townHall, ctx) === -1) {

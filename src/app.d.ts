@@ -1,4 +1,5 @@
 import type { User, Session } from 'lucia';
+import type { Server } from '$server/api/Server';
 
 // See https://kit.svelte.dev/docs/types#app
 // for information about these interfaces
@@ -19,6 +20,10 @@ export interface Request {
 	 * Unique identifier for this request.
 	 */
 	uuid: string;
+	/**
+	 * Server instance for the whole system.
+	 */
+	server: Server;
 	/**
 	 * Returns true if user is authenticated.
 	 */

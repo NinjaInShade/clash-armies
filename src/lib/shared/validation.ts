@@ -1,4 +1,4 @@
-import type { HeroType, ArmyCtx } from '$types';
+import type { HeroType, StaticGameData } from '$types';
 import { BANNERS, VALID_UNIT_HOME, VALID_HEROES, GUIDE_TEXT_CHAR_LIMIT, YOUTUBE_URL_REGEX, MAX_COMMENT_LENGTH } from './utils';
 import { ArmyModel, UnitModel, PetModel, EquipmentModel, GuideModel } from '$models';
 import { parseHTML } from 'zeed-dom';
@@ -47,7 +47,7 @@ export const commentSchema = z.object({
  * Validates data for a saved or unsaved army, returning a validated, ready for saving to the db, `ArmyModel`, if successful.
  * Also validates business logic rules such as making sure units are unlocked for the town hall etc...
  */
-export function validateArmy(data: unknown, ctx: ArmyCtx): ArmyModel {
+export function validateArmy(data: unknown, ctx: StaticGameData): ArmyModel {
 	const army = armySchema.parse(data);
 	const model = new ArmyModel(ctx, army);
 

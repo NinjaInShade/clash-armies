@@ -175,7 +175,7 @@ export type Guide = {
 	updatedTime: Date;
 };
 
-export type ArmyCtx = {
+export type StaticGameData = {
 	units: Unit[];
 	townHalls: TownHall[];
 	equipment: Equipment[];

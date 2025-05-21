@@ -1,9 +1,8 @@
-import { getUnits, getTownHalls, getEquipment, getPets } from '$server/army';
-import type { User, ArmyCtx } from '$types';
+import type { User } from '$types';
 import type { Army } from '$models';
 import { BANNERS } from '$shared/utils';
-import { migration } from '$server/migration';
-import { db } from '$server/db';
+import { v4 as uuidv4 } from 'uuid';
+import type { Server } from '$server/api/Server';
 import chaiSubset from 'chai-subset';
 import type { RequestEvent } from '@sveltejs/kit';
 import { hasAuth, requireAuth, hasRoles, requireRoles } from '$server/auth/utils';
@@ -39,9 +38,12 @@ export const USER_ADMIN = {
 /**
  * Sveltekit request object shim
  */
-export function createReq(user: User) {
+export function createReq(user: User, server: Server) {
+	const uuid = uuidv4();
 	const req = {
 		locals: {
+			uuid,
+			server,
 			hasAuth: () => hasAuth(req),
 			requireAuth: () => requireAuth(req),
 			hasRoles: (...roles: string[]) => hasRoles(req, ...roles),
@@ -58,35 +60,17 @@ export function createReq(user: User) {
 	return req;
 }
 
-export async function createDB() {
-	// Init database & migrate
-	await db.connect();
-	await db.migrate(migration);
+export async function createUsers(server: Server) {
 	// Create test users
 	const users = [USER, USER_2, USER_ADMIN];
-	await db.insertMany(
+	await server.db.insertMany(
 		'users',
 		users.map((user) => ({ username: user.username, googleId: user.googleId }))
 	);
-	await db.insertMany(
+	await server.db.insertMany(
 		'user_roles',
 		users.flatMap((user) => user.roles.map((role) => ({ userId: user.id, role })))
 	);
-	return db;
-}
-
-export async function destroyDB() {
-	await db.dispose();
-}
-
-export async function getCtx() {
-	const ctx: ArmyCtx = {
-		units: await getUnits(),
-		townHalls: await getTownHalls(),
-		equipment: await getEquipment(),
-		pets: await getPets(),
-	};
-	return ctx;
 }
 
 /** Returns an army, defaulting certain fields with dummy data for convenience */

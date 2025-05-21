@@ -1,9 +1,9 @@
-import type { ArmyCtx } from '$types';
+import type { StaticGameData } from '$types';
 import type { ArmyGuide } from './Army.svelte';
 import type { VDocumentFragment, VHTMLDocument } from 'zeed-dom';
 
 export class GuideModel {
-	public ctx: ArmyCtx;
+	public ctx: StaticGameData;
 
 	/**
 	 * Corresponding id in the army_guides table.
@@ -16,7 +16,7 @@ export class GuideModel {
 	public textContent = $state<string | null>(null);
 	public youtubeUrl = $state<string | null>(null);
 
-	constructor(ctx: ArmyCtx, data?: Partial<ArmyGuide>) {
+	constructor(ctx: StaticGameData, data?: Partial<ArmyGuide>) {
 		this.ctx = ctx;
 
 		this.id = data?.id;

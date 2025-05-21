@@ -1,9 +1,9 @@
-import type { UnitHome, Unit, Optional, ArmyCtx } from '$types';
+import type { UnitHome, Unit, Optional, StaticGameData } from '$types';
 import { ArmyModel, type ArmyUnit } from './Army.svelte';
 import { SUPER_TO_REGULAR } from '$shared/utils';
 
 export class UnitModel {
-	public ctx: ArmyCtx;
+	public ctx: StaticGameData;
 
 	/**
 	 * Corresponding id in the army_units table.
@@ -16,7 +16,7 @@ export class UnitModel {
 
 	public info: Unit;
 
-	constructor(ctx: ArmyCtx, data: Optional<ArmyUnit, 'id'>) {
+	constructor(ctx: StaticGameData, data: Optional<ArmyUnit, 'id'>) {
 		this.ctx = ctx;
 
 		this.id = data.id;
@@ -36,7 +36,7 @@ export class UnitModel {
 		};
 	}
 
-	public static require(unitId: number, ctx: ArmyCtx) {
+	public static require(unitId: number, ctx: StaticGameData) {
 		const unit = ctx.units.find((u) => u.id === unitId);
 		if (!unit) {
 			throw new Error(`Expected unit "${unitId}"`);
@@ -44,7 +44,7 @@ export class UnitModel {
 		return unit;
 	}
 
-	public static requireTroopByName(name: string, ctx: ArmyCtx) {
+	public static requireTroopByName(name: string, ctx: StaticGameData) {
 		const unit = ctx.units.find((u) => (u.type === 'Troop' || u.type === 'Siege') && u.name === name);
 		if (!unit) {
 			throw new Error(`Expected troop "${name}"`);
@@ -52,7 +52,7 @@ export class UnitModel {
 		return unit;
 	}
 
-	public static requireSpellByName(name: string, ctx: ArmyCtx) {
+	public static requireSpellByName(name: string, ctx: StaticGameData) {
 		const unit = ctx.units.find((u) => u.type === 'Spell' && u.name === name);
 		if (!unit) {
 			throw new Error(`Expected spell "${name}"`);
@@ -60,7 +60,7 @@ export class UnitModel {
 		return unit;
 	}
 
-	public static requireTroopByClashID(clashId: number, ctx: ArmyCtx) {
+	public static requireTroopByClashID(clashId: number, ctx: StaticGameData) {
 		const unit = ctx.units.find((u) => (u.type === 'Troop' || u.type === 'Siege') && u.clashId === clashId);
 		if (!unit) {
 			throw new Error(`Expected troop "${clashId}"`);
@@ -68,7 +68,7 @@ export class UnitModel {
 		return unit;
 	}
 
-	public static requireSpellByClashID(clashId: number, ctx: ArmyCtx) {
+	public static requireSpellByClashID(clashId: number, ctx: StaticGameData) {
 		const unit = ctx.units.find((u) => u.type === 'Spell' && u.clashId === clashId);
 		if (!unit) {
 			throw new Error(`Expected spell "${clashId}"`);
@@ -96,7 +96,7 @@ export class UnitModel {
 	 *
 	 * @returns highest available unit level or -1 if player hasn't unlocked it at all
 	 */
-	public static getMaxLevel(unit: Unit, townHall: number, ctx: ArmyCtx): number {
+	public static getMaxLevel(unit: Unit, townHall: number, ctx: StaticGameData): number {
 		const thData = ArmyModel.requireTownHall(townHall, ctx);
 
 		const { name, type } = unit;
@@ -184,7 +184,7 @@ export class UnitModel {
 	 *
 	 * @returns highest available unit level or -1 if player doesn't have access to it at all
 	 */
-	public static getMaxCcLevel(unit: Unit, townHall: number, ctx: ArmyCtx): number {
+	public static getMaxCcLevel(unit: Unit, townHall: number, ctx: StaticGameData): number {
 		const thData = ArmyModel.requireTownHall(townHall, ctx);
 
 		const { name, type } = unit;

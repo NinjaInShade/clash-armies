@@ -1,7 +1,11 @@
 import type { MySQL } from '@ninjalib/sql';
 import util from '@ninjalib/util';
 import { migration } from '$server/migration';
+import { ArmyAPI } from '$server/api/ArmyAPI';
+import { UserAPI } from '$server/api/UserAPI';
+import { NotificationAPI } from '$server/api/NotificationAPI';
 import { lucia } from '$server/auth/lucia';
+import { pluralize } from '$shared/utils';
 import { CronJob } from 'cron';
 
 /**
@@ -12,11 +16,19 @@ export class Server {
 	public db: MySQL;
 	public log: util.Logger;
 
+	public army: ArmyAPI;
+	public user: UserAPI;
+	public notification: NotificationAPI;
+
 	private hourlyTaskJob: CronJob;
 
 	constructor(db: MySQL) {
 		this.db = db;
 		this.log = util.logger('clash-armies:server');
+
+		this.army = new ArmyAPI(this);
+		this.user = new UserAPI(this);
+		this.notification = new NotificationAPI(this);
 
 		this.hourlyTaskJob = new CronJob('0 0 * * * *', async () => {
 			return this.hourlyTask();
@@ -29,14 +41,21 @@ export class Server {
 
 		this.hourlyTaskJob.start();
 		this.hourlyTaskJob.fireOnTick();
+
+		await this.army.init();
+		await this.user.init();
+		await this.notification.init();
 	}
 
 	public async dispose(reason?: string) {
 		const start = Date.now();
 		this.log.info('Disposing server');
 
-		this.hourlyTaskJob.stop();
+		await this.notification.dispose();
+		await this.user.dispose();
+		await this.army.dispose();
 
+		this.hourlyTaskJob.stop();
 		await this.db.dispose();
 
 		const duration = Date.now() - start;
@@ -68,10 +87,10 @@ export class Server {
 		const start = Date.now();
 		this.log.info('Deleting old notifications...');
 
-		const deletedNotifications =
-			(await this.db.query('DELETE FROM army_notifications WHERE timestamp < NOW() - INTERVAL 3 MONTH'))?.affectedRows ?? '<unknown>';
+		const deletedRows = (await this.db.query('DELETE FROM army_notifications WHERE timestamp < NOW() - INTERVAL 3 MONTH'))?.affectedRows ?? '<unknown>';
 
 		const duration = Date.now() - start;
-		this.log.info(`Deleted ${deletedNotifications} old notification${deletedNotifications !== 1 ? 's' : ''} in ${duration}ms`);
+		const pluralized = pluralize('notification', deletedRows);
+		this.log.info(`Deleted ${deletedRows} old ${pluralized} in ${duration}ms`);
 	}
 }

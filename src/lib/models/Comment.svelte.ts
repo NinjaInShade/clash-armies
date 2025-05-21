@@ -1,8 +1,8 @@
-import type { ArmyCtx, Optional } from '$types';
+import type { StaticGameData, Optional } from '$types';
 import type { ArmyComment, StructuredArmyComment } from './Army.svelte';
 
 export class CommentModel {
-	public ctx: ArmyCtx;
+	public ctx: StaticGameData;
 
 	/**
 	 * Corresponding id in the army_comments table.
@@ -18,7 +18,7 @@ export class CommentModel {
 	public replyTo = $state<number | null>(null);
 	public replies = $state<CommentModel[]>([]);
 
-	constructor(ctx: ArmyCtx, data: Optional<ArmyComment, 'id'>) {
+	constructor(ctx: StaticGameData, data: Optional<ArmyComment, 'id'>) {
 		this.ctx = ctx;
 
 		this.id = data?.id;

@@ -1,16 +1,23 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { endpoint } from '$server/utils';
-import { saveComment, deleteComment } from '$server/army';
+import z from 'zod';
 
 export const POST: RequestHandler = endpoint(async (req) => {
+	const server = req.locals.server;
 	const comment = await req.request.json();
-	const id = await saveComment(req, comment);
+
+	const id = await server.army.saveComment(req, comment);
+
 	return json({ id }, { status: 200 });
 });
 
 export const DELETE: RequestHandler = endpoint(async (req) => {
-	const id = await req.request.json();
-	await deleteComment(req, id);
+	const server = req.locals.server;
+	const data = await req.request.json();
+
+	const commentId = z.number().parse(data);
+	await server.army.deleteComment(req, commentId);
+
 	return json({}, { status: 200 });
 });

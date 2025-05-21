@@ -1,8 +1,8 @@
-import type { HeroType, Pet, Optional, ArmyCtx } from '$types';
+import type { HeroType, Pet, Optional, StaticGameData } from '$types';
 import { ArmyModel, type ArmyPet } from './Army.svelte';
 
 export class PetModel {
-	public ctx: ArmyCtx;
+	public ctx: StaticGameData;
 
 	/**
 	 * Corresponding id in the army_pets table.
@@ -14,7 +14,7 @@ export class PetModel {
 
 	public info: Pet;
 
-	constructor(ctx: ArmyCtx, data: Optional<ArmyPet, 'id'>) {
+	constructor(ctx: StaticGameData, data: Optional<ArmyPet, 'id'>) {
 		this.ctx = ctx;
 
 		this.id = data.id;
@@ -32,7 +32,7 @@ export class PetModel {
 		};
 	}
 
-	public static require(petId: number, ctx: ArmyCtx) {
+	public static require(petId: number, ctx: StaticGameData) {
 		const pet = ctx.pets.find((p) => p.id === petId);
 		if (!pet) {
 			throw new Error(`Expected pet "${petId}"`);
@@ -40,7 +40,7 @@ export class PetModel {
 		return pet;
 	}
 
-	public static requireByName(name: string, ctx: ArmyCtx) {
+	public static requireByName(name: string, ctx: StaticGameData) {
 		const pet = ctx.pets.find((p) => p.name === name);
 		if (!pet) {
 			throw new Error(`Expected pet "${name}"`);
@@ -48,7 +48,7 @@ export class PetModel {
 		return pet;
 	}
 
-	public static requireByClashID(clashId: number, ctx: ArmyCtx) {
+	public static requireByClashID(clashId: number, ctx: StaticGameData) {
 		const pet = ctx.pets.find((p) => p.clashId === clashId);
 		if (!pet) {
 			throw new Error(`Expected pet "${clashId}"`);
@@ -62,7 +62,7 @@ export class PetModel {
 	 *
 	 * @returns highest available pet level or -1 if player hasn't unlocked it at all
 	 */
-	public static getMaxLevel(name: string, townHall: number, ctx: ArmyCtx) {
+	public static getMaxLevel(name: string, townHall: number, ctx: StaticGameData) {
 		const thData = ArmyModel.requireTownHall(townHall, ctx);
 		const appPet = PetModel.requireByName(name, ctx);
 		const prodLevel = thData.maxPetHouse;

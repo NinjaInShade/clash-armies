@@ -79,3 +79,7 @@ export const HERO_CLASH_IDS = {
 	'Royal Champion': 4,
 	'Minion Prince': 6,
 };
+
+export function pluralize(string: string, count: number, suffix = 's') {
+	return `${string}${count !== 1 ? suffix : ''}`;
+}

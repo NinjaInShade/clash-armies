@@ -1,5 +1,5 @@
 import C from '$components';
-import type { AppState, ArmyCtx, UnitHome } from '$types';
+import type { AppState, StaticGameData, UnitHome } from '$types';
 import type { Component } from 'svelte';
 import { VALID_HEROES, HERO_CLASH_IDS } from '$shared/utils';
 import { validateArmy } from '$shared/validation';
@@ -104,7 +104,7 @@ const ARMY_LINK_HERO_PATTERN = /(?<hero_id>\d+)(?:m\d+)?(?:p(?<pet_id>\d+))?(?:e
 /**
  * Takes in a clash of clans army link and parses it into clash army units/ccUnits/heroes data.
  */
-export function parseLink(fullLink: string, ctx: ArmyCtx) {
+export function parseLink(fullLink: string, ctx: StaticGameData) {
 	const url = new URL(fullLink);
 	const link = url.searchParams.get('army');
 	if (!link) {

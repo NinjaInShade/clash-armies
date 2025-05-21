@@ -1,11 +1,12 @@
 import type { PageServerLoad } from './$types';
-import { getTownHalls, getUnits } from '$server/army';
 
 export const load: PageServerLoad = async (req) => {
 	req.locals.requireRoles('admin');
 
+	const { server } = req.locals;
+
 	return {
-		units: await getUnits(),
-		townHalls: await getTownHalls(),
+		units: server.army.units,
+		townHalls: server.army.townHalls,
 	};
 };

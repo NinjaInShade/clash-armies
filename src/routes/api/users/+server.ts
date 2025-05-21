@@ -1,10 +1,12 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { saveUser } from '$server/user';
 import { endpoint } from '$server/utils';
 
 export const POST: RequestHandler = endpoint(async (req) => {
+	const server = req.locals.server;
 	const user = await req.request.json();
-	await saveUser(req, user);
+
+	await server.user.saveUser(req, user);
+
 	return json({}, { status: 200 });
 });

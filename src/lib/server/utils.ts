@@ -5,7 +5,7 @@ import { json } from '@sveltejs/kit';
 import { hasAuth, requireAuth, hasRoles, requireRoles } from '$server/auth/utils';
 import { lucia } from '$server/auth/lucia';
 import type { RequestEvent, Handle } from '@sveltejs/kit';
-import { server } from '$server/hooks.server';
+import type { Server } from '$server/api/Server';
 import { dev } from '$app/environment';
 
 export type SvelteKitHandleResolve = Parameters<Handle>[0]['resolve'];
@@ -57,6 +57,8 @@ export function getResponseStats(requestStats: RequestStats, response: Response)
  */
 export function endpoint(action: (req: RequestEvent) => Promise<Response>) {
 	return async (req: RequestEvent) => {
+		const server = req.locals.server;
+
 		try {
 			const result = await action(req);
 			return result;
@@ -80,8 +82,9 @@ export function endpoint(action: (req: RequestEvent) => Promise<Response>) {
 	};
 }
 
-export function initRequest(req: RequestEvent) {
+export function initRequest(req: RequestEvent, server: Server) {
 	req.locals.uuid = uuidv4();
+	req.locals.server = server;
 	req.locals.hasAuth = () => hasAuth(req);
 	req.locals.requireAuth = () => requireAuth(req);
 	req.locals.hasRoles = (...roles: string[]) => hasRoles(req, ...roles);
@@ -89,6 +92,7 @@ export function initRequest(req: RequestEvent) {
 }
 
 export async function resolveRequest(req: RequestEvent, resolve: SvelteKitHandleResolve) {
+	const server = req.locals.server;
 	const start = Date.now();
 	const requestInfo = getRequestStats(req);
 	server.log.info('Request:', requestInfo);
@@ -104,6 +108,7 @@ export async function resolveRequest(req: RequestEvent, resolve: SvelteKitHandle
 }
 
 export function handleUnexpectedError(req: RequestEvent, error: unknown, status: number, message: string) {
+	const server = req.locals.server;
 	server.log.error('SvelteKit error:', {
 		requestId: req.locals.uuid,
 		error,
@@ -147,4 +152,16 @@ export async function authMiddleware(req: RequestEvent) {
 export function getDisplayZodError(error: z.ZodError) {
 	const { formErrors, fieldErrors } = error.flatten();
 	return { form: formErrors, ...fieldErrors };
+}
+
+/**
+ * Unfortunately we have to parse JSON field values ourself.
+ * Related to the underlying mysql2 package not correctly handling this for MariaDB.
+ * See https://github.com/sidorares/node-mysql2/issues/1287
+ */
+export function parseDBJsonField(data: any) {
+	if (data === undefined) {
+		return undefined;
+	}
+	return JSON.parse(data);
 }
