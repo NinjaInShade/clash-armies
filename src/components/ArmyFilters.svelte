@@ -125,8 +125,7 @@
 
 	function filterFn(army: ArmyModel) {
 		const tags = getTags(army);
-		const units = army.units.filter((unit) => unit.home === 'armyCamp');
-		const ccUnits = army.units.filter((unit) => unit.home === 'clanCastle');
+		const { units, ccUnits } = army;
 		if (typeof $townHall === 'number' && army.townHall !== $townHall) {
 			return false;
 		}
