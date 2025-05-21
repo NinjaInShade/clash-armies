@@ -3,7 +3,7 @@ import type { ArmyGuide } from './Army.svelte';
 import type { VDocumentFragment, VHTMLDocument } from 'zeed-dom';
 
 export class GuideModel {
-	public ctx: StaticGameData;
+	public gameData: StaticGameData;
 
 	/**
 	 * Corresponding id in the army_guides table.
@@ -16,8 +16,8 @@ export class GuideModel {
 	public textContent = $state<string | null>(null);
 	public youtubeUrl = $state<string | null>(null);
 
-	constructor(ctx: StaticGameData, data?: Partial<ArmyGuide>) {
-		this.ctx = ctx;
+	constructor(gameData: StaticGameData, data?: Partial<ArmyGuide>) {
+		this.gameData = gameData;
 
 		this.id = data?.id;
 		this.createdTime = data?.createdTime;

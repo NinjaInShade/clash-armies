@@ -8,7 +8,7 @@ import { db } from '$server/db';
 import { Server } from '$server/api/Server';
 import type { RequestEvent } from '@sveltejs/kit';
 
-let ctx: StaticGameData;
+let gameData: StaticGameData;
 let server: Server;
 
 let req: RequestEvent;
@@ -22,7 +22,7 @@ let reqAdminUser: User;
 beforeAll(async function () {
 	server = new Server(db);
 	await server.init();
-	ctx = server.army.gameData;
+	gameData = server.army.gameData;
 
 	await createUsers(server);
 });
@@ -55,8 +55,8 @@ describe('Saving', function () {
 				name: 'test',
 				townHall: 16,
 				units: [
-					{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Barbarian', ctx).id, amount: 10 },
-					{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Archer', ctx).id, amount: 10 },
+					{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Barbarian', gameData).id, amount: 10 },
+					{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Archer', gameData).id, amount: 10 },
 				],
 			});
 			await server.army.saveArmy(req, data);
@@ -69,10 +69,10 @@ describe('Saving', function () {
 				name: 'test',
 				townHall: 16,
 				units: [
-					{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Barbarian', ctx).id, amount: 10 },
-					{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Archer', ctx).id, amount: 10 },
-					{ home: 'clanCastle', unitId: UnitModel.requireTroopByName('Barbarian', ctx).id, amount: 10 },
-					{ home: 'clanCastle', unitId: UnitModel.requireTroopByName('Archer', ctx).id, amount: 10 },
+					{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Barbarian', gameData).id, amount: 10 },
+					{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Archer', gameData).id, amount: 10 },
+					{ home: 'clanCastle', unitId: UnitModel.requireTroopByName('Barbarian', gameData).id, amount: 10 },
+					{ home: 'clanCastle', unitId: UnitModel.requireTroopByName('Archer', gameData).id, amount: 10 },
 				],
 			});
 			await server.army.saveArmy(req, data);
@@ -85,14 +85,14 @@ describe('Saving', function () {
 				name: 'test',
 				townHall: 16,
 				units: [
-					{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Barbarian', ctx).id, amount: 10 },
-					{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Archer', ctx).id, amount: 10 },
-					{ home: 'clanCastle', unitId: UnitModel.requireTroopByName('Barbarian', ctx).id, amount: 10 },
-					{ home: 'clanCastle', unitId: UnitModel.requireTroopByName('Archer', ctx).id, amount: 10 },
+					{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Barbarian', gameData).id, amount: 10 },
+					{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Archer', gameData).id, amount: 10 },
+					{ home: 'clanCastle', unitId: UnitModel.requireTroopByName('Barbarian', gameData).id, amount: 10 },
+					{ home: 'clanCastle', unitId: UnitModel.requireTroopByName('Archer', gameData).id, amount: 10 },
 				],
 				equipment: [
-					{ equipmentId: EquipmentModel.requireByName('Barbarian Puppet', ctx).id },
-					{ equipmentId: EquipmentModel.requireByName('Rage Vial', ctx).id },
+					{ equipmentId: EquipmentModel.requireByName('Barbarian Puppet', gameData).id },
+					{ equipmentId: EquipmentModel.requireByName('Rage Vial', gameData).id },
 				],
 			});
 			await server.army.saveArmy(req, data);
@@ -105,18 +105,18 @@ describe('Saving', function () {
 				name: 'test',
 				townHall: 16,
 				units: [
-					{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Barbarian', ctx).id, amount: 10 },
-					{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Archer', ctx).id, amount: 10 },
-					{ home: 'clanCastle', unitId: UnitModel.requireTroopByName('Barbarian', ctx).id, amount: 10 },
-					{ home: 'clanCastle', unitId: UnitModel.requireTroopByName('Archer', ctx).id, amount: 10 },
+					{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Barbarian', gameData).id, amount: 10 },
+					{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Archer', gameData).id, amount: 10 },
+					{ home: 'clanCastle', unitId: UnitModel.requireTroopByName('Barbarian', gameData).id, amount: 10 },
+					{ home: 'clanCastle', unitId: UnitModel.requireTroopByName('Archer', gameData).id, amount: 10 },
 				],
 				equipment: [
-					{ equipmentId: EquipmentModel.requireByName('Barbarian Puppet', ctx).id },
-					{ equipmentId: EquipmentModel.requireByName('Rage Vial', ctx).id },
+					{ equipmentId: EquipmentModel.requireByName('Barbarian Puppet', gameData).id },
+					{ equipmentId: EquipmentModel.requireByName('Rage Vial', gameData).id },
 				],
 				pets: [
-					{ hero: 'Barbarian King', petId: PetModel.requireByName('Lassi', ctx).id },
-					{ hero: 'Archer Queen', petId: PetModel.requireByName('Spirit Fox', ctx).id },
+					{ hero: 'Barbarian King', petId: PetModel.requireByName('Lassi', gameData).id },
+					{ hero: 'Archer Queen', petId: PetModel.requireByName('Spirit Fox', gameData).id },
 				],
 			});
 			await server.army.saveArmy(req, data);
@@ -128,7 +128,7 @@ describe('Saving', function () {
 			const data = makeData({
 				name: 'test',
 				townHall: 16,
-				units: [{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Barbarian', ctx).id, amount: 10 }],
+				units: [{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Barbarian', gameData).id, amount: 10 }],
 				guide: {
 					textContent: '<p>Guide!</p>',
 					youtubeUrl: null,
@@ -143,7 +143,7 @@ describe('Saving', function () {
 			const data = makeData({
 				name: 'test',
 				townHall: 16,
-				units: [{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Barbarian', ctx).id, amount: 10 }],
+				units: [{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Barbarian', gameData).id, amount: 10 }],
 				guide: {
 					textContent: `
 						<p></p>
@@ -168,21 +168,21 @@ describe('Saving', function () {
 				name: 'test',
 				townHall: 16,
 				units: [
-					{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Barbarian', ctx).id, amount: 10 },
-					{ home: 'clanCastle', unitId: UnitModel.requireTroopByName('Barbarian', ctx).id, amount: 10 },
+					{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Barbarian', gameData).id, amount: 10 },
+					{ home: 'clanCastle', unitId: UnitModel.requireTroopByName('Barbarian', gameData).id, amount: 10 },
 				],
-				equipment: [{ equipmentId: EquipmentModel.requireByName('Barbarian Puppet', ctx).id }],
-				pets: [{ hero: 'Barbarian King', petId: PetModel.requireByName('Lassi', ctx).id }],
+				equipment: [{ equipmentId: EquipmentModel.requireByName('Barbarian Puppet', gameData).id }],
+				pets: [{ hero: 'Barbarian King', petId: PetModel.requireByName('Lassi', gameData).id }],
 			});
 			await server.army.saveArmy(req, data);
 			const army = (await server.army.getArmies(req))[0];
 			// Add units
 			army.units.push(
-				{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Archer', ctx).id, amount: 5 },
-				{ home: 'clanCastle', unitId: UnitModel.requireTroopByName('Archer', ctx).id, amount: 5 }
+				{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Archer', gameData).id, amount: 5 },
+				{ home: 'clanCastle', unitId: UnitModel.requireTroopByName('Archer', gameData).id, amount: 5 }
 			);
-			army.equipment.push({ equipmentId: EquipmentModel.requireByName('Rage Vial', ctx).id });
-			army.pets.push({ hero: 'Archer Queen', petId: PetModel.requireByName('Spirit Fox', ctx).id });
+			army.equipment.push({ equipmentId: EquipmentModel.requireByName('Rage Vial', gameData).id });
+			army.pets.push({ hero: 'Archer Queen', petId: PetModel.requireByName('Spirit Fox', gameData).id });
 			await server.army.saveArmy(req, army);
 			const armySaved = (await server.army.getArmies(req))[0];
 			assertArmies([armySaved], [army]);
@@ -193,18 +193,18 @@ describe('Saving', function () {
 				name: 'test',
 				townHall: 16,
 				units: [
-					{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Barbarian', ctx).id, amount: 10 },
-					{ home: 'clanCastle', unitId: UnitModel.requireTroopByName('Barbarian', ctx).id, amount: 10 },
-					{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Archer', ctx).id, amount: 5 },
-					{ home: 'clanCastle', unitId: UnitModel.requireTroopByName('Archer', ctx).id, amount: 5 },
+					{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Barbarian', gameData).id, amount: 10 },
+					{ home: 'clanCastle', unitId: UnitModel.requireTroopByName('Barbarian', gameData).id, amount: 10 },
+					{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Archer', gameData).id, amount: 5 },
+					{ home: 'clanCastle', unitId: UnitModel.requireTroopByName('Archer', gameData).id, amount: 5 },
 				],
 				equipment: [
-					{ equipmentId: EquipmentModel.requireByName('Barbarian Puppet', ctx).id },
-					{ equipmentId: EquipmentModel.requireByName('Rage Vial', ctx).id },
+					{ equipmentId: EquipmentModel.requireByName('Barbarian Puppet', gameData).id },
+					{ equipmentId: EquipmentModel.requireByName('Rage Vial', gameData).id },
 				],
 				pets: [
-					{ hero: 'Barbarian King', petId: PetModel.requireByName('Lassi', ctx).id },
-					{ hero: 'Archer Queen', petId: PetModel.requireByName('Spirit Fox', ctx).id },
+					{ hero: 'Barbarian King', petId: PetModel.requireByName('Lassi', gameData).id },
+					{ hero: 'Archer Queen', petId: PetModel.requireByName('Spirit Fox', gameData).id },
 				],
 			});
 			await server.army.saveArmy(req, data);
@@ -222,9 +222,9 @@ describe('Saving', function () {
 		// However, the system shouldn't care about IDs and still handle this correctly as if you just did nothing.
 		// This tests a bug where the system actually just inserted a duplicate unit in the DB since the upsert didn't detect collision with the PK (since id is now undefined)
 		it('Should not create duplicate unit db records if unit was removed then re-added', async function () {
-			const unit = { id: undefined, home: 'armyCamp', unitId: UnitModel.requireTroopByName('Barbarian', ctx).id, amount: 1 };
-			const equipment = { id: undefined, equipmentId: EquipmentModel.requireByName('Barbarian Puppet', ctx).id };
-			const pet = { id: undefined, hero: 'Barbarian King', petId: PetModel.requireByName('Lassi', ctx).id };
+			const unit = { id: undefined, home: 'armyCamp', unitId: UnitModel.requireTroopByName('Barbarian', gameData).id, amount: 1 };
+			const equipment = { id: undefined, equipmentId: EquipmentModel.requireByName('Barbarian Puppet', gameData).id };
+			const pet = { id: undefined, hero: 'Barbarian King', petId: PetModel.requireByName('Lassi', gameData).id };
 			const data = makeData({
 				name: 'test',
 				townHall: 16,
@@ -256,10 +256,10 @@ describe('Saving', function () {
 				townHall: 16,
 				units: [
 					// Just so we always have one unit in the home camp otherwise you can't save empty army
-					{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Barbarian', ctx).id, amount: 1 },
+					{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Barbarian', gameData).id, amount: 1 },
 					// Same unit types but one for home camp, and one for clan castle
-					{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Archer', ctx).id, amount: 1 },
-					{ home: 'clanCastle', unitId: UnitModel.requireTroopByName('Archer', ctx).id, amount: 1 },
+					{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Archer', gameData).id, amount: 1 },
+					{ home: 'clanCastle', unitId: UnitModel.requireTroopByName('Archer', gameData).id, amount: 1 },
 				],
 			});
 			await server.army.saveArmy(req, data);
@@ -287,7 +287,7 @@ describe('Saving', function () {
 			const data = makeData({
 				name: 'test',
 				townHall: 16,
-				units: [{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Barbarian', ctx).id, amount: 10 }],
+				units: [{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Barbarian', gameData).id, amount: 10 }],
 			});
 			await server.army.saveArmy(req, data);
 			const army = (await server.army.getArmies(req))[0];
@@ -302,7 +302,7 @@ describe('Saving', function () {
 			const data = makeData({
 				name: 'test',
 				townHall: 16,
-				units: [{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Barbarian', ctx).id, amount: 10 }],
+				units: [{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Barbarian', gameData).id, amount: 10 }],
 				guide: {
 					textContent: '<p>Guide!</p>',
 					youtubeUrl: null,
@@ -329,18 +329,18 @@ describe('Fetching', function () {
 			name: 'test',
 			townHall: 16,
 			units: [
-				{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Barbarian', ctx).id, amount: 10 },
-				{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Archer', ctx).id, amount: 10 },
-				{ home: 'clanCastle', unitId: UnitModel.requireTroopByName('Barbarian', ctx).id, amount: 10 },
-				{ home: 'clanCastle', unitId: UnitModel.requireTroopByName('Archer', ctx).id, amount: 10 },
+				{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Barbarian', gameData).id, amount: 10 },
+				{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Archer', gameData).id, amount: 10 },
+				{ home: 'clanCastle', unitId: UnitModel.requireTroopByName('Barbarian', gameData).id, amount: 10 },
+				{ home: 'clanCastle', unitId: UnitModel.requireTroopByName('Archer', gameData).id, amount: 10 },
 			],
 			equipment: [
-				{ equipmentId: EquipmentModel.requireByName('Barbarian Puppet', ctx).id },
-				{ equipmentId: EquipmentModel.requireByName('Rage Vial', ctx).id },
+				{ equipmentId: EquipmentModel.requireByName('Barbarian Puppet', gameData).id },
+				{ equipmentId: EquipmentModel.requireByName('Rage Vial', gameData).id },
 			],
 			pets: [
-				{ hero: 'Barbarian King', petId: PetModel.requireByName('Lassi', ctx).id },
-				{ hero: 'Archer Queen', petId: PetModel.requireByName('Spirit Fox', ctx).id },
+				{ hero: 'Barbarian King', petId: PetModel.requireByName('Lassi', gameData).id },
+				{ hero: 'Archer Queen', petId: PetModel.requireByName('Spirit Fox', gameData).id },
 			],
 		});
 		const data2 = { ...data, name: 'test2' };
@@ -362,12 +362,12 @@ describe('Army comments', function () {
 		const data = makeData({
 			name: 'test',
 			townHall: 1,
-			units: [{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Barbarian', ctx).id, amount: 5 }],
+			units: [{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Barbarian', gameData).id, amount: 5 }],
 		});
 		const data2 = makeData({
 			name: 'test2',
 			townHall: 1,
-			units: [{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Barbarian', ctx).id, amount: 5 }],
+			units: [{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Barbarian', gameData).id, amount: 5 }],
 		});
 		armyId = await server.army.saveArmy(req, data);
 		armyId2 = await server.army.saveArmy(req, data2);
@@ -487,7 +487,7 @@ describe('Army notifications', function () {
 		const data = makeData({
 			name: 'test',
 			townHall: 1,
-			units: [{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Barbarian', ctx).id, amount: 5 }],
+			units: [{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Barbarian', gameData).id, amount: 5 }],
 		});
 		armyId = await server.army.saveArmy(req, data);
 	});
@@ -590,22 +590,24 @@ describe('Army notifications', function () {
 describe('Validation', function () {
 	function testCapacity(type: UnitType, clanCastle: boolean) {
 		function _testCapacity(overflow: boolean) {
-			const th = ArmyModel.requireTownHall(16, ctx);
+			const th = ArmyModel.requireTownHall(16, gameData);
 			const longType = type === 'Siege' ? 'siege machine' : type.toLowerCase();
 			const maxCapacity = clanCastle ? th[`cc${type}Capacity`] : th[`${type.toLowerCase()}Capacity`];
 			const data = makeData({
 				name: 'test',
 				townHall: th.level,
-				units: [{ home: clanCastle ? 'clanCastle' : 'armyCamp', unitId: ctx.units.find((u) => u.type === type)?.id, amount: maxCapacity + (overflow ? 1 : 0) }],
+				units: [
+					{ home: clanCastle ? 'clanCastle' : 'armyCamp', unitId: gameData.units.find((u) => u.type === type)?.id, amount: maxCapacity + (overflow ? 1 : 0) },
+				],
 			});
 			if (overflow) {
 				const msg = `Town hall ${th.level} has a max ${clanCastle ? 'clan castle ' : ''}${longType} capacity of ${maxCapacity}, but this army exceeded that with ${maxCapacity + 1}`;
 				assert.throws(function () {
-					validateArmy(data, ctx);
+					validateArmy(data, gameData);
 				}, msg);
 			} else {
 				// Should not throw
-				validateArmy(data, ctx);
+				validateArmy(data, gameData);
 			}
 		}
 		// Test we don't throw if capacity is just within bounds, but throw if we exceed it
@@ -619,13 +621,13 @@ describe('Validation', function () {
 			name: 'test',
 			townHall: 16,
 			units: [
-				{ home, unitId: UnitModel.requireTroopByName('Barbarian', ctx).id, amount: 1 },
-				{ home, unitId: UnitModel.requireTroopByName('Barbarian', ctx).id, amount: 1 },
+				{ home, unitId: UnitModel.requireTroopByName('Barbarian', gameData).id, amount: 1 },
+				{ home, unitId: UnitModel.requireTroopByName('Barbarian', gameData).id, amount: 1 },
 			],
 		});
 		assert.throws(
 			function () {
-				validateArmy(data, ctx);
+				validateArmy(data, gameData);
 			},
 			`Duplicate ${clanCastle ? 'clan castle ' : ''}unit "Barbarian" found`
 		);
@@ -636,24 +638,24 @@ describe('Validation', function () {
 		const data = makeData({
 			name: 'test',
 			townHall: 6,
-			units: [{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Barbarian', ctx).id, amount: 1 }],
+			units: [{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Barbarian', gameData).id, amount: 1 }],
 			equipment: [
 				// Barbarian King equipment
-				{ equipmentId: EquipmentModel.requireByName('Barbarian Puppet', ctx).id },
+				{ equipmentId: EquipmentModel.requireByName('Barbarian Puppet', gameData).id },
 				// Archer Queen equipment
-				{ equipmentId: EquipmentModel.requireByName('Archer Puppet', ctx).id },
+				{ equipmentId: EquipmentModel.requireByName('Archer Puppet', gameData).id },
 				// Royal Champion equipment
-				{ equipmentId: EquipmentModel.requireByName('Rocket Spear', ctx).id },
+				{ equipmentId: EquipmentModel.requireByName('Rocket Spear', gameData).id },
 				// Grand Warden equipment
-				{ equipmentId: EquipmentModel.requireByName('Eternal Tome', ctx).id },
+				{ equipmentId: EquipmentModel.requireByName('Eternal Tome', gameData).id },
 			],
 			pets: [
 				// Minion Prince
-				{ hero: 'Minion Prince', petId: PetModel.requireByName('Lassi', ctx).id },
+				{ hero: 'Minion Prince', petId: PetModel.requireByName('Lassi', gameData).id },
 			],
 		});
 		assert.throws(function () {
-			validateArmy(data, ctx);
+			validateArmy(data, gameData);
 		}, 'Cannot use more than 4 heroes');
 	});
 
@@ -673,63 +675,63 @@ describe('Validation', function () {
 				name: 'test',
 				townHall: 16,
 				units: [
-					{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Super Barbarian', ctx).id, amount: 1 },
-					{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Super Archer', ctx).id, amount: 1 },
-					{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Super Miner', ctx).id, amount: 1 },
+					{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Super Barbarian', gameData).id, amount: 1 },
+					{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Super Archer', gameData).id, amount: 1 },
+					{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Super Miner', gameData).id, amount: 1 },
 				],
 			});
 			// Should throw with 3 unique super troops
 			assert.throws(function () {
-				validateArmy(data, ctx);
+				validateArmy(data, gameData);
 			}, 'An army can have a maximum of two unique super troops');
 			// Should not throw now with 2 unique super troops
 			data.units?.splice(0, 1);
-			validateArmy(data, ctx);
+			validateArmy(data, gameData);
 		});
 
 		it('Should not allow super troops before town hall 11', function () {
 			const data = makeData({
 				name: 'test',
 				townHall: 10,
-				units: [{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Super Barbarian', ctx).id, amount: 1 }],
+				units: [{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Super Barbarian', gameData).id, amount: 1 }],
 			});
 			// Should throw at town hall 10
 			assert.throws(function () {
-				validateArmy(data, ctx);
+				validateArmy(data, gameData);
 			}, `Unit "Super Barbarian" isn't available at town hall 10`);
 			// Should not throw at town hall 11
 			data.townHall = 11;
-			validateArmy(data, ctx);
+			validateArmy(data, gameData);
 		});
 
 		it('Should not allow spells before town hall 5', function () {
 			const data = makeData({
 				name: 'test',
 				townHall: 4,
-				units: [{ home: 'armyCamp', unitId: UnitModel.requireSpellByName('Lightning', ctx).id, amount: 1 }],
+				units: [{ home: 'armyCamp', unitId: UnitModel.requireSpellByName('Lightning', gameData).id, amount: 1 }],
 			});
 			// Should throw at town hall 4
 			assert.throws(function () {
-				validateArmy(data, ctx);
+				validateArmy(data, gameData);
 			}, `Town hall 4 has a max spell capacity of 0, but this army exceeded that with 1`);
 			// Should not throw at town hall 5
 			data.townHall = 5;
-			validateArmy(data, ctx);
+			validateArmy(data, gameData);
 		});
 
 		it('Should not allow siege machines before town hall 12', function () {
 			const data = makeData({
 				name: 'test',
 				townHall: 11,
-				units: [{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Wall Wrecker', ctx).id, amount: 1 }],
+				units: [{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Wall Wrecker', gameData).id, amount: 1 }],
 			});
 			// Should throw at town hall 11
 			assert.throws(function () {
-				validateArmy(data, ctx);
+				validateArmy(data, gameData);
 			}, `Town hall 11 has a max siege machine capacity of 0, but this army exceeded that with 1`);
 			// Should not throw at town hall 12
 			data.townHall = 12;
-			validateArmy(data, ctx);
+			validateArmy(data, gameData);
 		});
 	});
 
@@ -749,54 +751,54 @@ describe('Validation', function () {
 				name: 'test',
 				townHall: 16,
 				units: [
-					{ home: 'clanCastle', unitId: UnitModel.requireTroopByName('Super Barbarian', ctx).id, amount: 1 },
-					{ home: 'clanCastle', unitId: UnitModel.requireTroopByName('Super Archer', ctx).id, amount: 1 },
-					{ home: 'clanCastle', unitId: UnitModel.requireTroopByName('Super Miner', ctx).id, amount: 1 },
+					{ home: 'clanCastle', unitId: UnitModel.requireTroopByName('Super Barbarian', gameData).id, amount: 1 },
+					{ home: 'clanCastle', unitId: UnitModel.requireTroopByName('Super Archer', gameData).id, amount: 1 },
+					{ home: 'clanCastle', unitId: UnitModel.requireTroopByName('Super Miner', gameData).id, amount: 1 },
 				],
 			});
 			// Should not throw even with more than 2 unique super troops
-			validateArmy(data, ctx);
+			validateArmy(data, gameData);
 		});
 
 		it('Should only allow super troop if the regular troop version is at a high enough level to be boosted', function () {
 			// Super valkyrie must be level 7 to be boosted (which requires lab level 10)
-			const thLabLvl9 = ctx.townHalls.find((th) => th.maxLaboratory === 9);
-			const thLabLvl10 = ctx.townHalls.find((th) => th.maxLaboratory === 10);
+			const thLabLvl9 = gameData.townHalls.find((th) => th.maxLaboratory === 9);
+			const thLabLvl10 = gameData.townHalls.find((th) => th.maxLaboratory === 10);
 			if (!thLabLvl9 || !thLabLvl10) {
 				throw new Error('Expected town hall data');
 			}
 			const data = makeData({
 				name: 'test',
 				townHall: thLabLvl9.level,
-				units: [{ home: 'clanCastle', unitId: UnitModel.requireTroopByName('Super Valkyrie', ctx).id, amount: 1 }],
+				units: [{ home: 'clanCastle', unitId: UnitModel.requireTroopByName('Super Valkyrie', gameData).id, amount: 1 }],
 			});
 			// Should throw when lab is level 9
 			assert.throws(function () {
-				validateArmy(data, ctx);
+				validateArmy(data, gameData);
 			}, `Clan castle unit "Super Valkyrie" isn't available at town hall ${thLabLvl9.level}`);
 			// Should not throw when lab is level 10
 			data.townHall = thLabLvl10.level;
-			validateArmy(data, ctx);
+			validateArmy(data, gameData);
 		});
 
 		it('Should only allow battle drill once clan castle level 9 is unlocked', function () {
-			const thCcLvl8 = ctx.townHalls.find((th) => th.maxCc === 8);
-			const thCcLvl9 = ctx.townHalls.find((th) => th.maxCc === 9);
+			const thCcLvl8 = gameData.townHalls.find((th) => th.maxCc === 8);
+			const thCcLvl9 = gameData.townHalls.find((th) => th.maxCc === 9);
 			if (!thCcLvl8 || !thCcLvl9) {
 				throw new Error('Expected town hall data');
 			}
 			const data = makeData({
 				name: 'test',
 				townHall: thCcLvl8.level,
-				units: [{ home: 'clanCastle', unitId: UnitModel.requireTroopByName('Battle Drill', ctx).id, amount: 1 }],
+				units: [{ home: 'clanCastle', unitId: UnitModel.requireTroopByName('Battle Drill', gameData).id, amount: 1 }],
 			});
 			// Should throw when clan castle is level 8
 			assert.throws(function () {
-				validateArmy(data, ctx);
+				validateArmy(data, gameData);
 			}, `Clan castle unit "Battle Drill" isn't available at town hall ${thCcLvl8.level}`);
 			// Should not throw when clan castle is level 9
 			data.townHall = thCcLvl9.level;
-			validateArmy(data, ctx);
+			validateArmy(data, gameData);
 		});
 	});
 
@@ -805,30 +807,30 @@ describe('Validation', function () {
 			const data = makeData({
 				name: 'test',
 				townHall: 6,
-				units: [{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Barbarian', ctx).id, amount: 1 }],
-				equipment: [{ equipmentId: EquipmentModel.requireByName('Barbarian Puppet', ctx).id }],
+				units: [{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Barbarian', gameData).id, amount: 1 }],
+				equipment: [{ equipmentId: EquipmentModel.requireByName('Barbarian Puppet', gameData).id }],
 			});
 			// Should throw at town hall level 6 as king isn't unlocked yet
 			assert.throws(function () {
-				validateArmy(data, ctx);
+				validateArmy(data, gameData);
 			}, `Equipment "Barbarian Puppet" can't be used as the barbarian king isn't unlocked at town hall 6`);
 			// Should not throw at town hall 7 as king is unlocked
 			data.townHall = 7;
-			validateArmy(data, ctx);
+			validateArmy(data, gameData);
 		});
 
 		it('Should not allow hero to have duplicate equipment', function () {
 			const data = makeData({
 				name: 'test',
 				townHall: 16,
-				units: [{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Barbarian', ctx).id, amount: 1 }],
+				units: [{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Barbarian', gameData).id, amount: 1 }],
 				equipment: [
-					{ equipmentId: EquipmentModel.requireByName('Barbarian Puppet', ctx).id },
-					{ equipmentId: EquipmentModel.requireByName('Barbarian Puppet', ctx).id },
+					{ equipmentId: EquipmentModel.requireByName('Barbarian Puppet', gameData).id },
+					{ equipmentId: EquipmentModel.requireByName('Barbarian Puppet', gameData).id },
 				],
 			});
 			assert.throws(function () {
-				validateArmy(data, ctx);
+				validateArmy(data, gameData);
 			}, 'Duplicate equipment "Barbarian Puppet" on barbarian king');
 		});
 
@@ -836,15 +838,15 @@ describe('Validation', function () {
 			const data = makeData({
 				name: 'test',
 				townHall: 16,
-				units: [{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Barbarian', ctx).id, amount: 1 }],
+				units: [{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Barbarian', gameData).id, amount: 1 }],
 				equipment: [
-					{ equipmentId: EquipmentModel.requireByName('Barbarian Puppet', ctx).id },
-					{ equipmentId: EquipmentModel.requireByName('Rage Vial', ctx).id },
-					{ equipmentId: EquipmentModel.requireByName('Earthquake Boots', ctx).id },
+					{ equipmentId: EquipmentModel.requireByName('Barbarian Puppet', gameData).id },
+					{ equipmentId: EquipmentModel.requireByName('Rage Vial', gameData).id },
+					{ equipmentId: EquipmentModel.requireByName('Earthquake Boots', gameData).id },
 				],
 			});
 			assert.throws(function () {
-				validateArmy(data, ctx);
+				validateArmy(data, gameData);
 			}, 'Hero barbarian king cannot have more than two pieces of equipment');
 		});
 	});
@@ -854,14 +856,14 @@ describe('Validation', function () {
 			const data = makeData({
 				name: 'test',
 				townHall: 16,
-				units: [{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Barbarian', ctx).id, amount: 1 }],
+				units: [{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Barbarian', gameData).id, amount: 1 }],
 				pets: [
-					{ hero: 'Barbarian King', petId: PetModel.requireByName('Lassi', ctx).id },
-					{ hero: 'Barbarian King', petId: PetModel.requireByName('Spirit Fox', ctx).id },
+					{ hero: 'Barbarian King', petId: PetModel.requireByName('Lassi', gameData).id },
+					{ hero: 'Barbarian King', petId: PetModel.requireByName('Spirit Fox', gameData).id },
 				],
 			});
 			assert.throws(function () {
-				validateArmy(data, ctx);
+				validateArmy(data, gameData);
 			}, 'Hero barbarian king cannot have more than one pet');
 		});
 
@@ -869,14 +871,14 @@ describe('Validation', function () {
 			const data = makeData({
 				name: 'test',
 				townHall: 16,
-				units: [{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Barbarian', ctx).id, amount: 1 }],
+				units: [{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Barbarian', gameData).id, amount: 1 }],
 				pets: [
-					{ hero: 'Barbarian King', petId: PetModel.requireByName('Mighty Yak', ctx).id },
-					{ hero: 'Archer Queen', petId: PetModel.requireByName('Mighty Yak', ctx).id },
+					{ hero: 'Barbarian King', petId: PetModel.requireByName('Mighty Yak', gameData).id },
+					{ hero: 'Archer Queen', petId: PetModel.requireByName('Mighty Yak', gameData).id },
 				],
 			});
 			assert.throws(function () {
-				validateArmy(data, ctx);
+				validateArmy(data, gameData);
 			}, 'Pet "Mighty Yak" has already been assigned to another hero');
 		});
 	});
@@ -886,14 +888,14 @@ describe('Validation', function () {
 			const data = makeData({
 				name: 'test',
 				townHall: 16,
-				units: [{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Barbarian', ctx).id, amount: 10 }],
+				units: [{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Barbarian', gameData).id, amount: 10 }],
 				guide: {
 					textContent: null,
 					youtubeUrl: null,
 				},
 			});
 			assert.throws(function () {
-				validateArmy(data, ctx);
+				validateArmy(data, gameData);
 			}, 'Guide must have at least either text content or YouTube video URL');
 		});
 
@@ -901,7 +903,7 @@ describe('Validation', function () {
 			const data = makeData({
 				name: 'test',
 				townHall: 16,
-				units: [{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Barbarian', ctx).id, amount: 10 }],
+				units: [{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Barbarian', gameData).id, amount: 10 }],
 				guide: {
 					textContent: null,
 					youtubeUrl: 'https://www.youtube.com/invalid-url',
@@ -921,13 +923,13 @@ describe('Validation', function () {
 			for (const invalid of invalidURLs) {
 				data.guide.youtubeUrl = invalid;
 				assert.throws(function () {
-					validateArmy(data, ctx);
+					validateArmy(data, gameData);
 				}, 'Guide has an invalid YouTube URL');
 			}
 			for (const valid of validURLs) {
 				// Should not throw as now the youtube URL is valid
 				data.guide.youtubeUrl = valid;
-				validateArmy(data, ctx);
+				validateArmy(data, gameData);
 			}
 		});
 
@@ -935,14 +937,14 @@ describe('Validation', function () {
 			const data = makeData({
 				name: 'test',
 				townHall: 16,
-				units: [{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Barbarian', ctx).id, amount: 10 }],
+				units: [{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Barbarian', gameData).id, amount: 10 }],
 				guide: {
 					textContent: '',
 					youtubeUrl: null,
 				},
 			});
 			assert.throws(function () {
-				validateArmy(data, ctx);
+				validateArmy(data, gameData);
 			}, 'Guide must have at least either text content or YouTube video URL');
 		});
 
@@ -950,18 +952,18 @@ describe('Validation', function () {
 			const data = makeData({
 				name: 'test',
 				townHall: 16,
-				units: [{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Barbarian', ctx).id, amount: 10 }],
+				units: [{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Barbarian', gameData).id, amount: 10 }],
 				guide: {
 					textContent: `<p>${'a'.repeat(GUIDE_TEXT_CHAR_LIMIT + 1)}</p>`,
 					youtubeUrl: null,
 				},
 			});
 			assert.throws(function () {
-				validateArmy(data, ctx);
+				validateArmy(data, gameData);
 			}, 'Guide text content exceeded the character limit');
 			// Should not fail now as within limit
 			data.guide.textContent = `<p>${'a'.repeat(GUIDE_TEXT_CHAR_LIMIT)}</p>`;
-			validateArmy(data, ctx);
+			validateArmy(data, gameData);
 		});
 	});
 });
@@ -969,36 +971,36 @@ describe('Validation', function () {
 describe('Army model', function () {
 	describe('getStats()', function () {
 		it('should correctly report if we have a clan castle', function () {
-			const model = new ArmyModel(ctx);
+			const model = new ArmyModel(gameData);
 
 			// Should be false for empty army
 			assert.equal(model.getStats().hasClanCastle, false);
 
 			// Add non-cc troop, should still be false
-			const unit = UnitModel.requireTroopByName('Barbarian', ctx);
+			const unit = UnitModel.requireTroopByName('Barbarian', gameData);
 			model.addUnit(unit, 'armyCamp');
 			assert.equal(model.getStats().hasClanCastle, false);
 
 			// Add cc troop, should now be true
-			const ccUnit = UnitModel.requireTroopByName('Barbarian', ctx);
+			const ccUnit = UnitModel.requireTroopByName('Barbarian', gameData);
 			model.addUnit(ccUnit, 'clanCastle');
 			assert.equal(model.getStats().hasClanCastle, true);
 		});
 
 		it('should correctly report if we have heroes', function () {
-			const model = new ArmyModel(ctx);
+			const model = new ArmyModel(gameData);
 
 			// Should be false for empty army
 			assert.equal(model.getStats().hasHeroes, false);
 
 			// Should be true if hero is added (note heroes are ephemeral, so we have one if any equipment/pets for that hero are present)
-			const equipment = EquipmentModel.requireByName('Eternal Tome', ctx);
+			const equipment = EquipmentModel.requireByName('Eternal Tome', gameData);
 			model.addEquipment(equipment);
 			assert.equal(model.getStats().hasHeroes, true);
 		});
 
 		it('should correctly report if we have a guide', function () {
-			const model = new ArmyModel(ctx);
+			const model = new ArmyModel(gameData);
 
 			// Should be false for empty army
 			assert.equal(model.getStats().hasGuide, false);
@@ -1009,43 +1011,43 @@ describe('Army model', function () {
 		});
 
 		it('should correctly report the type of army', function () {
-			const model = new ArmyModel(ctx);
+			const model = new ArmyModel(gameData);
 
 			// Empty army technically will never exist, there will always be some units (in practice) so no
 			// point even testing what it chooses, but we can test it at least doesn't error because why not
 			model.getStats();
 
 			// Should be hybrid if equal ground+air units with same housing space
-			model.addUnit(UnitModel.requireTroopByName('Giant', ctx), 'armyCamp');
-			model.addUnit(UnitModel.requireTroopByName('Balloon', ctx), 'armyCamp');
+			model.addUnit(UnitModel.requireTroopByName('Giant', gameData), 'armyCamp');
+			model.addUnit(UnitModel.requireTroopByName('Balloon', gameData), 'armyCamp');
 			assert.equal(model.getStats().type, 'Hybrid');
 			model.remove('Giant', 'armyCamp');
 			model.remove('Balloon', 'armyCamp');
 
 			// Should be air if equal ground+air units but air has higher housing space
-			model.addUnit(UnitModel.requireTroopByName('Giant', ctx), 'armyCamp');
-			model.addUnit(UnitModel.requireTroopByName('Baby Dragon', ctx), 'armyCamp');
+			model.addUnit(UnitModel.requireTroopByName('Giant', gameData), 'armyCamp');
+			model.addUnit(UnitModel.requireTroopByName('Baby Dragon', gameData), 'armyCamp');
 			assert.equal(model.getStats().type, 'Air');
 			model.remove('Giant', 'armyCamp');
 			model.remove('Baby Dragon', 'armyCamp');
 
 			// Should be ground if equal ground+air units but ground has higher housing space
-			model.addUnit(UnitModel.requireTroopByName('Golem', ctx), 'armyCamp');
-			model.addUnit(UnitModel.requireTroopByName('Balloon', ctx), 'armyCamp');
+			model.addUnit(UnitModel.requireTroopByName('Golem', gameData), 'armyCamp');
+			model.addUnit(UnitModel.requireTroopByName('Balloon', gameData), 'armyCamp');
 			assert.equal(model.getStats().type, 'Ground');
 			model.remove('Golem', 'armyCamp');
 			model.remove('Balloon', 'armyCamp');
 
 			// Should be ground if more ground units but same housing space as air units
-			model.addUnit(UnitModel.requireTroopByName('Giant', ctx), 'armyCamp', 2);
-			model.addUnit(UnitModel.requireTroopByName('Balloon', ctx), 'armyCamp', 1);
+			model.addUnit(UnitModel.requireTroopByName('Giant', gameData), 'armyCamp', 2);
+			model.addUnit(UnitModel.requireTroopByName('Balloon', gameData), 'armyCamp', 1);
 			assert.equal(model.getStats().type, 'Ground');
 			model.remove('Giant', 'armyCamp');
 			model.remove('Balloon', 'armyCamp');
 
 			// Should be air if more air units but same housing space as ground units
-			model.addUnit(UnitModel.requireTroopByName('Giant', ctx), 'armyCamp', 1);
-			model.addUnit(UnitModel.requireTroopByName('Balloon', ctx), 'armyCamp', 2);
+			model.addUnit(UnitModel.requireTroopByName('Giant', gameData), 'armyCamp', 1);
+			model.addUnit(UnitModel.requireTroopByName('Balloon', gameData), 'armyCamp', 2);
 			assert.equal(model.getStats().type, 'Air');
 			model.remove('Giant', 'armyCamp');
 			model.remove('Balloon', 'armyCamp');

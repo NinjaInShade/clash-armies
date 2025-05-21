@@ -42,7 +42,7 @@
 			selected.amount;
 		}
 		return untrack(() => {
-			const copy = selectedUnits.map((u) => new UnitModel(model.ctx, u));
+			const copy = selectedUnits.map((u) => new UnitModel(model.gameData, u));
 			const preview = add(unit, copy);
 			const { troops, sieges, spells } = UnitModel.getTotals(preview);
 			return troops > capacity.troops || sieges > capacity.sieges || spells > capacity.spells;
@@ -89,7 +89,7 @@
 		if (existing) {
 			existing.amount += 1;
 		} else {
-			const newUnit = new UnitModel(model.ctx, { unitId: unit.id, home: housedIn, amount: 1 });
+			const newUnit = new UnitModel(model.gameData, { unitId: unit.id, home: housedIn, amount: 1 });
 			arr.push(newUnit);
 		}
 		return arr;
@@ -97,9 +97,9 @@
 
 	function getLevel(unit: Unit) {
 		if (housedIn === 'armyCamp') {
-			return UnitModel.getMaxLevel(unit, model.townHall, model.ctx);
+			return UnitModel.getMaxLevel(unit, model.townHall, model.gameData);
 		} else {
-			return UnitModel.getMaxCcLevel(unit, model.townHall, model.ctx);
+			return UnitModel.getMaxCcLevel(unit, model.townHall, model.gameData);
 		}
 	}
 </script>

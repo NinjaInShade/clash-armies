@@ -2,7 +2,7 @@ import type { HeroType, Pet, Optional, StaticGameData } from '$types';
 import { ArmyModel, type ArmyPet } from './Army.svelte';
 
 export class PetModel {
-	public ctx: StaticGameData;
+	public gameData: StaticGameData;
 
 	/**
 	 * Corresponding id in the army_pets table.
@@ -14,14 +14,14 @@ export class PetModel {
 
 	public info: Pet;
 
-	constructor(ctx: StaticGameData, data: Optional<ArmyPet, 'id'>) {
-		this.ctx = ctx;
+	constructor(gameData: StaticGameData, data: Optional<ArmyPet, 'id'>) {
+		this.gameData = gameData;
 
 		this.id = data.id;
 		this.petId = data.petId;
 		this.hero = data.hero;
 
-		this.info = PetModel.require(data.petId, this.ctx);
+		this.info = PetModel.require(data.petId, this.gameData);
 	}
 
 	public getSaveData() {
@@ -32,24 +32,24 @@ export class PetModel {
 		};
 	}
 
-	public static require(petId: number, ctx: StaticGameData) {
-		const pet = ctx.pets.find((p) => p.id === petId);
+	public static require(petId: number, gameData: StaticGameData) {
+		const pet = gameData.pets.find((p) => p.id === petId);
 		if (!pet) {
 			throw new Error(`Expected pet "${petId}"`);
 		}
 		return pet;
 	}
 
-	public static requireByName(name: string, ctx: StaticGameData) {
-		const pet = ctx.pets.find((p) => p.name === name);
+	public static requireByName(name: string, gameData: StaticGameData) {
+		const pet = gameData.pets.find((p) => p.name === name);
 		if (!pet) {
 			throw new Error(`Expected pet "${name}"`);
 		}
 		return pet;
 	}
 
-	public static requireByClashID(clashId: number, ctx: StaticGameData) {
-		const pet = ctx.pets.find((p) => p.clashId === clashId);
+	public static requireByClashID(clashId: number, gameData: StaticGameData) {
+		const pet = gameData.pets.find((p) => p.clashId === clashId);
 		if (!pet) {
 			throw new Error(`Expected pet "${clashId}"`);
 		}
@@ -62,9 +62,9 @@ export class PetModel {
 	 *
 	 * @returns highest available pet level or -1 if player hasn't unlocked it at all
 	 */
-	public static getMaxLevel(name: string, townHall: number, ctx: StaticGameData) {
-		const thData = ArmyModel.requireTownHall(townHall, ctx);
-		const appPet = PetModel.requireByName(name, ctx);
+	public static getMaxLevel(name: string, townHall: number, gameData: StaticGameData) {
+		const thData = ArmyModel.requireTownHall(townHall, gameData);
+		const appPet = PetModel.requireByName(name, gameData);
 		const prodLevel = thData.maxPetHouse;
 		if (prodLevel === null) {
 			// Pet house is not unlocked at this town hall

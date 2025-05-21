@@ -104,14 +104,14 @@ const ARMY_LINK_HERO_PATTERN = /(?<hero_id>\d+)(?:m\d+)?(?:p(?<pet_id>\d+))?(?:e
 /**
  * Takes in a clash of clans army link and parses it into clash army units/ccUnits/heroes data.
  */
-export function parseLink(fullLink: string, ctx: StaticGameData) {
+export function parseLink(fullLink: string, gameData: StaticGameData) {
 	const url = new URL(fullLink);
 	const link = url.searchParams.get('army');
 	if (!link) {
 		throw new Error(`Import link "${fullLink}" is invalid`);
 	}
 
-	const model = new ArmyModel(ctx);
+	const model = new ArmyModel(gameData);
 
 	function parseUnits(data: string) {
 		return data
@@ -125,11 +125,11 @@ export function parseLink(fullLink: string, ctx: StaticGameData) {
 
 	function addUnit(data: { id: number; amount: number }, type: 'Troop' | 'Spell', housedIn: UnitHome) {
 		if (type === 'Troop') {
-			const unit = UnitModel.requireTroopByClashID(data.id, ctx);
+			const unit = UnitModel.requireTroopByClashID(data.id, gameData);
 			const modelUnit = model.addUnit(unit, housedIn);
 			modelUnit.amount = data.amount;
 		} else if (type === 'Spell') {
-			const unit = UnitModel.requireSpellByClashID(data.id, ctx);
+			const unit = UnitModel.requireSpellByClashID(data.id, gameData);
 			const modelUnit = model.addUnit(unit, housedIn);
 			modelUnit.amount = data.amount;
 		}
@@ -146,18 +146,18 @@ export function parseLink(fullLink: string, ctx: StaticGameData) {
 						throw new Error('Invalid hero ID');
 					}
 					if (groups.pet_id) {
-						const pet = PetModel.requireByClashID(parseInt(groups.pet_id, 10), ctx);
+						const pet = PetModel.requireByClashID(parseInt(groups.pet_id, 10), gameData);
 						model.addPet(pet, heroName);
 					}
 					if (groups.eq1) {
-						const eq = EquipmentModel.requireByClashID(parseInt(groups.eq1, 10), ctx);
+						const eq = EquipmentModel.requireByClashID(parseInt(groups.eq1, 10), gameData);
 						if (eq.hero !== heroName) {
 							throw new Error(`Hero mismatch "${eq.hero}" and "${heroName}"`);
 						}
 						model.addEquipment(eq);
 					}
 					if (groups.eq2) {
-						const eq = EquipmentModel.requireByClashID(parseInt(groups.eq2, 10), ctx);
+						const eq = EquipmentModel.requireByClashID(parseInt(groups.eq2, 10), gameData);
 						if (eq.hero !== heroName) {
 							throw new Error(`Hero mismatch "${eq.hero}" and "${heroName}"`);
 						}
@@ -192,7 +192,7 @@ export function parseLink(fullLink: string, ctx: StaticGameData) {
 	// about certain things like units, so we end up having to "stub" some properties
 	modelData.name = 'stub';
 
-	validateArmy(modelData, ctx);
+	validateArmy(modelData, gameData);
 
 	return model;
 }

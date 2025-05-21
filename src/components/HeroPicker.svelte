@@ -123,7 +123,7 @@
 				</ul>
 				<ul class="picker-list">
 					{#each sortedEquipment as equipment}
-						{@const level = EquipmentModel.getMaxLevel(equipment.name, model.townHall, model.ctx)}
+						{@const level = EquipmentModel.getMaxLevel(equipment.name, model.townHall, model.gameData)}
 						{@const title = getEquipmentTitle(level, equipment.name, _selectedEquipment)}
 						<li>
 							<button
@@ -152,7 +152,7 @@
 					</div>
 					<ul class="picker-list">
 						{#each app.pets as pet}
-							{@const level = PetModel.getMaxLevel(pet.name, model.townHall, model.ctx)}
+							{@const level = PetModel.getMaxLevel(pet.name, model.townHall, model.gameData)}
 							{@const title = getPetTitle(level, pet.name, model.pets)}
 							{@const equippedHero = model.pets.find((p) => p.info.name === pet.name)?.hero}
 							{@const equippedOnDifferentHero = equippedHero !== undefined && equippedHero !== hero}

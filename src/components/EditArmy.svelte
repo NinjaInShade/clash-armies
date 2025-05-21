@@ -284,7 +284,7 @@
 				</h2>
 			</div>
 			{#each VALID_HEROES as hero}
-				{#if model.thData && ArmyModel.getMaxHeroLevel(hero, model.townHall, model.ctx) !== -1}
+				{#if model.thData && ArmyModel.getMaxHeroLevel(hero, model.townHall, model.gameData) !== -1}
 					<div class="hero-picker-container">
 						<HeroPicker {model} {hero} bind:shownHeroes />
 					</div>

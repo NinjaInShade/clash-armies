@@ -2,7 +2,7 @@ import type { Equipment, Optional, StaticGameData } from '$types';
 import { ArmyModel, type ArmyEquipment } from './Army.svelte';
 
 export class EquipmentModel {
-	public ctx: StaticGameData;
+	public gameData: StaticGameData;
 
 	/**
 	 * Corresponding id in the army_equipment table.
@@ -13,13 +13,13 @@ export class EquipmentModel {
 
 	public info: Equipment;
 
-	constructor(ctx: StaticGameData, data: Optional<ArmyEquipment, 'id'>) {
-		this.ctx = ctx;
+	constructor(gameData: StaticGameData, data: Optional<ArmyEquipment, 'id'>) {
+		this.gameData = gameData;
 
 		this.id = data.id;
 		this.equipmentId = data.equipmentId;
 
-		this.info = EquipmentModel.require(data.equipmentId, this.ctx);
+		this.info = EquipmentModel.require(data.equipmentId, this.gameData);
 	}
 
 	public getSaveData() {
@@ -29,24 +29,24 @@ export class EquipmentModel {
 		};
 	}
 
-	public static require(equipmentId: number, ctx: StaticGameData) {
-		const eq = ctx.equipment.find((eq) => eq.id === equipmentId);
+	public static require(equipmentId: number, gameData: StaticGameData) {
+		const eq = gameData.equipment.find((eq) => eq.id === equipmentId);
 		if (!eq) {
 			throw new Error(`Expected equipment "${equipmentId}"`);
 		}
 		return eq;
 	}
 
-	public static requireByName(name: string, ctx: StaticGameData) {
-		const eq = ctx.equipment.find((p) => p.name === name);
+	public static requireByName(name: string, gameData: StaticGameData) {
+		const eq = gameData.equipment.find((p) => p.name === name);
 		if (!eq) {
 			throw new Error(`Expected equipment "${name}"`);
 		}
 		return eq;
 	}
 
-	public static requireByClashID(clashId: number, ctx: StaticGameData) {
-		const eq = ctx.equipment.find((eq) => eq.clashId === clashId);
+	public static requireByClashID(clashId: number, gameData: StaticGameData) {
+		const eq = gameData.equipment.find((eq) => eq.clashId === clashId);
 		if (!eq) {
 			throw new Error(`Expected equipment "${clashId}"`);
 		}
@@ -59,10 +59,10 @@ export class EquipmentModel {
 	 *
 	 * @returns highest available equipment level or -1 if player hasn't unlocked it at all
 	 */
-	public static getMaxLevel(name: string, townHall: number, ctx: StaticGameData) {
-		const thData = ArmyModel.requireTownHall(townHall, ctx);
-		const appEquipment = EquipmentModel.requireByName(name, ctx);
-		if (ArmyModel.getMaxHeroLevel(appEquipment.hero, townHall, ctx) === -1) {
+	public static getMaxLevel(name: string, townHall: number, gameData: StaticGameData) {
+		const thData = ArmyModel.requireTownHall(townHall, gameData);
+		const appEquipment = EquipmentModel.requireByName(name, gameData);
+		if (ArmyModel.getMaxHeroLevel(appEquipment.hero, townHall, gameData) === -1) {
 			// Check hero is unlocked
 			return -1;
 		}

@@ -61,7 +61,7 @@ export type StructuredArmyComment = ArmyComment & {
 };
 
 export class ArmyModel {
-	public ctx: StaticGameData;
+	public gameData: StaticGameData;
 
 	/**
 	 * Corresponding id in the armies table.
@@ -87,8 +87,8 @@ export class ArmyModel {
 	public userVote = $state(0);
 	public userBookmarked = $state(false);
 
-	constructor(ctx: StaticGameData, data?: Partial<Army>) {
-		this.ctx = ctx;
+	constructor(gameData: StaticGameData, data?: Partial<Army>) {
+		this.gameData = gameData;
 
 		// Set initial data. Normally I'd like to `this.foo = initial ?? default` but the default has
 		// to be in the property declaration otherwise the $state becomes `| undefined` which is annoying.
@@ -107,7 +107,7 @@ export class ArmyModel {
 		}
 		if (data?.units) {
 			for (const unit of data.units) {
-				const model = new UnitModel(this.ctx, unit);
+				const model = new UnitModel(this.gameData, unit);
 				if (unit.home === 'armyCamp') {
 					this.units.push(model);
 				} else if (unit.home === 'clanCastle') {
@@ -119,22 +119,22 @@ export class ArmyModel {
 		}
 		if (data?.pets) {
 			for (const pet of data.pets) {
-				const model = new PetModel(this.ctx, pet);
+				const model = new PetModel(this.gameData, pet);
 				this.pets.push(model);
 			}
 		}
 		if (data?.equipment) {
 			for (const equipment of data.equipment) {
-				const model = new EquipmentModel(this.ctx, equipment);
+				const model = new EquipmentModel(this.gameData, equipment);
 				this.equipment.push(model);
 			}
 		}
 		if (data?.guide) {
-			this.guide = new GuideModel(this.ctx, data?.guide ?? undefined);
+			this.guide = new GuideModel(this.gameData, data?.guide ?? undefined);
 		}
 		if (data?.comments) {
 			for (const comment of data.comments) {
-				const model = new CommentModel(this.ctx, comment);
+				const model = new CommentModel(this.gameData, comment);
 				this.comments.push(model);
 			}
 			this.structuredComments = CommentModel.structureComments(this.comments);
@@ -189,30 +189,30 @@ export class ArmyModel {
 	}
 
 	public get thData() {
-		return ArmyModel.requireTownHall(this.townHall, this.ctx);
+		return ArmyModel.requireTownHall(this.townHall, this.gameData);
 	}
 
 	public addUnit(unit: Unit, home: UnitHome, amount = 1) {
-		const newUnit = new UnitModel(this.ctx, { unitId: unit.id, amount, home });
+		const newUnit = new UnitModel(this.gameData, { unitId: unit.id, amount, home });
 		const units = home === 'clanCastle' ? this.ccUnits : this.units;
 		units.push(newUnit);
 		return newUnit;
 	}
 
 	public addPet(pet: Pet, hero: HeroType) {
-		const newPet = new PetModel(this.ctx, { hero, petId: pet.id });
+		const newPet = new PetModel(this.gameData, { hero, petId: pet.id });
 		this.pets.push(newPet);
 		return newPet;
 	}
 
 	public addEquipment(equipment: Equipment) {
-		const newEquipment = new EquipmentModel(this.ctx, { equipmentId: equipment.id });
+		const newEquipment = new EquipmentModel(this.gameData, { equipmentId: equipment.id });
 		this.equipment.push(newEquipment);
 		return newEquipment;
 	}
 
 	public addGuide() {
-		this.guide = new GuideModel(this.ctx);
+		this.guide = new GuideModel(this.gameData);
 		return this.guide;
 	}
 
@@ -312,8 +312,8 @@ export class ArmyModel {
 		return 'Hybrid';
 	}
 
-	public static getMaxHeroLevel(hero: HeroType, townHall: number, ctx: StaticGameData) {
-		const thData = ArmyModel.requireTownHall(townHall, ctx);
+	public static getMaxHeroLevel(hero: HeroType, townHall: number, gameData: StaticGameData) {
+		const thData = ArmyModel.requireTownHall(townHall, gameData);
 		if (!VALID_HEROES.includes(hero)) {
 			return -1;
 		}
@@ -336,8 +336,8 @@ export class ArmyModel {
 		return -1;
 	}
 
-	public static requireTownHall(level: number, ctx: StaticGameData) {
-		const th = ctx.townHalls.find((th) => th.level === level);
+	public static requireTownHall(level: number, gameData: StaticGameData) {
+		const th = gameData.townHalls.find((th) => th.level === level);
 		if (!th) {
 			throw new Error(`Expected town hall ${level}`);
 		}

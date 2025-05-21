@@ -3,7 +3,7 @@ import { ArmyModel, type ArmyUnit } from './Army.svelte';
 import { SUPER_TO_REGULAR } from '$shared/utils';
 
 export class UnitModel {
-	public ctx: StaticGameData;
+	public gameData: StaticGameData;
 
 	/**
 	 * Corresponding id in the army_units table.
@@ -16,15 +16,15 @@ export class UnitModel {
 
 	public info: Unit;
 
-	constructor(ctx: StaticGameData, data: Optional<ArmyUnit, 'id'>) {
-		this.ctx = ctx;
+	constructor(gameData: StaticGameData, data: Optional<ArmyUnit, 'id'>) {
+		this.gameData = gameData;
 
 		this.id = data.id;
 		this.unitId = data.unitId;
 		this.home = data.home;
 		this.amount = data.amount;
 
-		this.info = UnitModel.require(data.unitId, ctx);
+		this.info = UnitModel.require(data.unitId, gameData);
 	}
 
 	public getSaveData() {
@@ -36,40 +36,40 @@ export class UnitModel {
 		};
 	}
 
-	public static require(unitId: number, ctx: StaticGameData) {
-		const unit = ctx.units.find((u) => u.id === unitId);
+	public static require(unitId: number, gameData: StaticGameData) {
+		const unit = gameData.units.find((u) => u.id === unitId);
 		if (!unit) {
 			throw new Error(`Expected unit "${unitId}"`);
 		}
 		return unit;
 	}
 
-	public static requireTroopByName(name: string, ctx: StaticGameData) {
-		const unit = ctx.units.find((u) => (u.type === 'Troop' || u.type === 'Siege') && u.name === name);
+	public static requireTroopByName(name: string, gameData: StaticGameData) {
+		const unit = gameData.units.find((u) => (u.type === 'Troop' || u.type === 'Siege') && u.name === name);
 		if (!unit) {
 			throw new Error(`Expected troop "${name}"`);
 		}
 		return unit;
 	}
 
-	public static requireSpellByName(name: string, ctx: StaticGameData) {
-		const unit = ctx.units.find((u) => u.type === 'Spell' && u.name === name);
+	public static requireSpellByName(name: string, gameData: StaticGameData) {
+		const unit = gameData.units.find((u) => u.type === 'Spell' && u.name === name);
 		if (!unit) {
 			throw new Error(`Expected spell "${name}"`);
 		}
 		return unit;
 	}
 
-	public static requireTroopByClashID(clashId: number, ctx: StaticGameData) {
-		const unit = ctx.units.find((u) => (u.type === 'Troop' || u.type === 'Siege') && u.clashId === clashId);
+	public static requireTroopByClashID(clashId: number, gameData: StaticGameData) {
+		const unit = gameData.units.find((u) => (u.type === 'Troop' || u.type === 'Siege') && u.clashId === clashId);
 		if (!unit) {
 			throw new Error(`Expected troop "${clashId}"`);
 		}
 		return unit;
 	}
 
-	public static requireSpellByClashID(clashId: number, ctx: StaticGameData) {
-		const unit = ctx.units.find((u) => u.type === 'Spell' && u.clashId === clashId);
+	public static requireSpellByClashID(clashId: number, gameData: StaticGameData) {
+		const unit = gameData.units.find((u) => u.type === 'Spell' && u.clashId === clashId);
 		if (!unit) {
 			throw new Error(`Expected spell "${clashId}"`);
 		}
@@ -96,8 +96,8 @@ export class UnitModel {
 	 *
 	 * @returns highest available unit level or -1 if player hasn't unlocked it at all
 	 */
-	public static getMaxLevel(unit: Unit, townHall: number, ctx: StaticGameData): number {
-		const thData = ArmyModel.requireTownHall(townHall, ctx);
+	public static getMaxLevel(unit: Unit, townHall: number, gameData: StaticGameData): number {
+		const thData = ArmyModel.requireTownHall(townHall, gameData);
 
 		const { name, type } = unit;
 
@@ -159,11 +159,11 @@ export class UnitModel {
 					return maxLevel;
 				}
 				// If super troops unlocked, level matches the max level of the regular troop version
-				const regularTroopVersion = ctx.units.find((x) => x.type === 'Troop' && x.name === SUPER_TO_REGULAR[name]);
+				const regularTroopVersion = gameData.units.find((x) => x.type === 'Troop' && x.name === SUPER_TO_REGULAR[name]);
 				if (!regularTroopVersion) {
 					throw new Error(`Expected to find regular troop version for "${name}"`);
 				}
-				const regularMaxLevel = UnitModel.getMaxLevel(regularTroopVersion, townHall, ctx);
+				const regularMaxLevel = UnitModel.getMaxLevel(regularTroopVersion, townHall, gameData);
 				if (level > regularMaxLevel) {
 					// Some super troop must have their regular troop unlocked to a certain level (e.g. super bowler requires level 4 bowler).
 					// Therefore, some super troop levels start from the base regular troop level.
@@ -184,8 +184,8 @@ export class UnitModel {
 	 *
 	 * @returns highest available unit level or -1 if player doesn't have access to it at all
 	 */
-	public static getMaxCcLevel(unit: Unit, townHall: number, ctx: StaticGameData): number {
-		const thData = ArmyModel.requireTownHall(townHall, ctx);
+	public static getMaxCcLevel(unit: Unit, townHall: number, gameData: StaticGameData): number {
+		const thData = ArmyModel.requireTownHall(townHall, gameData);
 
 		const { name, type } = unit;
 
@@ -210,19 +210,19 @@ export class UnitModel {
 					return maxLevel;
 				}
 				// If super troops unlocked, level matches the max level allowed for the regular troop version
-				const regularTroopVersion = ctx.units.find((x) => x.type === 'Troop' && x.name === SUPER_TO_REGULAR[name]);
+				const regularTroopVersion = gameData.units.find((x) => x.type === 'Troop' && x.name === SUPER_TO_REGULAR[name]);
 				if (!regularTroopVersion) {
 					throw new Error(`Expected to find regular troop version for "${name}"`);
 				}
 
 				// For super troop to be donated, the laboratory must be at least high enough for the regular troop to be boosted
 				// See `getUnitLevel` for more info on how this check works
-				const regularMaxLevel = UnitModel.getMaxLevel(regularTroopVersion, townHall, ctx);
+				const regularMaxLevel = UnitModel.getMaxLevel(regularTroopVersion, townHall, gameData);
 				if (level > regularMaxLevel) return maxLevel;
 
 				// If the laboratory is high enough to boost the regular troop,
 				// use the max level of the regular troop in line with the `getCcUnitLevel` rules
-				return UnitModel.getMaxCcLevel(regularTroopVersion, townHall, ctx);
+				return UnitModel.getMaxCcLevel(regularTroopVersion, townHall, gameData);
 			}
 
 			maxLevel = level;
