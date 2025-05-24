@@ -1,5 +1,6 @@
 import type { Server } from '$server/api/Server';
 import { parseDBJsonField } from '$server/utils';
+import { ArmyMetricsAPI } from '$server/api/ArmyMetricsAPI';
 import type { RequestEvent } from '@sveltejs/kit';
 import z from 'zod';
 import { USER_MAX_ARMIES } from '$shared/utils';
@@ -35,6 +36,8 @@ type GetUnitsOptions = {
 };
 
 export class ArmyAPI {
+	public metrics: ArmyMetricsAPI;
+
 	/** Game units static data */
 	public units: Unit[] = [];
 	/** Game equipment static data */
@@ -48,6 +51,8 @@ export class ArmyAPI {
 
 	constructor(server: Server) {
 		this.server = server;
+
+		this.metrics = new ArmyMetricsAPI(this.server, { metricsMinAgeMs: 1000 * 60 });
 	}
 
 	public async init() {

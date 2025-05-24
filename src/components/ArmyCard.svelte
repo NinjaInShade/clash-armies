@@ -97,7 +97,7 @@
 			</ActionButton>
 			<ActionButton
 				ghost
-				onclick={() => openInGame(model)}
+				onclick={() => openInGame(model, app)}
 				disabled={!model.units.length && !model.ccUnits.length && !model.pets.length && !model.equipment.length}
 				title={getOpenBtnTitle(model)}
 			>

@@ -18,6 +18,7 @@ export const handle: Handle = async ({ event: req, resolve }) => {
 	initRequest(req, server);
 
 	await authMiddleware(req);
+	await server.army.metrics.requestMiddleware(req);
 
 	return resolveRequest(req, resolve);
 };

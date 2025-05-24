@@ -1,7 +1,8 @@
 <script lang="ts">
 	import type { PageData } from './$types';
 	import { page } from '$app/state';
-	import { getContext, untrack } from 'svelte';
+	import { onMount, getContext, untrack } from 'svelte';
+	import { PAGE_VIEW_METRIC } from '$shared/utils';
 	import type { AppState } from '$types';
 	import { ArmyModel } from '$models';
 	import C from '$components';
@@ -19,6 +20,10 @@
 	const metaDescription = $derived.by(getMetaDescription);
 	const ogTitle = $derived(`${model.name}: A powerful Clash of Clans TH${model.townHall} ${stats.type} attack army`);
 	const ogDescription = $derived(metaDescription);
+
+	onMount(() => {
+		app.http.post('/api/armies/metrics', { metric: PAGE_VIEW_METRIC, armyId: army.id }).catch(() => {});
+	});
 
 	// TODO: this function is not well implemented, but it's late and works well enough for now...
 	function getMetaDescription() {

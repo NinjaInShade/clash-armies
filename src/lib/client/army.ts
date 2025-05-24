@@ -1,7 +1,7 @@
 import C from '$components';
 import type { AppState, StaticGameData, UnitHome } from '$types';
 import type { Component } from 'svelte';
-import { VALID_HEROES, HERO_CLASH_IDS } from '$shared/utils';
+import { HERO_CLASH_IDS, COPY_LINK_CLICK_METRIC, OPEN_LINK_CLICK_METRIC } from '$shared/utils';
 import { validateArmy } from '$shared/validation';
 import { ArmyModel, UnitModel, PetModel, EquipmentModel } from '$models';
 
@@ -201,12 +201,6 @@ export function openLink(href: string, openInNewTab = true) {
 	window.open(href, openInNewTab ? '_blank' : undefined, 'rel="noreferrer"');
 }
 
-export async function copyLink(army: ArmyModel, app: AppState) {
-	const link = generateLink(army);
-	await copy(link);
-	app.notify({ title: 'Copied army!', description: 'Successfully copied army link to clipboard', theme: 'success' });
-}
-
 async function copy(text: string) {
 	if ('navigator' in window && window.navigator.clipboard) {
 		try {
@@ -240,7 +234,15 @@ async function copy(text: string) {
 	}
 }
 
-export function openInGame(army: ArmyModel) {
+export async function copyLink(army: ArmyModel, app: AppState) {
+	app.http.post('/api/armies/metrics', { metric: COPY_LINK_CLICK_METRIC, armyId: army.id }).catch(() => {});
+	const link = generateLink(army);
+	await copy(link);
+	app.notify({ title: 'Copied army!', description: 'Successfully copied army link to clipboard', theme: 'success' });
+}
+
+export function openInGame(army: ArmyModel, app: AppState) {
+	app.http.post('/api/armies/metrics', { metric: OPEN_LINK_CLICK_METRIC, armyId: army.id }).catch(() => {});
 	const link = generateLink(army);
 	openLink(link);
 }
