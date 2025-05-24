@@ -1,3 +1,15 @@
+## [0.4.0] - 2025-05-24
+
+- Add ctrl+s shortcut to save army
+- Fix link import breaking in edge case
+- Fix duplicate unit/equipment/pets bug
+- Fix clan castle filtering not working
+- Improve army type determination
+- Increase max comment length
+- Increase default toast notification duration
+- Auto-scroll to errors
+- Internal improvements (better army metrics beta)
+
 ## [0.3.17] - 2025-05-18
 
 - Add canonical tag for specific army pages
