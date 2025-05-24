@@ -1,12 +1,14 @@
 <script lang="ts">
 	import type { PageData } from './$types';
-	import THWidgetDisplay from './THWidgetDisplay.svelte';
-	import UnitTableDisplay from './UnitTableDisplay.svelte';
+	import THWidgetDisplay from '$components/THWidgetDisplay.svelte';
+	import UnitTableDisplay from '$components/UnitTableDisplay.svelte';
 	import type { Unit, TownHall } from '$types';
 	import C from '$components';
 
 	const { data }: { data: PageData } = $props();
-	const { units, townHalls } = $derived(data);
+	const { serverStats, units, townHalls } = $derived(data);
+
+	$inspect('Server stat', serverStats);
 
 	let selectedTHs = $state<number[]>([]);
 	const thColumns = [
@@ -76,31 +78,70 @@
 	</div>
 </header>
 
-<section class="town-halls">
-	<div class="container">
-		<div class="table-above">
-			<div>
-				<h2>Town halls</h2>
-				<p class="body">Town hall data</p>
+<main>
+	<section class="stats">
+		<div class="container">
+			<div class="table-above">
+				<div>
+					<h2>Server</h2>
+					<p class="body">Server/system stats</p>
+				</div>
+				<div class="actions"></div>
 			</div>
-			<div class="actions"></div>
+			<div class="stats-grid">
+				<div class="stats-card">
+					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 36">
+						<path fill="currentColor" d="M30.86 8.43A2 2 0 0 0 28.94 7H7.06a2 2 0 0 0-1.93 1.47L2.29 20h31.42Z" class="clr-i-solid clr-i-solid-path-1" />
+						<path fill="currentColor" d="M2 22v7a2 2 0 0 0 2 2h28a2 2 0 0 0 2-2v-7Zm28 5h-4v-2h4Z" class="clr-i-solid clr-i-solid-path-2" />
+						<path fill="none" d="M0 0h36v36H0z" />
+					</svg>
+					<h3>Disk usage</h3>
+					<b>{serverStats.usedDisk}/{serverStats.totalDisk} GB</b>
+				</div>
+				<div class="stats-card">
+					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+						<path
+							fill="currentColor"
+							d="M232 56H24A16 16 0 0 0 8 72v128a8 8 0 0 0 16 0v-16h16v16a8 8 0 0 0 16 0v-16h16v16a8 8 0 0 0 16 0v-16h16v16a8 8 0 0 0 16 0v-16h16v16a8 8 0 0 0 16 0v-16h16v16a8 8 0 0 0 16 0v-16h16v16a8 8 0 0 0 16 0v-16h16v16a8 8 0 0 0 16 0V72a16 16 0 0 0-16-16m-24 40v48h-64V96Zm-96 0v48H48V96Z"
+						/>
+					</svg>
+					<h3>RAM usage</h3>
+					<b>{serverStats.usedMemory}/{serverStats.totalMemory} GB</b>
+				</div>
+			</div>
 		</div>
-		<C.Table data={townHalls} columns={thColumns} bind:selectedKeys={selectedTHs} defaultSortKey="level" selectable />
-	</div>
-</section>
+	</section>
 
-<section class="units">
-	<div class="container">
-		<div class="table-above">
-			<div>
-				<h2>Units</h2>
-				<p class="body">Unit data</p>
+	<section class="town-halls">
+		<div class="container">
+			<div class="table-above">
+				<div>
+					<h2>Town halls ({townHalls.length})</h2>
+					<p class="body">Town hall data</p>
+				</div>
+				<div class="actions"></div>
 			</div>
-			<div class="actions"></div>
+			<div class="table-container">
+				<C.Table data={townHalls} columns={thColumns} bind:selectedKeys={selectedTHs} defaultSortKey="level" selectable />
+			</div>
 		</div>
-		<C.Table data={units} columns={unitColumns} bind:selectedKeys={selectedUnits} defaultSortKey="type" selectable />
-	</div>
-</section>
+	</section>
+
+	<section class="units">
+		<div class="container">
+			<div class="table-above">
+				<div>
+					<h2>Units ({units.length})</h2>
+					<p class="body">Unit data</p>
+				</div>
+				<div class="actions"></div>
+			</div>
+			<div class="table-container">
+				<C.Table data={units} columns={unitColumns} bind:selectedKeys={selectedUnits} defaultSortKey="type" selectable />
+			</div>
+		</div>
+	</section>
+</main>
 
 <style>
 	header {
@@ -145,19 +186,74 @@
 		gap: 0.5em;
 	}
 
+	.table-container {
+		display: flex;
+		max-height: 600px;
+	}
+
+	.stats-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+		grid-auto-rows: 1fr;
+		height: 100%;
+		width: 100%;
+		gap: 1.5em;
+
+		& .stats-card {
+			display: flex;
+			flex-flow: column nowrap;
+			justify-content: center;
+			align-items: center;
+			position: relative;
+			overflow: hidden;
+			background-color: var(--grey-900);
+			border-radius: 8px;
+			padding: 1em;
+			width: 100%;
+
+			& svg {
+				color: var(--grey-400);
+				width: 2.5em;
+				height: 2.5em;
+			}
+
+			& h3 {
+				color: var(--grey-400);
+				text-transform: uppercase;
+				margin: 0.25em 0;
+				text-align: center;
+				font-weight: 400;
+			}
+
+			& b {
+				display: block;
+				text-align: center;
+				font-size: var(--fs-md);
+				line-height: var(--fs-md-lh);
+				color: var(--grey-100);
+			}
+		}
+	}
+
 	h2 {
 		color: var(--primary-400);
 	}
 
 	h2 + p {
-		margin-top: 0.5em;
+		margin-top: 0.15em;
 	}
 
-	.town-halls {
-		padding: 50px var(--side-padding);
-	}
+	main {
+		> section {
+			padding: 0 var(--side-padding) 24px var(--side-padding);
 
-	.units {
-		padding: 0 var(--side-padding) 50px var(--side-padding);
+			&:first-child {
+				padding-top: 24px;
+			}
+
+			&:last-child {
+				padding-bottom: 50px;
+			}
+		}
 	}
 </style>
