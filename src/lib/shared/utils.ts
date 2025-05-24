@@ -28,6 +28,8 @@ export const HOLD_REMOVE_SPEED = 150;
 export const SECOND = 1000;
 export const MINUTE = SECOND * 60;
 export const HOUR = MINUTE * 60;
+export const DAY = HOUR * 24;
+export const YEAR = DAY * 365;
 
 /**
  * Should match banner file names (without extension) in /static/clash/banners/*
@@ -70,6 +72,11 @@ export const VALID_HEROES = ['Barbarian King', 'Archer Queen', 'Grand Warden', '
 export const GUIDE_TEXT_CHAR_LIMIT = 3_000;
 export const YOUTUBE_URL_REGEX = /^(?:https:\/\/)?(?:www\.)?youtube\.com\/watch\?(?=.*v=((\w|-){11}))(?:\S+)?$/;
 export const MAX_COMMENT_LENGTH = 2_000;
+
+// Should match metric name in `metrics` table
+export const PAGE_VIEW_METRIC = 'page-view';
+export const COPY_LINK_CLICK_METRIC = 'copy-link-click';
+export const OPEN_LINK_CLICK_METRIC = 'open-link-click';
 
 // Heroes aren't stored explicitly in the database so storing here instead (for now at least)
 export const HERO_CLASH_IDS = {

@@ -68,6 +68,7 @@ export class Server {
 
 		await this.purgeExpiredSessions();
 		await this.purgeOldNotifications();
+		await this.army.metrics.purgeOldEvents();
 
 		const duration = Date.now() - start;
 		this.log.info(`Finished hourly task in ${duration}ms`);

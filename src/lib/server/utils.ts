@@ -165,3 +165,44 @@ export function parseDBJsonField(data: any) {
 	}
 	return JSON.parse(data);
 }
+
+export const KNOWN_BOT_UAS = [
+	// Search engine bots
+	'Googlebot',
+	'bingbot',
+	'Baiduspider',
+	'YandexBot',
+	'DuckDuckBot',
+	'Slurp', // Yahoo
+	'Sogou web spider',
+	'Exabot',
+	'SemrushBot',
+
+	// Social media bots
+	'facebookexternalhit',
+	'Facebot',
+	'Twitterbot',
+	'LinkedInBot',
+	'Pinterestbot',
+
+	// SEO/Analytics tools
+	'AhrefsBot',
+	'rogerbot', // Moz
+	'MJ12bot', // Majestic
+	'Screaming Frog SEO Spider',
+
+	// Monitoring & uptime bots
+	'UptimeRobot',
+	'StatusCake',
+	'Pingdom',
+
+	// General scrapers/parsers
+	'python-requests',
+	'python',
+	'curl',
+	'Wget',
+	'Java/',
+	'libwww-perl',
+	'node-fetch',
+	'axios',
+];
