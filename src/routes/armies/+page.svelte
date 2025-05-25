@@ -86,14 +86,18 @@
 
 <style>
 	.armies {
-		padding: 32px var(--side-padding);
+		padding: 24px var(--side-padding) 32px var(--side-padding);
 		flex: 1 0 0px;
-	}
 
-	.armies .container {
-		display: flex;
-		flex-flow: column nowrap;
-		height: 100%;
+		& .container {
+			display: flex;
+			flex-flow: column nowrap;
+			height: 100%;
+		}
+
+		@media (max-width: 500px) {
+			padding: 16px var(--side-padding) 32px var(--side-padding);
+		}
 	}
 
 	.armies-grid {
@@ -170,12 +174,6 @@
 
 		:global(.filters .sort-control) {
 			grid-column: 1 / span 2;
-		}
-	}
-
-	@media (max-width: 425px) {
-		.armies {
-			padding-top: 32px;
 		}
 	}
 </style>

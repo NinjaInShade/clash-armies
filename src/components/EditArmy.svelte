@@ -189,7 +189,23 @@
 
 <section class="dashed details">
 	<div>
-		<h2>Army details</h2>
+		<div class="title">
+			<h2>
+				<img src="/clash/ui/hammer-and-saw.png" alt="Hammer and saw crossed over each other" />
+				Army
+				<ActionButton theme="primary-dark" onclick={importUnits} class="title-action-btn">
+					<svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+						<path
+							fill-rule="evenodd"
+							clip-rule="evenodd"
+							d="M6.44941 5.8225L8.71951 3.5531L9.70931 4.5429L5.74941 8.5028L1.78951 4.5429L2.77931 3.5531L5.04941 5.8225V0H6.5L6.44941 5.8225ZM0.149414 7.8H1.54941V10.6H9.94941V7.8H11.3494V10.6C11.3494 11.37 10.7194 12 9.94941 12H1.54941C0.779414 12 0.149414 11.3259 0.149414 10.6V7.8Z"
+							fill="currentColor"
+						/>
+					</svg>
+					Import
+				</ActionButton>
+			</h2>
+		</div>
 		<Fieldset label="Army name*:" htmlName="name" style="padding: 0 8px" --input-width="250px">
 			<Input bind:value={model.name} maxlength={25} />
 		</Fieldset>
@@ -210,18 +226,7 @@
 		<div class="title">
 			<h2>
 				<img src="/clash/ui/army-camp.png" alt="Clash of clans army camp" />
-				Unit selector
-				<ActionButton theme="primary-dark" onclick={importUnits} class="title-action-btn">
-					<svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-						<path
-							fill-rule="evenodd"
-							clip-rule="evenodd"
-							d="M6.44941 5.8225L8.71951 3.5531L9.70931 4.5429L5.74941 8.5028L1.78951 4.5429L2.77931 3.5531L5.04941 5.8225V0H6.5L6.44941 5.8225ZM0.149414 7.8H1.54941V10.6H9.94941V7.8H11.3494V10.6C11.3494 11.37 10.7194 12 9.94941 12H1.54941C0.779414 12 0.149414 11.3259 0.149414 10.6V7.8Z"
-							fill="#E0A153"
-						/>
-					</svg>
-					Import
-				</ActionButton>
+				Army camp
 			</h2>
 			<UnitTotals {model} housedIn="armyCamp" />
 		</div>
@@ -366,7 +371,7 @@
 
 	/* DETAILS */
 	.details {
-		margin-top: 48px;
+		margin-top: 32px;
 	}
 	.details > div {
 		padding: 0 24px 24px 24px;

@@ -56,7 +56,7 @@
 		<h1>Find the best<br /> armies <span>EVER!</span></h1>
 		<p class="body">The number one tool to find, create, learn and share the best armies in Clash of Clans</p>
 		<div class="buttons">
-			<C.Button asLink href="/armies">Find armies</C.Button>
+			<C.Button asLink href="/armies">Find army</C.Button>
 			<C.Button asLink href="/create">Create army</C.Button>
 		</div>
 
@@ -126,7 +126,7 @@
 	}
 
 	.top-armies {
-		padding: 0 var(--side-padding) 50px var(--side-padding);
+		padding: 0 var(--side-padding) 32px var(--side-padding);
 	}
 
 	.top-armies h2 {
@@ -172,7 +172,7 @@
 
 	@media (max-width: 625px) {
 		header {
-			background: repeat-x 0 8.5% url('/clash/ui/stones-background.png');
+			background: repeat-x 0 7% url('/clash/ui/stones-background.png');
 		}
 
 		.graphic {
@@ -191,7 +191,7 @@
 		}
 
 		header .container {
-			padding: 75px 0 0 0;
+			padding: 60px 0 0 0;
 		}
 	}
 

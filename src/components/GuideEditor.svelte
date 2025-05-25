@@ -463,8 +463,8 @@
 		margin-top: 0;
 	}
 	:global(.tiptap h1) {
-		font-size: var(--h1-guide);
-		line-height: var(--h1-guide-lh);
+		font-size: var(--h2-lg);
+		line-height: var(--h2-lg-lh);
 	}
 	:global(.tiptap hr) {
 		border: none;

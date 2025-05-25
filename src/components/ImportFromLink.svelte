@@ -41,7 +41,7 @@
 	</div>
 {/snippet}
 
-<Modal title="Import units from link" {close} {controls}>
+<Modal title="Import army from link" {close} {controls}>
 	{#if error}
 		<div class="errors-container">
 			<Errors errors={error} />

@@ -132,6 +132,10 @@ body {
 	flex-flow: column;
 }
 
+svg {
+	display: block;
+}
+
 ::-webkit-scrollbar-track {
 	border-left: 1px solid var(--grey-600);
 	background-color: var(--grey-800);
@@ -172,8 +176,8 @@ body {
 	--h1: 56px;
 	--h1-lh: 68px;
 
-	--h1-guide: 38px;
-	--h1-guide-lh: 46px;
+	--h2-lg: 38px;
+	--h2-lg-lh: 46px;
 
 	--h2: 24px;
 	--h2-lh: 29px;
@@ -346,8 +350,8 @@ button span {
 		--h1: 42px;
 		--h1-lh: 49px;
 
-		--h1-guide: 31px;
-		--h1-guide-lh: 27px;
+		--h2-lg: 31px;
+		--h2-lg-lh: 36px;
 
 		--fs: 15px;
 		--fs-lh: 22px;
@@ -370,6 +374,6 @@ button span {
 		--h1: 38px;
 		--h1-lh: 43px;
 
-		--side-padding: 24px;
+		--side-padding: 16px;
 	}
 }

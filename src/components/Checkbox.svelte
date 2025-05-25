@@ -79,7 +79,6 @@
 	.inner-container:has(:global(.checkbox:focus)) {
 		outline: none;
 		border: 1px solid var(--primary-400);
-		box-shadow: 0 0 10px 0 hsla(33, 78%, 57%, 0.2);
 	}
 
 	.inner-container:has(:global(.checkbox:disabled)) {

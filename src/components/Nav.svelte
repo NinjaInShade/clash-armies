@@ -54,9 +54,6 @@
 		<ul class="links">
 			{#if app.user}
 				<li>
-					<a class="body focus-grey" href="/users/{app.user.username}">Account</a>
-				</li>
-				<li>
 					<button
 						class="notifications-btn"
 						class:has-unseen={hasUnseenNotifications}
@@ -75,6 +72,16 @@
 						{/if}
 					</button>
 					<NotificationsMenu bind:open={notificationsOpen} elRef={notificationsBtn} />
+				</li>
+				<li>
+					<a class="body focus-grey" href="/users/{app.user.username}" aria-label="Account">
+						<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+							<path
+								d="M10 0C4.48 0 0 4.48 0 10C0 15.52 4.48 20 10 20C15.52 20 20 15.52 20 10C20 4.48 15.52 0 10 0ZM10 4C11.93 4 13.5 5.57 13.5 7.5C13.5 9.43 11.93 11 10 11C8.07 11 6.5 9.43 6.5 7.5C6.5 5.57 8.07 4 10 4ZM10 18C7.97 18 5.57 17.18 3.86 15.12C5.61182 13.7462 7.77376 12.9996 10 12.9996C12.2262 12.9996 14.3882 13.7462 16.14 15.12C14.43 17.18 12.03 18 10 18Z"
+								fill="currentColor"
+							/>
+						</svg>
+					</a>
 				</li>
 			{/if}
 			<li class="control">
@@ -233,23 +240,31 @@
 	.links {
 		display: flex;
 		align-items: center;
-	}
 
-	.links li:not(:last-child) {
-		margin-right: 16px;
-	}
+		& li {
+			&:not(:last-child) {
+				margin-right: 16px;
+			}
 
-	.links li.control:not(:last-child) {
-		margin-right: 8px;
-	}
+			&.control:not(:last-child) {
+				margin-right: 8px;
+			}
 
-	.links li a {
-		transition: color 0.15s ease-in-out;
-		color: var(--grey-400);
-	}
+			& a {
+				display: block;
+				transition: color 0.15s ease-in-out;
+				color: var(--grey-400);
 
-	.links li a:hover {
-		color: var(--grey-300);
+				&:hover {
+					color: var(--grey-300);
+				}
+			}
+
+			& button,
+			a {
+				padding: 2px;
+			}
+		}
 	}
 
 	.notifications-btn {
@@ -278,8 +293,7 @@
 		display: block;
 	}
 
-	.notifications-btn,
-	.notifications-btn svg {
+	.notifications-btn {
 		display: block;
 	}
 
@@ -447,6 +461,12 @@
 		}
 	}
 
+	@media (max-width: 500px) {
+		.sidebar {
+			padding: 0 32px;
+		}
+	}
+
 	@media (max-width: 425px) {
 		nav {
 			padding: 20px var(--side-padding);
@@ -459,10 +479,6 @@
 		.navbar-hamburger {
 			width: 1.45rem;
 			height: 1.45rem;
-		}
-
-		.sidebar {
-			padding: 0 40px;
 		}
 	}
 </style>

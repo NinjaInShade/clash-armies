@@ -116,11 +116,6 @@
 	.input:active {
 		outline: none;
 		border: 1px solid var(--grey-400);
-		box-shadow: 0 0 10px 0 hsla(33, 78%, 57%, 0.2);
-	}
-
-	.outer-container.error .input:active {
-		box-shadow: 0 0 10px 0 hsla(0, 50%, 50%, 0.2);
 	}
 
 	.input:disabled {

@@ -39,89 +39,79 @@
 		border-radius: 4px;
 		transition: background 0.15 ease-in-out;
 		white-space: nowrap;
-	}
 
-	/* Regular */
-	.action-btn.primary {
-		background-color: #806039;
-		color: #f3e7d8;
-	}
-	.action-btn.primary :global(svg path) {
-		fill: #f3e7d8;
-	}
-	.action-btn.primary:hover:not(:disabled) {
-		background-color: hsl(33, 38%, 32%);
-	}
-	.action-btn.primary-dark {
-		background-color: hsl(33, 15%, 26%);
-		color: #e0a153;
-	}
-	.action-btn.primary-dark :global(svg path) {
-		fill: #e0a153;
-	}
-	.action-btn.primary-dark:hover:not(:disabled) {
-		background-color: hsl(33, 15%, 22%);
-	}
-	.action-btn.success {
-		background-color: #424c38;
-		color: #53e059;
-	}
-	.action-btn.success:focus {
-		outline: #53e059 dotted 2px;
-	}
-	.action-btn.success :global(svg path) {
-		fill: #53e059;
-	}
-	.action-btn.success:hover:not(:disabled) {
-		background-color: #384130;
-	}
-	.action-btn.danger {
-		background-color: #4c3838;
-		color: #e05353;
-	}
-	.action-btn.danger:focus {
-		outline: #e05353 dotted 2px;
-	}
-	.action-btn.danger :global(svg path) {
-		fill: #e05353;
-	}
-	.action-btn.danger:hover:not(:disabled) {
-		background-color: #413030;
-	}
+		&.primary {
+			background-color: #806039;
+			color: #f3e7d8;
 
-	.action-btn.grey {
-		background-color: var(--grey-850);
-		color: var(--grey-400);
-	}
-	.action-btn.grey :global(svg path) {
-		fill: var(--grey-400);
-	}
-	.action-btn.grey:hover:not(:disabled) {
-		background-color: var(--grey-600);
-	}
+			&:hover:not(:disabled) {
+				background-color: hsl(33, 38%, 32%);
+			}
 
-	/* Ghost */
-	.action-btn.primary.ghost {
-		background: none;
-		border: 1px dashed #cb995b;
-		color: #cb995b;
-	}
-	.action-btn.primary.ghost :global(svg path) {
-		fill: #cb995b;
-	}
-	.action-btn.primary.ghost:hover:not(:disabled) {
-		background-color: #463c2e;
-	}
-	.action-btn.success.ghost {
-		background: none;
-		border: 1px dashed #759257;
-		color: #759257;
-	}
-	.action-btn.success.ghost :global(svg path) {
-		fill: #759257;
-	}
-	.action-btn.success.ghost:hover:not(:disabled) {
-		background-color: #20211e;
+			&.ghost {
+				background: none;
+				border: 1px dashed #cb995b;
+				color: #cb995b;
+
+				&:hover:not(:disabled) {
+					background-color: hsl(33, 38%, 32%);
+				}
+			}
+		}
+
+		&.primary-dark {
+			background-color: hsl(33, 15%, 26%);
+			color: #e0a153;
+
+			&:hover:not(:disabled) {
+				background-color: hsl(33, 15%, 22%);
+			}
+		}
+
+		&.success {
+			background-color: #424c38;
+			color: #53e059;
+
+			&:hover:not(:disabled) {
+				background-color: #384130;
+			}
+
+			&:focus {
+				outline: #53e059 dotted 2px;
+			}
+
+			&.ghost {
+				background: none;
+				border: 1px dashed #759257;
+				color: #759257;
+
+				&:hover:not(:disabled) {
+					background-color: #20211e;
+				}
+			}
+		}
+
+		&.danger {
+			background-color: #4c3838;
+			color: #e05353;
+
+			&:hover:not(:disabled) {
+				background-color: #413030;
+			}
+
+			&:focus {
+				outline: #e05353 dotted 2px;
+			}
+		}
+
+		&.grey {
+			background-color: var(--grey-700);
+			color: var(--grey-400);
+
+			&:hover:not(:disabled) {
+				background-color: var(--grey-600);
+			}
+		}
 	}
 
 	@media (max-width: 850px) {
