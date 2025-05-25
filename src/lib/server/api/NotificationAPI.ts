@@ -2,6 +2,8 @@ import type { Server } from '$server/api/Server';
 import type { RequestEvent } from '@sveltejs/kit';
 import { parseDBJsonField } from '$server/utils';
 import type { ArmyNotification } from '$types';
+import { pluralize } from '$shared/utils';
+import util from '@ninjalib/util';
 import z from 'zod';
 
 type GetNotificationsOptions = {
@@ -11,9 +13,11 @@ type GetNotificationsOptions = {
 
 export class NotificationAPI {
 	private server: Server;
+	private log: util.Logger;
 
 	constructor(server: Server) {
 		this.server = server;
+		this.log = util.logger('clash-armies:notif');
 	}
 
 	public async init() {
@@ -90,5 +94,17 @@ export class NotificationAPI {
             `;
 			await tx.query(query, [unacknowledgedIds]);
 		});
+	}
+
+	public async purgeOldNotifications() {
+		const start = Date.now();
+		this.log.info('Deleting old notifications...');
+
+		const queryResult = await this.server.db.query('DELETE FROM army_notifications WHERE timestamp < NOW() - INTERVAL 1 YEAR');
+		const deletedRows = queryResult?.affectedRows ?? '<unknown>';
+
+		const duration = Date.now() - start;
+		const pluralized = pluralize('notification', deletedRows);
+		this.log.info(`Deleted ${deletedRows} old ${pluralized} in ${duration}ms`);
 	}
 }

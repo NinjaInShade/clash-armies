@@ -67,7 +67,7 @@ export class Server {
 		this.log.info('Running hourly task...');
 
 		await this.purgeExpiredSessions();
-		await this.purgeOldNotifications();
+		await this.notification.purgeOldNotifications();
 		await this.army.metrics.purgeOldEvents();
 
 		const duration = Date.now() - start;
@@ -82,16 +82,5 @@ export class Server {
 
 		const duration = Date.now() - start;
 		this.log.info(`Deleted expired sessions in ${duration}ms`);
-	}
-
-	private async purgeOldNotifications() {
-		const start = Date.now();
-		this.log.info('Deleting old notifications...');
-
-		const deletedRows = (await this.db.query('DELETE FROM army_notifications WHERE timestamp < NOW() - INTERVAL 3 MONTH'))?.affectedRows ?? '<unknown>';
-
-		const duration = Date.now() - start;
-		const pluralized = pluralize('notification', deletedRows);
-		this.log.info(`Deleted ${deletedRows} old ${pluralized} in ${duration}ms`);
 	}
 }
