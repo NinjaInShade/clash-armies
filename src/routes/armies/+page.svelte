@@ -2,6 +2,8 @@
 	import type { PageData } from './$types';
 	import type { AppState } from '$types';
 	import { ArmyModel } from '$models';
+	import { page } from '$app/state';
+	import { goto } from '$app/navigation';
 	import { getContext, untrack } from 'svelte';
 	import C from '$components';
 
@@ -14,19 +16,34 @@
 	);
 
 	const ENTRIES_PER_PAGE = 25;
-	let page = $state<number>(1);
+
+	let pageNumber = $state<number>(getInitialPageNumber());
 
 	let armyFiltersRef = $state<C.ArmyFilters>();
 	let filteredArmies = $state<ArmyModel[] | null>(null);
-	let displayArmies = $derived((filteredArmies ?? []).slice(0, page * ENTRIES_PER_PAGE));
+	let displayArmies = $derived((filteredArmies ?? []).slice(0, pageNumber * ENTRIES_PER_PAGE));
 
 	function resetFilters() {
 		if (!armyFiltersRef) return;
 		armyFiltersRef.resetAllFilters();
 	}
 
-	function loadMore() {
-		page += 1;
+	function getInitialPageNumber() {
+		const pageParam = page.url.searchParams.get('page');
+		if (!pageParam || Number.isNaN(+pageParam)) {
+			return 1;
+		}
+		return +pageParam;
+	}
+
+	async function loadMore() {
+		pageNumber += 1;
+		page.url.searchParams.set('page', String(pageNumber));
+		await goto(`?${page.url.searchParams.toString()}`, {
+			replaceState: true,
+			noScroll: true,
+			keepFocus: true,
+		});
 	}
 </script>
 

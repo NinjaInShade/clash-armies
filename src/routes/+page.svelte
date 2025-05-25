@@ -1,6 +1,8 @@
 <script lang="ts">
 	import C from '$components';
 	import { getContext, untrack } from 'svelte';
+	import { page } from '$app/state';
+	import { goto } from '$app/navigation';
 	import type { PageData } from './$types';
 	import type { AppState } from '$types';
 	import { ArmyModel } from '$models';
@@ -15,14 +17,28 @@
 
 	const ENTRIES_PER_PAGE = 10;
 
-	let page = $state<number>(1);
+	let pageNumber = $state<number>(getInitialPageNumber());
 
 	const displayArmies = $derived.by(() => {
-		return armies.slice(0, page * ENTRIES_PER_PAGE);
+		return armies.slice(0, pageNumber * ENTRIES_PER_PAGE);
 	});
 
-	function loadMore() {
-		page += 1;
+	function getInitialPageNumber() {
+		const pageParam = page.url.searchParams.get('page');
+		if (!pageParam || Number.isNaN(+pageParam)) {
+			return 1;
+		}
+		return +pageParam;
+	}
+
+	async function loadMore() {
+		pageNumber += 1;
+		page.url.searchParams.set('page', String(pageNumber));
+		await goto(`?${page.url.searchParams.toString()}`, {
+			replaceState: true,
+			noScroll: true,
+			keepFocus: true,
+		});
 	}
 </script>
 
