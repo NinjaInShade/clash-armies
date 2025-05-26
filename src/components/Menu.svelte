@@ -6,10 +6,11 @@
 		open: boolean;
 		elRef: HTMLElement | undefined;
 		placement?: Placement;
+		placementOffset?: number;
 		onClose?: () => void;
 		children: Snippet;
 	};
-	let { open = $bindable(), elRef, children, placement = 'bottom', onClose = () => {} }: Props = $props();
+	let { open = $bindable(), elRef, children, placement = 'bottom', placementOffset = 2, onClose = () => {} }: Props = $props();
 
 	// This shouldn't be state as $effect will infinitely re-run otherwise
 	let autoUpdateDispose = () => {};
@@ -36,7 +37,7 @@
 
 	async function updatePos(el: HTMLElement | undefined, menu: HTMLElement | undefined) {
 		if (!el || !menu) return;
-		const middleware = [offset(2), flip(), shift({ padding: 16 })];
+		const middleware = [offset(placementOffset), flip(), shift({ padding: 16 })];
 		const pos = await computePosition(el, menu, { placement, middleware });
 		x = pos.x;
 		y = pos.y;
@@ -94,9 +95,12 @@
 <style>
 	.menu {
 		position: absolute;
-		width: max-content;
 		left: var(--x);
 		top: var(--y);
+		max-width: var(--menu-width, max-content);
+		max-height: var(--menu-height, max-content);
+		width: 100%;
+		height: 100%;
 		z-index: 1;
 	}
 	.menu.hidden {

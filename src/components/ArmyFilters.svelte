@@ -242,7 +242,7 @@
 			{/if}
 		</button>
 		<Menu bind:open={thMenuShow} elRef={thMenuEl}>
-			<ul class="menu th-menu">
+			<ul class="ca-menu th-menu">
 				{#each [...app.townHalls].reverse() as th}
 					{@const isSelected = $townHall === th.level}
 					<li>
@@ -261,7 +261,7 @@
 							</div>
 							{#if $townHall === th.level}
 								<svg width="13" height="10" viewBox="0 0 8 6" fill="none" xmlns="http://www.w3.org/2000/svg">
-									<path d="M3.00044 3.99976L0.999912 2.00024L0 3L3.00044 6L8 1.00047L7.0008 0L3.00044 3.99976Z" fill="#F0F0F0" />
+									<path d="M3.00044 3.99976L0.999912 2.00024L0 3L3.00044 6L8 1.00047L7.0008 0L3.00044 3.99976Z" fill="currentColor" />
 								</svg>
 							{/if}
 						</button>
@@ -313,8 +313,8 @@
 			</svg>
 			{$sort !== undefined ? $sort : 'Sort'}
 		</button>
-		<Menu bind:open={sortMenuShow} elRef={sortMenuEl}>
-			<ul class="menu sort-menu">
+		<Menu bind:open={sortMenuShow} elRef={sortMenuEl} --menu-width="115px">
+			<ul class="ca-menu">
 				{#each sortOptions as option}
 					<li>
 						<button
@@ -381,78 +381,74 @@
 		outline: none;
 	}
 
-	.menu {
-		box-shadow: 2px 8px 10px 6px hsla(0, 0%, 0%, 0.4);
-		background-color: var(--grey-800);
-		border: 1px solid var(--grey-550);
-		border-radius: 6px;
-	}
-	.menu li:first-child,
-	.menu li:first-child button {
-		border-radius: 6px 6px 0 0;
-	}
-	.menu li:last-child,
-	.menu li:last-child button {
-		border-radius: 0 0 6px 6px;
-	}
-	.menu li:not(:last-child) {
-		border-bottom: 1px solid var(--grey-550);
-	}
-	.menu li button {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		transition:
-			background 0.15s ease-in-out,
-			visibility 0s;
-		font-size: var(--fs);
-		line-height: var(--fs);
+	.ca-menu {
 		color: var(--grey-100);
-		text-align: left;
-		padding: 10px;
-		width: 100%;
-		gap: 8px;
-	}
-	.menu li button:hover {
-		background-color: var(--grey-850);
-	}
-	.menu li button svg path {
-		fill: var(--grey-100);
-	}
-	.menu li button svg {
-		display: block;
+
+		& li {
+			&:first-child,
+			&:first-child button {
+				border-radius: 4px 4px 0 0;
+			}
+
+			&:last-child,
+			&:last-child button {
+				border-radius: 0 0 4px 4px;
+			}
+
+			&:not(:last-child) {
+				border-bottom: 1px solid var(--grey-600);
+			}
+
+			& button {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				transition:
+					background 0.1s ease-in-out,
+					visibility 0s;
+				font-size: var(--fs);
+				line-height: var(--fs);
+				color: var(--grey-100);
+				text-align: left;
+				padding: 10px;
+				width: 100%;
+				gap: 8px;
+
+				&:hover {
+					background-color: var(--grey-900);
+				}
+			}
+		}
 	}
 
-	.sort-menu li {
-		min-width: 110px;
-	}
 	.th-menu {
 		overflow-y: auto;
 		max-height: 250px;
 		min-width: 125px;
-	}
-	.th-menu li button svg path {
-		fill: var(--grey-100);
-	}
-	.th-menu .town-hall .flex {
-		height: 22px;
-		display: flex;
-		gap: 4px;
-	}
-	.th-menu .town-hall {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		width: 100%;
-	}
-	.th-menu .town-hall .body {
-		font-family: 'Clash', sans-serif;
-		color: var(--grey-100);
-		min-width: 2ch;
-	}
-	.th-menu .town-hall img {
-		max-height: 100%;
-		width: auto;
+
+		& .town-hall {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			width: 100%;
+
+			& .flex {
+				height: 22px;
+				display: flex;
+				gap: 4px;
+			}
+
+			& .body {
+				font-family: 'Clash', sans-serif;
+				color: var(--grey-100);
+				min-width: 2ch;
+			}
+
+			& img {
+				max-height: 100%;
+				width: auto;
+			}
+		}
 	}
 
 	.th-filter {

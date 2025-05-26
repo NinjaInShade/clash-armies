@@ -3,6 +3,8 @@
 	import type { AppState } from '$types';
 	import Logo from './Logo.svelte';
 	import NotificationsMenu from './NotificationsMenu.svelte';
+	import Menu from './Menu.svelte';
+	import BMCButton from './BMCButton.svelte';
 	import Button from './Button.svelte';
 
 	const app = getContext<AppState>('app');
@@ -12,22 +14,27 @@
 	let sidebarOpen = $state<boolean>(false);
 
 	let notificationsBtn = $state<HTMLButtonElement>();
-	let notificationsBtnMobile = $state<HTMLButtonElement>();
-
 	let notificationsOpen = $state<boolean>(false);
-	let notificationsOpenMobile = $state<boolean>(false);
+
+	let accountBtn = $state<HTMLButtonElement>();
+	let accountMenuOpen = $state<boolean>(false);
 
 	function toggleSidebar() {
 		sidebarOpen = !sidebarOpen;
 		document.body.classList.toggle('sidebar-active');
 	}
 
+	function closeSidebar() {
+		sidebarOpen = false;
+		document.body.classList.remove('sidebar-active');
+	}
+
 	function toggleNotifications() {
 		notificationsOpen = !notificationsOpen;
 	}
 
-	function toggleNotificationsMobile() {
-		notificationsOpenMobile = !notificationsOpenMobile;
+	function toggleAccountMenu() {
+		accountMenuOpen = !accountMenuOpen;
 	}
 </script>
 
@@ -35,271 +42,314 @@
 	<div class="container">
 		<div class="left">
 			<Logo />
-			<ul class="links">
+			<ul class="links desktop">
 				<li>
-					<a class="body focus-grey" href="/armies">Armies</a>
+					{@render armiesLink()}
 				</li>
-				{#if app.user}
-					<li>
-						<a class="body focus-grey" href="/army-builder">Create</a>
-					</li>
-					{#if app.user.hasRoles('admin')}
-						<li>
-							<a class="body focus-grey" href="/admin">Admin</a>
-						</li>
-					{/if}
-				{/if}
+				<li>
+					{@render armyBuilderLink()}
+				</li>
+				<li>
+					{@render adminLink()}
+				</li>
 			</ul>
 		</div>
 		<ul class="links">
-			{#if app.user}
-				<li>
-					<button
-						class="notifications-btn"
-						class:has-unseen={hasUnseenNotifications}
-						onclick={toggleNotifications}
-						aria-label="Notifications"
-						bind:this={notificationsBtn}
-					>
-						<svg width="18" height="20" viewBox="0 0 18 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-							<path
-								d="M8.93816 0.5C7.08165 0.5 5.30117 1.2375 3.98842 2.55025C2.67566 3.86301 1.93816 5.64348 1.93816 7.5V11.028C1.93831 11.1831 1.90236 11.3362 1.83316 11.475L0.116163 14.908C0.0322892 15.0757 -0.00731514 15.2621 0.00111129 15.4494C0.00953771 15.6368 0.0657151 15.8188 0.164308 15.9783C0.262901 16.1379 0.400635 16.2695 0.56443 16.3608C0.728224 16.4521 0.912641 16.5 1.10016 16.5H16.7762C16.9637 16.5 17.1481 16.4521 17.3119 16.3608C17.4757 16.2695 17.6134 16.1379 17.712 15.9783C17.8106 15.8188 17.8668 15.6368 17.8752 15.4494C17.8836 15.2621 17.844 15.0757 17.7602 14.908L16.0442 11.475C15.9746 11.3362 15.9383 11.1832 15.9382 11.028V7.5C15.9382 5.64348 15.2007 3.86301 13.8879 2.55025C12.5752 1.2375 10.7947 0.5 8.93816 0.5ZM8.93816 19.5C8.31751 19.5003 7.71204 19.3081 7.20518 18.9499C6.69833 18.5917 6.31505 18.0852 6.10816 17.5H11.7682C11.5613 18.0852 11.178 18.5917 10.6711 18.9499C10.1643 19.3081 9.55882 19.5003 8.93816 19.5Z"
-								fill="currentColor"
-							/>
-						</svg>
-						{#if hasUnseenNotifications}
-							<div class="notifications-count"></div>
-						{/if}
-					</button>
-					<NotificationsMenu bind:open={notificationsOpen} elRef={notificationsBtn} />
-				</li>
-				<li>
-					<a class="body focus-grey" href="/users/{app.user.username}" aria-label="Account">
-						<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-							<path
-								d="M10 0C4.48 0 0 4.48 0 10C0 15.52 4.48 20 10 20C15.52 20 20 15.52 20 10C20 4.48 15.52 0 10 0ZM10 4C11.93 4 13.5 5.57 13.5 7.5C13.5 9.43 11.93 11 10 11C8.07 11 6.5 9.43 6.5 7.5C6.5 5.57 8.07 4 10 4ZM10 18C7.97 18 5.57 17.18 3.86 15.12C5.61182 13.7462 7.77376 12.9996 10 12.9996C12.2262 12.9996 14.3882 13.7462 16.14 15.12C14.43 17.18 12.03 18 10 18Z"
-								fill="currentColor"
-							/>
-						</svg>
-					</a>
+			<li>
+				{@render notificationsButton()}
+			</li>
+			<li class="desktop">
+				{@render accountButton()}
+			</li>
+			{#if !app.user}
+				<li class="desktop">
+					<Button asLink href="/login">Log in</Button>
 				</li>
 			{/if}
-			<li class="control">
-				{#if app.user}
-					<Button asLink href="/api/logout">Log out</Button>
-				{:else}
-					<Button asLink href="/login">Log in</Button>
-				{/if}
+			<li class="mobile">
+				<button class="navbar-hamburger focus-grey" type="button" aria-label="Sidebar toggle" onclick={toggleSidebar}>
+					<svg class="hamburger-svg" class:active={sidebarOpen} viewBox="0 0 100 100" width="45">
+						<path class="line top" d="m 70,33 h -40 c 0,0 -8.5,-0.149796 -8.5,8.5 0,8.649796 8.5,8.5 8.5,8.5 h 20 v -20" />
+						<path class="line middle" d="m 70,50 h -40" />
+						<path class="line bottom" d="m 30,67 h 40 c 0,0 8.5,0.149796 8.5,-8.5 0,-8.649796 -8.5,-8.5 -8.5,-8.5 h -20 v 20" />
+					</svg>
+				</button>
 			</li>
 		</ul>
-		<div class="mobile-nav">
-			{#if app.user}
-				<li>
-					<button
-						class="notifications-btn"
-						class:has-unseen={hasUnseenNotifications}
-						onclick={toggleNotificationsMobile}
-						aria-label="Notifications"
-						bind:this={notificationsBtnMobile}
-					>
-						<svg width="18" height="20" viewBox="0 0 18 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-							<path
-								d="M8.93816 0.5C7.08165 0.5 5.30117 1.2375 3.98842 2.55025C2.67566 3.86301 1.93816 5.64348 1.93816 7.5V11.028C1.93831 11.1831 1.90236 11.3362 1.83316 11.475L0.116163 14.908C0.0322892 15.0757 -0.00731514 15.2621 0.00111129 15.4494C0.00953771 15.6368 0.0657151 15.8188 0.164308 15.9783C0.262901 16.1379 0.400635 16.2695 0.56443 16.3608C0.728224 16.4521 0.912641 16.5 1.10016 16.5H16.7762C16.9637 16.5 17.1481 16.4521 17.3119 16.3608C17.4757 16.2695 17.6134 16.1379 17.712 15.9783C17.8106 15.8188 17.8668 15.6368 17.8752 15.4494C17.8836 15.2621 17.844 15.0757 17.7602 14.908L16.0442 11.475C15.9746 11.3362 15.9383 11.1832 15.9382 11.028V7.5C15.9382 5.64348 15.2007 3.86301 13.8879 2.55025C12.5752 1.2375 10.7947 0.5 8.93816 0.5ZM8.93816 19.5C8.31751 19.5003 7.71204 19.3081 7.20518 18.9499C6.69833 18.5917 6.31505 18.0852 6.10816 17.5H11.7682C11.5613 18.0852 11.178 18.5917 10.6711 18.9499C10.1643 19.3081 9.55882 19.5003 8.93816 19.5Z"
-								fill="currentColor"
-							/>
-						</svg>
-						{#if hasUnseenNotifications}
-							<div class="notifications-count"></div>
-						{/if}
-					</button>
-					<NotificationsMenu bind:open={notificationsOpenMobile} elRef={notificationsBtnMobile} />
-				</li>
-			{/if}
-			<button class="navbar-hamburger focus-grey" type="button" aria-label="Sidebar toggle" onclick={toggleSidebar}>
-				<svg class="ham hamRotate ham4" class:active={sidebarOpen} viewBox="0 0 100 100" width="45">
-					<path class="line top" d="m 70,33 h -40 c 0,0 -8.5,-0.149796 -8.5,8.5 0,8.649796 8.5,8.5 8.5,8.5 h 20 v -20" />
-					<path class="line middle" d="m 70,50 h -40" />
-					<path class="line bottom" d="m 30,67 h 40 c 0,0 8.5,0.149796 8.5,-8.5 0,-8.649796 -8.5,-8.5 -8.5,-8.5 h -20 v 20" />
-				</svg>
-			</button>
-		</div>
 	</div>
 </nav>
 
-<nav class="sidebar" class:sidebar-active={sidebarOpen} tabIndex={sidebarOpen ? undefined : -1}>
+<nav class="sidebar" class:active={sidebarOpen} tabIndex={sidebarOpen ? undefined : -1}>
 	<div>
-		<ul class="sidebar-links">
-			<li class="sidebar-link">
-				<a class="focus-grey" href="/" onclick={toggleSidebar}>Home</a>
-			</li>
-			<li class="sidebar-link">
-				<a class="focus-grey" href="/armies" onclick={toggleSidebar}>Armies</a>
-			</li>
-			{#if app.user}
-				<li class="sidebar-link">
-					<a class="focus-grey" href="/army-builder" onclick={toggleSidebar}>Create</a>
+		<section class="sidebar-section">
+			<h3>General</h3>
+			<ul class="sidebar-links">
+				<li>
+					{@render homeLink(true)}
 				</li>
-			{/if}
-			{#if app.user && app.user.hasRoles('admin')}
-				<li class="sidebar-link">
-					<a class="focus-grey" href="/admin" onclick={toggleSidebar}>Admin</a>
+			</ul>
+		</section>
+		<section class="sidebar-section">
+			<h3>Armies</h3>
+			<ul class="sidebar-links">
+				<li>
+					{@render armiesLink(true)}
 				</li>
-			{/if}
-			{#if app.user}
-				<li class="sidebar-link">
-					<a class="focus-grey" href="/users/{app.user.username}" onclick={toggleSidebar}>Account</a>
+				<li>
+					{@render armyBuilderLink(true)}
 				</li>
-			{/if}
-		</ul>
-		<ul class="sidebar-links">
-			<li class="sidebar-link">
-				<a class="bmc focus-grey" href="https://www.buymeacoffee.com/clasharmies" target="_blank">
-					<svg width="14" height="21" viewBox="0 0 884 1279" fill="none" xmlns="http://www.w3.org/2000/svg">
-						<path d="M791.109 297.518L790.231 297.002L788.201 296.383C789.018 297.072 790.04 297.472 791.109 297.518V297.518Z" fill="var(--grey-400)" />
-						<path d="M803.896 388.891L802.916 389.166L803.896 388.891Z" fill="var(--grey-400)" />
-						<path
-							d="M791.484 297.377C791.359 297.361 791.237 297.332 791.118 297.29C791.111 297.371 791.111 297.453 791.118 297.534C791.252 297.516 791.379 297.462 791.484 297.377V297.377Z"
-							fill="var(--grey-400)"
-						/>
-						<path d="M791.113 297.529H791.244V297.447L791.113 297.529Z" fill="var(--grey-400)" />
-						<path
-							d="M803.111 388.726L804.591 387.883L805.142 387.573L805.641 387.04C804.702 387.444 803.846 388.016 803.111 388.726V388.726Z"
-							fill="var(--grey-400)"
-						/>
-						<path d="M793.669 299.515L792.223 298.138L791.243 297.605C791.77 298.535 792.641 299.221 793.669 299.515V299.515Z" fill="var(--grey-400)" />
-						<path
-							d="M430.019 1186.18C428.864 1186.68 427.852 1187.46 427.076 1188.45L427.988 1187.87C428.608 1187.3 429.485 1186.63 430.019 1186.18Z"
-							fill="var(--grey-400)"
-						/>
-						<path
-							d="M641.187 1144.63C641.187 1143.33 640.551 1143.57 640.705 1148.21C640.705 1147.84 640.86 1147.46 640.929 1147.1C641.015 1146.27 641.084 1145.46 641.187 1144.63Z"
-							fill="var(--grey-400)"
-						/>
-						<path
-							d="M619.284 1186.18C618.129 1186.68 617.118 1187.46 616.342 1188.45L617.254 1187.87C617.873 1187.3 618.751 1186.63 619.284 1186.18Z"
-							fill="var(--grey-400)"
-						/>
-						<path
-							d="M281.304 1196.06C280.427 1195.3 279.354 1194.8 278.207 1194.61C279.136 1195.06 280.065 1195.51 280.684 1195.85L281.304 1196.06Z"
-							fill="var(--grey-400)"
-						/>
-						<path
-							d="M247.841 1164.01C247.704 1162.66 247.288 1161.35 246.619 1160.16C247.093 1161.39 247.489 1162.66 247.806 1163.94L247.841 1164.01Z"
-							fill="var(--grey-400)"
-						/>
-						<path
-							d="M472.623 590.836C426.682 610.503 374.546 632.802 306.976 632.802C278.71 632.746 250.58 628.868 223.353 621.274L270.086 1101.08C271.74 1121.13 280.876 1139.83 295.679 1153.46C310.482 1167.09 329.87 1174.65 349.992 1174.65C349.992 1174.65 416.254 1178.09 438.365 1178.09C462.161 1178.09 533.516 1174.65 533.516 1174.65C553.636 1174.65 573.019 1167.08 587.819 1153.45C602.619 1139.82 611.752 1121.13 613.406 1101.08L663.459 570.876C641.091 563.237 618.516 558.161 593.068 558.161C549.054 558.144 513.591 573.303 472.623 590.836Z"
-							fill="var(--primary-400)"
-						/>
-						<path d="M78.6885 386.132L79.4799 386.872L79.9962 387.182C79.5987 386.787 79.1603 386.435 78.6885 386.132V386.132Z" fill="var(--grey-400)" />
-						<path
-							d="M879.567 341.849L872.53 306.352C866.215 274.503 851.882 244.409 819.19 232.898C808.711 229.215 796.821 227.633 788.786 220.01C780.751 212.388 778.376 200.55 776.518 189.572C773.076 169.423 769.842 149.257 766.314 129.143C763.269 111.85 760.86 92.4243 752.928 76.56C742.604 55.2584 721.182 42.8009 699.88 34.559C688.965 30.4844 677.826 27.0375 666.517 24.2352C613.297 10.1947 557.342 5.03277 502.591 2.09047C436.875 -1.53577 370.983 -0.443234 305.422 5.35968C256.625 9.79894 205.229 15.1674 158.858 32.0469C141.91 38.224 124.445 45.6399 111.558 58.7341C95.7448 74.8221 90.5829 99.7026 102.128 119.765C110.336 134.012 124.239 144.078 138.985 150.737C158.192 159.317 178.251 165.846 198.829 170.215C256.126 182.879 315.471 187.851 374.007 189.968C438.887 192.586 503.87 190.464 568.44 183.618C584.408 181.863 600.347 179.758 616.257 177.304C634.995 174.43 647.022 149.928 641.499 132.859C634.891 112.453 617.134 104.538 597.055 107.618C594.095 108.082 591.153 108.512 588.193 108.942L586.06 109.252C579.257 110.113 572.455 110.915 565.653 111.661C551.601 113.175 537.515 114.414 523.394 115.378C491.768 117.58 460.057 118.595 428.363 118.647C397.219 118.647 366.058 117.769 334.983 115.722C320.805 114.793 306.661 113.611 292.552 112.177C286.134 111.506 279.733 110.801 273.333 110.009L267.241 109.235L265.917 109.046L259.602 108.134C246.697 106.189 233.792 103.953 221.025 101.251C219.737 100.965 218.584 100.249 217.758 99.2193C216.932 98.1901 216.482 96.9099 216.482 95.5903C216.482 94.2706 216.932 92.9904 217.758 91.9612C218.584 90.9319 219.737 90.2152 221.025 89.9293H221.266C232.33 87.5721 243.479 85.5589 254.663 83.8038C258.392 83.2188 262.131 82.6453 265.882 82.0832H265.985C272.988 81.6186 280.026 80.3625 286.994 79.5366C347.624 73.2302 408.614 71.0801 469.538 73.1014C499.115 73.9618 528.676 75.6996 558.116 78.6935C564.448 79.3474 570.746 80.0357 577.043 80.8099C579.452 81.1025 581.878 81.4465 584.305 81.7391L589.191 82.4445C603.438 84.5667 617.61 87.1419 631.708 90.1703C652.597 94.7128 679.422 96.1925 688.713 119.077C691.673 126.338 693.015 134.408 694.649 142.03L696.731 151.752C696.786 151.926 696.826 152.105 696.852 152.285C701.773 175.227 706.7 198.169 711.632 221.111C711.994 222.806 712.002 224.557 711.657 226.255C711.312 227.954 710.621 229.562 709.626 230.982C708.632 232.401 707.355 233.6 705.877 234.504C704.398 235.408 702.75 235.997 701.033 236.236H700.895L697.884 236.649L694.908 237.044C685.478 238.272 676.038 239.419 666.586 240.486C647.968 242.608 629.322 244.443 610.648 245.992C573.539 249.077 536.356 251.102 499.098 252.066C480.114 252.57 461.135 252.806 442.162 252.771C366.643 252.712 291.189 248.322 216.173 239.625C208.051 238.662 199.93 237.629 191.808 236.58C198.106 237.389 187.231 235.96 185.029 235.651C179.867 234.928 174.705 234.177 169.543 233.397C152.216 230.798 134.993 227.598 117.7 224.793C96.7944 221.352 76.8005 223.073 57.8906 233.397C42.3685 241.891 29.8055 254.916 21.8776 270.735C13.7217 287.597 11.2956 305.956 7.64786 324.075C4.00009 342.193 -1.67805 361.688 0.472751 380.288C5.10128 420.431 33.165 453.054 73.5313 460.35C111.506 467.232 149.687 472.807 187.971 477.556C338.361 495.975 490.294 498.178 641.155 484.129C653.44 482.982 665.708 481.732 677.959 480.378C681.786 479.958 685.658 480.398 689.292 481.668C692.926 482.938 696.23 485.005 698.962 487.717C701.694 490.429 703.784 493.718 705.08 497.342C706.377 500.967 706.846 504.836 706.453 508.665L702.633 545.797C694.936 620.828 687.239 695.854 679.542 770.874C671.513 849.657 663.431 928.434 655.298 1007.2C653.004 1029.39 650.71 1051.57 648.416 1073.74C646.213 1095.58 645.904 1118.1 641.757 1139.68C635.218 1173.61 612.248 1194.45 578.73 1202.07C548.022 1209.06 516.652 1212.73 485.161 1213.01C450.249 1213.2 415.355 1211.65 380.443 1211.84C343.173 1212.05 297.525 1208.61 268.756 1180.87C243.479 1156.51 239.986 1118.36 236.545 1085.37C231.957 1041.7 227.409 998.039 222.9 954.381L197.607 711.615L181.244 554.538C180.968 551.94 180.693 549.376 180.435 546.76C178.473 528.023 165.207 509.681 144.301 510.627C126.407 511.418 106.069 526.629 108.168 546.76L120.298 663.214L145.385 904.104C152.532 972.528 159.661 1040.96 166.773 1109.41C168.15 1122.52 169.44 1135.67 170.885 1148.78C178.749 1220.43 233.465 1259.04 301.224 1269.91C340.799 1276.28 381.337 1277.59 421.497 1278.24C472.979 1279.07 524.977 1281.05 575.615 1271.72C650.653 1257.95 706.952 1207.85 714.987 1130.13C717.282 1107.69 719.576 1085.25 721.87 1062.8C729.498 988.559 737.115 914.313 744.72 840.061L769.601 597.451L781.009 486.263C781.577 480.749 783.905 475.565 787.649 471.478C791.392 467.391 796.352 464.617 801.794 463.567C823.25 459.386 843.761 452.245 859.023 435.916C883.318 409.918 888.153 376.021 879.567 341.849ZM72.4301 365.835C72.757 365.68 72.1548 368.484 71.8967 369.792C71.8451 367.813 71.9483 366.058 72.4301 365.835ZM74.5121 381.94C74.6842 381.819 75.2003 382.508 75.7337 383.334C74.925 382.576 74.4089 382.009 74.4949 381.94H74.5121ZM76.5597 384.641C77.2996 385.897 77.6953 386.689 76.5597 384.641V384.641ZM80.672 387.979H80.7752C80.7752 388.1 80.9645 388.22 81.0333 388.341C80.9192 388.208 80.7925 388.087 80.6548 387.979H80.672ZM800.796 382.989C793.088 390.319 781.473 393.726 769.996 395.43C641.292 414.529 510.713 424.199 380.597 419.932C287.476 416.749 195.336 406.407 103.144 393.382C94.1102 392.109 84.3197 390.457 78.1082 383.798C66.4078 371.237 72.1548 345.944 75.2003 330.768C77.9878 316.865 83.3218 298.334 99.8572 296.355C125.667 293.327 155.64 304.218 181.175 308.09C211.917 312.781 242.774 316.538 273.745 319.36C405.925 331.405 540.325 329.529 671.92 311.91C695.905 308.686 719.805 304.941 743.619 300.674C764.835 296.871 788.356 289.731 801.175 311.703C809.967 326.673 811.137 346.701 809.778 363.615C809.359 370.984 806.139 377.915 800.779 382.989H800.796Z"
-							fill="var(--grey-400)"
-						/>
-					</svg>
-					Buy me a coffee
-				</a>
+			</ul>
+		</section>
+		<section class="sidebar-section">
+			<h3>Account</h3>
+			<ul class="sidebar-links">
+				<li>
+					{@render accountLink(true)}
+				</li>
+				<li>
+					{@render adminLink(true)}
+				</li>
+				<li>
+					{@render logoutLink(true)}
+				</li>
+				<li>
+					{@render loginLink(true)}
+				</li>
+			</ul>
+		</section>
+	</div>
+	<ul class="sidebar-buttons">
+		<li>
+			<BMCButton />
+		</li>
+	</ul>
+</nav>
+<button class="sidebar-overlay" class:active={sidebarOpen} onclick={toggleSidebar} tabIndex={sidebarOpen ? undefined : -1} aria-label="Close sidebar"></button>
+
+<NotificationsMenu bind:open={notificationsOpen} elRef={notificationsBtn} />
+
+<Menu bind:open={accountMenuOpen} elRef={accountBtn} placementOffset={12} --menu-width="175px">
+	<div class="ca-menu">
+		<ul class="ca-menu-list">
+			<li>
+				{@render accountLink(true)}
 			</li>
-			<li class="sidebar-link">
-				{#if app.user}
-					<Button asLink href="/api/logout" style="width: 100%;" onClick={toggleSidebar}>Log out</Button>
-				{:else}
-					<Button asLink href="/login" style="width: 100%;" onClick={toggleSidebar}>Log in</Button>
-				{/if}
+			<li>
+				{@render logoutLink(true)}
 			</li>
 		</ul>
 	</div>
-</nav>
-<button
-	class="sidebar-overlay"
-	class:sidebar-overlay-active={sidebarOpen}
-	onclick={toggleSidebar}
-	tabIndex={sidebarOpen ? undefined : -1}
-	aria-label="Close sidebar"
-></button>
+</Menu>
+
+{#snippet armiesLink(mobile = false)}
+	<a class="body focus-grey link link-{mobile ? 'mobile' : 'desktop'}" href="/armies" onclick={closeSidebar}>
+		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
+			<path
+				fill-rule="evenodd"
+				clip-rule="evenodd"
+				d="M15.0886 3.42858e-08C15.3303 3.42858e-08 15.5621 0.0960204 15.7331 0.266937C15.904 0.437854 16 0.669667 16 0.91138V6.06706C16 6.20955 15.9667 6.35006 15.9026 6.47732C15.8385 6.60457 15.7454 6.71503 15.6309 6.79981L9.07078 11.6484L9.93294 12.5114C10.1038 12.6823 10.1998 12.9141 10.1998 13.1558C10.1998 13.3974 10.1038 13.6292 9.93294 13.8001L8.64425 15.0888C8.50898 15.224 8.33463 15.3131 8.14588 15.3437C7.95713 15.3743 7.76354 15.3448 7.59251 15.2592L5.60206 14.2649L4.13292 15.7332C3.96201 15.904 3.73023 16 3.48857 16C3.2469 16 3.01513 15.904 2.84422 15.7332L0.26684 13.1558C0.0959825 12.9849 0 12.7531 0 12.5114C0 12.2698 0.0959825 12.038 0.26684 11.8671L1.73507 10.3979L0.740758 8.40748C0.655245 8.23646 0.62569 8.04287 0.656276 7.85412C0.686862 7.66537 0.77604 7.49102 0.911186 7.35575L2.19988 6.06706C2.37079 5.8962 2.60256 5.80022 2.84422 5.80022C3.08589 5.80022 3.31766 5.8962 3.48857 6.06706L4.35165 6.92922L9.20019 0.369109C9.28497 0.254587 9.39543 0.161538 9.52268 0.0974355C9.64994 0.0333326 9.79045 -3.90467e-05 9.93294 3.42858e-08H15.0886Z"
+				fill="currentColor"
+			/>
+		</svg>
+		Armies
+	</a>
+{/snippet}
+
+{#snippet armyBuilderLink(mobile = false)}
+	{#if app.user}
+		<a class="body focus-grey link link-{mobile ? 'mobile' : 'desktop'}" href="/create" onclick={closeSidebar}>
+			<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
+				<path
+					d="M4.2261 3.99116C4.00805 4.07567 3.89338 4.15679 3.8595 4.18975L2.63114 2.99485L5.00881 0.681946C5.97568 -0.258596 7.66098 -0.245075 8.77641 0.83997L9.78325 1.81938C9.9477 1.66954 10.1656 1.58772 10.3909 1.59119C10.6162 1.59466 10.8313 1.68315 10.9908 1.83798L14.5568 5.30691C14.7161 5.46195 14.8072 5.67113 14.811 5.89029C14.8147 6.10945 14.7307 6.32145 14.5768 6.48153L15.7452 7.61897C15.826 7.69745 15.8901 7.79065 15.9338 7.89324C15.9775 7.99582 16 8.10579 16 8.21684C16 8.32789 15.9775 8.43786 15.9338 8.54044C15.8901 8.64303 15.826 8.73623 15.7452 8.81471L13.9626 10.5488C13.7997 10.7072 13.5788 10.7962 13.3484 10.7962C13.1181 10.7962 12.8972 10.7072 12.7343 10.5488L11.565 9.41132C11.4104 9.55211 11.2084 9.63316 10.9967 9.63923C10.7851 9.6453 10.5785 9.57597 10.4157 9.44428L6.73668 5.86718C6.60117 5.70866 6.52991 5.50742 6.53631 5.30135C6.54271 5.09529 6.62633 4.8986 6.77142 4.74833L6.03389 4.03173C5.87752 3.87962 5.50745 3.75962 4.94105 3.82046C4.69588 3.84717 4.45616 3.90454 4.2261 3.99116ZM5.54567 7.09673L0.254347 12.2448C0.0914889 12.4032 0 12.6181 0 12.8422C0 13.0663 0.0914889 13.2812 0.254347 13.4397L2.63114 15.7526C2.79405 15.911 3.01497 16 3.24532 16C3.47567 16 3.69659 15.911 3.8595 15.7526L9.15083 10.6054L5.54567 7.09842V7.09673Z"
+					fill="currentColor"
+				/>
+			</svg>
+			Army Builder
+		</a>
+	{/if}
+{/snippet}
+
+{#snippet adminLink(mobile = false)}
+	{#if app.user && app.user.hasRoles('admin')}
+		<a class="body focus-grey link link-{mobile ? 'mobile' : 'desktop'}" href="/admin" onclick={closeSidebar}>
+			<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 13 16">
+				<path
+					d="M6.5 8H11.5556C11.1728 10.9891 9.18667 13.6582 6.5 14.4873V8ZM6.5 8H1.44444V3.85455L6.5 1.59273M6.5 0L0 2.90909V7.27273C0 11.3091 2.77333 15.0764 6.5 16C10.2267 15.0764 13 11.3091 13 7.27273V2.90909L6.5 0Z"
+					fill="currentColor"
+				/>
+			</svg>
+			Admin
+		</a>
+	{/if}
+{/snippet}
+
+{#snippet accountLink(mobile = false)}
+	{#if app.user}
+		<a class="body focus-grey link link-{mobile ? 'mobile' : 'desktop'}" href="/users/{app.user.username}" aria-label="Account" onclick={closeSidebar}>
+			{@render accountIcon(mobile)}
+			Profile
+		</a>
+	{/if}
+{/snippet}
+
+{#snippet logoutLink(mobile = false)}
+	{#if app.user}
+		<a class="body focus-grey link link-{mobile ? 'mobile' : 'desktop'}" href="/api/logout" onclick={closeSidebar}>
+			{@render authIcon()}
+			Log out
+		</a>
+	{/if}
+{/snippet}
+
+{#snippet loginLink(mobile = false)}
+	{#if !app.user}
+		<a class="body focus-grey link link-{mobile ? 'mobile' : 'desktop'}" href="/login" onclick={closeSidebar}>
+			{@render authIcon()}
+			Log in
+		</a>
+	{/if}
+{/snippet}
+
+{#snippet homeLink(mobile = false)}
+	<a class="body focus-grey link link-{mobile ? 'mobile' : 'desktop'}" href="/" onclick={closeSidebar}>
+		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
+			<path
+				fill-rule="evenodd"
+				clip-rule="evenodd"
+				d="M7.3707 0.260258C7.53762 0.0936147 7.76398 0 8 0C8.23602 0 8.46238 0.0936147 8.6293 0.260258L13.9699 5.59365L15.7501 7.37145C15.9123 7.5391 16.002 7.76364 16 7.99671C15.9979 8.22977 15.9043 8.45272 15.7393 8.61753C15.5743 8.78234 15.351 8.87582 15.1176 8.87785C14.8842 8.87987 14.6594 8.79028 14.4915 8.62836L14.2307 8.36791V14.2222C14.2307 14.6937 14.0432 15.1459 13.7093 15.4793C13.3755 15.8127 12.9227 16 12.4505 16H9.78021C9.54414 16 9.31774 15.9063 9.15081 15.7396C8.98388 15.5729 8.8901 15.3469 8.8901 15.1111V12.4444H7.1099V15.1111C7.1099 15.3469 7.01612 15.5729 6.84919 15.7396C6.68226 15.9063 6.45586 16 6.21979 16H3.54948C3.07734 16 2.62454 15.8127 2.29068 15.4793C1.95683 15.1459 1.76927 14.6937 1.76927 14.2222V8.36791L1.50847 8.62836C1.34059 8.79028 1.11575 8.87987 0.88237 8.87785C0.648987 8.87582 0.425738 8.78234 0.260706 8.61753C0.095673 8.45272 0.00206168 8.22977 3.36483e-05 7.99671C-0.00199438 7.76364 0.0877231 7.5391 0.249863 7.37145L2.03007 5.59365L7.3707 0.260258Z"
+				fill="currentColor"
+			/>
+		</svg>
+		Home
+	</a>
+{/snippet}
+
+{#snippet accountIcon(mobile = false)}
+	<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" id="account-{mobile ? 'mobile' : 'desktop'}">
+		<path
+			d="M12 0C5.376 0 0 5.376 0 12C0 18.624 5.376 24 12 24C18.624 24 24 18.624 24 12C24 5.376 18.624 0 12 0ZM12 4.8C14.316 4.8 16.2 6.684 16.2 9C16.2 11.316 14.316 13.2 12 13.2C9.684 13.2 7.8 11.316 7.8 9C7.8 6.684 9.684 4.8 12 4.8ZM12 21.6C9.564 21.6 6.684 20.616 4.632 18.144C6.73419 16.4955 9.32851 15.5995 12 15.5995C14.6715 15.5995 17.2658 16.4955 19.368 18.144C17.316 20.616 14.436 21.6 12 21.6Z"
+			fill="currentColor"
+		/>
+	</svg>
+{/snippet}
+
+{#snippet authIcon()}
+	<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
+		<path
+			d="M1.81818 16C1.31818 16 0.890303 15.8261 0.534545 15.4782C0.178788 15.1304 0.000606061 14.7117 0 14.2222V1.77778C0 1.28889 0.178182 0.870518 0.534545 0.522666C0.890909 0.174815 1.31879 0.000592592 1.81818 0H7.27273C7.5303 0 7.74636 0.0853334 7.92091 0.256C8.09545 0.426666 8.18242 0.637629 8.18182 0.888888C8.18121 1.14015 8.09394 1.35141 7.92 1.52267C7.74606 1.69392 7.5303 1.77896 7.27273 1.77778H1.81818V14.2222H7.27273C7.5303 14.2222 7.74636 14.3075 7.92091 14.4782C8.09545 14.6489 8.18242 14.8598 8.18182 15.1111C8.18121 15.3624 8.09394 15.5736 7.92 15.7449C7.74606 15.9161 7.5303 16.0012 7.27273 16H1.81818ZM12.8864 8.88888H6.36364C6.10606 8.88888 5.8903 8.80355 5.71636 8.63288C5.54242 8.46222 5.45515 8.25125 5.45455 7.99999C5.45394 7.74874 5.54121 7.53777 5.71636 7.36711C5.89152 7.19644 6.10727 7.11111 6.36364 7.11111H12.8864L11.1818 5.44444C11.0152 5.28148 10.9318 5.08148 10.9318 4.84444C10.9318 4.6074 11.0152 4.4 11.1818 4.22222C11.3485 4.04444 11.5606 3.9517 11.8182 3.944C12.0758 3.93629 12.2955 4.02163 12.4773 4.2L15.7273 7.37777C15.9091 7.55555 16 7.76296 16 7.99999C16 8.23703 15.9091 8.44444 15.7273 8.62222L12.4773 11.8C12.2955 11.9778 12.0797 12.0631 11.83 12.056C11.5803 12.0489 11.3642 11.9561 11.1818 11.7778C11.0152 11.6 10.9358 11.389 10.9436 11.1449C10.9515 10.9007 11.0385 10.6969 11.2045 10.5333L12.8864 8.88888Z"
+			fill="currentColor"
+		/>
+	</svg>
+{/snippet}
+
+{#snippet notificationsButton()}
+	{#if app.user}
+		<button
+			class="notifications-btn link link-desktop"
+			class:has-unseen={hasUnseenNotifications}
+			onclick={toggleNotifications}
+			aria-label="Notifications"
+			bind:this={notificationsBtn}
+		>
+			<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18 20" id="notifications">
+				<path
+					d="M8.93816 0.5C7.08165 0.5 5.30117 1.2375 3.98842 2.55025C2.67566 3.86301 1.93816 5.64348 1.93816 7.5V11.028C1.93831 11.1831 1.90236 11.3362 1.83316 11.475L0.116163 14.908C0.0322892 15.0757 -0.00731514 15.2621 0.00111129 15.4494C0.00953771 15.6368 0.0657151 15.8188 0.164308 15.9783C0.262901 16.1379 0.400635 16.2695 0.56443 16.3608C0.728224 16.4521 0.912641 16.5 1.10016 16.5H16.7762C16.9637 16.5 17.1481 16.4521 17.3119 16.3608C17.4757 16.2695 17.6134 16.1379 17.712 15.9783C17.8106 15.8188 17.8668 15.6368 17.8752 15.4494C17.8836 15.2621 17.844 15.0757 17.7602 14.908L16.0442 11.475C15.9746 11.3362 15.9383 11.1832 15.9382 11.028V7.5C15.9382 5.64348 15.2007 3.86301 13.8879 2.55025C12.5752 1.2375 10.7947 0.5 8.93816 0.5ZM8.93816 19.5C8.31751 19.5003 7.71204 19.3081 7.20518 18.9499C6.69833 18.5917 6.31505 18.0852 6.10816 17.5H11.7682C11.5613 18.0852 11.178 18.5917 10.6711 18.9499C10.1643 19.3081 9.55882 19.5003 8.93816 19.5Z"
+					fill="currentColor"
+				/>
+			</svg>
+			{#if hasUnseenNotifications}
+				<div class="notifications-count"></div>
+			{/if}
+		</button>
+	{/if}
+{/snippet}
+
+{#snippet accountButton()}
+	{#if app.user}
+		<button class="account-btn link link-desktop" onclick={toggleAccountMenu} aria-label="Account" bind:this={accountBtn}>
+			{@render accountIcon()}
+		</button>
+	{/if}
+{/snippet}
 
 <style>
 	nav {
+		display: flex;
+		align-items: center;
 		background-color: var(--grey-800);
 		padding: 16px var(--side-padding);
-	}
+		height: 76px;
 
-	nav .container {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		gap: 1em;
-	}
+		& .container {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			gap: 1em;
+		}
 
-	nav .left {
-		display: flex;
-		align-items: center;
-		gap: 24px;
+		& .left {
+			display: flex;
+			align-items: center;
+			gap: 24px;
+		}
+
+		@media (max-width: 425px) {
+			height: 70px;
+		}
 	}
 
 	.links {
 		display: flex;
 		align-items: center;
+		gap: 24px;
 
-		& li {
-			&:not(:last-child) {
-				margin-right: 16px;
-			}
-
-			&.control:not(:last-child) {
-				margin-right: 8px;
-			}
-
-			& a {
-				display: block;
-				transition: color 0.15s ease-in-out;
-				color: var(--grey-400);
-
-				&:hover {
-					color: var(--grey-300);
-				}
-			}
-
-			& button,
-			a {
-				padding: 2px;
-			}
+		@media (max-width: 850px) {
+			gap: 16px;
 		}
 	}
 
-	.notifications-btn {
+	.link {
+		display: inline-flex;
+		align-items: center;
+		white-space: nowrap;
 		position: relative;
+		gap: 6px;
+		transition: color 0.15s ease-in-out;
 		color: var(--grey-400);
-	}
-
-	.notifications-btn.has-unseen {
-		color: var(--grey-100);
-	}
-
-	.notifications-count {
-		display: none;
-		position: absolute;
-		background-color: var(--primary-600);
-		border: 2px solid var(--grey-700);
-		border-radius: 50%;
 		padding: 2px;
-		height: 12px;
-		width: 12px;
-		right: -3px;
-		top: -3px;
-	}
 
-	.has-unseen .notifications-count {
-		display: block;
-	}
+		&:hover {
+			color: var(--grey-100);
+		}
 
-	.notifications-btn {
-		display: block;
-	}
+		& svg:not(.hamburger-svg) {
+			height: 16px;
+			width: auto;
 
-	/* Hamburger */
-	.mobile-nav {
-		display: none;
+			&#notifications {
+				height: 20px;
+			}
+
+			&#account-desktop {
+				height: 22px;
+			}
+
+			@media (max-width: 850px) {
+				&#notifications {
+					height: 18px;
+				}
+			}
+		}
+
+		@media (max-width: 850px) {
+			&.link-desktop svg:not(.hamburger-svg) {
+				height: 14px;
+
+				&#account-desktop {
+					height: 20px;
+				}
+			}
+		}
 	}
 
 	.navbar-hamburger {
@@ -309,57 +359,50 @@
 		width: 1.875rem;
 		height: 1.875rem;
 		z-index: 4;
-	}
 
-	.ham {
-		cursor: pointer;
-		-webkit-tap-highlight-color: transparent;
-		transition: transform 400ms;
-		-moz-user-select: none;
-		-webkit-user-select: none;
-		-ms-user-select: none;
-		user-select: none;
-		position: relative;
-		bottom: 8px;
-		right: 8px;
-	}
+		& .hamburger-svg {
+			cursor: pointer;
+			-webkit-tap-highlight-color: transparent;
+			transition: transform 400ms;
+			-moz-user-select: none;
+			-webkit-user-select: none;
+			-ms-user-select: none;
+			user-select: none;
+			position: relative;
+			bottom: 8px;
+			right: 8px;
 
-	.hamRotate.active {
-		transform: rotate(45deg);
-	}
+			&.active {
+				transform: rotate(45deg);
+			}
 
-	.line {
-		fill: none;
-		transition:
-			stroke-dasharray 400ms,
-			stroke-dashoffset 400ms;
-		stroke: var(--grey-100);
-		stroke-width: 5.5;
-		stroke-linecap: round;
-	}
+			& .line {
+				fill: none;
+				transition:
+					stroke-dasharray 400ms,
+					stroke-dashoffset 400ms;
+				stroke: var(--grey-100);
+				stroke-width: 5.5;
+				stroke-linecap: round;
+			}
 
-	.ham4 .top {
-		stroke-dasharray: 40 121;
-	}
+			& .top {
+				stroke-dasharray: 40 121;
+			}
 
-	.ham4 .bottom {
-		stroke-dasharray: 40 121;
-	}
+			& .bottom {
+				stroke-dasharray: 40 121;
+			}
 
-	.ham4.active .top {
-		stroke-dashoffset: -68px;
-	}
+			&.active .top {
+				stroke-dashoffset: -68px;
+			}
 
-	.ham4.active .bottom {
-		stroke-dashoffset: -68px;
+			&.active .bottom {
+				stroke-dashoffset: -68px;
+			}
+		}
 	}
-
-	:global(body.sidebar-active) {
-		position: fixed;
-		height: 100vh;
-	}
-
-	/* Sidebar */
 
 	.sidebar-overlay {
 		position: fixed;
@@ -368,117 +411,110 @@
 		backdrop-filter: blur(10px);
 		background: hsla(0, 0%, 0%, 0.9);
 		width: 100%;
-		height: 100%;
+		height: 100dvh;
 		opacity: 0;
 		z-index: 1;
 		top: 0;
 		left: 0;
+
+		&.active {
+			pointer-events: all;
+			opacity: 1;
+		}
 	}
 
 	.sidebar {
+		--side-padding: 24px;
+
 		display: flex;
+		flex-flow: column nowrap;
+		justify-content: space-between;
 		transition: transform 0.3s ease-in-out;
 		position: fixed;
 		background: var(--grey-700);
 		right: 0;
 		top: 0;
-		height: 100%;
+		height: 100dvh;
 		width: 275px;
 		transform: translateX(275px);
-		padding: 0 48px;
+		padding: 68px 0 var(--side-padding) 0;
 		z-index: 2;
+
+		&.active {
+			transform: translateX(0);
+		}
+
+		& > * {
+			width: 100%;
+		}
+
+		& .sidebar-section h3 {
+			padding: 12px var(--side-padding);
+			background-color: var(--grey-800);
+			font-weight: 500;
+		}
+
+		& .sidebar-links {
+			text-align: right;
+			padding: 6px 0;
+
+			.link {
+				padding: 10px var(--side-padding);
+				width: 100%;
+			}
+		}
+
+		& .sidebar-buttons {
+			padding: 0 var(--side-padding);
+
+			&:not(:first-child) {
+				margin-top: 16px;
+			}
+		}
 	}
 
-	.sidebar-active {
-		transform: translateX(0);
-	}
-
-	.sidebar-overlay-active {
-		pointer-events: all;
-		opacity: 1;
-	}
-
-	.sidebar > div {
-		display: none;
-		padding: 65px 0 32px 0;
-	}
-
-	.sidebar-links {
-		text-align: right;
-	}
-
-	.sidebar-link {
-		display: flex;
-		justify-content: flex-end;
-	}
-
-	.sidebar-link:not(:last-child) {
-		padding-bottom: 16px;
-	}
-	.sidebar-link:has(:global(> .bmc)) {
-		padding-bottom: 12px;
-	}
-
-	.sidebar-link a:not(.bmc) {
+	.notifications-btn,
+	.account-btn {
 		position: relative;
-		transition: opacity 0.2s ease-in-out;
-		color: var(--grey-100);
-		opacity: 0.5;
 	}
 
-	.sidebar-link a:hover {
-		opacity: 1;
+	.notifications-btn {
+		display: block;
+
+		& .notifications-count {
+			display: none;
+			position: absolute;
+			background-color: var(--primary-600);
+			border: 2px solid var(--grey-700);
+			border-radius: 50%;
+			padding: 2px;
+			height: 12px;
+			width: 12px;
+			right: -3px;
+			top: -3px;
+		}
+
+		&.has-unseen {
+			color: var(--grey-100);
+
+			& .notifications-count {
+				display: block;
+			}
+		}
 	}
 
-	.bmc {
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		font-weight: 500;
-		gap: 0.5em;
-		border: 1px solid var(--grey-400);
-		color: var(--grey-400);
-		opacity: 1;
-		padding: 0.5em 0.75em;
-		width: 100%;
-		border-radius: 6px;
-	}
+	.desktop {
+		display: inherit;
 
-	@media (max-width: 815px) {
-		.links {
+		@media (max-width: 700px) {
 			display: none;
 		}
-		.mobile-nav {
-			display: flex;
-			align-items: center;
-			gap: 10px;
-		}
-		.sidebar-active > div {
-			display: flex;
-			flex-flow: column nowrap;
-			justify-content: space-between;
-			flex: 1 0 0px;
-		}
 	}
+	.mobile {
+		display: none;
 
-	@media (max-width: 500px) {
-		.sidebar {
-			padding: 0 32px;
-		}
-	}
-
-	@media (max-width: 425px) {
-		nav {
-			padding: 20px var(--side-padding);
-		}
-
-		.ham {
-			width: 40px;
-		}
-
-		.navbar-hamburger {
-			width: 1.45rem;
-			height: 1.45rem;
+		@media (max-width: 700px) {
+			display: inherit;
 		}
 	}
 </style>

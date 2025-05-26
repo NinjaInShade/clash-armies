@@ -91,6 +91,7 @@
 	header {
 		background: repeat-x 0 25% url('/clash/ui/stones-background.png');
 		padding: 0 var(--side-padding);
+		overflow: hidden;
 	}
 
 	header .container {

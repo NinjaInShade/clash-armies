@@ -42,3 +42,41 @@
 .picker-list li button.visually-disabled {
 	filter: grayscale(1);
 }
+
+.ca-menu {
+	background-color: var(--grey-850);
+	border: 1px dashed var(--grey-500);
+	box-shadow: 0 10px 25px 5px hsla(0, 0%, 0%, 0.25);
+	border-radius: 4px;
+
+	& .ca-menu-list {
+		display: flex;
+		flex-flow: column nowrap;
+		padding: 6px 0;
+
+		& a,
+		& button {
+			display: inline-flex;
+			align-items: center;
+			white-space: nowrap;
+			position: relative;
+			transition: color 0.15s ease-in-out;
+			color: var(--grey-400);
+			font-size: var(--fs-sm);
+			line-height: var(--fs-sm-lh);
+			font-weight: 500;
+			padding: 7px 16px;
+			width: 100%;
+			gap: 6px;
+
+			&:hover {
+				color: var(--grey-100);
+			}
+
+			& svg {
+				height: 16px;
+				width: auto;
+			}
+		}
+	}
+}

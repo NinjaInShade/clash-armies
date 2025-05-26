@@ -1,5 +1,15 @@
 <script lang="ts">
 	import { version } from '$app/environment';
+
+	type Props = {
+		/**
+		 * Show version badge.
+		 * Clicking on it goes to the changelog page
+		 * @default false
+		 */
+		showVersion?: boolean;
+	};
+	const { showVersion = false }: Props = $props();
 </script>
 
 <div class="logo-container">
@@ -7,7 +17,9 @@
 		<img src="/clash/ui/swords.png" alt="Clash of clans overlapping swords" />
 		Clash <span>Armies</span>
 	</a>
-	<a href="/changelog" class="version"><span>v</span>{version}</a>
+	{#if showVersion}
+		<a href="/changelog" class="version"><span>v</span>{version}</a>
+	{/if}
 </div>
 
 <style>

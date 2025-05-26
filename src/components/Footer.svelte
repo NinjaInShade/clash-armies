@@ -10,7 +10,7 @@
 	<div class="container">
 		<div class="top">
 			<div class="left">
-				<Logo />
+				<Logo showVersion />
 				<p class="desc">The number one tool to find, create, learn and share the best armies in clash of clans!</p>
 				<ul class="social-links">
 					<li>
@@ -71,7 +71,7 @@
 					</li>
 					{#if app.user}
 						<li>
-							<a href="/army-builder">Create</a>
+							<a href="/army-builder">Army builder</a>
 						</li>
 					{/if}
 					{#if app.user && app.user.hasRoles('admin')}

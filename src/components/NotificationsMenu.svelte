@@ -51,9 +51,9 @@
 	}
 </script>
 
-<Menu bind:open {elRef}>
+<Menu bind:open {elRef} placementOffset={12} --menu-width="350px">
 	<FocusTrap>
-		<div class="menu-container">
+		<div class="ca-menu menu-container">
 			<header>
 				<h3>Notifications {notifications.length ? `(${notifications.length})` : ''}</h3>
 				{#if notifications.filter((notif) => !notif.seen).length > 0}
@@ -89,14 +89,8 @@
 
 <style>
 	.menu-container {
-		background-color: var(--grey-900);
-		border: 1px dashed var(--grey-500);
-		box-shadow: 0 7px 100px 0 hsla(0, 0%, 0%, 0.25);
-		border-radius: 6px;
 		max-height: 90dvh; /** TODO: hack... */
 		overflow-y: auto;
-		max-width: 350px;
-		width: 100%;
 	}
 
 	.menu-container > *:last-child {
@@ -107,7 +101,6 @@
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
-		background-color: var(--grey-900);
 		border-bottom: 1px dashed var(--grey-500);
 		padding: 12px 16px;
 		position: sticky;

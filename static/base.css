@@ -116,20 +116,23 @@ html,
 body {
 	width: 100%;
 	min-height: 100vh;
-	overflow-x: hidden;
 }
 
 html {
 	background-color: var(--grey-600);
-}
 
-html.hide-overflow {
-	overflow: hidden;
+	&.hide-overflow {
+		overflow: hidden;
+	}
 }
 
 body {
 	display: flex;
 	flex-flow: column;
+
+	&.sidebar-active {
+		position: fixed;
+	}
 }
 
 svg {
@@ -374,6 +377,6 @@ button span {
 		--h1: 38px;
 		--h1-lh: 43px;
 
-		--side-padding: 16px;
+		--side-padding: 18px;
 	}
 }

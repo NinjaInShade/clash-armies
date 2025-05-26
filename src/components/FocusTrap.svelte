@@ -109,6 +109,12 @@
 
 <svelte:window onkeydown={onKeyDown} />
 
-<div bind:this={trapContainer}>
+<div class="focus-trap" bind:this={trapContainer}>
 	{@render children()}
 </div>
+
+<style>
+	.focus-trap {
+		display: contents;
+	}
+</style>

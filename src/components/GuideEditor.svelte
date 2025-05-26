@@ -341,9 +341,9 @@
 					/>
 				</svg>
 			</button>
-			<Menu bind:open={linkMenuOpen} elRef={linkRef} onClose={setLink}>
+			<Menu bind:open={linkMenuOpen} elRef={linkRef} onClose={setLink} placementOffset={6}>
 				<FocusTrap>
-					<div class="menu">
+					<div class="ca-menu">
 						<Input bind:value={linkInput} onkeydown={(ev) => ev.key === 'Enter' && setLink()} placeholder="https://example.com" />
 						<ActionButton onclick={setLink} theme="grey">Set</ActionButton>
 					</div>
@@ -512,19 +512,16 @@
 		color: var(--error-400);
 	}
 
-	.menu {
-		box-shadow: 2px 8px 10px 6px hsla(0, 0%, 0%, 0.4);
-		background-color: var(--grey-800);
-		border: 1px solid var(--grey-550);
-		border-radius: 6px;
+	.ca-menu {
 		display: flex;
 		padding: 0.5em;
 		font-size: 0.65em;
 		gap: 6px;
-	}
-	.menu :global(.input) {
-		font-size: 14px;
-		line-height: 14px;
-		padding: 4px 10px;
+
+		:global(.input) {
+			font-size: 14px;
+			line-height: 14px;
+			padding: 4px 10px;
+		}
 	}
 </style>
