@@ -41,7 +41,7 @@
 				</li>
 				{#if app.user}
 					<li>
-						<a class="body focus-grey" href="/create">Create</a>
+						<a class="body focus-grey" href="/army-builder">Create</a>
 					</li>
 					{#if app.user.hasRoles('admin')}
 						<li>
@@ -137,7 +137,7 @@
 			</li>
 			{#if app.user}
 				<li class="sidebar-link">
-					<a class="focus-grey" href="/create" onclick={toggleSidebar}>Create</a>
+					<a class="focus-grey" href="/army-builder" onclick={toggleSidebar}>Create</a>
 				</li>
 			{/if}
 			{#if app.user && app.user.hasRoles('admin')}

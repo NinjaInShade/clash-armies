@@ -57,7 +57,7 @@
 		<p class="body">The number one tool to find, create, learn and share the best armies in Clash of Clans</p>
 		<div class="buttons">
 			<C.Button asLink href="/armies">Find army</C.Button>
-			<C.Button asLink href="/create">Create army</C.Button>
+			<C.Button asLink href="/army-builder">Create army</C.Button>
 		</div>
 
 		<img class="graphic" src="/clash/ui/header-barbarian.png" alt="Angry clash of clans barbarian" />

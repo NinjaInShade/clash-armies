@@ -6,9 +6,9 @@
 	<!-- Note: title tag lives within the EditArmy component -->
 	<meta
 		name="description"
-		content="Build your own Clash of Clans army with our simple and intuitive builder. Choose troops, spells, heroes, and write a guide to share with the community— or just plan your perfect attack."
+		content="Build your own Clash of Clans army with our simple and intuitive builder. Choose troops, spells, heroes, and write a guide to share with the community - or just plan your perfect attack."
 	/>
-	<link rel="canonical" href="https://clasharmies.com/create" />
+	<link rel="canonical" href="https://clasharmies.com/army-builder" />
 </svelte:head>
 
 <section class="army">

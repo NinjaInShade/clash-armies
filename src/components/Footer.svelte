@@ -71,7 +71,7 @@
 					</li>
 					{#if app.user}
 						<li>
-							<a href="/create">Create</a>
+							<a href="/army-builder">Create</a>
 						</li>
 					{/if}
 					{#if app.user && app.user.hasRoles('admin')}

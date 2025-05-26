@@ -18,7 +18,7 @@
 <div class="header">
 	<h2>Created armies</h2>
 	{#if currentUser === username && armies.length > 0}
-		<C.ActionButton asLink href="/create" theme="success">Create army</C.ActionButton>
+		<C.ActionButton asLink href="/army-builder" theme="success">Create army</C.ActionButton>
 	{/if}
 </div>
 {#if armies.length}
@@ -38,7 +38,7 @@
 			{/if}
 		</h2>
 		{#if currentUser === username}
-			<C.Button asLink href="/create">Create army</C.Button>
+			<C.Button asLink href="/army-builder">Create army</C.Button>
 		{/if}
 	</div>
 {/if}
