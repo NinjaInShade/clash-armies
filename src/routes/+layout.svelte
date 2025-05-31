@@ -1,11 +1,12 @@
 <script lang="ts">
 	import { fade } from 'svelte/transition';
 	import { sineInOut } from 'svelte/easing';
-	import { setContext, type Snippet } from 'svelte';
+	import { onMount, setContext, tick, type Snippet } from 'svelte';
 	import type { LayoutData } from './$types';
 	import { createAppState } from '$client/state.svelte';
-	import { invalidateAll } from '$app/navigation';
+	import { invalidateAll, goto } from '$app/navigation';
 	import type { AppState, ArmyNotification } from '$types';
+	import { page } from '$app/state';
 	import C from '$components';
 
 	type Props = {
@@ -13,6 +14,19 @@
 		children: Snippet;
 	};
 	let { data, children }: Props = $props();
+
+	onMount(async () => {
+		const scrollTop = page.url.searchParams.get('scrollTop');
+
+		if (scrollTop) {
+			if (!Number.isNaN(+scrollTop)) {
+				await tick();
+				window.scrollTo({ left: 0, top: +scrollTop, behavior: 'instant' });
+			}
+			page.url.searchParams.delete('scrollTop');
+			await goto(`?${page.url.searchParams.toString()}`, { replaceState: true, noScroll: true });
+		}
+	});
 
 	const alerts = [];
 

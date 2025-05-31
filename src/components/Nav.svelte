@@ -63,7 +63,7 @@
 			</li>
 			{#if !app.user}
 				<li class="desktop">
-					<Button asLink href="/login">Log in</Button>
+					<Button asLink href="/api/login/google">Log in</Button>
 				</li>
 			{/if}
 			<li class="mobile">
@@ -203,7 +203,7 @@
 
 {#snippet loginLink(mobile = false)}
 	{#if !app.user}
-		<a class="body focus-grey link link-{mobile ? 'mobile' : 'desktop'}" href="/login" onclick={closeSidebar}>
+		<a class="body focus-grey link link-{mobile ? 'mobile' : 'desktop'}" href="/api/login/google" onclick={closeSidebar}>
 			{@render authIcon()}
 			Log in
 		</a>

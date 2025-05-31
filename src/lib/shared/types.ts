@@ -214,6 +214,11 @@ export type AppState = {
 	notify(opts: ToastNotification['opts']): void;
 	// Confirm
 	confirm(confirmText: string): Promise<boolean>;
+	/**
+	 * Navigates to auth login endpoint.
+	 * Ensures it redirects back to current page with the current scroll position.
+	 */
+	requireAuth(): Promise<void>;
 };
 
 export type Banner = (typeof BANNERS)[number];

@@ -12,7 +12,7 @@ export function requireAuth(req: RequestEvent) {
 	if (!user) {
 		const redirectQuery = `${req.url.pathname}${req.url.search}`;
 		const encodedRedirect = encodeURIComponent(redirectQuery);
-		redirect(302, `/login?r=${encodedRedirect}`);
+		redirect(302, `/api/login/google?r=${encodedRedirect}`);
 	}
 	return user;
 }

@@ -1,9 +1,3 @@
-<script lang="ts">
-	import { page } from '$app/state';
-
-	const redirect = $derived(page.url.searchParams.get('r') ?? null);
-</script>
-
 <svelte:head>
 	<title>ClashArmies • Login • Save & Create Clash of Clans Armies</title>
 	<meta
@@ -22,7 +16,7 @@
 				<p>By logging in, you will be able to start creating armies!</p>
 			</header>
 			<div class="btn-container">
-				<a href="/api/login/google{redirect ? `?r=${encodeURIComponent(redirect)}` : ''}" class="login-btn">
+				<a href="/api/login/google" class="login-btn">
 					<img src="/icons/google-logo.svg" alt="Google logo" />
 					Sign in with Google
 				</a>

@@ -5,17 +5,18 @@ import { google } from '$server/auth/lucia';
 import { dev } from '$app/environment';
 
 export async function GET(req: RequestEvent): Promise<Response> {
-	const redirectQuery = req.url.searchParams.get('r');
-	const decodedRedirect = decodeURIComponent(redirectQuery || '/');
+	const redirectTo = req.locals.server.getSafeRedirect(req, {
+		considerRedirectParam: true,
+		considerRefererHeader: true,
+	});
 
 	if (req.locals.user) {
 		// already logged in
-		redirect(302, decodedRedirect);
+		redirect(302, redirectTo);
 	}
 
-	const state = JSON.stringify({ r: decodedRedirect });
+	const state = JSON.stringify({ r: redirectTo });
 	const codeVerifier = generateCodeVerifier();
-
 	const url = await google.createAuthorizationURL(state, codeVerifier, {
 		scopes: ['email'],
 	});

@@ -1,4 +1,5 @@
 import type { MySQL } from '@ninjalib/sql';
+import type { RequestEvent } from '@sveltejs/kit';
 import util from '@ninjalib/util';
 import { migration } from '$server/migration';
 import { ArmyAPI } from '$server/api/ArmyAPI';
@@ -7,6 +8,12 @@ import { NotificationAPI } from '$server/api/NotificationAPI';
 import { lucia } from '$server/auth/lucia';
 import { pluralize } from '$shared/utils';
 import { CronJob } from 'cron';
+
+type GetSafeRedirectOptions = {
+	considerRedirectParam?: boolean;
+	considerRefererHeader?: boolean;
+	fallbackPath?: string;
+};
 
 /**
  * General place to keep business logic operations/tasks.
@@ -60,6 +67,31 @@ export class Server {
 
 		const duration = Date.now() - start;
 		this.log.info(`Server disposed in ${duration}ms ${reason ? `[${reason}]` : ''}`);
+	}
+
+	public getSafeRedirect(req: RequestEvent, options: GetSafeRedirectOptions = {}) {
+		const { considerRedirectParam = false, considerRefererHeader = false, fallbackPath = '/' } = options;
+
+		const redirectQuery = req.url.searchParams.get('r');
+		const refererHeader = req.request.headers.get('referer');
+
+		// We use this just to build a convenient URL object.
+		// But we never actually use the base url, only pathname & params.
+		const URL_BASE = 'http://localhost';
+
+		let redirectTo: URL;
+		if (considerRedirectParam && redirectQuery) {
+			const decoded = decodeURIComponent(redirectQuery);
+			redirectTo = new URL(decoded, URL_BASE);
+		} else if (considerRefererHeader && refererHeader) {
+			const decoded = decodeURIComponent(refererHeader);
+			redirectTo = new URL(decoded, URL_BASE);
+		} else {
+			redirectTo = new URL(fallbackPath, URL_BASE);
+		}
+
+		// Ensure redirect can't be to a different site, to prevent open redirect attacks
+		return `${redirectTo.pathname}${redirectTo.search}`;
 	}
 
 	private async hourlyTask() {

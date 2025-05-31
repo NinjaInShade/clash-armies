@@ -1,5 +1,6 @@
 import type { AppState, Modal, ToastNotification } from '$types';
 import { HTTPApi } from '$shared/http';
+import { goto } from '$app/navigation';
 import C from '$components';
 
 const TOAST_DEFAULT_DURATION = 2500;
@@ -109,6 +110,16 @@ export function createAppState(initial: Pick<AppState, 'units' | 'townHalls' | '
 		async confirm(confirmText: string) {
 			const confirmed = await this.openModalAsync<boolean>(C.Confirm, { confirmText });
 			return Boolean(confirmed);
+		},
+		async requireAuth() {
+			const loc = window.location;
+
+			const redirectURL = new URL(`${loc.pathname}${loc.search}`, loc.origin);
+			redirectURL.searchParams.set('scrollTop', window.scrollY.toString());
+
+			const encodedRedirect = encodeURIComponent(`${redirectURL.pathname}${redirectURL.search}`);
+			const authURL = new URL(`/api/login/google?r=${encodedRedirect}`, loc.origin);
+			await goto(authURL);
 		},
 	};
 }
