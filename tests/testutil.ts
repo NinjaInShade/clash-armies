@@ -75,7 +75,7 @@ export async function createUsers(server: Server) {
 
 /** Returns an army, defaulting certain fields with dummy data for convenience */
 export function makeData(data: Record<string, unknown>): Record<string, any> {
-	return { units: [], equipment: [], pets: [], guide: null, banner: BANNERS[0], ...data };
+	return { units: [], equipment: [], pets: [], tags: [], guide: null, banner: BANNERS[0], ...data };
 }
 
 export function assertArmies(actual: Army[], expected: Record<string, any>[]) {

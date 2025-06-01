@@ -91,6 +91,7 @@ export class ArmyAPI {
 				au.units,
 				ae.equipment,
 				ap.pets,
+				at.tags,
 				ac.comments,
 				av.votes,
 				IF(ag.id, JSON_OBJECT(
@@ -187,6 +188,11 @@ export class ArmyAPI {
 				FROM army_votes
 				GROUP BY armyId
 			) av ON av.armyId = a.id
+			LEFT JOIN (
+				SELECT armyId, JSON_ARRAYAGG(tag) AS tags
+				FROM army_tags
+				GROUP BY armyId
+			) at ON at.armyId = a.id
 			LEFT JOIN army_guides ag ON ag.armyId = a.id
 			LEFT JOIN army_votes uv ON uv.armyId = a.id AND uv.votedBy = ?
 			LEFT JOIN saved_armies sa ON sa.armyId = a.id AND sa.userId = ?
@@ -223,6 +229,7 @@ export class ArmyAPI {
 				army.guide = parseDBJsonField(army.guide);
 			}
 
+			army.tags = parseDBJsonField(army.tags) ?? [];
 			army.comments = parseDBJsonField(army.comments) ?? [];
 			for (const comment of army.comments) {
 				// JSON agg objects lose date type casting
@@ -271,7 +278,7 @@ export class ArmyAPI {
 		const user = req.locals.requireAuth();
 
 		const model = validateArmy(data, this.gameData);
-		const { equipment, pets, guide, units, ccUnits, allUnits } = model;
+		const { equipment, pets, guide, units, ccUnits, allUnits, tags } = model;
 
 		if (guide && typeof guide.textContent === 'string') {
 			// Escapes/sanitizes the HTML for security reasons (converting to JSON and back to HTML achieves this)
@@ -291,6 +298,7 @@ export class ArmyAPI {
 			if (userArmies.length === USER_MAX_ARMIES) {
 				throw new Error(`Maximum armies reached (${USER_MAX_ARMIES}/${USER_MAX_ARMIES})`);
 			}
+
 			return this.server.db.transaction(async (tx) => {
 				const armyId = await tx.insertOne('armies', {
 					name: model.name,
@@ -298,30 +306,17 @@ export class ArmyAPI {
 					banner: model.banner,
 					createdBy: user.id,
 				});
-				const armyUnits = allUnits.map((unit) => {
-					return {
-						armyId,
-						home: unit.home,
-						unitId: unit.unitId,
-						amount: unit.amount,
-					};
-				});
-				const armyEquipment = equipment.map((eq) => {
-					return {
-						armyId,
-						equipmentId: eq.equipmentId,
-					};
-				});
-				const armyPets = pets.map((p) => {
-					return {
-						armyId,
-						hero: p.hero,
-						petId: p.petId,
-					};
-				});
+
+				const armyUnits = allUnits.map((u) => ({ armyId, home: u.home, unitId: u.unitId, amount: u.amount }));
+				const armyEquipment = equipment.map((eq) => ({ armyId, equipmentId: eq.equipmentId }));
+				const armyPets = pets.map((p) => ({ armyId, petId: p.petId, hero: p.hero }));
+				const armyTags = tags.map((tag) => ({ armyId, tag }));
+
 				await tx.insertMany('army_units', armyUnits);
 				await tx.insertMany('army_equipment', armyEquipment);
 				await tx.insertMany('army_pets', armyPets);
+				await tx.insertMany('army_tags', armyTags);
+
 				if (guide) {
 					await tx.insertOne('army_guides', {
 						armyId,
@@ -329,6 +324,7 @@ export class ArmyAPI {
 						youtubeUrl: guide.youtubeUrl,
 					});
 				}
+
 				return armyId;
 			});
 		}
@@ -348,6 +344,11 @@ export class ArmyAPI {
 		}
 
 		return this.server.db.transaction(async (tx) => {
+			const armyUnits = allUnits.map((u) => ({ id: u.id ?? null, armyId, home: u.home, unitId: u.unitId, amount: u.amount }));
+			const armyEquipment = equipment.map((eq) => ({ id: eq.id ?? null, armyId, equipmentId: eq.equipmentId }));
+			const armyPets = pets.map((p) => ({ id: p.id ?? null, armyId, petId: p.petId, hero: p.hero }));
+			const armyTags = tags.map((tag) => ({ armyId, tag }));
+
 			// Update army
 			const updateQuery = `
 					UPDATE armies SET
@@ -358,37 +359,17 @@ export class ArmyAPI {
 			`;
 			await tx.query(updateQuery, [model.name, model.townHall, model.banner, armyId]);
 
-			// Remove deleted home units
-			if (units.length) {
-				const unitIds = units.map((u) => u.unitId);
-				await tx.query('DELETE FROM army_units WHERE armyId = ? AND unitId NOT IN (?) AND home = ?', [armyId, unitIds, 'armyCamp']);
-			}
-			// Remove deleted clan castle units
-			if (ccUnits.length) {
-				const unitIds = ccUnits.map((u) => u.unitId);
-				await tx.query('DELETE FROM army_units WHERE armyId = ? AND unitId NOT IN (?) AND home = ?', [armyId, unitIds, 'clanCastle']);
-			}
-			// Upsert units - UNIQUE(armyId, unitId, home) means if unit was removed+added and id is undefined it will still update correctly
-			const unitsData = allUnits.map((u) => ({ id: u.id ?? null, armyId, home: u.home, unitId: u.unitId, amount: u.amount }));
-			await tx.upsert('army_units', unitsData);
+			await tx.delete('army_units', { armyId });
+			await tx.insertMany('army_units', armyUnits);
 
-			// Remove deleted equipment
-			if (equipment.length) {
-				const equipmentIds = equipment.map((eq) => eq.equipmentId);
-				await tx.query('DELETE FROM army_equipment WHERE armyId = ? AND equipmentId NOT IN (?)', [armyId, equipmentIds]);
-			}
-			// Upsert equipment - UNIQUE(armyId, equipmentId) means if equipment was removed+added and id is undefined it will still update correctly
-			const equipmentData = equipment.map((eq) => ({ id: eq.id ?? null, armyId, equipmentId: eq.equipmentId }));
-			await tx.upsert('army_equipment', equipmentData);
+			await tx.delete('army_equipment', { armyId });
+			await tx.insertMany('army_equipment', armyEquipment);
 
-			// Remove deleted pets
-			if (pets.length) {
-				const petIds = pets.map((p) => p.petId);
-				await tx.query('DELETE FROM army_pets WHERE armyId = ? AND petId NOT IN (?)', [armyId, petIds]);
-			}
-			// Upsert pets - UNIQUE(armyId, petId, hero) means if pet was removed+added and id is undefined it will still update correctly
-			const petsData = pets.map((p) => ({ id: p.id ?? null, armyId, petId: p.petId, hero: p.hero }));
-			await tx.upsert('army_pets', petsData);
+			await tx.delete('army_pets', { armyId });
+			await tx.insertMany('army_pets', armyPets);
+
+			await tx.delete('army_tags', { armyId });
+			await tx.insertMany('army_tags', armyTags);
 
 			if (guide) {
 				const guideData = [{ id: guide.id ?? null, armyId, textContent: guide.textContent, youtubeUrl: guide.youtubeUrl }];

@@ -1,5 +1,5 @@
 import type { HeroType, StaticGameData } from '$types';
-import { BANNERS, VALID_UNIT_HOME, VALID_HEROES, GUIDE_TEXT_CHAR_LIMIT, YOUTUBE_URL_REGEX, MAX_COMMENT_LENGTH } from './utils';
+import { BANNERS, VALID_UNIT_HOME, VALID_HEROES, GUIDE_TEXT_CHAR_LIMIT, YOUTUBE_URL_REGEX, MAX_COMMENT_LENGTH, MAX_ARMY_TAGS, ARMY_TAGS } from './utils';
 import { ArmyModel, UnitModel, PetModel, EquipmentModel, GuideModel } from '$models';
 import { parseHTML } from 'zeed-dom';
 import z from 'zod';
@@ -33,6 +33,7 @@ export const armySchema = z.object({
 	units: z.array(unitSchema).nonempty(),
 	equipment: z.array(equipmentSchema),
 	pets: z.array(petSchema),
+	tags: z.array(z.enum(ARMY_TAGS)).max(MAX_ARMY_TAGS),
 	guide: guideSchema.nullable(),
 });
 

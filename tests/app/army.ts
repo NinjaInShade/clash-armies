@@ -218,6 +218,35 @@ describe('Saving', function () {
 			assertArmies([armySaved], [army]);
 		});
 
+		it('Should remove units if all were removed from the army', async function () {
+			const data = makeData({
+				name: 'test',
+				townHall: 16,
+				units: [
+					{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Barbarian', gameData).id, amount: 10 },
+					{ home: 'clanCastle', unitId: UnitModel.requireTroopByName('Barbarian', gameData).id, amount: 10 },
+					{ home: 'clanCastle', unitId: UnitModel.requireTroopByName('Archer', gameData).id, amount: 5 },
+				],
+				equipment: [
+					{ equipmentId: EquipmentModel.requireByName('Barbarian Puppet', gameData).id },
+					{ equipmentId: EquipmentModel.requireByName('Rage Vial', gameData).id },
+				],
+				pets: [
+					{ hero: 'Barbarian King', petId: PetModel.requireByName('Lassi', gameData).id },
+					{ hero: 'Archer Queen', petId: PetModel.requireByName('Spirit Fox', gameData).id },
+				],
+			});
+			await server.army.saveArmy(req, data);
+			const army = (await server.army.getArmies(req))[0];
+			// Remove all units (you need to keep the army camp units otherwise army can't be saved but that's okay)
+			army.units = army.units.filter((u) => u.home === 'armyCamp');
+			army.equipment = [];
+			army.pets = [];
+			await server.army.saveArmy(req, army);
+			const armySaved = (await server.army.getArmies(req))[0];
+			assertArmies([armySaved], [army]);
+		});
+
 		// When you remove and then add again on the UI, you technically are just making a new "blank" unit, so the previous database "id" field is now undefined.
 		// However, the system shouldn't care about IDs and still handle this correctly as if you just did nothing.
 		// This tests a bug where the system actually just inserted a duplicate unit in the DB since the upsert didn't detect collision with the PK (since id is now undefined)

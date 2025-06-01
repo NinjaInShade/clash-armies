@@ -1,4 +1,3 @@
-import C from '$components';
 import type { AppState, StaticGameData, UnitHome } from '$types';
 import type { Component } from 'svelte';
 import { HERO_CLASH_IDS, COPY_LINK_CLICK_METRIC, OPEN_LINK_CLICK_METRIC } from '$shared/utils';
@@ -254,14 +253,11 @@ export function getTags(army: ArmyModel) {
 	const tags: { label: string; icon?: Component }[] = [];
 	tags.push({ label: `TH${army.townHall}` });
 	tags.push({ label: armyStats.type });
-	if (armyStats.hasClanCastle) {
-		tags.push({ label: 'Clan castle', icon: C.IconTagsClanCastle });
-	}
-	if (armyStats.hasHeroes) {
-		tags.push({ label: 'Heroes', icon: C.IconTagsHeroes });
-	}
 	if (armyStats.hasGuide) {
 		tags.push({ label: 'Guide' });
+	}
+	for (const tag of army.tags) {
+		tags.push({ label: tag });
 	}
 	return tags;
 }

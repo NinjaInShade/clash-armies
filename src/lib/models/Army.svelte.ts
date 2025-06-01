@@ -15,6 +15,11 @@ export type Army = {
 	pets: ArmyPet[];
 	equipment: ArmyEquipment[];
 	banner: Banner;
+	/**
+	 * User-selected army tags.
+	 * These get merged with the auto-generated tags in `getTags`
+	 */
+	tags: string[];
 	comments: ArmyComment[];
 	username: string;
 	createdBy: number;
@@ -80,6 +85,7 @@ export class ArmyModel {
 	public pets = $state<PetModel[]>([]);
 	public equipment = $state<EquipmentModel[]>([]);
 	public guide = $state<GuideModel | null>(null);
+	public tags = $state<string[]>([]);
 	public banner = $state(BANNERS[Math.floor(Math.random() * BANNERS.length)]);
 	public comments = $state<CommentModel[]>([]);
 	public structuredComments = $state<StructuredArmyComment[]>([]);
@@ -132,6 +138,9 @@ export class ArmyModel {
 		if (data?.guide) {
 			this.guide = new GuideModel(this.gameData, data?.guide ?? undefined);
 		}
+		if (data?.tags) {
+			this.tags = data?.tags;
+		}
 		if (data?.comments) {
 			for (const comment of data.comments) {
 				const model = new CommentModel(this.gameData, comment);
@@ -162,6 +171,7 @@ export class ArmyModel {
 			pets: this.pets.map((pet) => pet.getSaveData()),
 			equipment: this.equipment.map((equipment) => equipment.getSaveData()),
 			guide: this.guide ? this.guide.getSaveData() : null,
+			tags: this.tags,
 			banner: this.banner,
 		};
 	}

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { getContext } from 'svelte';
 	import { invalidateAll, goto } from '$app/navigation';
-	import { VALID_HEROES, GUIDE_TEXT_CHAR_LIMIT } from '$shared/utils';
+	import { VALID_HEROES, GUIDE_TEXT_CHAR_LIMIT, ARMY_TAGS, MAX_ARMY_TAGS } from '$shared/utils';
 	import { HTTPError, type APIErrors } from '$shared/http';
 	import type { AppState, Banner } from '$types';
 	import { ArmyModel, type Army } from '$models';
@@ -134,6 +134,15 @@
 		model.townHall = value;
 	}
 
+	function toggleTag(tag: string) {
+		if (model.tags.includes(tag)) {
+			const idx = model.tags.indexOf(tag);
+			model.tags.splice(idx, 1);
+		} else {
+			model.tags.push(tag);
+		}
+	}
+
 	async function onKeyDown(ev: KeyboardEvent) {
 		const key = ev.key.toLowerCase();
 		const mod = ev.ctrlKey || ev.metaKey;
@@ -217,6 +226,18 @@
 					<TownHall onclick={() => setTownHall(th.level)} level={th.level} {...btnAttributes} --width="100%" />
 				{/each}
 			</div>
+		</Fieldset>
+		<Fieldset label="Tags (max {MAX_ARMY_TAGS}):" htmlName="tags" style="padding: 0 8px; margin-top: 16px;" --input-width="100%">
+			<ul class="army-tags">
+				{#each ARMY_TAGS as tag}
+					{@const active = model.tags.includes(tag)}
+					<li>
+						<button class="army-tag" class:active disabled={!active && model.tags.length >= MAX_ARMY_TAGS} onclick={() => toggleTag(tag)}>
+							{tag}
+						</button>
+					</li>
+				{/each}
+			</ul>
 		</Fieldset>
 	</div>
 </section>
@@ -505,6 +526,42 @@
 
 	:global(.title-action-btn) {
 		margin-left: 0.25em;
+	}
+
+	.army-tags {
+		display: flex;
+		flex-flow: row wrap;
+		align-items: center;
+		gap: 8px;
+
+		& .army-tag {
+			background-color: var(--grey-700);
+			border: 1px dashed var(--grey-400);
+			color: var(--grey-400);
+			font-size: var(--fs);
+			line-height: var(--fs-lh);
+			font-weight: 500;
+			border-radius: 4px;
+			padding: 4px 10px;
+
+			&:hover:not(:disabled),
+			&:focus {
+				outline: none;
+				background-color: var(--grey-850);
+			}
+
+			&.active {
+				border: 1px dashed #e0a153;
+				background-color: hsl(33, 15%, 26%);
+				color: #e0a153;
+
+				&:hover:not(:disabled),
+				&:focus {
+					outline: none;
+					background-color: hsl(33, 15%, 22%);
+				}
+			}
+		}
 	}
 
 	@media (max-width: 850px) {
