@@ -201,10 +201,12 @@ export function openLink(href: string, openInNewTab = true) {
 	window.open(href, openInNewTab ? '_blank' : undefined, 'rel="noreferrer"');
 }
 
-async function copy(text: string) {
+export async function copy(text: string) {
 	if ('navigator' in window && window.navigator.clipboard) {
 		try {
-			await navigator.clipboard.write(text);
+			const data = { 'text/plain': text };
+			const clipboardItem = new ClipboardItem(data);
+			await navigator.clipboard.write([clipboardItem]);
 			return;
 		} catch (err) {
 			console.error('Failed to copy with navigator.clipboard', err);

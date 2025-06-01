@@ -17,6 +17,7 @@
 	import Errors from './Errors.svelte';
 	import Button from './Button.svelte';
 	import Comments from './Comments.svelte';
+	import ArmyTags from './ArmyTags.svelte';
 
 	type Props = { army: Army };
 	const { army }: Props = $props();
@@ -76,16 +77,7 @@
 				<h1>{model.name}</h1>
 			</div>
 			<p class="author">Assembled by <a href="/users/{model.username}">@{model.username}</a></p>
-			<ul class="tags">
-				{#each getTags(model) as tag}
-					<li>
-						{#if tag.icon}
-							<tag.icon></tag.icon>
-						{/if}
-						{tag.label}
-					</li>
-				{/each}
-			</ul>
+			<ArmyTags {model} tagStyle="padding: 6px" />
 		</div>
 		<div class="right">
 			<div class="actions">

@@ -80,3 +80,72 @@
 		}
 	}
 }
+
+.utility-btn {
+	--br: 4px;
+	--gap: 10px;
+	--icon-height: 14px;
+	--fs: 14px;
+	--_fs-weight: var(--fs-weight, 700);
+	--_bg-clr: var(--bg-clr, none);
+	--_bg-clr-hover: var(--bg-clr-hover, var(--grey-600));
+
+	display: flex;
+	align-items: center;
+	border: 1px dashed var(--grey-500);
+	border-radius: var(--br);
+	background-color: var(--_bg-clr);
+	padding: var(--pad);
+	gap: var(--gap);
+	color: var(--grey-100);
+	font-size: var(--fs);
+	line-height: var(--fs);
+	font-weight: var(--_fs-weight);
+	text-transform: uppercase;
+	white-space: nowrap;
+
+	&:hover:not(:disabled) {
+		background-color: var(--_bg-clr-hover);
+	}
+
+	& svg {
+		height: var(--icon-height);
+		width: auto;
+	}
+
+	&.regular {
+		--pad: 8px;
+	}
+
+	&.large {
+		--pad: 10px;
+	}
+
+	@media (max-width: 400px) {
+		--gap: 8px;
+		--icon-height: 12px;
+		--fs: 12px;
+
+		&.regular {
+			--pad: 6px;
+		}
+
+		&.large {
+			--pad: 8px;
+		}
+	}
+}
+
+& .context-menu-btn {
+	color: var(--grey-400);
+	padding: 2px;
+
+	&:hover {
+		color: var(--grey-100);
+	}
+
+	& svg {
+		height: 16px;
+		width: auto;
+	}
+}

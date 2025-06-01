@@ -90,3 +90,14 @@ export const HERO_CLASH_IDS = {
 export function pluralize(string: string, count: number, suffix = 's') {
 	return `${string}${count !== 1 ? suffix : ''}`;
 }
+
+export function debounce<F extends (...args: Parameters<F>) => ReturnType<F>>(fn: F, ms: number) {
+	let timeoutId: ReturnType<typeof setTimeout>;
+
+	return function (this: any, ...args: Parameters<F>) {
+		clearTimeout(timeoutId);
+		timeoutId = setTimeout(() => {
+			fn.apply(this, args);
+		}, ms);
+	};
+}

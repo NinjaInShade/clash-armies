@@ -2,20 +2,20 @@
 	import { getContext } from 'svelte';
 	import type { AppState } from '$types';
 	import type { ArmyModel } from '$models';
+	import { debounce } from '$shared/utils';
 
 	type Props = {
 		model: ArmyModel;
-		allowEdit: boolean;
-		class?: string;
+		size?: 'regular' | 'large';
 	};
-	const { model, allowEdit, class: _class }: Props = $props();
-
+	const { model, size = 'regular' }: Props = $props();
 	const app = getContext<AppState>('app');
 
-	let saving = $state<boolean>(false);
+	// Intentionally not reactive
+	const originalVotes = model.votes;
+	const countLabel = $derived(originalVotes ? model.votes : 'Vote');
 
-	async function saveVote() {
-		saving = true;
+	const saveVote = debounce(async function () {
 		try {
 			const data = { armyId: model.id, vote: model.userVote };
 			await app.http.post('/api/armies/votes', data);
@@ -25,112 +25,119 @@
 				description: `There was a problem saving your vote`,
 				theme: 'failure',
 			});
-		} finally {
-			saving = false;
 		}
-	}
-	function getClass(votes: number) {
-		if (votes > 0) {
-			return 'upvote';
+	}, 150);
+
+	async function vote(userVote: number) {
+		if (!app.user) {
+			await app.requireAuth();
+			return;
 		}
-		if (votes < 0) {
-			return 'downvote';
-		}
-		return '';
+		model.userVote = userVote;
+		model.votes = originalVotes + userVote;
+		await saveVote();
 	}
 
 	async function downvote() {
-		model.votes -= model.userVote ? 2 : 1;
-		model.userVote = -1;
-		await saveVote();
+		await vote(-1);
 	}
 
 	async function upvote() {
-		model.votes += model.userVote ? 2 : 1;
-		model.userVote = 1;
-		await saveVote();
+		await vote(1);
 	}
 
 	async function clearVote() {
-		model.votes += model.userVote === -1 ? 1 : -1;
-		model.userVote = 0;
-		await saveVote();
+		await vote(0);
+	}
+
+	function getClass(userVote: number) {
+		if (userVote === 1) {
+			return 'upvoted';
+		}
+		if (userVote === -1) {
+			return 'downvoted';
+		}
+		return '';
 	}
 </script>
 
-<div class="vote {_class ? _class : ''}">
-	<b class={getClass(model.votes)}>{model.votes}</b>
-	{#if allowEdit}
-		<button
-			onclick={model.userVote === -1 ? clearVote : downvote}
-			disabled={saving || !allowEdit}
-			class="focus-grey"
-			class:selected={model.userVote === -1}
-			aria-label="Downvote"
-		>
-			<svg width="16.76" height="16" viewBox="0 0 17 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-				<path
-					d="M0 0H2.9932V8.2963H0V0ZM12.5714 0H4.19048V8.77215L6.01154 11.4761L6.51739 14.9825C6.55936 15.2645 6.70211 15.5223 6.91971 15.709C7.13731 15.8957 7.41533 15.9989 7.70329 16H7.78231C8.25847 15.9995 8.715 15.8121 9.05169 15.4788C9.38839 15.1455 9.57775 14.6936 9.57823 14.2222V10.6667H14.3673C15.0022 10.6659 15.6108 10.4159 16.0597 9.97153C16.5086 9.52717 16.7611 8.92472 16.7619 8.2963V4.14815C16.7606 3.04838 16.3187 1.99401 15.5331 1.21635C14.7476 0.438694 13.6824 0.00125473 12.5714 0Z"
-					fill={model.userVote === -1 ? '#ff6666' : 'var(--grey-300)'}
-				/>
-			</svg>
-		</button>
-		<button
-			onclick={model.userVote === 1 ? clearVote : upvote}
-			disabled={saving || !allowEdit}
-			class="focus-grey"
-			class:selected={model.userVote === 1}
-			aria-label="Upvote"
-		>
-			<svg width="17.23" height="16" viewBox="0 0 18 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-				<path
-					d="M0 7.7037H3.07692V16H0V7.7037ZM12.9231 16H4.30769V7.22785L6.17969 4.52385L6.69969 1.01748C6.74284 0.735475 6.88958 0.47772 7.11327 0.291023C7.33696 0.104326 7.62276 0.00106815 7.91877 0H8C8.48948 0.000470646 8.95877 0.187923 9.30489 0.521219C9.651 0.854515 9.84567 1.30643 9.84615 1.77778V5.33333H14.7692C15.4218 5.33412 16.0475 5.5841 16.5089 6.02847C16.9704 6.47283 17.23 7.07528 17.2308 7.7037V11.8519C17.2295 12.9516 16.7752 14.006 15.9676 14.7836C15.1601 15.5613 14.0651 15.9987 12.9231 16Z"
-					fill={model.userVote === 1 ? '#53E059' : 'var(--grey-300)'}
-				/>
-			</svg>
-		</button>
-	{:else}
-		<div>
-			<svg width="17.23" height="16" viewBox="0 0 18 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-				<path
-					d="M0 7.7037H3.07692V16H0V7.7037ZM12.9231 16H4.30769V7.22785L6.17969 4.52385L6.69969 1.01748C6.74284 0.735475 6.88958 0.47772 7.11327 0.291023C7.33696 0.104326 7.62276 0.00106815 7.91877 0H8C8.48948 0.000470646 8.95877 0.187923 9.30489 0.521219C9.651 0.854515 9.84567 1.30643 9.84615 1.77778V5.33333H14.7692C15.4218 5.33412 16.0475 5.5841 16.5089 6.02847C16.9704 6.47283 17.23 7.07528 17.2308 7.7037V11.8519C17.2295 12.9516 16.7752 14.006 15.9676 14.7836C15.1601 15.5613 14.0651 15.9987 12.9231 16Z"
-					fill={model.votes > 0 ? '#53E059' : model.votes < 0 ? '#ff6666' : 'var(--grey-300)'}
-				/>
-			</svg>
-		</div>
-	{/if}
+<div class="utility-btn vote {getClass(model.userVote)} {size}">
+	<button class="focus-grey upvote-btn" aria-label="Upvote" onclick={model.userVote === 1 ? clearVote : upvote}>
+		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 13 12">
+			<path
+				d="M0 5.77778H2.32143V12H0V5.77778ZM9.75 12H3.25V5.42089L4.66236 3.39289L5.05468 0.763111C5.08723 0.551606 5.19794 0.35829 5.36671 0.218267C5.53547 0.0782446 5.7511 0.000801115 5.97443 0H6.03571C6.40501 0.000352984 6.75907 0.140942 7.02021 0.390914C7.28134 0.640886 7.4282 0.97982 7.42857 1.33333V4H11.1429C11.6352 4.00059 12.1072 4.18808 12.4554 4.52135C12.8035 4.85462 12.9994 5.30646 13 5.77778V8.88889C12.999 9.71372 12.6563 10.5045 12.047 11.0877C11.4377 11.671 10.6117 11.9991 9.75 12Z"
+				fill="currentColor"
+			/>
+		</svg>
+		<span class="vote-count" style="min-width: {String(originalVotes).length}ch">
+			{countLabel}
+		</span>
+	</button>
+	<div class="separator"></div>
+	<button class="focus-grey downvote-btn" aria-label="Downvote" onclick={model.userVote === -1 ? clearVote : downvote}>
+		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 13 12">
+			<path
+				d="M0 0H2.32143V6.22222H0V0ZM9.75 0H3.25V6.57911L4.66236 8.60711L5.05468 11.2369C5.08723 11.4484 5.19794 11.6417 5.36671 11.7817C5.53547 11.9218 5.7511 11.9992 5.97443 12H6.03571C6.40501 11.9996 6.75907 11.8591 7.02021 11.6091C7.28134 11.3591 7.4282 11.0202 7.42857 10.6667V8H11.1429C11.6352 7.99941 12.1072 7.81192 12.4554 7.47865C12.8035 7.14538 12.9994 6.69354 13 6.22222V3.11111C12.999 2.28628 12.6563 1.49551 12.047 0.912263C11.4377 0.32902 10.6117 0.00094105 9.75 0Z"
+				fill="currentColor"
+			/>
+		</svg>
+	</button>
 </div>
 
 <style>
 	.vote {
-		display: flex;
-		align-items: center;
-	}
+		padding: 0;
+		gap: 0;
 
-	b {
-		font-family: 'Clash', sans-serif;
-		font-size: 15px;
-		line-height: 15px;
-		color: var(--grey-100);
-		margin-right: 6px;
-	}
-	b.downvote {
-		color: #ff6666;
-	}
-	b.upvote {
-		color: #53e059;
-	}
+		&:hover {
+			background-color: var(--_bg-clr);
+		}
 
-	button svg {
-		display: block;
-	}
-	button path {
-		transition: fill 0.1s ease-in-out;
-	}
-	button:not(.selected):not(:disabled):hover path {
-		fill: var(--grey-100);
-	}
-	button:not(:last-child) {
-		margin-right: 4px;
+		& .upvote-btn {
+			display: flex;
+			align-items: center;
+			color: var(--grey-100);
+			padding: var(--pad) var(--gap) var(--pad) var(--pad);
+			border-radius: var(--br) 0 0 var(--br);
+			gap: 6px;
+
+			&:hover {
+				background-color: var(--_bg-clr-hover);
+			}
+
+			& .vote-count {
+				text-transform: uppercase;
+				white-space: nowrap;
+				font-weight: 700;
+				font-size: var(--fs);
+				line-height: var(--fs);
+			}
+		}
+
+		& .downvote-btn {
+			color: var(--grey-100);
+			padding: var(--pad) var(--pad) var(--pad) var(--gap);
+			border-radius: 0 var(--br) var(--br) 0;
+
+			&:hover {
+				background-color: var(--_bg-clr-hover);
+			}
+		}
+
+		&.upvoted .upvote-btn {
+			color: var(--upvote);
+		}
+
+		&.downvoted .downvote-btn,
+		&.downvoted .vote-count {
+			color: var(--downvote);
+		}
+
+		& .separator {
+			width: 0px;
+			height: max-content;
+			border-left: 1px dashed var(--grey-500);
+			padding: var(--pad) 0;
+		}
 	}
 </style>
