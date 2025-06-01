@@ -9,17 +9,13 @@
 	import HeroDisplayFull from './HeroDisplayFull.svelte';
 	import GuideEditor from './GuideEditor.svelte';
 	import Button from './Button.svelte';
-	import Comments from './Comments.svelte';
 	import ArmyTags from './ArmyTags.svelte';
 	import OpenInGameButton from './OpenInGameButton.svelte';
 	import CommentsCount from './CommentsCount.svelte';
 	import ShareButton from './ShareButton.svelte';
-<<<<<<< HEAD
-=======
 	import CtxMenu from './ArmyActionsMenu.svelte';
 	import CommentsList from './CommentsList.svelte';
 	import AddComment from './SaveComment.svelte';
->>>>>>> d3d11bc (s: view)
 
 	type Props = { army: Army };
 	const { army }: Props = $props();
@@ -186,11 +182,13 @@
 	</div>
 </div>
 
-{#if app.user || (!app.user && model.comments.length)}
-	<div class="comments-feed" id="comments">
-		<Comments {model} />
+<div class="comments-feed" class:has-comments={model.comments.length > 0} id="comments">
+	<CommentsList {model} comments={model.structuredComments} />
+
+	<div class="add-comment">
+		<AddComment {model} />
 	</div>
-{/if}
+</div>
 
 <CtxMenu bind:menuOpen bind:menuBtnRef={menuBtn} {model} hideViewArmyLink />
 
@@ -490,7 +488,7 @@
 		flex-flow: row wrap;
 		justify-content: space-between;
 		border-radius: 8px;
-		margin-top: 16px;
+		margin-top: 24px;
 		gap: 0.25em;
 
 		& > div {

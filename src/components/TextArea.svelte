@@ -45,6 +45,11 @@
 		txRef.style.height = 'auto';
 		txRef.style.height = txRef.scrollHeight + 2.5 + 'px';
 	}
+
+	export function focus() {
+		if (!txRef) return;
+		txRef.focus();
+	}
 </script>
 
 <!-- Input -->

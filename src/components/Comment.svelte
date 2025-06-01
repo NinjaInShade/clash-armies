@@ -7,9 +7,9 @@
 	import { getContext } from 'svelte';
 	import type { AppState } from '$types';
 	import { intlFormatDistance } from 'date-fns';
-	import { invalidateAll } from '$app/navigation';
 	import SaveComment from './SaveComment.svelte';
 	import type { ArmyModel, ArmyComment } from '$models';
+	import CtxMenu from './CommentMenu.svelte';
 
 	type Props = {
 		model: ArmyModel;
@@ -22,41 +22,44 @@
 	let editing = $derived(editingComment === comment.id);
 	let replying = $derived(addingReplyTo === comment.id);
 
+	let editCommentRef = $state<SaveComment | undefined>(undefined);
+	let replyCommentRef = $state<SaveComment | undefined>(undefined);
+
+	let menuBtn = $state<HTMLButtonElement>();
+	let menuOpen = $state(false);
+
+	$effect(() => {
+		if (editCommentRef) {
+			editCommentRef.focus();
+		}
+	});
+	$effect(() => {
+		if (replyCommentRef) {
+			replyCommentRef.focus();
+		}
+	});
+
+	function toggleContextMenu() {
+		menuOpen = !menuOpen;
+	}
+
 	function formatCreatedTime(createdTime: Date) {
 		// Add a second as comments created just now will cause the below function to return "In 0 secs"
 		const now = Date.now() + 1000;
 		return intlFormatDistance(createdTime, now, { style: 'short', numeric: 'always' });
 	}
 
-	async function deleteComment() {
-		const confirmed = await app.confirm('Are you sure you want to delete this comment?');
-		if (!confirmed) return;
-
-		try {
-			await app.http.delete('/api/armies/comments', comment.id);
-		} catch {
-			app.notify({
-				title: 'Failed action',
-				description: `There was a problem deleting this comment`,
-				theme: 'failure',
-			});
-			return;
-		}
-
-		await invalidateAll();
-	}
-
-	async function toggleEditComment() {
+	async function editComment() {
 		if (editingComment !== null && editingComment !== comment.id) {
 			const confirmed = await app.confirm('You are already editing another comment. Editing this will cancel your other edit. Are you sure?');
 			if (!confirmed) return;
 			editingComment = comment.id;
-		} else {
-			editingComment = editingComment ? null : comment.id;
+		} else if (!editingComment) {
+			editingComment = comment.id;
 		}
 	}
 
-	async function toggleReply() {
+	async function toggleReplyToComment() {
 		if (addingReplyTo !== null && addingReplyTo !== comment.id) {
 			const confirmed = await app.confirm('You are already replying to another comment. Editing this will cancel your other reply. Are you sure?');
 			if (!confirmed) return;
@@ -65,24 +68,15 @@
 			addingReplyTo = addingReplyTo ? null : comment.id;
 		}
 	}
-</script>
 
-{#snippet controls(layout: 'desktop' | 'mobile')}
-	<div class="controls {layout}">
-		{#if app.user}
-			{#if app.user.id === comment.createdBy || app.user.hasRoles('admin')}
-				<button class="control-btn delete-btn" onclick={deleteComment}>Delete</button>
-				<button class="control-btn" onclick={toggleEditComment}>{editing ? 'Cancel edit' : 'Edit'}</button>
-			{/if}
-			<button class="control-btn" onclick={toggleReply}>
-				<svg width="18" height="16" viewBox="0 0 18 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-					<path d="M7 4.5V0.5L0 7.5L7 14.5V10.4C12 10.4 15.5 12 18 15.5C17 10.5 14 5.5 7 4.5Z" fill="#E79C3E" />
-				</svg>
-				{replying ? 'Cancel reply' : 'Reply'}
-			</button>
-		{/if}
-	</div>
-{/snippet}
+	function cancelEdit() {
+		editingComment = null;
+	}
+
+	function cancelReply() {
+		addingReplyTo = null;
+	}
+</script>
 
 <li class="card" id="comment-{comment.id}">
 	<div class="header">
@@ -96,37 +90,63 @@
 			</svg>
 			<p class="time-ago">{formatCreatedTime(comment.createdTime)}</p>
 		</div>
-		{@render controls('desktop')}
+		<div class="controls">
+			{#if app.user}
+				<button class="control-btn" onclick={toggleReplyToComment}>
+					<svg width="18" height="16" viewBox="0 0 18 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+						<path d="M7 4.5V0.5L0 7.5L7 14.5V10.4C12 10.4 15.5 12 18 15.5C17 10.5 14 5.5 7 4.5Z" fill="#E79C3E" />
+					</svg>
+					Reply
+				</button>
+				{#if app.user.id === comment.createdBy || app.user.hasRoles('admin')}
+					<button class="context-menu-btn" aria-label="context-menu" bind:this={menuBtn} onclick={toggleContextMenu}>
+						<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 5 16">
+							<path
+								d="M2.28571 16C3.54808 16 4.57143 14.9767 4.57143 13.7143C4.57143 12.4519 3.54808 11.4286 2.28571 11.4286C1.02335 11.4286 0 12.4519 0 13.7143C0 14.9767 1.02335 16 2.28571 16Z"
+								fill="currentColor"
+							/>
+							<path
+								d="M2.28571 10.2856C3.54808 10.2856 4.57143 9.2623 4.57143 7.99994C4.57143 6.73758 3.54808 5.71423 2.28571 5.71423C1.02335 5.71423 0 6.73758 0 7.99994C0 9.2623 1.02335 10.2856 2.28571 10.2856Z"
+								fill="currentColor"
+							/>
+							<path
+								d="M2.28571 4.57141C3.54808 4.57141 4.57143 3.54806 4.57143 2.2857C4.57143 1.02334 3.54808 0 2.28571 0C1.02335 0 0 1.02334 0 2.2857C0 3.54806 1.02335 4.57141 2.28571 4.57141Z"
+								fill="currentColor"
+							/>
+						</svg>
+					</button>
+				{/if}
+			{/if}
+		</div>
 	</div>
 
 	{#if editing}
 		<div class="comment">
-			<SaveComment {model} {comment} replyTo={comment.replyTo} onSave={() => (editingComment = null)} />
+			<SaveComment bind:this={editCommentRef} {model} {comment} replyTo={comment.replyTo} cancelSave={cancelEdit} onSave={() => (editingComment = null)} />
 		</div>
 	{:else}
 		<p class="comment">{comment.comment}</p>
 	{/if}
-
-	{@render controls('mobile')}
 </li>
 
 {#if replying}
-	<SaveComment {model} replyTo={comment.id} onSave={() => (addingReplyTo = null)} />
+	<SaveComment bind:this={replyCommentRef} {model} replyTo={comment.id} cancelSave={cancelReply} onSave={() => (addingReplyTo = null)} />
 {/if}
+
+<CtxMenu bind:menuOpen bind:menuBtnRef={menuBtn} {comment} {editComment} />
 
 <style>
 	.card {
 		background-color: var(--grey-800);
 		border: 1px dashed var(--grey-500);
 		border-radius: 8px;
-		padding: 1em;
+		padding: 0.75em 1em;
 		width: 100%;
 	}
 	.header {
 		display: flex;
 		justify-content: space-between;
-		align-items: center;
-		flex-flow: row wrap;
+		align-items: flex-start;
 		gap: 0.5em;
 	}
 	.comment {
@@ -171,23 +191,14 @@
 		color: var(--primary-400);
 		gap: 0.3em;
 	}
-	.delete-btn {
-		color: #e05353;
-	}
-	.controls.mobile {
-		display: none;
+	.controls {
+		display: flex;
+		justify-content: flex-end;
 	}
 
 	@media (max-width: 575px) {
 		.separator {
 			display: none;
-		}
-		.controls.desktop {
-			display: none;
-		}
-		.controls.mobile {
-			display: flex;
-			margin-top: 0.5em;
 		}
 	}
 

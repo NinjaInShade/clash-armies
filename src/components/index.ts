@@ -33,7 +33,6 @@ export { default as HeroPicker } from './HeroPicker.svelte';
 export { default as UnitsList } from './UnitsList.svelte';
 export { default as EditBanner } from './EditBanner.svelte';
 export { default as Votes } from './Votes.svelte';
-export { default as Comments } from './Comments.svelte';
 export { default as Errors } from './Errors.svelte';
 export { default as ArmyCard } from './ArmyCard.svelte';
 export { default as ActionButton } from './ActionButton.svelte';
