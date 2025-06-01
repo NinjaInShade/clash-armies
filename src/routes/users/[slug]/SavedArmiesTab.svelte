@@ -19,7 +19,7 @@
 {#if savedArmies.length}
 	<ul class="armies-list">
 		{#each savedArmies as model (model.id)}
-			<C.ArmyCard {model} showBookmark={app.user?.id === user.id} />
+			<C.ArmyCard {model} />
 		{/each}
 	</ul>
 {:else}

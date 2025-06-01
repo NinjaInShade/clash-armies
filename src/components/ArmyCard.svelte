@@ -9,13 +9,12 @@
 	import OpenInGameButton from './OpenInGameButton.svelte';
 	import CommentsCount from './CommentsCount.svelte';
 	import ShareButton from './ShareButton.svelte';
-	import CtxMenu from './ArmyCardMenu.svelte';
+	import CtxMenu from './ArmyActionsMenu.svelte';
 
 	type Props = {
 		model: ArmyModel;
-		showBookmark?: boolean;
 	};
-	const { model, showBookmark = true }: Props = $props();
+	const { model }: Props = $props();
 
 	let menuBtn = $state<HTMLButtonElement>();
 	let menuOpen = $state(false);
@@ -84,7 +83,7 @@
 	</footer>
 </li>
 
-<CtxMenu bind:menuOpen bind:menuBtnRef={menuBtn} {model} {showBookmark} />
+<CtxMenu bind:menuOpen bind:menuBtnRef={menuBtn} {model} />
 
 <style>
 	.army-card {
@@ -125,22 +124,6 @@
 				justify-content: space-between;
 				align-items: center;
 				gap: 0.75em;
-			}
-
-			& .top {
-				& .context-menu-btn {
-					color: var(--grey-400);
-					padding: 2px;
-
-					&:hover {
-						color: var(--grey-100);
-					}
-				}
-
-				& svg {
-					height: 16px;
-					width: auto;
-				}
 			}
 
 			& .title-container {
