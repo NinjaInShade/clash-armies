@@ -26,8 +26,8 @@
 			<C.Button asLink href="/army-builder">Create army</C.Button>
 		</div>
 
-		<img class="graphic" src="/clash/ui/header-barbarian.png" alt="Angry clash of clans barbarian" />
-		<img class="graphic-mobile" src="/clash/ui/league-king-1.png" alt="Clash of clans barbarian king with league skin" />
+		<img class="graphic" src="/clash/ui/header-barbarian.webp" alt="Angry clash of clans barbarian" />
+		<img class="graphic-mobile" src="/clash/ui/league-king.webp" alt="Clash of clans barbarian king with league skin" />
 	</div>
 </header>
 
