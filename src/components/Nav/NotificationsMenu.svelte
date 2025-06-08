@@ -3,8 +3,8 @@
 	import { getContext } from 'svelte';
 	import { intlFormatDistance } from 'date-fns';
 	import { invalidateAll, goto } from '$app/navigation';
-	import Menu from './Menu.svelte';
-	import FocusTrap from './FocusTrap.svelte';
+	import Menu from '../Menu.svelte';
+	import FocusTrap from '../FocusTrap.svelte';
 
 	type Props = {
 		open: boolean;

@@ -380,7 +380,7 @@
 		gap: 6px;
 	}
 
-	.th-cell button:focus {
+	.th-cell button:focus-visible {
 		outline: var(--primary-400) dotted 2px;
 	}
 

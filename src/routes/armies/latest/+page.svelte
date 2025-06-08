@@ -4,16 +4,13 @@
 	import ArmyList from '~/components/Armies/ArmyList.svelte';
 
 	const { data }: { data: PageData } = $props();
-	const pageMeta = ARMY_PAGES.all;
+	const pageMeta = ARMY_PAGES.latest;
 </script>
 
 <svelte:head>
-	<title>ClashArmies • Find Clash of Clans armies by troops, TH Level & Strategy!</title>
-	<meta
-		name="description"
-		content="Browse hundreds of user-created Clash of Clans armies. Filter by town hall, strategy, troop types, and more to find the perfect attack for any war or farming goal."
-	/>
-	<link rel="canonical" href="https://clasharmies.com/armies" />
+	<title>ClashArmies • Latest Clash of Clans Armies - Fresh attack strategies</title>
+	<meta name="description" content="Explore the newest Clash of Clans armies - stay ahead and up-to-date with creative and in-meta armies" />
+	<link rel="canonical" href="https://clasharmies.com/latest" />
 </svelte:head>
 
 <section class="armies">
@@ -27,8 +24,6 @@
 			}}
 			allowSearch
 			allowTHFilter
-			allowSort={['most-votes', 'most-comments']}
-			allowFilters
 		/>
 	</div>
 </section>

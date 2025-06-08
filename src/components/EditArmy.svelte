@@ -545,7 +545,7 @@
 			padding: 4px 10px;
 
 			&:hover:not(:disabled),
-			&:focus {
+			&:focus-visible {
 				outline: none;
 				background-color: var(--grey-850);
 			}
@@ -556,7 +556,7 @@
 				color: #e0a153;
 
 				&:hover:not(:disabled),
-				&:focus {
+				&:focus-visible {
 					outline: none;
 					background-color: hsl(33, 15%, 22%);
 				}

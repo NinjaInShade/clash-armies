@@ -50,7 +50,7 @@
 		line-height: 10px;
 	}
 	.version:hover,
-	.version:focus {
+	.version:focus-visible {
 		background-color: var(--primary-400);
 		color: var(--grey-100);
 	}

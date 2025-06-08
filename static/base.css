@@ -130,7 +130,7 @@ body {
 	display: flex;
 	flex-flow: column;
 
-	&.sidebar-active {
+	&.mobile-nav-open {
 		position: fixed;
 	}
 }
@@ -146,7 +146,7 @@ svg {
 
 ::-webkit-scrollbar {
 	background-color: var(--grey-800);
-	width: 12px;
+	width: 8px;
 }
 
 ::-webkit-scrollbar-thumb {
@@ -292,8 +292,8 @@ a {
 	border: none;
 }
 
-button:focus,
-a:focus {
+button:focus-visible,
+a:focus-visible {
 	outline: var(--grey-400) dotted 1.5px;
 }
 
@@ -309,11 +309,11 @@ button span {
 	gap: 6px;
 }
 
-.focus-grey:focus {
+.focus-grey:focus-visible {
 	outline: var(--grey-400) dotted 1.5px;
 }
 
-.focus-primary:focus {
+.focus-primary:focus-visible {
 	outline: var(--primary-400) dotted 1.5px;
 }
 

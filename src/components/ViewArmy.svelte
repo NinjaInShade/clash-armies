@@ -499,11 +499,11 @@
 	}
 
 	.comments-feed {
-		margin-top: 12px;
+		margin-top: 10px;
 
 		&.has-comments {
 			& .add-comment {
-				margin-top: 12px;
+				margin-top: 10px;
 			}
 		}
 	}

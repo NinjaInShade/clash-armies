@@ -16,8 +16,8 @@ export { default as Menu } from './Menu.svelte';
 export { default as GuideEditor } from './GuideEditor.svelte';
 
 // App specific components
-export { default as Nav } from './Nav.svelte';
-export { default as Footer } from './Footer.svelte';
+export { default as Nav } from './Nav/Nav.svelte';
+export { default as Footer } from './Nav/Footer.svelte';
 export { default as Logo } from './Logo.svelte';
 export { default as TownHall } from './TownHall.svelte';
 export { default as UnitDisplay } from './UnitDisplay.svelte';
@@ -37,9 +37,7 @@ export { default as Errors } from './Errors.svelte';
 export { default as ArmyCard } from './ArmyCard.svelte';
 export { default as ActionButton } from './ActionButton.svelte';
 export { default as ImportFromLink } from './ImportFromLink.svelte';
-export { default as ArmyFilters } from './ArmyFilters.svelte';
-export { default as FiltersPopup } from './FiltersPopup.svelte';
-export { default as NotificationsMenu } from './NotificationsMenu.svelte';
+export { default as FiltersPopup } from './Armies/FiltersPopup.svelte';
 export { default as IconTagsClanCastle } from './IconTagsClanCastle.svelte';
 export { default as IconTagsHeroes } from './IconTagsHeroes.svelte';
 export { default as AddClanCastle } from './AddClanCastle.svelte';

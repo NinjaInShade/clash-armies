@@ -1,13 +1,13 @@
 <script lang="ts">
 	import { getContext } from 'svelte';
 	import type { AppState } from '$types';
-	import type { PickUnit, Filters } from './ArmyFilters.svelte';
+	import type { PickUnit, Filters } from './Controls.svelte';
 	import { VALID_HEROES } from '$shared/utils';
-	import ActionButton from './ActionButton.svelte';
-	import UnitDisplay from './UnitDisplay.svelte';
-	import EquipmentDisplay from './EquipmentDisplay.svelte';
-	import PetDisplay from './PetDisplay.svelte';
-	import FocusTrap from './FocusTrap.svelte';
+	import ActionButton from '../ActionButton.svelte';
+	import UnitDisplay from '../UnitDisplay.svelte';
+	import EquipmentDisplay from '../EquipmentDisplay.svelte';
+	import PetDisplay from '../PetDisplay.svelte';
+	import FocusTrap from '../FocusTrap.svelte';
 
 	type Props = {
 		close: (newFilters?: Filters) => void;
@@ -301,8 +301,8 @@
 		border: 1px dashed var(--grey-500);
 		height: 800px;
 		width: 700px;
-		max-width: calc(100dvw - 3em);
-		max-height: calc(100dvh - 3em);
+		max-width: calc(100dvw - 1em);
+		max-height: calc(100dvh - 2em);
 		border-radius: 6px;
 		overflow: hidden;
 		bottom: 50%;

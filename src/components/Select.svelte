@@ -260,12 +260,12 @@
 		color: var(--primary-400);
 	}
 
-	.select-menu-item:focus {
+	.select-menu-item:focus-visible {
 		outline: none;
 		border: 1px solid var(--primary-400);
 	}
 
-	.select-menu li:not(:last-child) .select-menu-item:focus {
+	.select-menu li:not(:last-child) .select-menu-item:focus-visible {
 		border-bottom: 1px solid var(--primary-400);
 	}
 </style>

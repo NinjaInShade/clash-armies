@@ -85,10 +85,10 @@
 	}
 	.tab.active,
 	.tab:hover,
-	.tab:focus {
+	.tab:focus-visible {
 		color: var(--grey-100);
 	}
-	.tab:focus {
+	.tab:focus-visible {
 		outline: none;
 	}
 	.tab.active::after {

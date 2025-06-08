@@ -33,7 +33,7 @@
 		flex-flow: column nowrap;
 		margin-left: calc(var(--nest-size) * var(--nest-depth));
 		position: relative;
-		gap: 12px;
+		gap: 10px;
 	}
 	.comments-list.nested::before {
 		content: '';

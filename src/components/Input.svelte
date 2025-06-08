@@ -62,6 +62,7 @@
 	.icon-container {
 		position: absolute;
 		transform: translateY(-50%);
+		color: var(--grey-100);
 		top: 50%;
 		left: 16px;
 	}
@@ -69,9 +70,6 @@
 		display: block;
 		max-width: 14px;
 		height: auto;
-	}
-	.icon-container :global(svg path) {
-		fill: var(--grey-500);
 	}
 
 	/* Input */
@@ -87,6 +85,9 @@
 	}
 	.icon-container + .input {
 		padding-left: 34px;
+	}
+	.icon-container:has(+ .input:placeholder-shown) {
+		color: var(--grey-500);
 	}
 
 	/* Input states */

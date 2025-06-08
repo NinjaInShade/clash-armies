@@ -5,12 +5,13 @@
 	type Props = {
 		open: boolean;
 		elRef: HTMLElement | undefined;
+		fixed?: boolean;
 		placement?: Placement;
 		placementOffset?: number;
 		onClose?: () => void;
 		children: Snippet;
 	};
-	let { open = $bindable(), elRef, children, placement = 'bottom', placementOffset = 2, onClose = () => {} }: Props = $props();
+	let { open = $bindable(), elRef, fixed = false, children, placement = 'bottom', placementOffset = 2, onClose = () => {} }: Props = $props();
 
 	// This shouldn't be state as $effect will infinitely re-run otherwise
 	let autoUpdateDispose = () => {};
@@ -82,6 +83,7 @@
 <!-- svelte-ignore a11y_click_events_have_key_events -->
 <div
 	class="menu focus-grey"
+	class:fixed
 	class:hidden={!open || x === null || y === null}
 	style="--x: {x}px; --y: {y}px;"
 	onclick={(ev) => ev.stopPropagation()}
@@ -102,6 +104,10 @@
 		width: 100%;
 		height: 100%;
 		z-index: 1;
+
+		&.fixed {
+			position: fixed;
+		}
 	}
 	.menu.hidden {
 		display: none;

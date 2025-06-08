@@ -76,7 +76,7 @@
 				background-color: #384130;
 			}
 
-			&:focus {
+			&:focus-visible {
 				outline: #53e059 dotted 2px;
 			}
 
@@ -99,7 +99,7 @@
 				background-color: #413030;
 			}
 
-			&:focus {
+			&:focus-visible {
 				outline: #e05353 dotted 2px;
 			}
 		}

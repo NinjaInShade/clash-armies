@@ -17,6 +17,10 @@ type GetArmiesOptions = {
 	ids?: number[];
 	/** Returns the armies made by this user */
 	username?: string;
+	/** Sort order */
+	sort?: 'new' | 'score';
+	/** Only fetch armies for this town hall */
+	townHall?: number;
 };
 
 type GetSavedArmiesOptions = {
@@ -80,7 +84,7 @@ export class ArmyAPI {
 	}
 
 	public async getArmies(req: RequestEvent, options: GetArmiesOptions = {}) {
-		const { ids, username } = options;
+		const { ids, username, sort, townHall } = options;
 		const userId = req.locals.user?.id ?? null;
 
 		const args: (number | number[] | string | null)[] = [userId, userId];
@@ -93,7 +97,7 @@ export class ArmyAPI {
 				ap.pets,
 				at.tags,
 				ac.comments,
-				av.votes,
+				COALESCE(av.votes, 0) AS votes,
 				IF(ag.id, JSON_OBJECT(
 					'id', ag.id,
 					'textContent', ag.textContent,
@@ -213,10 +217,26 @@ export class ArmyAPI {
 			args.push(username);
 		}
 
+		if (townHall) {
+			query += `
+				AND a.townHall = ?
+			`;
+			args.push(townHall);
+		}
+
 		query += `
 			GROUP BY a.id
-			ORDER BY a.createdTime DESC
 		`;
+
+		if (sort === 'score') {
+			query += `
+				ORDER BY votes DESC, a.createdTime DESC
+			`;
+		} else {
+			query += `
+				ORDER BY a.createdTime DESC
+			`;
+		}
 
 		const armies = await this.server.db.query<Army>(query, args);
 

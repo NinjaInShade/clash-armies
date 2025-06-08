@@ -1,19 +1,21 @@
 <script lang="ts">
 	import type { PageData } from './$types';
+	import { page } from '$app/state';
 	import { ARMY_PAGES } from '$client/pages';
 	import ArmyList from '~/components/Armies/ArmyList.svelte';
 
 	const { data }: { data: PageData } = $props();
-	const pageMeta = ARMY_PAGES.all;
+	const townHall = $derived(+page.params.slug);
+	const pageMeta = $derived(ARMY_PAGES.townHall(townHall));
 </script>
 
 <svelte:head>
-	<title>ClashArmies • Find Clash of Clans armies by troops, TH Level & Strategy!</title>
+	<title>ClashArmies • Best Clash of Clans TH{townHall} Armies - Best Town Hall {townHall} strategies</title>
 	<meta
 		name="description"
-		content="Browse hundreds of user-created Clash of Clans armies. Filter by town hall, strategy, troop types, and more to find the perfect attack for any war or farming goal."
+		content="Browse top performing Town Hall {townHall} armies. Perfect your TH{townHall} attacks for war, farming, and CWL with tested strategies."
 	/>
-	<link rel="canonical" href="https://clasharmies.com/armies" />
+	<link rel="canonical" href="https://clasharmies.com/town-hall-{townHall}" />
 </svelte:head>
 
 <section class="armies">
@@ -26,8 +28,6 @@
 				imgAlt: pageMeta.imgAlt,
 			}}
 			allowSearch
-			allowTHFilter
-			allowSort={['most-votes', 'most-comments']}
 			allowFilters
 		/>
 	</div>

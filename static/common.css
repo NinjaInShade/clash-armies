@@ -13,7 +13,7 @@
 .units-list:not(.removable) li button {
 	cursor: default;
 }
-.units-list:not(.removable) li button:focus {
+.units-list:not(.removable) li button:focus-visible {
 	outline: none;
 }
 
@@ -91,6 +91,7 @@
 	--_bg-clr-hover: var(--bg-clr-hover, var(--grey-600));
 
 	display: flex;
+	justify-content: center;
 	align-items: center;
 	border: 1px dashed var(--grey-500);
 	border-radius: var(--br);
@@ -147,5 +148,14 @@
 	& svg {
 		height: 16px;
 		width: auto;
+	}
+}
+
+@keyframes spin {
+	0% {
+		transform: rotate(0deg);
+	}
+	100% {
+		transform: rotate(360deg);
 	}
 }
