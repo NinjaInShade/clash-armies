@@ -1,3 +1,13 @@
+## [0.5.0] - 2025-06-08
+
+- Add various new army-related pages (e.g. latest, popular, town hall)
+- Add army tagging
+- Improved desktop & mobile navigation
+- Improved army card UI/UX
+- Improved view army UI/UX
+- Improved comment UI/UX
+- Various small UI tweaks
+
 ## [0.4.0] - 2025-05-24
 
 - Add ctrl+s shortcut to save army
