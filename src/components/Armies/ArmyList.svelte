@@ -1,7 +1,6 @@
 <script lang="ts">
 	import type { Army } from '$models';
 	import { getContext, untrack } from 'svelte';
-	import { SORT_OPTIONS } from './Controls.svelte';
 	import { page } from '$app/state';
 	import { goto } from '$app/navigation';
 	import type { AppState } from '$types';
@@ -29,10 +28,9 @@
 		armiesPerPage?: number;
 		allowSearch?: boolean;
 		allowTHFilter?: boolean;
-		allowSort?: (keyof typeof SORT_OPTIONS)[];
 		allowFilters?: boolean;
 	};
-	const { data, bannerOptions, armiesPerPage = 10, allowSearch = false, allowTHFilter = false, allowSort = [], allowFilters = false }: Props = $props();
+	const { data, bannerOptions, armiesPerPage = 10, allowSearch = false, allowTHFilter = false, allowFilters = false }: Props = $props();
 	const app = getContext<AppState>('app');
 	const armies = $derived.by(() => {
 		return data.map((army) => {
@@ -75,7 +73,7 @@
 	{/if}
 
 	<div class="controls">
-		<Controls bind:this={controlsRef} {armies} bind:filteredArmies {allowSearch} {allowTHFilter} {allowSort} {allowFilters} />
+		<Controls bind:this={controlsRef} {armies} bind:filteredArmies {allowSearch} {allowTHFilter} {allowFilters} />
 	</div>
 
 	{#if filteredArmies === null}

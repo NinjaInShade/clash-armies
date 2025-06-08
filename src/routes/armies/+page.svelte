@@ -27,7 +27,6 @@
 			}}
 			allowSearch
 			allowTHFilter
-			allowSort={['most-votes', 'most-comments']}
 			allowFilters
 		/>
 	</div>

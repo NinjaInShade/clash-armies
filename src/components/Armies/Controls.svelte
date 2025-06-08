@@ -1,11 +1,6 @@
 <script lang="ts" module>
 	import type { AppState, Unit, Equipment, Pet } from '$types';
 
-	export const SORT_OPTIONS = {
-		'most-votes': 'Votes',
-		'most-comments': 'Comments',
-		newest: 'Date',
-	};
 	export type PickUnit = (Unit & { pickType: 'unit' }) | (Equipment & { pickType: 'equipment' }) | (Pet & { pickType: 'pet' });
 	export type Filters = {
 		hasGuide?: true;
@@ -26,28 +21,25 @@
 	import { pluralize } from '$shared/utils';
 	import SearchBox from './SearchBox.svelte';
 	import THFilterButton from './THFilterButton.svelte';
-	import SortButton from './SortButton.svelte';
 	import FiltersPopup from './FiltersPopup.svelte';
 	import { getTags } from '$client/army';
 
 	type Props = {
 		/** The full list of armies */
 		armies: ArmyModel[];
-		/** The bound list of armies that have been filtered and sorted */
+		/** The bound list of armies that have been filtered */
 		filteredArmies: ArmyModel[] | null;
 		allowSearch: boolean;
 		allowTHFilter: boolean;
-		allowSort: (keyof typeof SORT_OPTIONS)[];
 		allowFilters: boolean;
 	};
-	let { armies, filteredArmies = $bindable(), allowSearch, allowTHFilter, allowSort, allowFilters }: Props = $props();
+	let { armies, filteredArmies = $bindable(), allowSearch, allowTHFilter, allowFilters }: Props = $props();
 
 	const app = getContext<AppState>('app');
-	const showControls = $derived(allowSearch || allowTHFilter || allowSort.length || allowFilters);
+	const showControls = $derived(allowSearch || allowTHFilter || allowFilters);
 
 	const search = mkParamStore('search', 'string');
 	const townHall = mkParamStore('townHall', 'number');
-	const sort = mkParamStore('sort', 'string');
 
 	const hasGuide = mkParamStore('hasGuide', 'boolean');
 	const attackType = mkParamStore('attackType', 'string');
@@ -119,15 +111,7 @@
 	);
 
 	$effect(() => {
-		const filtered = armies.filter(filterFn);
-		filtered.sort(sortFn);
-		filteredArmies = filtered;
-	});
-
-	$effect(() => {
-		if ($sort && !Object.keys(SORT_OPTIONS).includes($sort)) {
-			$sort = undefined;
-		}
+		filteredArmies = armies.filter(filterFn);
 	});
 
 	function filterFn(army: ArmyModel) {
@@ -178,19 +162,6 @@
 		return true;
 	}
 
-	function sortFn(a: ArmyModel, b: ArmyModel) {
-		if ($sort === 'most-votes') {
-			return b.votes - a.votes;
-		}
-		if ($sort === 'most-comments') {
-			return b.comments.length - a.comments.length;
-		}
-		if ($sort === 'newest') {
-			return +b.createdTime - +a.createdTime;
-		}
-		return 0;
-	}
-
 	async function openFiltersPopup() {
 		const newFilters = await app.openModalAsync<Filters>(FiltersPopup, { filters });
 		if (newFilters === undefined) {
@@ -232,9 +203,6 @@
 		<div class="right">
 			{#if allowTHFilter}
 				<THFilterButton value={$townHall} onChange={(value) => ($townHall = value ?? undefined)} />
-			{/if}
-			{#if allowSort.length}
-				<SortButton value={$sort} onChange={(value) => ($sort = value ?? undefined)} />
 			{/if}
 			{#if allowFilters}
 				<button
