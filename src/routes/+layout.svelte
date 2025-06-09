@@ -15,6 +15,8 @@
 	};
 	let { data, children }: Props = $props();
 
+	let adScriptTag = $state<HTMLScriptElement | undefined>(undefined);
+
 	onMount(async () => {
 		const scrollTop = page.url.searchParams.get('scrollTop');
 
@@ -25,6 +27,10 @@
 			}
 			page.url.searchParams.delete('scrollTop');
 			await goto(`?${page.url.searchParams.toString()}`, { replaceState: true, noScroll: true });
+		}
+
+		if (adScriptTag) {
+			adScriptTag.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1914457754037184';
 		}
 	});
 
@@ -101,6 +107,10 @@
 		lastModal.props.close();
 	}
 </script>
+
+<svelte:head>
+	<script async crossorigin="anonymous" bind:this={adScriptTag}></script>
+</svelte:head>
 
 <C.Nav />
 
