@@ -69,8 +69,8 @@
 			return;
 		}
 
-		await invalidateAll();
 		await goto(`/armies`);
+		await invalidateAll();
 	}
 </script>
 

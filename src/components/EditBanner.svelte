@@ -31,7 +31,7 @@
 				const SCROLL_PADDING = 16;
 				const offset = modalContent.getBoundingClientRect().top;
 				const top = selected.getBoundingClientRect().top;
-				modalContent.scrollTo({ left: 0, top: top - offset - SCROLL_PADDING, behavior: 'smooth' });
+				modalContent.scrollTo({ left: 0, top: top - offset - SCROLL_PADDING });
 			}
 		}, 10);
 	});

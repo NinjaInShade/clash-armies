@@ -55,7 +55,7 @@
 	.armies-list {
 		display: flex;
 		flex-flow: column nowrap;
-		gap: 1em;
+		gap: 10px;
 	}
 
 	.no-armies {

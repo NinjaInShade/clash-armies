@@ -36,12 +36,18 @@
 	}
 
 	async function openNotification(notification: ArmyNotification) {
+		open = false;
+
 		if (!notification.seen) {
 			await markAsRead([notification.id]);
 		}
+	}
+
+	function getNotificationLink(notification: ArmyNotification) {
 		if (['comment', 'comment-reply'].includes(notification.type)) {
-			await goto(`/armies/${notification.armyId}#comment-${notification.commentId}`);
+			return `/armies/${notification.armyId}#comment-${notification.commentId}`;
 		}
+		return '';
 	}
 
 	function formatTime(notificationTime: Date) {
@@ -64,13 +70,13 @@
 				<div class="notification">
 					<img src="/ui/barbarian.webp" alt="Clash of clans barbarian" />
 					<div class="notification-content">
-						<button onclick={() => openNotification(notif)} class="notification-title" class:seen={notif.seen}>
+						<a href={getNotificationLink(notif)} onclick={() => openNotification(notif)} class="notification-title" class:seen={notif.seen}>
 							{#if notif.type === 'comment'}
 								{notif.triggeringUserName} commented on your army "{notif.armyName}"
 							{:else if notif.type === 'comment-reply'}
 								{notif.triggeringUserName} replied to your comment on "{notif.armyName}"
 							{/if}
-						</button>
+						</a>
 						<footer>
 							<span class="notification-text">{formatTime(notif.timestamp)}</span>
 							{#if !notif.seen}
