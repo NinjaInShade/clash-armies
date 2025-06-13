@@ -10,7 +10,8 @@ export class PetModel {
 	 */
 	public id?: number;
 	public petId: number;
-	public hero: HeroType;
+	// @ts-expect-error this is set in the constructor
+	public hero: HeroType = $state();
 
 	public info: Pet;
 
