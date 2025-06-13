@@ -5,6 +5,9 @@ import os from 'node:os';
 
 export const load: PageServerLoad = async (req) => {
 	req.locals.requireRoles('admin');
+	req.setHeaders({
+		'Cache-Control': 'no-store',
+	});
 
 	const { server } = req.locals;
 	const stats = await getServerStats(server);
