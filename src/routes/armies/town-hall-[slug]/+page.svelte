@@ -20,16 +20,7 @@
 
 <section class="armies">
 	<div class="container">
-		<ArmyList
-			data={data.armies}
-			bannerOptions={{
-				...pageMeta.bannerOptions,
-				img: pageMeta.img,
-				imgAlt: pageMeta.imgAlt,
-			}}
-			allowSearch
-			allowFilters
-		/>
+		<ArmyList data={data.armies} bannerOptions={pageMeta.bannerOptions} allowSearch allowFilters />
 	</div>
 </section>
 

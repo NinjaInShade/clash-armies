@@ -18,7 +18,7 @@
 </script>
 
 <button class="town-hall {theme}" onclick={handleSelect} title="Town hall {level}" {...rest}>
-	<img src="/clash/town-halls/{level}.png" alt="Town hall {level}" />
+	<img src="/clash/town-halls/{level}_small.webp" alt="Town hall {level}" />
 	<p class="body">{level}</p>
 </button>
 

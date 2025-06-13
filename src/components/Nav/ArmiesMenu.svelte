@@ -34,7 +34,7 @@
 			<ul class="links">
 				{#each ARMY_LINKS as link}
 					<li>
-						<LinkCard {...link.navOptions} img={link.img} imgAlt={link.imgAlt} />
+						<LinkCard {...link.navOptions} />
 					</li>
 				{/each}
 			</ul>
@@ -45,7 +45,7 @@
 				{#each visibleTownHalls as th}
 					{@const options = ARMY_PAGES.townHall(th.level)}
 					<li>
-						<LinkCard {...options.navOptions} img={options.img} imgAlt={options.imgAlt} />
+						<LinkCard {...options.navOptions} />
 					</li>
 				{/each}
 			</ul>

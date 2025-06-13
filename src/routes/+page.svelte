@@ -33,14 +33,7 @@
 
 <section class="top-armies">
 	<div class="container">
-		<ArmyList
-			data={data.armies}
-			bannerOptions={{
-				...newArmiesMeta.bannerOptions,
-				img: newArmiesMeta.img,
-				imgAlt: newArmiesMeta.imgAlt,
-			}}
-		/>
+		<ArmyList data={data.armies} bannerOptions={newArmiesMeta.bannerOptions} />
 	</div>
 </section>
 

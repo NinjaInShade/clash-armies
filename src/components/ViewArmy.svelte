@@ -56,7 +56,7 @@
 	<div class="banner-content">
 		<div class="left">
 			<div class="title-container">
-				<img src="/clash/town-halls/{model.townHall}.png" alt="Town hall {model.townHall}" class="town-hall" />
+				<img src="/clash/town-halls/{model.townHall}.webp" alt="Town hall {model.townHall}" class="town-hall" />
 				<h1>{model.name}</h1>
 			</div>
 			<p class="author">Assembled by <a href="/users/{model.username}">@{model.username}</a></p>

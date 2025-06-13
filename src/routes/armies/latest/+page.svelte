@@ -15,16 +15,7 @@
 
 <section class="armies">
 	<div class="container">
-		<ArmyList
-			data={data.armies}
-			bannerOptions={{
-				...pageMeta.bannerOptions,
-				img: pageMeta.img,
-				imgAlt: pageMeta.imgAlt,
-			}}
-			allowSearch
-			allowTHFilter
-		/>
+		<ArmyList data={data.armies} bannerOptions={pageMeta.bannerOptions} allowSearch allowTHFilter />
 	</div>
 </section>
 

@@ -16,14 +16,14 @@
 
 <section class="town-halls">
 	<div class="container">
-		<Banner {...pageMeta.bannerOptions} img={pageMeta.img} imgAlt={pageMeta.imgAlt} />
+		<Banner {...pageMeta.bannerOptions} />
 		<ul class="links">
 			{#each [...app.townHalls].reverse() as th}
-				{@const { navOptions, img, imgAlt } = ARMY_PAGES.townHall(th.level)}
+				{@const { navOptions } = ARMY_PAGES.townHall(th.level)}
 				<li>
 					<a class="th-link-card" href={navOptions.href}>
 						<div class="img-container">
-							<img src={img} alt={imgAlt} />
+							<img src={navOptions.img} alt={navOptions.imgAlt} />
 						</div>
 						<div>
 							<b class="title">

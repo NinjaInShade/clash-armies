@@ -86,7 +86,7 @@
 		<ul class="links" style="--grid-cols: 2">
 			{#each armyLinks as link}
 				<li>
-					<LinkCard {...link.navOptions} img={link.img} imgAlt={link.imgAlt} onClicked={onLinkClicked} />
+					<LinkCard {...link.navOptions} onClicked={onLinkClicked} />
 				</li>
 			{/each}
 		</ul>

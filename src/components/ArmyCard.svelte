@@ -43,7 +43,7 @@
 	<header class="header">
 		<div class="top">
 			<a class="title-container" href="/armies/{model.id}">
-				<img src="/clash/town-halls/{model.townHall}.png" alt="Town hall {model.townHall}" class="town-hall" title="Town hall {model.townHall}" />
+				<img src="/clash/town-halls/{model.townHall}_small.webp" alt="Town hall {model.townHall}" class="town-hall" title="Town hall {model.townHall}" />
 				<h3>{model.name}</h3>
 			</a>
 			<button class="context-menu-btn" aria-label="context-menu" bind:this={menuBtn} onclick={toggleContextMenu}>
