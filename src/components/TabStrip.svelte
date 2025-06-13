@@ -17,20 +17,20 @@
 
 	let currentTab = $state<Tab | null>(null);
 
-	onMount(function () {
-		loadTab();
+	onMount(async function () {
+		await loadTab();
 	});
 
 	$effect(() => {
 		// If tabs change (such as component props changing), update state
-		loadTab();
+		void loadTab();
 	});
 
-	function loadTab() {
+	async function loadTab() {
 		const tab = page.url.searchParams.get('tab');
 		if (!tab) {
 			const defaultTab = tabs[0];
-			setTabQuery(defaultTab.name);
+			await setTabQuery(defaultTab.name);
 		} else {
 			const foundTab = tabs.find((t) => t.name === tab);
 			if (!foundTab) return;
@@ -38,14 +38,18 @@
 		}
 	}
 
-	function changeTab(tab: Tab) {
+	async function changeTab(tab: Tab) {
 		currentTab = tab;
-		setTabQuery(tab.name);
+		await setTabQuery(tab.name);
 	}
 
-	function setTabQuery(tab: string) {
+	async function setTabQuery(tab: string) {
 		page.url.searchParams.set('tab', tab);
-		goto(`?${page.url.searchParams.toString()}`);
+		await goto(`?${page.url.searchParams.toString()}`, {
+			replaceState: true,
+			noScroll: true,
+			keepFocus: true,
+		});
 	}
 </script>
 
@@ -54,8 +58,8 @@
 		<button
 			class="tab"
 			class:active={currentTab?.name === tab.name}
-			onclick={() => {
-				changeTab(tab);
+			onclick={async () => {
+				await changeTab(tab);
 			}}
 		>
 			{tab.label ?? tab.name}
