@@ -51,7 +51,10 @@
 </svelte:head>
 
 <section class="banner">
-	<img class="banner-img" src="/clash/banners/{model.banner}.webp" alt="Clash of clans banner artwork" />
+	<picture>
+		<source srcset="/clash/banners/{model.banner}.webp" media="(max-width: 900px)" />
+		<img class="banner-img" src="/clash/banners/{model.banner}_large.webp" alt="Clash of clans banner artwork" />
+	</picture>
 	<div class="banner-overlay"></div>
 	<div class="banner-content">
 		<div class="left">

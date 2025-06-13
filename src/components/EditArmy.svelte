@@ -185,7 +185,10 @@
 <svelte:window onkeydown={onKeyDown} />
 
 <section class="banner">
-	<img class="banner-img" src="/clash/banners/{model.banner}.webp" alt="Clash of clans banner artwork" />
+	<picture>
+		<source srcset="/clash/banners/{model.banner}.webp" media="(max-width: 900px)" />
+		<img class="banner-img" src="/clash/banners/{model.banner}_large.webp" alt="Clash of clans banner artwork" />
+	</picture>
 	<button class="banner-select-btn" type="button" onclick={editBanner} aria-label="Opens up army banner selection modal">
 		<svg width="27" height="27" viewBox="0 0 27 27" fill="none" xmlns="http://www.w3.org/2000/svg">
 			<path

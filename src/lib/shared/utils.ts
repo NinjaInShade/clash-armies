@@ -35,6 +35,13 @@ export const YEAR = DAY * 365;
  * Should match banner file names (without extension) in /static/clash/banners/*
  */
 export const BANNERS = [
+	'fire-and-ice',
+	'samurai',
+	'dark-days',
+	'bridge',
+	'fire-warden',
+	'gold-statues',
+	'goblin-fight',
 	'clan-capital-2',
 	'clashiversary',
 	'th-16',
