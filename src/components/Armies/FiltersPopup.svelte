@@ -141,7 +141,7 @@
 		const disablePet = filters.hasPets === false && unit.pickType === 'pet';
 		let title = undefined;
 		if (alreadySelected) {
-			title = 'This unit is already picked';
+			title = 'This unit is already selected, click to remove it';
 		} else if (disableSuperTroop) {
 			title = 'No super troops filter is applied';
 		} else if (disableEquipment) {
@@ -152,7 +152,8 @@
 			title = 'No pets filter is applied';
 		}
 		return {
-			disabled: alreadySelected || disableSuperTroop || disableEquipment || disableEpicEquipment || disablePet,
+			disabled: disableSuperTroop || disableEquipment || disableEpicEquipment || disablePet,
+			alreadySelected,
 			title,
 		};
 	}
@@ -164,6 +165,18 @@
 	function onKeyDown(e: KeyboardEvent) {
 		if (e.key === 'Escape') {
 			close(filters);
+		}
+	}
+
+	function onUnitListClick(unit: PickUnit, pickMode: boolean, alreadySelected: boolean) {
+		if (pickMode) {
+			if (alreadySelected) {
+				removeUnit(unit);
+			} else {
+				addUnit(unit);
+			}
+		} else {
+			removeUnit(unit);
 		}
 	}
 </script>
@@ -179,27 +192,21 @@
 {#snippet unitList(picker: boolean)}
 	<ul class={picker ? 'picker-list' : 'units-list removable'}>
 		{#each picker ? sortedUnits : sortedPickedUnits as unit}
-			{@const { disabled, title } = getUnitCardData(unit, filters)}
+			{@const { alreadySelected, disabled, title } = getUnitCardData(unit, filters)}
 			<li>
 				<button
 					type="button"
+					class="pick-button"
+					class:visually-disabled={picker && alreadySelected}
 					disabled={picker ? disabled : false}
 					onclick={() => {
-						if (picker) {
-							addUnit(unit);
-						} else {
-							removeUnit(unit);
-						}
+						onUnitListClick(unit, picker, alreadySelected);
 					}}
 					onkeypress={(ev) => {
 						if (ev.key !== 'Enter') {
 							return;
 						}
-						if (picker) {
-							addUnit(unit);
-						} else {
-							removeUnit(unit);
-						}
+						onUnitListClick(unit, picker, alreadySelected);
 					}}
 				>
 					{#if unit.pickType === 'unit'}
@@ -332,6 +339,10 @@
 		letter-spacing: 2px;
 		text-transform: uppercase;
 		font-weight: 700;
+	}
+
+	.pick-button {
+		cursor: pointer;
 	}
 
 	.content {
