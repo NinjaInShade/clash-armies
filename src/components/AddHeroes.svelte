@@ -18,10 +18,10 @@
 
 <div class="not-added">
 	<div class="heroes-img-container">
-		<img src="/clash/heroes/Barbarian King.png" alt="Clash of clans barbarian king hero" />
-		<img src="/clash/heroes/Archer Queen.png" alt="Clash of clans archer queen hero" />
-		<img src="/clash/heroes/Grand Warden.png" alt="Clash of clans grand warden hero" />
-		<img src="/clash/heroes/Royal Champion.png" alt="Clash of clans royal champion hero" />
+		<img src="/clash/heroes/Barbarian King.webp" alt="Clash of clans barbarian king hero" />
+		<img src="/clash/heroes/Archer Queen.webp" alt="Clash of clans archer queen hero" />
+		<img src="/clash/heroes/Grand Warden.webp" alt="Clash of clans grand warden hero" />
+		<img src="/clash/heroes/Royal Champion.webp" alt="Clash of clans royal champion hero" />
 	</div>
 	{#if model.townHall >= requiredThLvl}
 		<h2>Add hero pets/equipment</h2>

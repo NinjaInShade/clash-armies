@@ -25,7 +25,7 @@
 		display: flex;
 		justify-content: flex-start;
 		align-items: center;
-		background-image: url('/clash/ui/cloud-overlay.png');
+		background-image: url('/clash/ui/cloud-overlay.webp');
 		background-size: cover;
 		background-blend-mode: color-burn;
 		background-color: var(--grey-850);

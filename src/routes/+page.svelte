@@ -26,8 +26,11 @@
 			<C.Button asLink href="/army-builder">Create army</C.Button>
 		</div>
 
-		<img class="graphic" src="/clash/ui/header-barbarian.webp" alt="Angry clash of clans barbarian" />
-		<img class="graphic-mobile" src="/clash/ui/league-king.webp" alt="Clash of clans barbarian king with league skin" />
+		<picture>
+			<source srcset="/clash/ui/league-king.webp" media="(max-width: 400px)" />
+			<source srcset="/clash/ui/league-king_large.webp" media="(max-width: 625px)" />
+			<img class="graphic" src="/clash/ui/header-barbarian_large.webp" alt="Clash of Clans unit" />
+		</picture>
 	</div>
 </header>
 
@@ -39,7 +42,7 @@
 
 <style>
 	header {
-		background: repeat-x 0 25% url('/clash/ui/stones-background.png');
+		background: repeat-x 0 25% url('/clash/ui/stones-background.webp');
 		padding: 0 var(--side-padding);
 		overflow: hidden;
 	}
@@ -67,9 +70,6 @@
 		right: -215px;
 		bottom: 0;
 	}
-	.graphic-mobile {
-		display: none;
-	}
 
 	h1 span {
 		font-size: var(--h1);
@@ -83,7 +83,7 @@
 
 	@media (max-width: 1000px) {
 		header {
-			background: repeat-x 0 15% url('/clash/ui/stones-background.png');
+			background: repeat-x 0 15% url('/clash/ui/stones-background.webp');
 		}
 
 		header .container {
@@ -104,14 +104,10 @@
 
 	@media (max-width: 625px) {
 		header {
-			background: repeat-x 0 7% url('/clash/ui/stones-background.png');
+			background: repeat-x 0 7% url('/clash/ui/stones-background.webp');
 		}
 
 		.graphic {
-			display: none;
-		}
-
-		.graphic-mobile {
 			margin: 24px 0;
 			max-width: 100%;
 			height: auto;

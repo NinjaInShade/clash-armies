@@ -38,7 +38,7 @@
 		<div class="modal-header">
 			<h2 class="modal-title">{title ?? ''}</h2>
 			<button type="button" class="close-btn" onclick={() => close()}>
-				<img src="/clash/ui/close.png" alt="Close icon" />
+				<img src="/clash/ui/close.webp" alt="Close icon" />
 			</button>
 		</div>
 		<div class="modal-content">

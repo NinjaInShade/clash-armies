@@ -23,8 +23,8 @@
 			if (!grid) {
 				return;
 			}
-			// Look for the img with src ending in {banner}.png, use button position for `scrollTo()`
-			const selected = grid.querySelector(`img[src$="${banner}.png"]`)?.parentElement;
+			// Look for the img with src ending in {banner}.webp, use button position for `scrollTo()`
+			const selected = grid.querySelector(`img[src$="${banner}.webp"]`)?.parentElement;
 			// The modals content container is the scroll container we need to call `scrollTo()` on
 			const modalContent = grid.parentElement;
 			if (selected && modalContent) {

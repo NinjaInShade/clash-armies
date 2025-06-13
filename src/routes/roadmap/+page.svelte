@@ -6,7 +6,7 @@
 
 <section>
 	<div class="container">
-		<img src="/clash/ui/barb-gold.png" alt="Barbarian looking at a gold coin" />
+		<img src="/clash/ui/barb-gold.webp" alt="Barbarian looking at a gold coin" />
 		<h1>Coming soon...</h1>
 		<p>If you would like to follow development check out the <a href="https://discord.gg/9wCmfXhZM6" target="_blank">discord server</a></p>
 	</div>

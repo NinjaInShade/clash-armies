@@ -76,7 +76,7 @@
 <section class="dashed dashed-section units">
 	<header>
 		<h2 class="dashed dashed-title">
-			<img src="/clash/ui/army-camp.png" alt="Clash of clans army camp" />
+			<img src="/clash/ui/army-camp.webp" alt="Clash of clans army camp" />
 			Army camp
 		</h2>
 		<UnitTotals {model} housedIn="armyCamp" />
@@ -90,7 +90,7 @@
 	<section class="dashed dashed-section units">
 		<header>
 			<h2 class="dashed dashed-title">
-				<img src="/clash/ui/clan-castle.png" alt="Clash of clans clan castle" />
+				<img src="/clash/ui/clan-castle.webp" alt="Clash of clans clan castle" />
 				Clan castle
 			</h2>
 			<UnitTotals {model} housedIn="clanCastle" />
@@ -105,7 +105,7 @@
 	<section class="dashed dashed-section units heroes">
 		<header>
 			<h2 class="dashed dashed-title">
-				<img src="/clash/heroes/Barbarian King.png" alt="Clash of clans barbarian king hero" />
+				<img src="/clash/heroes/Barbarian King.webp" alt="Clash of clans barbarian king hero" />
 				Heroes
 			</h2>
 		</header>
@@ -123,7 +123,7 @@
 	<section class="dashed dashed-section guide">
 		<header>
 			<h2 class="dashed dashed-title">
-				<img src="/clash/ui/bb-duel.png" alt="Clash of clans builder base swords" />
+				<img src="/clash/ui/bb-duel.webp" alt="Clash of clans builder base swords" />
 				Guide
 			</h2>
 		</header>

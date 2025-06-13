@@ -62,7 +62,7 @@
 			</header>
 			{#each notifications as notif (notif.id)}
 				<div class="notification">
-					<img src="/clash/ui/barbarian.png" alt="Clash of clans barbarian" />
+					<img src="/clash/ui/barbarian.webp" alt="Clash of clans barbarian" />
 					<div class="notification-content">
 						<button onclick={() => openNotification(notif)} class="notification-title" class:seen={notif.seen}>
 							{#if notif.type === 'comment'}

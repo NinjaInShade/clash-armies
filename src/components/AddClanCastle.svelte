@@ -16,7 +16,7 @@
 
 <div class="not-added">
 	<div class="cc-img-container">
-		<img src="/clash/ui/clan-castle.png" alt="Clash of clans clan castle" />
+		<img src="/clash/ui/clan-castle.webp" alt="Clash of clans clan castle" />
 	</div>
 	{#if ccUnlocked}
 		<h2>Add clan castle</h2>

@@ -27,7 +27,7 @@
 {#snippet extraUnits()}
 	{#if model.ccUnits.length > 0}
 		<li class="clan-castle">
-			<img src="/clash/ui/clan-castle.png" alt="Clash of clans clan castle" title="Has clan castle" />
+			<img src="/clash/ui/clan-castle.webp" alt="Clash of clans clan castle" title="Has clan castle" />
 		</li>
 	{/if}
 	{#each VALID_HEROES as hero}

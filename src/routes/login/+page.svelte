@@ -11,7 +11,7 @@
 	<div class="container">
 		<div class="login-card">
 			<header class="info">
-				<img src="/clash/ui/swords.png" alt="Clash of clans overlapping swords" class="logo" />
+				<img src="/clash/ui/swords.webp" alt="Clash of clans overlapping swords" class="logo" />
 				<h2>Log in</h2>
 				<p>By logging in, you will be able to start creating armies!</p>
 			</header>

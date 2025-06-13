@@ -14,7 +14,7 @@
 
 <div class="logo-container">
 	<a class="logo" href="/">
-		<img src="/clash/ui/swords.png" alt="Clash of clans overlapping swords" />
+		<img src="/clash/ui/swords.webp" alt="Clash of clans overlapping swords" />
 		Clash <span>Armies</span>
 	</a>
 	{#if showVersion}

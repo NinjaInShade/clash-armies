@@ -15,14 +15,14 @@
 		{
 			title: 'Home',
 			description: 'Home page',
-			img: '/clash/ui/signpost.png',
+			img: '/clash/ui/signpost.webp',
 			imgAlt: 'Wooden signpost',
 			href: '/',
 		},
 		{
 			title: 'Army Builder',
 			description: 'Share your army!',
-			img: '/clash/ui/hammer-and-saw.png',
+			img: '/clash/ui/hammer-and-saw.webp',
 			imgAlt: 'Hammer and saw crossed over each other',
 			href: '/army-builder',
 		},
@@ -34,7 +34,7 @@
 				{
 					title: 'Profile',
 					description: 'View Profile',
-					img: '/clash/ui/clash-profile.png',
+					img: '/clash/ui/clash-profile.webp',
 					imgAlt: 'Profile',
 					href: `/users/${app.user?.username}`,
 				}]
@@ -43,7 +43,7 @@
 			{
 				title: 'Admin',
 				description: 'Admin Panel',
-				img: '/clash/ui/admin.png',
+				img: '/clash/ui/admin.webp',
 				imgAlt: 'Admin badge',
 				href: '/admin',
 			}]
