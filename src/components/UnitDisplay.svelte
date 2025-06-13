@@ -31,7 +31,7 @@
 	{#if level && level > 0}
 		<b class="unit-lvl" class:max-lvl={isMaxLevel}>{level}</b>
 	{/if}
-	<img class="unit-img" src="/clash/units/{name}_small.webp" alt="{type}: {name}" />
+	<img class="unit-img" src="/units/{name}_small.webp" alt="{type}: {name}" />
 </div>
 
 <style>

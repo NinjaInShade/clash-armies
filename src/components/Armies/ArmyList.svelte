@@ -93,7 +93,7 @@
 
 		{#if !displayArmies.length}
 			<div class="no-data">
-				<img src="/clash/ui/pekka.webp" alt="PEKKA" />
+				<img src="/ui/pekka.webp" alt="PEKKA" />
 				<h2>There are no armies matching this criteria warrior!</h2>
 				<div class="reset-filters">
 					<Button onClick={resetFilters}>Reset all filters</Button>

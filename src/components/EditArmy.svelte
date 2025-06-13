@@ -186,8 +186,8 @@
 
 <section class="banner">
 	<picture>
-		<source srcset="/clash/banners/{model.banner}.webp" media="(max-width: 900px)" />
-		<img class="banner-img" src="/clash/banners/{model.banner}_large.webp" alt="Clash of clans banner artwork" />
+		<source srcset="/banners/{model.banner}.webp" media="(max-width: 900px)" />
+		<img class="banner-img" src="/banners/{model.banner}_large.webp" alt="Clash of clans banner artwork" />
 	</picture>
 	<button class="banner-select-btn" type="button" onclick={editBanner} aria-label="Opens up army banner selection modal">
 		<svg width="27" height="27" viewBox="0 0 27 27" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -203,7 +203,7 @@
 	<div>
 		<div class="title">
 			<h2>
-				<img src="/clash/ui/hammer-and-saw.webp" alt="Hammer and saw crossed over each other" />
+				<img src="/ui/hammer-and-saw.webp" alt="Hammer and saw crossed over each other" />
 				Army
 				<ActionButton theme="primary-dark" onclick={importUnits} class="title-action-btn">
 					<svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -249,7 +249,7 @@
 	<div>
 		<div class="title">
 			<h2>
-				<img src="/clash/ui/army-camp.webp" alt="Clash of clans army camp" />
+				<img src="/ui/army-camp.webp" alt="Clash of clans army camp" />
 				Army camp
 			</h2>
 			<UnitTotals {model} housedIn="armyCamp" />
@@ -276,7 +276,7 @@
 		<div>
 			<div class="title">
 				<h2>
-					<img src="/clash/ui/clan-castle.webp" alt="Clash of clans clan castle" />
+					<img src="/ui/clan-castle.webp" alt="Clash of clans clan castle" />
 					Clan castle
 					<ActionButton theme="danger" onclick={removeClanCastle} class="title-action-btn">Remove</ActionButton>
 				</h2>
@@ -307,7 +307,7 @@
 		<div>
 			<div class="title">
 				<h2>
-					<img src="/clash/heroes/Barbarian King.webp" alt="Clash of clans barbarian king hero" />
+					<img src="/heroes/Barbarian King.webp" alt="Clash of clans barbarian king hero" />
 					Heroes
 					<ActionButton theme="danger" onclick={removeHeroes} class="title-action-btn">Remove</ActionButton>
 				</h2>
@@ -330,7 +330,7 @@
 		<div>
 			<div class="title">
 				<h2>
-					<img src="/clash/ui/bb-duel.webp" alt="Clash of clans builder base swords" />
+					<img src="/ui/bb-duel.webp" alt="Clash of clans builder base swords" />
 					Guide
 					<ActionButton theme="danger" onclick={removeGuide} class="title-action-btn">Remove</ActionButton>
 				</h2>

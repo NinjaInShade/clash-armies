@@ -32,7 +32,7 @@ export const DAY = HOUR * 24;
 export const YEAR = DAY * 365;
 
 /**
- * Should match banner file names (without extension) in /static/clash/banners/*
+ * Should match banner file names (without extension) in /static/banners/*
  */
 export const BANNERS = [
 	'fire-and-ice',

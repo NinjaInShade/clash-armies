@@ -27,7 +27,7 @@
 {#snippet extraUnits()}
 	{#if model.ccUnits.length > 0}
 		<li class="clan-castle">
-			<img src="/clash/ui/clan-castle.webp" alt="Clash of clans clan castle" title="Has clan castle" />
+			<img src="/ui/clan-castle.webp" alt="Clash of clans clan castle" title="Has clan castle" />
 		</li>
 	{/if}
 	{#each VALID_HEROES as hero}
@@ -43,7 +43,7 @@
 	<header class="header">
 		<div class="top">
 			<a class="title-container" href="/armies/{model.id}">
-				<img src="/clash/town-halls/{model.townHall}_small.webp" alt="Town hall {model.townHall}" class="town-hall" title="Town hall {model.townHall}" />
+				<img src="/town-halls/{model.townHall}_small.webp" alt="Town hall {model.townHall}" class="town-hall" title="Town hall {model.townHall}" />
 				<h3>{model.name}</h3>
 			</a>
 			<button class="context-menu-btn" aria-label="context-menu" bind:this={menuBtn} onclick={toggleContextMenu}>

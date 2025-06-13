@@ -14,18 +14,18 @@
 
 <div class="totals">
 	<small class="total">
-		<img src="/clash/ui/troops.webp" alt="Clash of clans troop capacity" />
+		<img src="/ui/troops.webp" alt="Clash of clans troop capacity" />
 		{used.troops}/{capacity.troops}
 	</small>
 	{#if capacity.spells > 0}
 		<small class="total">
-			<img src="/clash/ui/spells.webp" alt="Clash of clans spell capacity" />
+			<img src="/ui/spells.webp" alt="Clash of clans spell capacity" />
 			{used.spells}/{capacity.spells}
 		</small>
 	{/if}
 	{#if capacity.sieges > 0}
 		<small class="total">
-			<img src="/clash/ui/sieges.webp" alt="Clash of clans siege machine capacity" />
+			<img src="/ui/sieges.webp" alt="Clash of clans siege machine capacity" />
 			{used.sieges}/{capacity.sieges}
 		</small>
 	{/if}

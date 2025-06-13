@@ -24,7 +24,7 @@
 	</ul>
 {:else}
 	<div class="no-armies">
-		<img src="/clash/ui/falling-barb.webp" alt="Falling barbarian" />
+		<img src="/ui/falling-barb.webp" alt="Falling barbarian" />
 		<h2>
 			{#if currentUser === username}
 				You haven't saved any armies warrior!

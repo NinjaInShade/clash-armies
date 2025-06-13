@@ -27,9 +27,9 @@
 		</div>
 
 		<picture>
-			<source srcset="/clash/ui/league-king.webp" media="(max-width: 400px)" />
-			<source srcset="/clash/ui/league-king_large.webp" media="(max-width: 625px)" />
-			<img class="graphic" src="/clash/ui/header-barbarian_large.webp" alt="Clash of Clans unit" />
+			<source srcset="/ui/league-king.webp" media="(max-width: 400px)" />
+			<source srcset="/ui/league-king_large.webp" media="(max-width: 625px)" />
+			<img class="graphic" src="/ui/header-barbarian_large.webp" alt="Clash of Clans unit" />
 		</picture>
 	</div>
 </header>
@@ -42,7 +42,7 @@
 
 <style>
 	header {
-		background: repeat-x 0 25% url('/clash/ui/stones-background.webp');
+		background: repeat-x 0 25% url('/ui/stones-background.webp');
 		padding: 0 var(--side-padding);
 		overflow: hidden;
 	}
@@ -83,7 +83,7 @@
 
 	@media (max-width: 1000px) {
 		header {
-			background: repeat-x 0 15% url('/clash/ui/stones-background.webp');
+			background: repeat-x 0 15% url('/ui/stones-background.webp');
 		}
 
 		header .container {
@@ -104,7 +104,7 @@
 
 	@media (max-width: 625px) {
 		header {
-			background: repeat-x 0 7% url('/clash/ui/stones-background.webp');
+			background: repeat-x 0 7% url('/ui/stones-background.webp');
 		}
 
 		.graphic {

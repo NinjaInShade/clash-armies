@@ -73,7 +73,7 @@ const CURRENT_SPELLS: string[] = [
 ];
 
 /**
- * The troop names in static/clash/troops/troops.json don't
+ * The troop names in static/troops/troops.json don't
  * all correspond to the ones in static/objectIds.json so
  * we have to map the translations. TODO: investigate potentially better options
  */

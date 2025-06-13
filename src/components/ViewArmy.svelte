@@ -52,14 +52,14 @@
 
 <section class="banner">
 	<picture>
-		<source srcset="/clash/banners/{model.banner}.webp" media="(max-width: 900px)" />
-		<img class="banner-img" src="/clash/banners/{model.banner}_large.webp" alt="Clash of clans banner artwork" />
+		<source srcset="/banners/{model.banner}.webp" media="(max-width: 900px)" />
+		<img class="banner-img" src="/banners/{model.banner}_large.webp" alt="Clash of clans banner artwork" />
 	</picture>
 	<div class="banner-overlay"></div>
 	<div class="banner-content">
 		<div class="left">
 			<div class="title-container">
-				<img src="/clash/town-halls/{model.townHall}.webp" alt="Town hall {model.townHall}" class="town-hall" />
+				<img src="/town-halls/{model.townHall}.webp" alt="Town hall {model.townHall}" class="town-hall" />
 				<h1>{model.name}</h1>
 			</div>
 			<p class="author">Assembled by <a href="/users/{model.username}">@{model.username}</a></p>
@@ -76,7 +76,7 @@
 <section class="dashed dashed-section units">
 	<header>
 		<h2 class="dashed dashed-title">
-			<img src="/clash/ui/army-camp.webp" alt="Clash of clans army camp" />
+			<img src="/ui/army-camp.webp" alt="Clash of clans army camp" />
 			Army camp
 		</h2>
 		<UnitTotals {model} housedIn="armyCamp" />
@@ -90,7 +90,7 @@
 	<section class="dashed dashed-section units">
 		<header>
 			<h2 class="dashed dashed-title">
-				<img src="/clash/ui/clan-castle.webp" alt="Clash of clans clan castle" />
+				<img src="/ui/clan-castle.webp" alt="Clash of clans clan castle" />
 				Clan castle
 			</h2>
 			<UnitTotals {model} housedIn="clanCastle" />
@@ -105,7 +105,7 @@
 	<section class="dashed dashed-section units heroes">
 		<header>
 			<h2 class="dashed dashed-title">
-				<img src="/clash/heroes/Barbarian King.webp" alt="Clash of clans barbarian king hero" />
+				<img src="/heroes/Barbarian King.webp" alt="Clash of clans barbarian king hero" />
 				Heroes
 			</h2>
 		</header>
@@ -123,7 +123,7 @@
 	<section class="dashed dashed-section guide">
 		<header>
 			<h2 class="dashed dashed-title">
-				<img src="/clash/ui/bb-duel.webp" alt="Clash of clans builder base swords" />
+				<img src="/ui/bb-duel.webp" alt="Clash of clans builder base swords" />
 				Guide
 			</h2>
 		</header>

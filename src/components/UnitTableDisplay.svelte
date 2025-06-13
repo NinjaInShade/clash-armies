@@ -5,7 +5,7 @@
 	let { name }: Props = $props();
 </script>
 
-<img src="/clash/units/{name}.webp" alt="Unit: {name}" />
+<img src="/units/{name}.webp" alt="Unit: {name}" />
 
 <style>
 	img {

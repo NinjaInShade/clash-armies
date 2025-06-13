@@ -32,10 +32,10 @@
 	onclick={toggleMenu}
 >
 	{#if value === undefined}
-		<img src="/clash/town-halls/17_small.webp" alt="Town hall 17" />
+		<img src="/town-halls/17_small.webp" alt="Town hall 17" />
 		TH
 	{:else}
-		<img src="/clash/town-halls/{value}_small.webp" alt="Town hall {value}" />
+		<img src="/town-halls/{value}_small.webp" alt="Town hall {value}" />
 		TH{value}
 	{/if}
 </button>
@@ -53,7 +53,7 @@
 						title={isSelected ? `Town hall ${th.level} is already selected` : `Town hall ${th.level}`}
 					>
 						<div class="flex">
-							<img src="/clash/town-halls/{th.level}_small.webp" alt="Town hall {th.level}" />
+							<img src="/town-halls/{th.level}_small.webp" alt="Town hall {th.level}" />
 							<p class="body">{th.level}</p>
 						</div>
 						{#if value === th.level}

@@ -7,7 +7,7 @@
 	let { level, height, displayLevel }: Props = $props();
 </script>
 
-<img src="/clash/town-halls/{level}.webp" alt="Town hall {level}" style="--height: {height ?? 38}px" />
+<img src="/town-halls/{level}.webp" alt="Town hall {level}" style="--height: {height ?? 38}px" />
 
 {#if displayLevel}
 	<p>TH{level}</p>

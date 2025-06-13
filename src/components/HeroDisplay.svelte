@@ -18,7 +18,7 @@
 	{#if level && level > 0}
 		<b class="lvl" class:max={isMaxLevel}>{level}</b>
 	{/if}
-	<img src="/clash/heroes/{name} Full Height.webp" alt={`Clash of clans "${name}" hero`} />
+	<img src="/heroes/{name} Full Height.webp" alt={`Clash of clans "${name}" hero`} />
 </div>
 
 <style>

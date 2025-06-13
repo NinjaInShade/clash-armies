@@ -44,12 +44,12 @@
 	<div class="container">
 		<div class="left">
 			<div class="profile-pic">
-				<img src="/clash/ui/barb-king.webp" alt="Barbarian king" class="profile-pic-img" />
+				<img src="/ui/barb-king.webp" alt="Barbarian king" class="profile-pic-img" />
 			</div>
 			<div class="user-data">
 				<div class="level">
 					<b class="level-value">{user.level ?? '?'}</b>
-					<img src="/clash/ui/experience.webp" alt="Clash of clans experience" class="level-img" />
+					<img src="/ui/experience.webp" alt="Clash of clans experience" class="level-img" />
 				</div>
 				<h2 class="username">{username}</h2>
 				<h3 class="player-tag">#{user.playerTag ?? '??????'}</h3>
