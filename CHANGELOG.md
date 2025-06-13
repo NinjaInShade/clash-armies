@@ -1,3 +1,11 @@
+## [0.5.1] - 2025-06-08
+
+- Add Dark Crown equipment
+- Optimise images
+- Allow clicking on unit again to remove it in the filters popup
+- Fix navigating back on user page not always working
+- Fix pet replacement not updating UI
+
 ## [0.5.0] - 2025-06-08
 
 - Add various new army-related pages (e.g. latest, popular, town hall)
