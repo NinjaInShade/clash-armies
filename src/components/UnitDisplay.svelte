@@ -49,14 +49,17 @@
 
 	.unit-display.Troop,
 	.unit-display.Siege {
+		background: linear-gradient(0deg, hsl(207, 64%, 45%) 0%, hsl(203, 100%, 66%) 100%);
 		background-color: #60a7d8;
 	}
 
 	.unit-display.Spell {
+		background: linear-gradient(0deg, hsl(251, 65%, 57%) 0%, hsl(252, 68%, 62%) 100%);
 		background-color: #655fd0;
 	}
 
 	.unit-display.Super {
+		background: linear-gradient(0deg, hsl(357, 51%, 27%) 0%, hsl(2, 45%, 47%) 100%);
 		background-color: #a2283f;
 	}
 
