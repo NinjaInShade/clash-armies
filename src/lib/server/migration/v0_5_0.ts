@@ -1,4 +1,5 @@
 import type { MySQL, MigrationFn } from '@ninjalib/sql';
+import type { Unit, Pet } from '$types';
 
 // prettier-ignore
 export default function migration(runStep: MigrationFn) {
@@ -52,5 +53,51 @@ export default function migration(runStep: MigrationFn) {
 			{ equipmentId, level: 26, blacksmithLevel: 9 },
 			{ equipmentId, level: 27, blacksmithLevel: 9 },
 		]);
+	});
+	runStep(50, `
+        UPDATE town_halls SET
+            maxDarkSpellFactory = 7
+        WHERE level >= 14
+    `);
+	runStep(51, async (db: MySQL) => {
+		// Insert data for new "Ice Block" spell
+        const spellId = await db.insertOne('units', {
+            type: 'Spell',
+            name: 'Ice Block',
+            clashId: 109,
+            housingSpace: 1,
+            productionBuilding: 'Dark Spell Factory',
+        });
+        await db.insertMany('unit_levels', [
+            { unitId: spellId, level: 1, spellFactoryLevel: 7, laboratoryLevel: 1 },
+            { unitId: spellId, level: 2, spellFactoryLevel: 7, laboratoryLevel: 12 },
+            { unitId: spellId, level: 3, spellFactoryLevel: 7, laboratoryLevel: 13 },
+            { unitId: spellId, level: 4, spellFactoryLevel: 7, laboratoryLevel: 14 },
+            { unitId: spellId, level: 4, spellFactoryLevel: 7, laboratoryLevel: 15 },
+        ]);
+
+		// Insert data for new "Balloon" level
+		const balloon = await db.getRow<Unit>('units', { name: 'Balloon' });
+		const superBalloon = await db.getRow<Unit>('units', { name: 'Rocket Balloon' });
+		await db.insertOne('unit_levels', { unitId: balloon.id, level: 12, barrackLevel: 6, laboratoryLevel: 15 });
+		await db.insertOne('unit_levels', { unitId: superBalloon.id, level: 12, barrackLevel: 6, laboratoryLevel: 1 });
+
+		// Insert data for new "Druid" level
+		const druid = await db.getRow<Unit>('units', { name: 'Druid' });
+		await db.insertOne('unit_levels', { unitId: druid.id, level: 5, barrackLevel: 11, laboratoryLevel: 15 });
+
+		// Insert data for new "Battle Blimp" level
+		const blimp = await db.getRow<Unit>('units', { name: 'Battle Blimp' });
+		await db.insertOne('unit_levels', { unitId: blimp.id, level: 5, barrackLevel: 2, laboratoryLevel: 13 });
+
+		// Insert data for new "Frosty" levels
+		const frosty = await db.getRow<Pet>('pets', { name: 'Frosty' });
+		await db.insertMany('pet_levels', [
+            { petId: frosty.id, level: 11, petHouseLevel: 11 },
+            { petId: frosty.id, level: 12, petHouseLevel: 11 },
+            { petId: frosty.id, level: 13, petHouseLevel: 11 },
+            { petId: frosty.id, level: 14, petHouseLevel: 11 },
+            { petId: frosty.id, level: 15, petHouseLevel: 11 },
+        ]);
 	});
 }
