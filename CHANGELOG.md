@@ -1,3 +1,8 @@
+## [0.5.4] - 2025-06-19
+
+- Add Ice Block spell
+- Add new unit levels
+
 ## [0.5.1] - 2025-06-08
 
 - Add Dark Crown equipment
