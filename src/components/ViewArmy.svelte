@@ -315,7 +315,7 @@
 	}
 
 	.dashed-section {
-		margin-top: 32px;
+		margin-top: 28px;
 
 		& header {
 			display: flex;
@@ -353,8 +353,8 @@
 			padding-right: 24px;
 
 			&:not(:first-child) {
-				padding-left: 32px;
-				padding-right: 32px;
+				padding-left: 28px;
+				padding-right: 28px;
 			}
 		}
 
@@ -364,8 +364,8 @@
 				padding-right: 16px;
 
 				&:not(:first-child) {
-					padding-left: 24px;
-					padding-right: 24px;
+					padding-left: 20px;
+					padding-right: 20px;
 				}
 			}
 		}

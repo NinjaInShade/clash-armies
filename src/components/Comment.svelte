@@ -139,7 +139,7 @@
 	.card {
 		background-color: var(--grey-800);
 		border: 1px dashed var(--grey-500);
-		border-radius: 8px;
+		border-radius: 4px;
 		padding: 0.75em 1em;
 		width: 100%;
 	}
