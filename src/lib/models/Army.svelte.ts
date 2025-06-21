@@ -8,6 +8,10 @@ import { CommentModel } from './Comment.svelte';
 
 export type Army = {
 	id: number;
+	score: number;
+	pageViews: number;
+	openLinkClicks: number;
+	copyLinkClicks: number;
 	name: string;
 	townHall: number;
 	guide: ArmyGuide | null;

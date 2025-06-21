@@ -100,4 +100,10 @@ export default function migration(runStep: MigrationFn) {
             { petId: frosty.id, level: 15, petHouseLevel: 11 },
         ]);
 	});
+	// Insert vote metric so we can store it's weight and update it on-demand if required
+	// NOTE: minAgeHours doesn't have any effect since votes are recorded externally of army_metric_events
+	runStep(52, `
+		INSERT INTO metrics (name, weight, minAgeHours) VALUES
+			('vote', 50, 1)
+	`);
 }

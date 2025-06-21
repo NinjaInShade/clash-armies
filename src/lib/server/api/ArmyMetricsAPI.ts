@@ -54,6 +54,25 @@ export class ArmyMetricsAPI {
 		}
 	}
 
+	public async getMetricWeights() {
+		const metrics = await this.server.db.getRows<Metric>('metrics');
+
+		const requireMetric = (name: string) => {
+			const metric = metrics.find((metric) => metric.name === name);
+			if (!metric) {
+				throw new Error(`Invalid metric "${name}"`);
+			}
+			return metric.weight;
+		};
+
+		return {
+			vote: requireMetric('vote'),
+			pageView: requireMetric('page-view'),
+			copyLinkClick: requireMetric('copy-link-click'),
+			openLinkClick: requireMetric('open-link-click'),
+		};
+	}
+
 	public async reportPageView(req: RequestEvent, armyId: number) {
 		await this.handleMetricEvent(req, armyId, PAGE_VIEW_METRIC);
 	}

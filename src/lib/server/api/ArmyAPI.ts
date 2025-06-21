@@ -91,13 +91,17 @@ export class ArmyAPI {
 		let query = `
 			SELECT
 				a.*,
+				am.score,
+				am.votes,
+				am.pageViews,
+				am.openLinkClicks,
+				am.copyLinkClicks,
 				u.username,
 				au.units,
 				ae.equipment,
 				ap.pets,
 				at.tags,
 				ac.comments,
-				COALESCE(av.votes, 0) AS votes,
 				IF(ag.id, JSON_OBJECT(
 					'id', ag.id,
 					'textContent', ag.textContent,
@@ -106,6 +110,9 @@ export class ArmyAPI {
 				COALESCE(uv.vote, 0) AS userVote,
 				sa.id IS NOT NULL AS userBookmarked
 			FROM armies a
+			LEFT JOIN (
+				${await this.getArmyScoresQuery()}
+			) am ON am.armyId = a.id
 			LEFT JOIN users u ON u.id = a.createdBy
 			LEFT JOIN (
 				SELECT
@@ -188,11 +195,6 @@ export class ArmyAPI {
 				GROUP BY a.id
 			) ac ON ac.id = a.id
 			LEFT JOIN (
-				SELECT armyId, COALESCE(SUM(vote), 0) AS votes
-				FROM army_votes
-				GROUP BY armyId
-			) av ON av.armyId = a.id
-			LEFT JOIN (
 				SELECT armyId, JSON_ARRAYAGG(tag) AS tags
 				FROM army_tags
 				GROUP BY armyId
@@ -230,7 +232,7 @@ export class ArmyAPI {
 
 		if (sort === 'score') {
 			query += `
-				ORDER BY votes DESC, a.createdTime DESC
+				ORDER BY score DESC, a.createdTime DESC
 			`;
 		} else {
 			query += `
@@ -257,12 +259,44 @@ export class ArmyAPI {
 				comment.updatedTime = new Date(`${comment.updatedTime}Z`);
 			}
 
+			// TODO: should not have to do this, needs investigating
+			army.score = +army.score;
+			army.pageViews = +army.pageViews;
+			army.openLinkClicks = +army.openLinkClicks;
+			army.copyLinkClicks = +army.copyLinkClicks;
 			army.votes = +army.votes;
 			// @ts-expect-error data is 0/1 number when it's queried from the database // TODO: I think TINYINT(1) should just be returning a boolean?
 			army.userBookmarked = army.userBookmarked === 1 ? true : false;
 		}
 
 		return armies;
+	}
+
+	public async getArmyScoresQuery() {
+		const weights = await this.metrics.getMetricWeights();
+		return `
+			SELECT
+				a.id AS armyId,
+				(
+					(COALESCE(av.votes, 0) * ${weights.vote}) +
+					(COALESCE(metric_pv.value, 0) * ${weights.pageView}) +
+					(COALESCE(metric_cl.value, 0) * ${weights.copyLinkClick}) +
+					(COALESCE(metric_ol.value, 0) * ${weights.openLinkClick})
+				) AS score,
+				COALESCE(av.votes, 0) AS votes,
+				COALESCE(metric_pv.value, 0) AS pageViews,
+				COALESCE(metric_ol.value, 0) AS openLinkClicks,
+				COALESCE(metric_cl.value, 0) AS copyLinkClicks
+			FROM armies a
+			LEFT JOIN (
+				SELECT armyId, COALESCE(SUM(vote), 0) AS votes
+				FROM army_votes
+				GROUP BY armyId
+			) av ON av.armyId = a.id
+			LEFT JOIN army_metrics metric_pv ON metric_pv.armyId = a.id AND metric_pv.name = 'page-view'
+			LEFT JOIN army_metrics metric_cl ON metric_cl.armyId = a.id AND metric_cl.name = 'copy-link-click'
+			LEFT JOIN army_metrics metric_ol ON metric_ol.armyId = a.id AND metric_ol.name = 'open-link-click'
+		`;
 	}
 
 	public async getSavedArmies(req: RequestEvent, options: GetSavedArmiesOptions) {
