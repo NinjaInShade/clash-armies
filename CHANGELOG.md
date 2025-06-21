@@ -1,3 +1,9 @@
+## [0.5.5] - 2025-06-21
+
+- Calculating popular armies now takes in various metrics rather than just votes
+- Allow navigating to army builder page without being logged in - but still require being logged in to access it - partly a potential SEO benefit for the time being
+- Close popup menus on scroll
+
 ## [0.5.4] - 2025-06-19
 
 - Add Ice Block spell
