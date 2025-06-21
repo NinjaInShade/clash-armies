@@ -60,23 +60,32 @@
 				</ul>
 				<p class="copyright">Copyright © {new Date().getFullYear()} | All Rights Reserved</p>
 			</div>
-			<div class="col quick-links">
+			<div class="col armies">
+				<h3>Armies</h3>
+				<ul>
+					<li>
+						<a href="/armies/popular">Popular Armies</a>
+					</li>
+					<li>
+						<a href="/armies/latest">Latest Armies</a>
+					</li>
+					<li>
+						<a href="/armies/town-halls">By Town Hall</a>
+					</li>
+					<li>
+						<a href="/armies">All Armies</a>
+					</li>
+				</ul>
+			</div>
+			<div class="col">
 				<h3>Quick Links</h3>
 				<ul>
 					<li>
 						<a href="/">Home</a>
 					</li>
-					<li>
-						<a href="/armies">Armies</a>
-					</li>
 					{#if app.user}
 						<li>
 							<a href="/army-builder">Army builder</a>
-						</li>
-					{/if}
-					{#if app.user && app.user.hasRoles('admin')}
-						<li>
-							<a href="/admin">Admin</a>
 						</li>
 					{/if}
 					{#if app.user}
@@ -84,17 +93,6 @@
 							<a href="/users/{app.user.username}">Account</a>
 						</li>
 					{/if}
-				</ul>
-			</div>
-			<div class="col">
-				<h3>Development</h3>
-				<ul>
-					<li>
-						<a href="/changelog">Changelog</a>
-					</li>
-					<li>
-						<a href="/roadmap">Roadmap</a>
-					</li>
 				</ul>
 			</div>
 			<div class="col">
@@ -275,9 +273,10 @@
 	.col a:hover path {
 		fill: var(--grey-100);
 	}
-	.col.quick-links ul {
+	.col.armies ul {
 		display: grid;
-		grid-template-columns: repeat(3, 1fr);
+		grid-template-columns: repeat(2, 1fr);
+		column-gap: 16px;
 	}
 
 	small .copyright {
