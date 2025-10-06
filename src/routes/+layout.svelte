@@ -109,7 +109,9 @@
 </script>
 
 <svelte:head>
-	<script async crossorigin="anonymous" bind:this={adScriptTag}></script>
+	{#if !appState.user}
+		<script async crossorigin="anonymous" bind:this={adScriptTag}></script>
+	{/if}
 </svelte:head>
 
 <C.Nav />
