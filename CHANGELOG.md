@@ -1,3 +1,8 @@
+## [0.5.6] - 2025-10-08
+
+- Add new Heroic Torch GW equipment
+- Add new unit levels
+
 ## [0.5.5] - 2025-06-21
 
 - Calculating popular armies now takes in various metrics rather than just votes
