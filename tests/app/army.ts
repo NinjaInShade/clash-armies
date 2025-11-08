@@ -130,7 +130,7 @@ describe('Saving', function () {
 				townHall: 16,
 				units: [{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Barbarian', gameData).id, amount: 10 }],
 				guide: {
-					textContent: '<p>Guide!</p>',
+					textContent: '<p xmlns="http://www.w3.org/1999/xhtml">Guide!</p>',
 					youtubeUrl: null,
 				},
 			});
@@ -157,7 +157,7 @@ describe('Saving', function () {
 			await server.army.saveArmy(req, data);
 			const armies = await server.army.getArmies(req);
 			// Expect one empty tag
-			data.guide.textContent = '<p></p>';
+			data.guide.textContent = '<p xmlns="http://www.w3.org/1999/xhtml"></p>';
 			assertArmies(armies, [data]);
 		});
 	});
