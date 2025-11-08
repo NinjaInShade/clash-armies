@@ -48,7 +48,7 @@
 		"vitest": "^3.1.1"
 	},
 	"dependencies": {
-		"@floating-ui/dom": "^1.6.10",
+		"@floating-ui/dom": "^1.7.4",
 		"@ninjalib/sql": "^0.5.1",
 		"@ninjalib/util": "0.5.4",
 		"@tiptap/core": "^3.10.4",
