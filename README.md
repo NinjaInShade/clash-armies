@@ -11,7 +11,7 @@ If you need extra help, or have suggestions on improving the dev workflow, give 
 ## Prerequisites
 
 - `npm` >= 10.5.0
-- `node` >= 23.3.0
+- `node` >= 24.11.0
 - `docker` >= 20.10.24
 - `docker compose` >= 2.20.3
 

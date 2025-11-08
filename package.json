@@ -17,7 +17,7 @@
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json src"
 	},
 	"engines": {
-		"node": ">=23.3.0"
+		"node": ">=24.11.0"
 	},
 	"devDependencies": {
 		"@sveltejs/adapter-node": "^5.2.12",
