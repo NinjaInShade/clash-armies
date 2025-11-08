@@ -1,3 +1,7 @@
+## [0.5.8] - 2025-11-08
+
+- Update dependencies
+
 ## [0.5.7] - 2025-11-08
 
 - Add new Meteor Staff MP equipment
