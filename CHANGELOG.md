@@ -1,3 +1,7 @@
+## [0.5.7] - 2025-11-08
+
+- Add new Meteor Staff MP equipment
+
 ## [0.5.6] - 2025-10-08
 
 - Add new Heroic Torch GW equipment
