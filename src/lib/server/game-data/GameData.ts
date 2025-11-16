@@ -1,4 +1,4 @@
-import util from '@ninjalib/util';
+import { logger, type Logger } from '$server/logger';
 import type { MySQL } from '@ninjalib/sql';
 import type { Server } from '$server/api/Server';
 import type { Unit, Equipment, Pet, TownHall, StaticGameData, Hero, UnitType } from '$types';
@@ -25,7 +25,7 @@ type GetUnitsOptions = {
 
 export class GameData {
 	private server: Server;
-	private log: util.Logger;
+	private log: Logger;
 	private settings: GameDataSettings;
 
 	/** Game units static data */
@@ -80,7 +80,7 @@ export class GameData {
 
 	constructor(server: Server, settings: GameDataSettings = {}) {
 		this.server = server;
-		this.log = util.logger('clash-armies:data-sync');
+		this.log = logger('clash-armies:data-sync');
 		this.settings = settings;
 	}
 

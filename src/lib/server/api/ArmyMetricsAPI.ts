@@ -1,4 +1,4 @@
-import util from '@ninjalib/util';
+import { logger, type Logger } from '$server/logger';
 import type { Server } from '$server/api/Server';
 import type { RequestEvent } from '@sveltejs/kit';
 import { pluralize, HOUR, DAY, PAGE_VIEW_METRIC, COPY_LINK_CLICK_METRIC, OPEN_LINK_CLICK_METRIC } from '$shared/utils';
@@ -37,7 +37,7 @@ type ArmyMetricsAPIOptions = {
 const VISITOR_COOKIE_NAME = 'visitor_id';
 
 export class ArmyMetricsAPI {
-	public log: util.Logger;
+	public log: Logger;
 
 	private server: Server;
 	private visitorIdSecret: string;
@@ -46,7 +46,7 @@ export class ArmyMetricsAPI {
 	constructor(server: Server, options: ArmyMetricsAPIOptions = {}) {
 		this.server = server;
 		this.visitorIdSecret = requireVisitorIdSecret();
-		this.log = util.logger('clash-armies:metrics');
+		this.log = logger('clash-armies:metrics');
 
 		if (typeof options.metricsMinAgeMs === 'number') {
 			this.metricsMinAgeMsOverride = options.metricsMinAgeMs;

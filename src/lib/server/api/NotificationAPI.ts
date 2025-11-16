@@ -2,7 +2,7 @@ import type { Server } from '$server/api/Server';
 import type { RequestEvent } from '@sveltejs/kit';
 import type { ArmyNotification } from '$types';
 import { pluralize } from '$shared/utils';
-import util from '@ninjalib/util';
+import { logger, type Logger } from '$server/logger';
 
 type GetNotificationsOptions = {
 	/** Returns notifications for this user */
@@ -11,11 +11,11 @@ type GetNotificationsOptions = {
 
 export class NotificationAPI {
 	private server: Server;
-	private log: util.Logger;
+	private log: Logger;
 
 	constructor(server: Server) {
 		this.server = server;
-		this.log = util.logger('clash-armies:notif');
+		this.log = logger('clash-armies:notif');
 	}
 
 	public async init() {

@@ -14,9 +14,6 @@ importers:
       '@ninjalib/sql':
         specifier: ^0.5.1
         version: 0.5.1(@types/node@25.9.2)(lightningcss@1.32.0)(svelte@5.56.2(@typescript-eslint/types@8.60.1))
-      '@ninjalib/util':
-        specifier: 0.5.4
-        version: 0.5.4(lightningcss@1.32.0)(svelte@5.56.2(@typescript-eslint/types@8.60.1))
       '@tiptap/core':
         specifier: ^3.26.0
         version: 3.26.0(@tiptap/pm@3.26.0)
@@ -3250,7 +3247,7 @@ snapshots:
 
   '@types/ws@8.18.1':
     dependencies:
-      '@types/node': 25.6.0
+      '@types/node': 25.9.2
 
   '@typescript-eslint/eslint-plugin@8.60.1(@typescript-eslint/parser@8.60.1(eslint@10.4.1)(typescript@6.0.3))(eslint@10.4.1)(typescript@6.0.3)':
     dependencies:
@@ -3789,7 +3786,7 @@ snapshots:
 
   happy-dom@20.9.0:
     dependencies:
-      '@types/node': 25.6.0
+      '@types/node': 25.9.2
       '@types/whatwg-mimetype': 3.0.2
       '@types/ws': 8.18.1
       entities: 7.0.1

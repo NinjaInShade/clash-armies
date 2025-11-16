@@ -1,6 +1,6 @@
 import type { MySQL } from '@ninjalib/sql';
 import type { RequestEvent } from '@sveltejs/kit';
-import util from '@ninjalib/util';
+import { logger, type Logger } from '$server/logger';
 import { migration } from '$server/migration';
 import { GameData, type GameDataSettings } from '$server/game-data/GameData';
 import { ArmyAPI } from '$server/api/ArmyAPI';
@@ -28,7 +28,7 @@ type GetSafeRedirectOptions = {
  */
 export class Server {
 	public db: MySQL;
-	public log: util.Logger;
+	public log: Logger;
 
 	public army: ArmyAPI;
 	public user: UserAPI;
@@ -42,7 +42,7 @@ export class Server {
 	constructor(db: MySQL, settings: ServerSettings = {}) {
 		this.db = db;
 		this.settings = settings;
-		this.log = util.logger('clash-armies:server');
+		this.log = logger('clash-armies:server');
 
 		this.army = new ArmyAPI(this);
 		this.user = new UserAPI(this);

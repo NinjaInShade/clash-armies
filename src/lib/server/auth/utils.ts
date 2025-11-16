@@ -1,7 +1,7 @@
 import { type RequestEvent, redirect, error } from '@sveltejs/kit';
-import util from '@ninjalib/util';
+import { logger } from '$server/logger';
 
-export const log = util.logger('clash-armies:auth');
+export const log = logger('clash-armies:auth');
 
 export function hasAuth(req: RequestEvent) {
 	return Boolean(req.locals.user);

@@ -3,10 +3,10 @@ import { db } from '$server/db';
 import { initRequest, resolveRequest, handleUnexpectedError, authMiddleware } from '$server/utils';
 import { Server } from '$server/api/Server';
 import { dev } from '$app/environment';
-import util from '@ninjalib/util';
+import { Logger } from '$server/logger';
 
-util.Logger.showTimestamp = true;
-util.Logger.showDate = !dev;
+Logger.showTimestamp = true;
+Logger.showDate = !dev;
 
 const server = new Server(db);
 
