@@ -1,3 +1,10 @@
+## [0.5.9] - 2025-11-20
+
+- Add town hall 18
+- Add new Meteor Golem troop
+- Add new Totem spell
+- Add various new unit levels
+
 ## [0.5.8] - 2025-11-08
 
 - Update dependencies
