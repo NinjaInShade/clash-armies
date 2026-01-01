@@ -1,3 +1,7 @@
+## [0.5.10] - 2026-01-01
+
+- Add new Frost Falek RC equipment
+
 ## [0.5.9] - 2025-11-20
 
 - Add town hall 18
