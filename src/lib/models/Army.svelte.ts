@@ -83,7 +83,7 @@ export class ArmyModel {
 	public updatedTime?: Date;
 
 	public name = $state<string | null>(null);
-	public townHall = $state(17);
+	public townHall = $state(18);
 	public units = $state<UnitModel[]>([]);
 	public ccUnits = $state<UnitModel[]>([]);
 	public pets = $state<PetModel[]>([]);
