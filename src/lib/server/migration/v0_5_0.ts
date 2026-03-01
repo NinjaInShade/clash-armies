@@ -383,4 +383,228 @@ export default function migration(runStep: MigrationFn) {
 			{ equipmentId, level: 27, blacksmithLevel: 9 },
 		]);
 	});
+    runStep(57, async (db) => {
+        // Fix AQ not being available for selection at town hall 8
+        await db.query(`
+            UPDATE town_halls SET
+                maxArcherQueen = 10
+            WHERE level = 8
+        `);
+        // Fix max levels for a few heroes at town hall 14
+        await db.query(`
+            UPDATE town_halls SET
+                maxBarbarianKing = 85,
+                maxArcherQueen = 85,
+                maxGrandWarden = 60
+            WHERE level = 14
+        `);
+
+        // Update new pet house level
+        await db.query(`
+            UPDATE town_halls SET
+                maxPetHouse = 12
+            WHERE level >= 18
+        `);
+
+        // Insert data for new "Archer" level
+    	const archer = await db.getRow<Unit>('units', { name: 'Archer' });
+    	const superArcher = await db.getRow<Unit>('units', { name: 'Super Archer' });
+    	await db.insertOne('unit_levels', { unitId: archer.id, level: 14, barrackLevel: 2, laboratoryLevel: 16 });
+        await db.insertOne('unit_levels', { unitId: superArcher.id, level: 14, barrackLevel: 2, laboratoryLevel: 1 });
+
+        // Insert data for new "Baby Dragon" level
+    	const babyDragon = await db.getRow<Unit>('units', { name: 'Baby Dragon' });
+    	const infernoDragon = await db.getRow<Unit>('units', { name: 'Inferno Dragon' });
+    	await db.insertOne('unit_levels', { unitId: babyDragon.id, level: 12, barrackLevel: 11, laboratoryLevel: 16 });
+        await db.insertOne('unit_levels', { unitId: infernoDragon.id, level: 12, barrackLevel: 11, laboratoryLevel: 1 });
+
+        // Insert data for new "Electro Titan" level
+    	const electroTitan = await db.getRow<Unit>('units', { name: 'Electro Titan' });
+        await db.insertOne('unit_levels', { unitId: electroTitan.id, level: 5, barrackLevel: 16, laboratoryLevel: 16 });
+
+        // Insert data for new "Hog Rider" level
+    	const hogRider = await db.getRow<Unit>('units', { name: 'Hog Rider' });
+    	const superHogRider = await db.getRow<Unit>('units', { name: 'Super Hog Rider' });
+    	await db.insertOne('unit_levels', { unitId: hogRider.id, level: 15, barrackLevel: 2, laboratoryLevel: 16 });
+        await db.insertOne('unit_levels', { unitId: superHogRider.id, level: 15, barrackLevel: 2, laboratoryLevel: 1 });
+
+        // Insert data for new "Witch" level
+    	const witch = await db.getRow<Unit>('units', { name: 'Witch' });
+    	const superWitch = await db.getRow<Unit>('units', { name: 'Super Witch' });
+    	await db.insertOne('unit_levels', { unitId: witch.id, level: 8, barrackLevel: 5, laboratoryLevel: 16 });
+        await db.insertOne('unit_levels', { unitId: superWitch.id, level: 8, barrackLevel: 5, laboratoryLevel: 1 });
+
+  		// Insert data for new "Lava Hound" level
+		const lavaHound = await db.getRow<Unit>('units', { name: 'Lava Hound' });
+		const iceHound = await db.getRow<Unit>('units', { name: 'Ice Hound' });
+		await db.insertOne('unit_levels', { unitId: lavaHound.id, level: 8, barrackLevel: 6, laboratoryLevel: 16 });
+        await db.insertOne('unit_levels', { unitId: iceHound.id, level: 8, barrackLevel: 6, laboratoryLevel: 1 });
+
+        // Insert data for new "Revive" level
+		const revive = await db.getRow<Unit>('units', { name: 'Revive' });
+        await db.insertOne('unit_levels', { unitId: revive.id, level: 5, spellFactoryLevel: 8, laboratoryLevel: 16 });
+
+        // Insert data for new "Earthquake" level
+		const earthquake = await db.getRow<Unit>('units', { name: 'Earthquake' });
+        await db.insertOne('unit_levels', { unitId: earthquake.id, level: 8, spellFactoryLevel: 2, laboratoryLevel: 16 });
+
+        // Insert data for new "Stone Slammer" level
+    	const stoneSlammer = await db.getRow<Unit>('units', { name: 'Stone Slammer' });
+        await db.insertOne('unit_levels', { unitId: stoneSlammer.id, level: 6, barrackLevel: 3, laboratoryLevel: 16 });
+
+        // Insert data for new "Greedy Raven" pet
+        const ravenId = await db.insertOne('pets', { name: 'Greedy Raven', clashId: 17 });
+        await db.insertMany('pet_levels', [
+            { petId: ravenId, level: 1, petHouseLevel: 12 },
+            { petId: ravenId, level: 2, petHouseLevel: 12 },
+            { petId: ravenId, level: 3, petHouseLevel: 12 },
+            { petId: ravenId, level: 4, petHouseLevel: 12 },
+            { petId: ravenId, level: 5, petHouseLevel: 12 },
+            { petId: ravenId, level: 6, petHouseLevel: 12 },
+            { petId: ravenId, level: 7, petHouseLevel: 12 },
+            { petId: ravenId, level: 8, petHouseLevel: 12 },
+            { petId: ravenId, level: 9, petHouseLevel: 12 },
+            { petId: ravenId, level: 10, petHouseLevel: 12 },
+        ]);
+
+        // Insert data for new "Stick Horse" equipment
+		const equipmentId = await db.insertOne('equipment', {
+			hero: 'Barbarian King',
+			name: 'Stick Horse',
+			epic: 1,
+            clashId: 51,
+		});
+		// Insert levels
+		await db.insertMany('equipment_levels', [
+			{ equipmentId, level: 1, blacksmithLevel: 1 },
+			{ equipmentId, level: 2, blacksmithLevel: 1 },
+			{ equipmentId, level: 3, blacksmithLevel: 1 },
+			{ equipmentId, level: 4, blacksmithLevel: 1 },
+			{ equipmentId, level: 5, blacksmithLevel: 1 },
+			{ equipmentId, level: 6, blacksmithLevel: 1 },
+			{ equipmentId, level: 7, blacksmithLevel: 1 },
+			{ equipmentId, level: 8, blacksmithLevel: 1 },
+			{ equipmentId, level: 9, blacksmithLevel: 1 },
+			{ equipmentId, level: 10, blacksmithLevel: 1 },
+			{ equipmentId, level: 11, blacksmithLevel: 1 },
+			{ equipmentId, level: 12, blacksmithLevel: 1 },
+			{ equipmentId, level: 13, blacksmithLevel: 3 },
+			{ equipmentId, level: 14, blacksmithLevel: 3 },
+			{ equipmentId, level: 15, blacksmithLevel: 3 },
+			{ equipmentId, level: 16, blacksmithLevel: 5 },
+			{ equipmentId, level: 17, blacksmithLevel: 5 },
+			{ equipmentId, level: 18, blacksmithLevel: 5 },
+			{ equipmentId, level: 19, blacksmithLevel: 7 },
+			{ equipmentId, level: 20, blacksmithLevel: 7 },
+			{ equipmentId, level: 21, blacksmithLevel: 7 },
+			{ equipmentId, level: 22, blacksmithLevel: 8 },
+			{ equipmentId, level: 23, blacksmithLevel: 8 },
+			{ equipmentId, level: 24, blacksmithLevel: 8 },
+			{ equipmentId, level: 25, blacksmithLevel: 9 },
+			{ equipmentId, level: 26, blacksmithLevel: 9 },
+			{ equipmentId, level: 27, blacksmithLevel: 9 },
+        ]);
+
+		// Add "Dragon Duke" hero
+		await db.query(`
+            ALTER TABLE town_halls
+            ADD COLUMN maxDragonDuke SMALLINT DEFAULT NULL AFTER maxMinionPrince
+        `, []);
+        const thToDDLvl = [
+            { thLvl: 1, ddLvl: null },
+            { thLvl: 2, ddLvl: null },
+            { thLvl: 3, ddLvl: null },
+            { thLvl: 4, ddLvl: null },
+            { thLvl: 5, ddLvl: null },
+            { thLvl: 6, ddLvl: null },
+            { thLvl: 7, ddLvl: null },
+            { thLvl: 8, ddLvl: null },
+            { thLvl: 9, ddLvl: null },
+            { thLvl: 10, ddLvl: null },
+            { thLvl: 11, ddLvl: null },
+            { thLvl: 12, ddLvl: null },
+            { thLvl: 13, ddLvl: null },
+            { thLvl: 14, ddLvl: null },
+            { thLvl: 15, ddLvl: 10 },
+            { thLvl: 16, ddLvl: 15 },
+            { thLvl: 17, ddLvl: 20 },
+            { thLvl: 18, ddLvl: 25 },
+        ];
+        await Promise.all(thToDDLvl.map((entry) => {
+            return db.query(`
+                UPDATE town_halls SET
+                    maxDragonDuke = ?
+                WHERE level = ?
+            `, [entry.ddLvl, entry.thLvl]);
+        }));
+
+        // Insert data for new "Fire Heart" equipment
+        const fhId = await db.insertOne('equipment', { hero: 'Dragon Duke', name: 'Fire Heart', epic: false, clashId: 52 });
+        await db.insertMany('equipment_levels', [
+            { equipmentId: fhId, level: 1, blacksmithLevel: 1 },
+            { equipmentId: fhId, level: 2, blacksmithLevel: 1 },
+            { equipmentId: fhId, level: 3, blacksmithLevel: 1 },
+            { equipmentId: fhId, level: 4, blacksmithLevel: 1 },
+            { equipmentId: fhId, level: 5, blacksmithLevel: 1 },
+            { equipmentId: fhId, level: 6, blacksmithLevel: 1 },
+            { equipmentId: fhId, level: 7, blacksmithLevel: 1 },
+            { equipmentId: fhId, level: 8, blacksmithLevel: 1 },
+            { equipmentId: fhId, level: 9, blacksmithLevel: 1 },
+            { equipmentId: fhId, level: 10, blacksmithLevel: 3 },
+            { equipmentId: fhId, level: 11, blacksmithLevel: 3 },
+            { equipmentId: fhId, level: 12, blacksmithLevel: 3 },
+            { equipmentId: fhId, level: 13, blacksmithLevel: 5 },
+            { equipmentId: fhId, level: 14, blacksmithLevel: 5 },
+            { equipmentId: fhId, level: 15, blacksmithLevel: 5 },
+            { equipmentId: fhId, level: 16, blacksmithLevel: 7 },
+            { equipmentId: fhId, level: 17, blacksmithLevel: 7 },
+            { equipmentId: fhId, level: 18, blacksmithLevel: 7 },
+        ]);
+
+        // Insert data for new "Flame Blower" equipment
+        const fbId = await db.insertOne('equipment', { hero: 'Dragon Duke', name: 'Flame Blower', epic: false, clashId: 57 });
+        await db.insertMany('equipment_levels', [
+            { equipmentId: fbId, level: 1, blacksmithLevel: 1 },
+            { equipmentId: fbId, level: 2, blacksmithLevel: 1 },
+            { equipmentId: fbId, level: 3, blacksmithLevel: 1 },
+            { equipmentId: fbId, level: 4, blacksmithLevel: 1 },
+            { equipmentId: fbId, level: 5, blacksmithLevel: 1 },
+            { equipmentId: fbId, level: 6, blacksmithLevel: 1 },
+            { equipmentId: fbId, level: 7, blacksmithLevel: 1 },
+            { equipmentId: fbId, level: 8, blacksmithLevel: 1 },
+            { equipmentId: fbId, level: 9, blacksmithLevel: 1 },
+            { equipmentId: fbId, level: 10, blacksmithLevel: 3 },
+            { equipmentId: fbId, level: 11, blacksmithLevel: 3 },
+            { equipmentId: fbId, level: 12, blacksmithLevel: 3 },
+            { equipmentId: fbId, level: 13, blacksmithLevel: 5 },
+            { equipmentId: fbId, level: 14, blacksmithLevel: 5 },
+            { equipmentId: fbId, level: 15, blacksmithLevel: 5 },
+            { equipmentId: fbId, level: 16, blacksmithLevel: 7 },
+            { equipmentId: fbId, level: 17, blacksmithLevel: 7 },
+            { equipmentId: fbId, level: 18, blacksmithLevel: 7 },
+        ]);
+
+        // Insert data for new "Stun Blaster" equipment
+        const sbId = await db.insertOne('equipment', { hero: 'Dragon Duke', name: 'Stun Blaster', epic: false, clashId: 56 });
+        await db.insertMany('equipment_levels', [
+            { equipmentId: sbId, level: 1, blacksmithLevel: 9 },
+            { equipmentId: sbId, level: 2, blacksmithLevel: 9 },
+            { equipmentId: sbId, level: 3, blacksmithLevel: 9 },
+            { equipmentId: sbId, level: 4, blacksmithLevel: 9 },
+            { equipmentId: sbId, level: 5, blacksmithLevel: 9 },
+            { equipmentId: sbId, level: 6, blacksmithLevel: 9 },
+            { equipmentId: sbId, level: 7, blacksmithLevel: 9 },
+            { equipmentId: sbId, level: 8, blacksmithLevel: 9 },
+            { equipmentId: sbId, level: 9, blacksmithLevel: 9 },
+            { equipmentId: sbId, level: 10, blacksmithLevel: 9 },
+            { equipmentId: sbId, level: 11, blacksmithLevel: 9 },
+            { equipmentId: sbId, level: 12, blacksmithLevel: 9 },
+            { equipmentId: sbId, level: 13, blacksmithLevel: 9 },
+            { equipmentId: sbId, level: 14, blacksmithLevel: 9 },
+            { equipmentId: sbId, level: 15, blacksmithLevel: 9 },
+            { equipmentId: sbId, level: 16, blacksmithLevel: 9 },
+            { equipmentId: sbId, level: 17, blacksmithLevel: 9 },
+            { equipmentId: sbId, level: 18, blacksmithLevel: 9 },
+        ]);
+	});
 }

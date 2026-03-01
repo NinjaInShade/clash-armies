@@ -346,6 +346,9 @@ export class ArmyModel {
 		if (hero === 'Minion Prince') {
 			return thData.maxMinionPrince ?? -1;
 		}
+		if (hero === 'Dragon Duke') {
+			return thData.maxDragonDuke ?? -1;
+		}
 		// Should never happen?
 		return -1;
 	}

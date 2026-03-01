@@ -76,7 +76,7 @@ export const BANNERS = [
 export const ARMY_TAGS = ['CWL/War', 'Legends League', 'Farming', 'Beginner Friendly', 'Spam'] as const;
 export const USER_MAX_ARMIES = 40;
 export const VALID_UNIT_HOME = ['armyCamp', 'clanCastle'] as const;
-export const VALID_HEROES = ['Barbarian King', 'Archer Queen', 'Grand Warden', 'Royal Champion', 'Minion Prince'] as const;
+export const VALID_HEROES = ['Barbarian King', 'Archer Queen', 'Grand Warden', 'Royal Champion', 'Minion Prince', 'Dragon Duke'] as const;
 export const GUIDE_TEXT_CHAR_LIMIT = 3_000;
 export const YOUTUBE_URL_REGEX = /^(?:https:\/\/)?(?:www\.)?youtube\.com\/watch\?(?=.*v=((\w|-){11}))(?:\S+)?$/;
 export const MAX_COMMENT_LENGTH = 2_000;
@@ -94,6 +94,7 @@ export const HERO_CLASH_IDS = {
 	'Grand Warden': 2,
 	'Royal Champion': 4,
 	'Minion Prince': 6,
+	'Dragon Duke': 7,
 };
 
 export function pluralize(string: string, count: number, suffix = 's') {
