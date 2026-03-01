@@ -35,9 +35,9 @@
 			return "What's your take?";
 		}
 		if (!model.comments.length) {
-			return 'Be the first to share your thoughts!';
+			return 'Tried this army? Be the first to share how it went!';
 		}
-		return 'Share your thoughts!';
+		return 'Tried this army? Share how it went!';
 	});
 
 	async function saveComment() {
@@ -109,9 +109,9 @@
 				<h2>What's your take?</h2>
 				<p class="body">
 					{#if model.comments.length > 0}
-						Log in to leave a comment!
+						Join the discussion - sign in to comment!
 					{:else}
-						Log in to be the first to comment!
+						Sign in to be the first to review this army!
 					{/if}
 				</p>
 				<Button onclick={app.requireAuth}>Log in</Button>
