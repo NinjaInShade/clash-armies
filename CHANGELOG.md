@@ -1,6 +1,22 @@
+## [0.6.0] - 2026-03-01
+
+- Add new Dragon Duke hero
+- Add new Fire Heart equipment
+- Add new Flame Blower equipment
+- Add new Stun Blaster equipment
+- Add new Greedy Raven pet
+- Add new Stick Horse equipment
+- Add various new unit levels
+- Add ability to set player tag (NOTE: not yet used to show stats etc...)
+- Show "Member since" text on user profile
+- Merge "Latest" and "All" army pages into one "Rising" page
+- Updated webmanifest to use better fitting theme colours
+- Fixed valid youtube guide URLs not being accepted
+- Improve comment and notification time formatting
+
 ## [0.5.10] - 2026-01-01
 
-- Add new Frost Falek RC equipment
+- Add new Frost Flake RC equipment
 
 ## [0.5.9] - 2025-11-20
 
