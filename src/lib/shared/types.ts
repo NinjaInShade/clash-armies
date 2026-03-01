@@ -70,6 +70,7 @@ export type User = {
 	roles: string[];
 	playerTag: string | null;
 	level: number | null;
+	createdTime: Date;
 };
 
 export type Session = {

@@ -4,6 +4,7 @@
 	import type { AppState } from '$types';
 	import type { PageData } from './$types';
 	import { ArmyModel } from '$models';
+	import { format } from 'date-fns';
 	import EditUser from './EditUser.svelte';
 	import CreatedArmiesTab from './CreatedArmiesTab.svelte';
 	import SavedArmiesTab from './SavedArmiesTab.svelte';
@@ -53,13 +54,14 @@
 				</div>
 				<h2 class="username">{username}</h2>
 				<h3 class="player-tag">{user.playerTag ?? '#??????'}</h3>
+				<p class="member-since">Member since {format(user.createdTime, 'MMMM yyyy')}</p>
 			</div>
 		</div>
-		<div class="right">
-			{#if username === currentUser || app.user?.hasRoles('admin')}
+		{#if username === currentUser || app.user?.hasRoles('admin')}
+			<div class="right">
 				<C.Button onClick={editUser}>Edit</C.Button>
-			{/if}
-		</div>
+			</div>
+		{/if}
 	</div>
 </header>
 
@@ -98,13 +100,13 @@
 		flex-shrink: 0;
 		background-color: var(--grey-800);
 		border-radius: 8px;
-		max-width: 110px;
-		height: 90px;
+		max-width: 124px;
+		height: 132px;
 		width: 100%;
+		padding: 0.3em;
 	}
 
 	.profile-pic-img {
-		top: -32px;
 		position: relative;
 		max-width: 100%;
 	}
@@ -147,6 +149,13 @@
 		font-weight: 400;
 	}
 
+	.member-since {
+		color: var(--grey-400);
+		font-weight: 500;
+		font-size: 0.9em;
+		margin-top: 0.35em;
+	}
+
 	.tabs {
 		padding: 0 var(--side-padding) 50px var(--side-padding);
 		flex: 1 0 0px;
@@ -154,5 +163,27 @@
 
 	.right {
 		padding-bottom: 0.5em;
+	}
+
+	@media (max-width: 850px) {
+		.profile-pic {
+			height: 124px;
+			padding: 0.5em;
+		}
+
+		.profile-pic-img {
+			top: -4px;
+		}
+
+		.member-since {
+			font-size: 0.8em;
+			margin-top: 0.2em;
+		}
+	}
+
+	@media (max-width: 500px) {
+		header {
+			padding: 50px var(--side-padding) 0 var(--side-padding);
+		}
 	}
 </style>

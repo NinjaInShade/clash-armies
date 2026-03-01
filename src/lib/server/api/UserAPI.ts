@@ -41,7 +41,8 @@ export class UserAPI {
                 u.googleId,
                 JSON_ARRAYAGG(ur.role) AS roles,
                 u.username,
-                u.playerTag
+                u.playerTag,
+                u.createdTime
             FROM users u
             LEFT JOIN user_roles ur ON ur.userId = u.id
             WHERE TRUE
