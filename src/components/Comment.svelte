@@ -6,7 +6,7 @@
 <script lang="ts">
 	import { getContext } from 'svelte';
 	import type { AppState } from '$types';
-	import { intlFormatDistance } from 'date-fns';
+	import { formatDistanceToNow } from 'date-fns';
 	import SaveComment from './SaveComment.svelte';
 	import type { ArmyModel, ArmyComment } from '$models';
 	import CtxMenu from './CommentMenu.svelte';
@@ -44,9 +44,7 @@
 	}
 
 	function formatCreatedTime(createdTime: Date) {
-		// Add a second as comments created just now will cause the below function to return "In 0 secs"
-		const now = Date.now() + 1000;
-		return intlFormatDistance(createdTime, now, { style: 'short', numeric: 'always' });
+		return formatDistanceToNow(createdTime, { addSuffix: true });
 	}
 
 	async function editComment() {

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { AppState, ArmyNotification } from '$types';
 	import { getContext } from 'svelte';
-	import { intlFormatDistance } from 'date-fns';
+	import { formatDistanceToNow } from 'date-fns';
 	import { invalidateAll, goto } from '$app/navigation';
 	import Menu from '../Menu.svelte';
 	import FocusTrap from '../FocusTrap.svelte';
@@ -51,9 +51,7 @@
 	}
 
 	function formatTime(notificationTime: Date) {
-		// Add a second as otherwise time will read as "In 0 secs"
-		const now = Date.now() + 1000;
-		return intlFormatDistance(notificationTime, now, { style: 'short', numeric: 'always' });
+		return formatDistanceToNow(notificationTime, { addSuffix: true });
 	}
 </script>
 
