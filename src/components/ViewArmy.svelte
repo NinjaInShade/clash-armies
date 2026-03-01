@@ -34,10 +34,10 @@
 
 	function getYoutubeEmbedSrc(url: string) {
 		const match = url.match(YOUTUBE_URL_REGEX);
-		if (!match || !match[1]) {
+		const videoId = match?.[1] ?? match?.[2] ?? match?.[3];
+		if (!videoId) {
 			return null;
 		}
-		const videoId = match[1];
 		return `https://www.youtube.com/embed/${videoId}`;
 	}
 

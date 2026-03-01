@@ -948,6 +948,10 @@ describe('Validation', function () {
 				'https://www.youtube.com/watch?v=ZxWrWMDJS8Q',
 				'https://youtube.com/watch?v=ZxWrWMDJS8Q', // No www
 				'https://www.youtube.com/watch?v=ZxWrWMDJS8Q&t=4s', // Has time param
+				'https://m.youtube.com/watch?v=ZxWrWMDJS8Q', // Mobile
+				'https://www.youtube.com/shorts/n0BHlqkWQG4', // Shorts
+				'https://m.youtube.com/shorts/n0BHlqkWQG4', // Shorts mobile
+				'https://youtu.be/ZxWrWMDJS8Q?si=sbyI3Z8vJXqi0P_n&t=869', // Short URL with share & time params
 			];
 			for (const invalid of invalidURLs) {
 				data.guide.youtubeUrl = invalid;
