@@ -2,7 +2,7 @@ export const ARMY_PAGES = {
 	popular: {
 		bannerOptions: {
 			title: 'Popular Armies',
-			description: 'Browse the <b>most popular</b> armies and take your attacks to the next level',
+			description: 'Browse the <b>most popular</b> armies and take your attacks to the next level!',
 			descriptionWidth: 315,
 			img: '/ui/red-book.webp',
 			imgAlt: 'Red book with up arrow',
@@ -15,33 +15,17 @@ export const ARMY_PAGES = {
 			imgAlt: 'Red book with up arrow',
 		},
 	},
-	latest: {
+	rising: {
 		bannerOptions: {
-			title: 'Discover New',
-			description: '<b>Shape the meta</b> by taking a vote on the newest armies',
-			descriptionWidth: 250,
-			img: '/ui/clock.webp',
-			imgAlt: 'Clock',
-		},
-		navOptions: {
-			title: 'Latest',
-			description: 'Newest Armies',
-			img: '/ui/clock.webp',
-			imgAlt: 'Clock',
-			href: '/armies/latest',
-		},
-	},
-	all: {
-		bannerOptions: {
-			title: 'All Armies',
-			description: 'Find the <b>best army</b> for your play style - filter by what suits you',
+			title: 'Rising Armies',
+			description: '<b>Vote on new armies</b> and help shape the attacking meta!',
 			descriptionWidth: 275,
 			img: '/ui/badge-purple.webp',
 			imgAlt: 'Purple badge with sword across it, at a skewed angle',
 		},
 		navOptions: {
-			title: 'All',
-			description: 'See them all!',
+			title: 'Rising',
+			description: 'Latest armies',
 			img: '/ui/badge-purple.webp',
 			imgAlt: 'Purple badge with sword across it, at a skewed angle',
 			href: '/armies',

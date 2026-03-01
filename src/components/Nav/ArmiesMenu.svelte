@@ -20,7 +20,7 @@
 	const TH_WIDTH = 140;
 	const TH_ROWS_MAX = 2;
 	const TH_COL_GAP = 24;
-	const ARMY_LINKS = [ARMY_PAGES.popular, ARMY_PAGES.latest, ARMY_PAGES.all];
+	const ARMY_LINKS = [ARMY_PAGES.popular, ARMY_PAGES.rising];
 
 	let townHallsContainer = $state<HTMLUListElement | undefined>(undefined);
 	let visibleTownHalls = $state<TownHall[]>([]);

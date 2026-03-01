@@ -1,7 +1,6 @@
+import { redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 
-export const load: PageServerLoad = async (req) => {
-	const server = req.locals.server;
-	const armies = await server.army.getArmies(req, { sort: 'new' });
-	return { armies };
+export const load: PageServerLoad = () => {
+	redirect(301, '/armies');
 };

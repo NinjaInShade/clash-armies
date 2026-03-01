@@ -67,7 +67,7 @@
 						<a href="/armies/popular">Popular Armies</a>
 					</li>
 					<li>
-						<a href="/armies/latest">Latest Armies</a>
+						<a href="/armies">Latest Armies</a>
 					</li>
 					<li>
 						<a href="/armies/town-halls">By Town Hall</a>
