@@ -101,17 +101,25 @@ export class UserAPI {
 		const userSchema = z.object({
 			id: z.number(),
 			username: z.string().trim().min(3).max(30),
+			playerTag: z.string().trim().max(15).nullable(),
 		});
 
 		const authUser = req.locals.requireAuth();
 
 		const user = userSchema.parse(data);
-		const { username } = user;
+		const { username, playerTag } = user;
 
 		const usernameRe = /^[a-zA-Z0-9_-]+$/;
 		const validUsername = usernameRe.test(username);
 		if (!validUsername) {
 			throw new Error('Username can only contain english letters, numbers, underscores and hyphens');
+		}
+
+		if (playerTag !== null) {
+			const playerTagRe = /^#[0289CGJLPQRUVY]+$/i;
+			if (!playerTagRe.test(playerTag)) {
+				throw new Error('Invalid player tag format');
+			}
 		}
 
 		const existing = await this.getUserById(req, user.id);
@@ -134,8 +142,9 @@ export class UserAPI {
 		// prettier-ignore
 		await this.server.db.query(`
             UPDATE users SET
-                username = ?
+                username = ?,
+                playerTag = ?
             WHERE id = ?
-        `, [username, user.id]);
+        `, [username, playerTag, user.id]);
 	}
 }

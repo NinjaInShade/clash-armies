@@ -15,12 +15,18 @@
 	const app = getContext<AppState>('app');
 
 	let username = $state<string>(user.username);
+	let playerTag = $state<string | null>(user.playerTag);
 
 	let errors = $state<APIErrors | null>(null);
 
 	async function saveUser() {
 		const trimmedUsername = username.trim();
-		const data = { id: user.id, username: trimmedUsername };
+		const trimmerPlayerTag = playerTag?.trim();
+		const data = {
+			id: user.id,
+			username: trimmedUsername,
+			playerTag: trimmerPlayerTag || null,
+		};
 
 		try {
 			await app.http.post('/api/users', data);
@@ -52,6 +58,10 @@
 
 	<C.Fieldset label="Username" htmlName="username" style="margin-bottom: 1em" --input-width="100%">
 		<C.Input bind:value={username} name="username" />
+	</C.Fieldset>
+
+	<C.Fieldset label="Player tag" htmlName="playerTag" style="margin-bottom: 1em" --input-width="100%">
+		<C.Input bind:value={playerTag} name="playerTag" placeholder="#XXXXXXXX" />
 	</C.Fieldset>
 </C.Modal>
 

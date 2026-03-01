@@ -52,7 +52,7 @@
 					<img src="/ui/experience.webp" alt="Clash of clans experience" class="level-img" />
 				</div>
 				<h2 class="username">{username}</h2>
-				<h3 class="player-tag">#{user.playerTag ?? '??????'}</h3>
+				<h3 class="player-tag">{user.playerTag ?? '#??????'}</h3>
 			</div>
 		</div>
 		<div class="right">
