@@ -1,6 +1,8 @@
 {
 	"name": "Clash Armies",
+	"description": "Build and share Clash of Clans armies",
 	"short_name": "CA",
+	"start_url": "/",
 	"icons": [
 		{
 			"src": "/android-chrome-192x192.png",
@@ -13,7 +15,8 @@
 			"type": "image/png"
 		}
 	],
-	"theme_color": "#ffffff",
-	"background_color": "#ffffff",
-	"display": "standalone"
+	"theme_color": "#292929",
+	"background_color": "#292929",
+	"display": "standalone",
+	"categories": ["games", "utilities"]
 }
