@@ -116,28 +116,26 @@ export class ArmyModel {
 			this.townHall = data.townHall;
 		}
 		if (data?.units) {
+			const units: UnitModel[] = [];
+			const ccUnits: UnitModel[] = [];
 			for (const unit of data.units) {
 				const model = new UnitModel(this.gameData, unit);
 				if (unit.home === 'armyCamp') {
-					this.units.push(model);
+					units.push(model);
 				} else if (unit.home === 'clanCastle') {
-					this.ccUnits.push(model);
+					ccUnits.push(model);
 				} else {
 					throw new Error(`Unit home "${unit.home}" is not implemented`);
 				}
 			}
+			this.units = units;
+			this.ccUnits = ccUnits;
 		}
 		if (data?.pets) {
-			for (const pet of data.pets) {
-				const model = new PetModel(this.gameData, pet);
-				this.pets.push(model);
-			}
+			this.pets = data.pets.map((pet) => new PetModel(this.gameData, pet));
 		}
 		if (data?.equipment) {
-			for (const equipment of data.equipment) {
-				const model = new EquipmentModel(this.gameData, equipment);
-				this.equipment.push(model);
-			}
+			this.equipment = data.equipment.map((eq) => new EquipmentModel(this.gameData, eq));
 		}
 		if (data?.guide) {
 			this.guide = new GuideModel(this.gameData, data?.guide ?? undefined);
@@ -146,11 +144,9 @@ export class ArmyModel {
 			this.tags = data?.tags;
 		}
 		if (data?.comments) {
-			for (const comment of data.comments) {
-				const model = new CommentModel(this.gameData, comment);
-				this.comments.push(model);
-			}
-			this.structuredComments = CommentModel.structureComments(this.comments);
+			const comments = data.comments.map((c) => new CommentModel(this.gameData, c));
+			this.comments = comments;
+			this.structuredComments = CommentModel.structureComments(comments);
 		}
 		if (data?.banner) {
 			this.banner = data.banner;
