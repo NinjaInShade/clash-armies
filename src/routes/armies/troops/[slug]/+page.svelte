@@ -3,19 +3,18 @@
 	import { page } from '$app/state';
 	import { ARMY_PAGES } from '$client/pages';
 	import ArmyList from '~/components/Armies/ArmyList.svelte';
+	import { decodeUnitName } from '$shared/utils';
 
 	const { data }: { data: PageData } = $props();
-	const townHall = $derived(+page.params.slug!);
-	const pageMeta = $derived(ARMY_PAGES.townHall(townHall));
+	const troop = $derived(page.params.slug!);
+	const troopDecoded = $derived(decodeUnitName(troop));
+	const pageMeta = $derived(ARMY_PAGES.troop(troopDecoded));
 </script>
 
 <svelte:head>
-	<title>ClashArmies • Best town hall {townHall} armies - Clash of Clans</title>
-	<meta
-		name="description"
-		content="Browse top performing Town Hall {townHall} armies. Perfect your TH{townHall} attacks for war, farming, and CWL with tested strategies."
-	/>
-	<link rel="canonical" href="https://clasharmies.com/town-hall-{townHall}" />
+	<title>ClashArmies • Best {troopDecoded} armies - Clash of Clans</title>
+	<meta name="description" content="Browse top performing {troop} armies. Find the best Clash of Clans strategies featuring the {troop} troop." />
+	<link rel="canonical" href="https://clasharmies.com/armies/troops/{troop}" />
 </svelte:head>
 
 <section class="armies">

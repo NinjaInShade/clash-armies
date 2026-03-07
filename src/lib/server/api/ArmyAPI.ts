@@ -21,6 +21,18 @@ type GetArmiesOptions = {
 	sort?: 'new' | 'score';
 	/** Only fetch armies for this town hall */
 	townHall?: number;
+	/**
+	 * Only fetch armies containing this unit (by name).
+	 * A unit can be a troop, spell or a siege machine.
+	 * NOTE: units in the army's clan castle are *not* considered a match.
+	 */
+	unit?: string;
+	/** Only fetch armies featuring this hero (by name, based on existence of hero's equipment or pets) */
+	hero?: string;
+	/** Only fetch armies with this equipment (by name) */
+	equipment?: string;
+	/** Only fetch armies with this pet (by name) */
+	pet?: string;
 };
 
 type GetSavedArmiesOptions = {
@@ -51,6 +63,37 @@ export class ArmyAPI {
 	/** Game town halls static data */
 	public townHalls: TownHall[] = [];
 
+	/**
+	 * Cached map of valid troop names to their database IDs.
+	 * NOTE: use `this.units` filtered by type if you need the full {@link Unit} object.
+	 */
+	public troopNames = new Map<string, number>();
+	/**
+	 * Cached map of valid spell names to their database IDs.
+	 * NOTE: use `this.units` filtered by type if you need the full {@link Unit} object.
+	 */
+	public spellNames = new Map<string, number>();
+	/**
+	 * Cached map of valid siege machine names to their database IDs.
+	 * NOTE: use `this.units` filtered by type if you need the full {@link Unit} object.
+	 */
+	public siegeNames = new Map<string, number>();
+	/**
+	 * Cached map of valid equipment names to their database IDs.
+	 * NOTE: use `this.equipment` if you need the full {@link Equipment} object.
+	 */
+	public equipmentNames = new Map<string, number>();
+	/**
+	 * Cached map of valid pet names to their database IDs.
+	 * NOTE: use `this.pets` if you need the full {@link Pet} object.
+	 */
+	public petNames = new Map<string, number>();
+	/**
+	 * Cached set of valid town halls (numeric value).
+	 * NOTE: use `this.townHalls` if you need the full {@link TownHall} object.
+	 */
+	public validTownHalls = new Set<number>();
+
 	private server: Server;
 
 	constructor(server: Server) {
@@ -64,6 +107,29 @@ export class ArmyAPI {
 		this.equipment = await this.getEquipmentData();
 		this.pets = await this.getPetsData();
 		this.townHalls = await this.getTownHallsData();
+
+		for (const unit of this.units) {
+			switch (unit.type) {
+				case 'Troop':
+					this.troopNames.set(unit.name, unit.id);
+					break;
+				case 'Spell':
+					this.spellNames.set(unit.name, unit.id);
+					break;
+				case 'Siege':
+					this.siegeNames.set(unit.name, unit.id);
+					break;
+			}
+		}
+		for (const eq of this.equipment) {
+			this.equipmentNames.set(eq.name, eq.id);
+		}
+		for (const pet of this.pets) {
+			this.petNames.set(pet.name, pet.id);
+		}
+		for (const th of this.townHalls) {
+			this.validTownHalls.add(th.level);
+		}
 	}
 
 	public async dispose() {
@@ -84,7 +150,7 @@ export class ArmyAPI {
 	}
 
 	public async getArmies(req: RequestEvent, options: GetArmiesOptions = {}) {
-		const { ids, username, sort, townHall } = options;
+		const { ids, username, sort, townHall, hero, equipment, pet, unit } = options;
 		const userId = req.locals.user?.id ?? null;
 
 		const args: (number | number[] | string | null)[] = [userId, userId];
@@ -224,6 +290,66 @@ export class ArmyAPI {
 				AND a.townHall = ?
 			`;
 			args.push(townHall);
+		}
+
+		if (hero) {
+			query += `
+				AND (
+					a.id IN (
+						SELECT ae2.armyId FROM army_equipment ae2
+						INNER JOIN equipment eq2 ON eq2.id = ae2.equipmentId
+						WHERE eq2.hero = ?
+					)
+					OR a.id IN (
+						SELECT ap2.armyId FROM army_pets ap2
+						WHERE ap2.hero = ?
+					)
+				)
+			`;
+			args.push(hero);
+			args.push(hero);
+		}
+
+		if (equipment) {
+			const eqId = this.equipmentNames.get(equipment);
+			if (!eqId) {
+				throw new Error(`Unknown equipment: "${equipment}"`);
+			}
+			query += `
+				AND a.id IN (
+					SELECT ae2.armyId FROM army_equipment ae2
+					WHERE ae2.equipmentId = ?
+				)
+			`;
+			args.push(eqId);
+		}
+
+		if (pet) {
+			const petId = this.petNames.get(pet);
+			if (!petId) {
+				throw new Error(`Unknown pet: "${pet}"`);
+			}
+			query += `
+				AND a.id IN (
+					SELECT ap2.armyId FROM army_pets ap2
+					WHERE ap2.petId = ?
+				)
+			`;
+			args.push(petId);
+		}
+
+		if (unit) {
+			const unitId = this.troopNames.get(unit) ?? this.spellNames.get(unit) ?? this.siegeNames.get(unit);
+			if (!unitId) {
+				throw new Error(`Unknown unit: "${unit}"`);
+			}
+			query += `
+				AND a.id IN (
+					SELECT au2.armyId FROM army_units au2
+					WHERE au2.unitId = ? AND au2.home = 'armyCamp'
+				)
+			`;
+			args.push(unitId);
 		}
 
 		query += `

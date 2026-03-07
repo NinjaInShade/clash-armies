@@ -21,6 +21,7 @@
 	const TH_ROWS_MAX = 2;
 	const TH_COL_GAP = 24;
 	const ARMY_LINKS = [ARMY_PAGES.popular, ARMY_PAGES.rising];
+	const OTHER_LINKS = [ARMY_PAGES.browse];
 
 	let townHallsContainer = $state<HTMLUListElement | undefined>(undefined);
 	let visibleTownHalls = $state<TownHall[]>([]);
@@ -55,6 +56,16 @@
 					<path d="M1 4.5H9M9 4.5L5.8 1.5M9 4.5L5.8 7.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
 				</svg>
 			</a>
+		</section>
+		<section>
+			<h3>Other</h3>
+			<ul class="links">
+				{#each OTHER_LINKS as link}
+					<li>
+						<LinkCard {...link.navOptions} />
+					</li>
+				{/each}
+			</ul>
 		</section>
 	</div>
 </Menu>

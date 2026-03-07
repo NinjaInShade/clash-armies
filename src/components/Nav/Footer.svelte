@@ -73,7 +73,7 @@
 						<a href="/armies/town-halls">By Town Hall</a>
 					</li>
 					<li>
-						<a href="/armies">All Armies</a>
+						<a href="/armies/browse">By unit</a>
 					</li>
 				</ul>
 			</div>
