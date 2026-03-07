@@ -15,7 +15,7 @@
 </script>
 
 <script lang="ts">
-	import { getContext } from 'svelte';
+	import { getContext, untrack } from 'svelte';
 	import type { ArmyModel } from '$models';
 	import { mkParamStore } from '$client/utils';
 	import { pluralize } from '$shared/utils';
@@ -111,7 +111,17 @@
 	);
 
 	$effect(() => {
-		filteredArmies = armies.filter(filterFn);
+		// Register the dependencies we care about
+		void armies;
+		void filters;
+		void $search;
+		void $townHall;
+
+		// Untrack the actual filtering to guarantee we avoid
+		// any deep reactive reads on ArmyModel properties
+		filteredArmies = untrack(() => {
+			return armies.filter(filterFn);
+		});
 	});
 
 	function filterFn(army: ArmyModel) {
