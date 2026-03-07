@@ -21,6 +21,7 @@
 	const TH_ROWS_MAX = 2;
 	const TH_COL_GAP = 24;
 	const ARMY_LINKS = [ARMY_PAGES.popular, ARMY_PAGES.rising];
+	const OTHER_LINKS = [ARMY_PAGES.browse];
 
 	let townHallsContainer = $state<HTMLUListElement | undefined>(undefined);
 	let visibleTownHalls = $state<TownHall[]>([]);
@@ -56,6 +57,16 @@
 				</svg>
 			</a>
 		</section>
+		<section>
+			<h3>Other</h3>
+			<ul class="links">
+				{#each OTHER_LINKS as link}
+					<li>
+						<LinkCard {...link.navOptions} />
+					</li>
+				{/each}
+			</ul>
+		</section>
 	</div>
 </Menu>
 
@@ -72,8 +83,8 @@
 	.armies-menu {
 		display: flex;
 		flex-flow: column nowrap;
-		padding: 24px;
-		gap: 32px;
+		padding: 20px;
+		gap: 24px;
 
 		&:focus,
 		&:focus-visible {

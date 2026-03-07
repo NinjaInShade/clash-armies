@@ -5,17 +5,14 @@
 	import ArmyList from '~/components/Armies/ArmyList.svelte';
 
 	const { data }: { data: PageData } = $props();
-	const townHall = $derived(+page.params.slug!);
-	const pageMeta = $derived(ARMY_PAGES.townHall(townHall));
+	const slug = $derived(page.params.slug!);
+	const pageMeta = $derived(ARMY_PAGES.spell(data.name));
 </script>
 
 <svelte:head>
-	<title>ClashArmies • Best town hall {townHall} armies - Clash of Clans</title>
-	<meta
-		name="description"
-		content="Browse top performing Town Hall {townHall} armies. Perfect your TH{townHall} attacks for war, farming, and CWL with tested strategies."
-	/>
-	<link rel="canonical" href="https://clasharmies.com/town-hall-{townHall}" />
+	<title>ClashArmies • Best {data.name} spell armies - Clash of Clans</title>
+	<meta name="description" content="Browse top performing {data.name} spell armies. Find the best Clash of Clans strategies with the {data.name} spell." />
+	<link rel="canonical" href="https://clasharmies.com/armies/spells/{slug}" />
 </svelte:head>
 
 <section class="armies">

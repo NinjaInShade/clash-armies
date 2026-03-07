@@ -97,6 +97,18 @@ export const HERO_CLASH_IDS = {
 	'Dragon Duke': 7,
 };
 
+/**
+ * Encode a unit name for clean use in the browser URL.
+ * The unit here can also be a hero/equipment/pet name.
+ */
+export function encodeUnitName(name: string) {
+	if (name === 'P.E.K.K.A') {
+		// NOTE: pekka is a special case
+		return 'pekka';
+	}
+	return name.replaceAll(' ', '-').toLowerCase();
+}
+
 export function pluralize(string: string, count: number, suffix = 's') {
 	return `${string}${count !== 1 ? suffix : ''}`;
 }

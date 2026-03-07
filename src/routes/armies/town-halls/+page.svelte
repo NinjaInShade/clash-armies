@@ -11,7 +11,7 @@
 <svelte:head>
 	<title>ClashArmies • Best Clash of Clans Armies for every Town Hall</title>
 	<meta name="description" content="Browse Clash of Clans armies by Town Hall. Select a Town Hall level to view powerful attack strategies." />
-	<link rel="canonical" href="https://clasharmies.com/town-halls" />
+	<link rel="canonical" href="https://clasharmies.com/armies/town-halls" />
 </svelte:head>
 
 <section class="town-halls">
@@ -49,7 +49,7 @@
 
 	.links {
 		display: grid;
-		grid-template-columns: repeat(auto-fill, minmax(175px, 1fr));
+		grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
 		margin-top: 10px;
 		gap: 10px;
 
@@ -121,6 +121,12 @@
 					color: var(--grey-100);
 				}
 			}
+		}
+	}
+
+	@media (max-width: 600px) {
+		.links {
+			grid-template-columns: repeat(auto-fill, minmax(175px, 1fr));
 		}
 	}
 </style>
