@@ -6,9 +6,22 @@
 	import C from '$components';
 
 	const { data }: { data: PageData } = $props();
-	const { serverStats, units, townHalls } = $derived(data);
+	const { serverStats, appStats, units, townHalls } = $derived(data);
 
 	$inspect('Server stat', serverStats);
+
+	const armiesByTHColumns = [
+		{
+			key: '',
+			component: (row: { townHall: number; count: number }) => {
+				return [THWidgetDisplay, { level: row.townHall }];
+			},
+			width: '65px',
+			cellStyle: 'justify-content: center; overflow-y: hidden',
+		},
+		{ key: 'townHall', label: 'Town Hall', width: '120px' },
+		{ key: 'count', label: 'Armies' },
+	];
 
 	let selectedTHs = $state<number[]>([]);
 	const thColumns = [
@@ -108,6 +121,56 @@
 					<h3>RAM usage</h3>
 					<b>{serverStats.usedMemory}/{serverStats.totalMemory} GB</b>
 				</div>
+			</div>
+		</div>
+	</section>
+
+	<section class="stats">
+		<div class="container">
+			<div class="table-above">
+				<div>
+					<h2>App</h2>
+					<p class="body">Application stats</p>
+				</div>
+				<div class="actions"></div>
+			</div>
+			<div class="stats-grid">
+				<div class="stats-card">
+					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+						<path fill="currentColor" d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+					</svg>
+					<h3>Users</h3>
+					<b>{appStats.totalUsers}</b>
+				</div>
+				<div class="stats-card">
+					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+						<path fill="currentColor" d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm-1 7V3.5L18.5 9H13z" />
+					</svg>
+					<h3>Armies</h3>
+					<b>{appStats.totalArmies}</b>
+				</div>
+				<div class="stats-card">
+					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+						<path fill="currentColor" d="M21.99 4c0-1.1-.89-2-1.99-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14l4 4-.01-18z" />
+					</svg>
+					<h3>Comments</h3>
+					<b>{appStats.totalComments}</b>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<section class="armies-by-th">
+		<div class="container">
+			<div class="table-above">
+				<div>
+					<h2>Armies by Town Hall</h2>
+					<p class="body">Army count per town hall level</p>
+				</div>
+				<div class="actions"></div>
+			</div>
+			<div class="table-container">
+				<C.Table data={appStats.armiesByTownHall} columns={armiesByTHColumns} defaultSortKey="townHall" selectable />
 			</div>
 		</div>
 	</section>

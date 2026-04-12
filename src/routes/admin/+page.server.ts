@@ -11,13 +11,33 @@ export const load: PageServerLoad = async (req) => {
 
 	const { server } = req.locals;
 	const stats = await getServerStats(server);
+	const appStats = await getAppStats(server);
 
 	return {
 		serverStats: stats,
+		appStats,
 		units: server.army.units,
 		townHalls: server.army.townHalls,
 	};
 };
+
+async function getAppStats(server: Server) {
+	const [usersResult, armiesResult, commentsResult, armiesByTHResult] = await Promise.all([
+		server.db.query<{ count: number }>('SELECT COUNT(*) as count FROM users'),
+		server.db.query<{ count: number }>('SELECT COUNT(*) as count FROM armies'),
+		server.db.query<{ count: number }>('SELECT COUNT(*) as count FROM army_comments'),
+		server.db.query<{ townHall: number; count: number }>(
+			'SELECT townHall, COUNT(*) as count FROM armies GROUP BY townHall ORDER BY townHall ASC'
+		),
+	]);
+
+	return {
+		totalUsers: usersResult[0]?.count ?? 0,
+		totalArmies: armiesResult[0]?.count ?? 0,
+		totalComments: commentsResult[0]?.count ?? 0,
+		armiesByTownHall: armiesByTHResult,
+	};
+}
 
 // TODO: move this to a dedicated server subclass at some point
 async function getServerStats(server: Server) {
