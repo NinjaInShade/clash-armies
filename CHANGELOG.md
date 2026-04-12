@@ -1,3 +1,8 @@
+## [0.7.1] - 2026-04-12
+
+- Add non-intrusive feedback banner
+- Add more stats to admin page
+
 ## [0.7.0] - 2026-04-12
 
 - Add new Rocket Backpack equipment
