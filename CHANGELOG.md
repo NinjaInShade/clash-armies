@@ -1,3 +1,8 @@
+## [0.7.0] - 2026-04-12
+
+- Add new Rocket Backpack equipment
+- Add armies browser page to enable searching by unit
+
 ## [0.6.0] - 2026-03-01
 
 - Add new Dragon Duke hero
