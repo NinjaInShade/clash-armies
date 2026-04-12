@@ -8,6 +8,7 @@
 	import type { AppState, ArmyNotification } from '$types';
 	import { page } from '$app/state';
 	import C from '$components';
+	import FeedbackBanner from '$components/FeedbackBanner.svelte';
 
 	type Props = {
 		data: LayoutData;
@@ -115,6 +116,8 @@
 </svelte:head>
 
 <C.Nav />
+
+<FeedbackBanner />
 
 {#if alerts.length}
 	<div class="alerts">
