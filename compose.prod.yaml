@@ -1,0 +1,30 @@
+services:
+  app:
+    image: ghcr.io/ninjainshade/clash-armies:${APP_VERSION}
+    restart: unless-stopped
+    depends_on:
+      db:
+        # Don't start app until db accepts connections
+        condition: service_healthy
+    env_file: .env
+    ports:
+      - '127.0.0.1:${HOST_PORT}:3000'
+  db:
+    image: mariadb:11.3
+    restart: unless-stopped
+    environment:
+      MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MARIADB_USER: ${DB_USER}
+      MARIADB_PASSWORD: ${DB_PASSWORD}
+      MARIADB_DATABASE: clash-armies
+    volumes:
+      - clash-armies-db:/var/lib/mysql
+    # No exposed ports, db is only reachable on internal compose network.
+    # Use `docker compose exec db mariadb --user=$DB_USER --database=clash-armies -p` for a shell.
+    healthcheck:
+      test: ['CMD', 'healthcheck.sh', '--connect', '--innodb_initialized']
+      interval: 10s
+      timeout: 5s
+      retries: 10
+volumes:
+  clash-armies-db:

@@ -36,9 +36,11 @@ Next thing you will need to do is create a `.env` file at the root of the projec
 - DB_ROOT_PASSWORD
 - DB_USER
 - DB_PASSWORD
-- BASE_APP_URL (set this to `http://localhost:5173`)
+- ORIGIN
 - GOOGLE_AUTH_CLIENT_ID (use the google client id from before)
 - GOOGLE_AUTH_SECRET (use the google secret from before)
+
+You can see example values for reference in `.env.example`.
 
 Once all that is done, install the dependencies:
 

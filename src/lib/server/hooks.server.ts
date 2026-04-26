@@ -15,6 +15,10 @@ export const init: ServerInit = async () => {
 };
 
 export const handle: Handle = async ({ event: req, resolve }) => {
+	if (req.url.pathname === '/healthcheck') {
+		return new Response('ok', { status: 200 });
+	}
+
 	initRequest(req, server);
 
 	await authMiddleware(req);
