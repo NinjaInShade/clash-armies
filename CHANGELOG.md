@@ -1,3 +1,7 @@
+## [0.7.2] - 2026-04-26
+
+- Fix incorrect max barracks level for town halls 16 and 17
+
 ## [0.7.1] - 2026-04-12
 
 - Add non-intrusive feedback banner
