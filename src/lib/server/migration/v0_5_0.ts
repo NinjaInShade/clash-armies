@@ -645,5 +645,17 @@ export default function migration(runStep: MigrationFn) {
 			{ equipmentId, level: 26, blacksmithLevel: 9 },
 			{ equipmentId, level: 27, blacksmithLevel: 9 },
 		]);
-	});
+    });
+    // Fix wrong max barracks level at town hall 16
+    runStep(59, `
+        UPDATE town_halls
+            SET maxBarracks = 18
+        WHERE level = 16
+    `);
+    // Fix wrong max barracks level at town hall 17
+    runStep(60, `
+        UPDATE town_halls
+            SET maxBarracks = 19
+        WHERE level = 17
+    `);
 }
