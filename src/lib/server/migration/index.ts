@@ -7,6 +7,7 @@ import v0_2_0 from './v0_2_0';
 import v0_3_0 from './v0_3_0';
 import v0_4_0 from './v0_4_0';
 import v0_5_0 from './v0_5_0';
+import v0_8_0 from './v0_8_0';
 
 export function migration(runStep: MigrationFn) {
 	v0_0_1(runStep);
@@ -17,4 +18,5 @@ export function migration(runStep: MigrationFn) {
 	v0_3_0(runStep);
 	v0_4_0(runStep);
 	v0_5_0(runStep);
+	v0_8_0(runStep);
 }
