@@ -1,3 +1,7 @@
+## [0.8.3] - 2026-05-02
+
+- Switch to `pnpm` package manager
+
 ## [0.8.2] - 2026-05-02
 
 - github actions CI test
