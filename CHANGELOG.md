@@ -1,3 +1,8 @@
+## [0.8.0] - 2026-05-02
+
+- Migrate deployment to docker
+- Database connection now uses `DB_HOST`/`DB_PORT` env vars (defaults `localhost`/`3306`)
+
 ## [0.7.2] - 2026-04-26
 
 - Fix incorrect max barracks level for town halls 16 and 17
