@@ -10,6 +10,7 @@
 		"start:https": "DEV_HTTPS=1 npm run start:network",
 		"production": "vite preview",
 		"build": "vite build",
+		"build:dev-image": "docker build -t clash-armies:devel .",
 		"test:before": "docker compose --env-file=.env.test --file=compose.test.yaml down -v && docker compose --env-file=.env.test --file=compose.test.yaml up -d",
 		"test:coverage": "npm run test:before && vitest run --coverage",
 		"test:ui": "npm run test:before && vitest --ui --coverage.enabled=true",
