@@ -1,3 +1,10 @@
+## [0.8.1] - 2026-05-02
+
+- Add new Sky Wagon siege machine
+- Add new Electro Fangs equipment
+- Add new army camp, workshop and blacksmith levels
+- Add various new unit levels
+
 ## [0.8.0] - 2026-05-02
 
 - Migrate deployment to docker
