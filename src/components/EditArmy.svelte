@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { getContext } from 'svelte';
 	import { invalidateAll, goto } from '$app/navigation';
-	import { VALID_HEROES, GUIDE_TEXT_CHAR_LIMIT, ARMY_TAGS, MAX_ARMY_TAGS } from '$shared/utils';
+	import { GUIDE_TEXT_CHAR_LIMIT, ARMY_TAGS, MAX_ARMY_TAGS } from '$shared/utils';
 	import { HTTPError, type APIErrors } from '$shared/http';
 	import type { AppState, Banner } from '$types';
 	import { ArmyModel, type Army } from '$models';
@@ -32,7 +32,7 @@
 	let errors = $state<APIErrors | null>(null);
 	let saveDisabled = $derived(!model.name || model.name.length < 2 || model.name.length > 25 || !model.units.length);
 	let showClanCastle = $state(model.ccUnits.length > 0);
-	let shownHeroes = $state(model.id ? VALID_HEROES.filter((hero) => model.hasHero(hero)) : null);
+	let shownHeroes = $state(model.id ? app.heroNames.filter((hero) => model.hasHero(hero)) : null);
 
 	function addClanCastle() {
 		showClanCastle = true;
@@ -47,9 +47,11 @@
 	}
 
 	function getDefaultHeroes(thLvl: number) {
-		return VALID_HEROES.filter((hero) => {
-			return ArmyModel.getMaxHeroLevel(hero, thLvl, app) !== -1;
-		}).slice(0, 4);
+		return app.heroNames
+			.filter((hero) => {
+				return ArmyModel.getMaxHeroLevel(hero, thLvl, app) !== -1;
+			})
+			.slice(0, 4);
 	}
 
 	async function removeClanCastle() {
@@ -98,7 +100,7 @@
 
 		showClanCastle = importedModel.ccUnits.length > 0;
 
-		const importedHeroes = VALID_HEROES.filter((hero) => importedModel.hasHero(hero));
+		const importedHeroes = app.heroNames.filter((hero) => importedModel.hasHero(hero));
 		if (importedHeroes.length) {
 			shownHeroes = importedHeroes;
 		} else {
@@ -303,7 +305,7 @@
 </section>
 
 <section class="dashed units heroes">
-	{#if model.thData && model.thData.maxBarbarianKing !== null && shownHeroes}
+	{#if model.thData && Object.keys(model.thData.heroMaxLevels).length > 0 && shownHeroes}
 		<div>
 			<div class="title">
 				<h2>
@@ -312,7 +314,7 @@
 					<ActionButton theme="danger" onclick={removeHeroes} class="title-action-btn">Remove</ActionButton>
 				</h2>
 			</div>
-			{#each VALID_HEROES as hero}
+			{#each app.heroNames as hero}
 				{#if model.thData && ArmyModel.getMaxHeroLevel(hero, model.townHall, model.gameData) !== -1}
 					<div class="hero-picker-container">
 						<HeroPicker {model} {hero} bind:shownHeroes />

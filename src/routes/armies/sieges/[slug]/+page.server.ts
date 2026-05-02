@@ -5,7 +5,7 @@ import z from 'zod';
 export const load: PageServerLoad = async (req) => {
 	const slug = z.string().trim().min(1).parse(req.params.slug);
 	const server = req.locals.server;
-	const siege = server.army.siegeSlugs.get(slug);
+	const siege = server.gameData.siegeSlugs.get(slug);
 	if (!siege) {
 		return error(404);
 	}

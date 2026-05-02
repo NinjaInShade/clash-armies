@@ -114,7 +114,7 @@ export class UnitModel {
 					throw new Error(`Unrecognized production building "${unit.productionBuilding}" for troop "${name}"`);
 				}
 				// Check if troop unlocked via barracks
-				if ((levelData.barrackLevel ?? -1) > prodLevel) {
+				if ((levelData.buildingLevel ?? -1) > prodLevel) {
 					return maxLevel;
 				}
 			}
@@ -125,7 +125,7 @@ export class UnitModel {
 					return -1;
 				}
 				// Check if siege unlocked via workshop
-				if ((levelData.barrackLevel ?? -1) > thData.maxWorkshop) {
+				if ((levelData.buildingLevel ?? -1) > thData.maxWorkshop) {
 					return maxLevel;
 				}
 			}
@@ -142,7 +142,7 @@ export class UnitModel {
 					throw new Error(`Unrecognized production building "${unit.productionBuilding}" for spell "${name}"`);
 				}
 				// Check if unlocked via spell factory
-				if ((levelData.spellFactoryLevel ?? -1) > prodLevel) {
+				if ((levelData.buildingLevel ?? -1) > prodLevel) {
 					return maxLevel;
 				}
 			}

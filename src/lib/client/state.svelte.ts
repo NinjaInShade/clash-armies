@@ -13,11 +13,12 @@ export function requireHTML() {
 	return html;
 }
 
-export function createAppState(initial: Pick<AppState, 'units' | 'townHalls' | 'equipment' | 'pets' | 'user'>) {
+export function createAppState(initial: Pick<AppState, 'units' | 'townHalls' | 'heroes' | 'equipment' | 'pets' | 'user'>) {
 	const http = new HTTPApi();
 
 	let units = $state<AppState['units']>(initial.units);
 	let townHalls = $state<AppState['townHalls']>(initial.townHalls);
+	let heroes = $state<AppState['heroes']>(initial.heroes);
 	let equipment = $state<AppState['equipment']>(initial.equipment);
 	let pets = $state<AppState['pets']>(initial.pets);
 	let user = $state<AppState['user']>(initial.user);
@@ -31,6 +32,15 @@ export function createAppState(initial: Pick<AppState, 'units' | 'townHalls' | '
 		},
 		set townHalls(newTownHalls: AppState['townHalls']) {
 			townHalls = newTownHalls;
+		},
+		get heroes() {
+			return heroes;
+		},
+		set heroes(newHeroes: AppState['heroes']) {
+			heroes = newHeroes;
+		},
+		get heroNames() {
+			return heroes.map((hero) => hero.name);
 		},
 		get units() {
 			return units;

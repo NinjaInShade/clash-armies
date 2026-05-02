@@ -28,6 +28,7 @@ export default defineConfig((env) => {
 			coverage: {
 				exclude: ['build/**', 'scripts/**', 'discord/**', 'svelte.config.js', ...coverageConfigDefaults.exclude],
 			},
+			fileParallelism: false,
 		},
 		plugins,
 		define: {

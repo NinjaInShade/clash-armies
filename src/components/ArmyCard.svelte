@@ -1,5 +1,6 @@
 <script lang="ts">
-	import { VALID_HEROES } from '$shared/utils';
+	import { getContext } from 'svelte';
+	import type { AppState } from '$types';
 	import { ArmyModel } from '$models';
 	import HeroDisplay from './HeroDisplay.svelte';
 	import UnitTotals from './UnitTotals.svelte';
@@ -16,6 +17,7 @@
 	};
 	const { model }: Props = $props();
 
+	const app = getContext<AppState>('app');
 	const downloads = $derived(model.openLinkClicks + model.copyLinkClicks);
 
 	let menuBtn = $state<HTMLButtonElement>();
@@ -32,7 +34,7 @@
 			<img src="/ui/clan-castle.webp" alt="Clash of clans clan castle" title="Has clan castle" />
 		</li>
 	{/if}
-	{#each VALID_HEROES as hero}
+	{#each app.heroNames as hero}
 		{#if model.hasHero(hero)}
 			<li>
 				<HeroDisplay name={hero} />

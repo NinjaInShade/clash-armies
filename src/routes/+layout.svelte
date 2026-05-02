@@ -87,6 +87,7 @@
 		townHalls: data.townHalls,
 		equipment: data.equipment,
 		pets: data.pets,
+		heroes: data.heroes,
 		user: extendUser(data.user, data.userNotifications),
 	});
 	setContext('app', appState);
@@ -97,6 +98,7 @@
 		appState.townHalls = data.townHalls;
 		appState.equipment = data.equipment;
 		appState.pets = data.pets;
+		appState.heroes = data.heroes;
 		appState.user = extendUser(data.user, data.userNotifications);
 	});
 

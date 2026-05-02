@@ -1,6 +1,6 @@
 import type { AppState, StaticGameData, UnitHome } from '$types';
 import type { Component } from 'svelte';
-import { HERO_CLASH_IDS, COPY_LINK_CLICK_METRIC, OPEN_LINK_CLICK_METRIC } from '$shared/utils';
+import { COPY_LINK_CLICK_METRIC, OPEN_LINK_CLICK_METRIC } from '$shared/utils';
 import { validateArmy } from '$shared/validation';
 import { ArmyModel, UnitModel, PetModel, EquipmentModel } from '$models';
 
@@ -22,8 +22,11 @@ export function generateLink(army: ArmyModel): string {
 	function buildHeroesStr(heroes: Record<string, { pet?: PetModel; eq1?: EquipmentModel; eq2?: EquipmentModel }>) {
 		return Object.entries(heroes)
 			.reduce<string[]>((prev, [name, hero]) => {
-				const clashId = HERO_CLASH_IDS[name];
-				let heroStr = clashId;
+				const heroData = army.gameData.heroes.find((hero) => hero.name === name);
+				if (!heroData) {
+					throw new Error(`Unknown hero "${name}"`);
+				}
+				let heroStr = String(heroData.clashId);
 				if (hero.pet) {
 					heroStr += `p${hero.pet.info.clashId}`;
 				}
@@ -140,7 +143,7 @@ export function parseLink(fullLink: string, gameData: StaticGameData) {
 				const m = ARMY_LINK_HERO_PATTERN.exec(hero);
 				const groups = m?.groups;
 				if (groups) {
-					const heroName = Object.entries(HERO_CLASH_IDS).find(([name, id]) => id === parseInt(groups.hero_id, 10))?.[0];
+					const heroName = model.gameData.heroes.find((hero) => hero.clashId === +groups.hero_id)?.name;
 					if (!heroName) {
 						throw new Error('Invalid hero ID');
 					}

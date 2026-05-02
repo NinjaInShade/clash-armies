@@ -26,7 +26,7 @@ ENV PORT=3000
 ENV HOST=0.0.0.0
 COPY --from=prod-deps /app/node_modules ./node_modules
 COPY --from=build     /app/dist         ./dist
-COPY package.json ./
+COPY package.json game-data.json5 ./
 USER node
 EXPOSE 3000
 HEALTHCHECK \

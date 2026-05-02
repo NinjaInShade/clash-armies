@@ -2,7 +2,6 @@
 	import { getContext } from 'svelte';
 	import type { AppState } from '$types';
 	import { ARMY_PAGES } from '$client/pages';
-	import { VALID_HEROES } from '$shared/utils';
 	import Banner from '~/components/Armies/Banner.svelte';
 
 	const app = getContext<AppState>('app');
@@ -27,7 +26,7 @@
 			<section>
 				<h3>Heroes</h3>
 				<ul class="links">
-					{#each VALID_HEROES as hero}
+					{#each app.heroNames as hero}
 						{@render linkCard(ARMY_PAGES.hero(hero).navOptions)}
 					{/each}
 				</ul>

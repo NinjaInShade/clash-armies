@@ -2,7 +2,6 @@
 	import { getContext } from 'svelte';
 	import type { AppState } from '$types';
 	import type { PickUnit, Filters } from './Controls.svelte';
-	import { VALID_HEROES } from '$shared/utils';
 	import ActionButton from '../ActionButton.svelte';
 	import UnitDisplay from '../UnitDisplay.svelte';
 	import EquipmentDisplay from '../EquipmentDisplay.svelte';
@@ -57,8 +56,8 @@
 			}
 		}
 		if (a.pickType === 'equipment' && b.pickType === 'equipment') {
-			const heroIndexA = VALID_HEROES.indexOf(a.hero);
-			const heroIndexB = VALID_HEROES.indexOf(b.hero);
+			const heroIndexA = app.heroNames.indexOf(a.hero);
+			const heroIndexB = app.heroNames.indexOf(b.hero);
 			if (+a.epic !== +b.epic) {
 				return +a.epic - +b.epic;
 			}

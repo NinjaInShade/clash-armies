@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { getContext, untrack } from 'svelte';
-	import { VALID_HEROES, YOUTUBE_URL_REGEX } from '$shared/utils';
+	import { YOUTUBE_URL_REGEX } from '$shared/utils';
 	import type { AppState } from '$types';
 	import { ArmyModel, type Army } from '$models';
 	import UnitTotals from './UnitTotals.svelte';
@@ -27,7 +27,7 @@
 	});
 
 	const stats = $derived(model.getStats());
-	const heroes = $derived(VALID_HEROES.filter((hero) => model.hasHero(hero)));
+	const heroes = $derived(app.heroNames.filter((hero) => model.hasHero(hero)));
 
 	let menuBtn = $state<HTMLButtonElement>();
 	let menuOpen = $state(false);
@@ -110,7 +110,7 @@
 			</h2>
 		</header>
 		<div class="heroes-list">
-			{#each VALID_HEROES as hero}
+			{#each app.heroNames as hero}
 				{#if model.hasHero(hero)}
 					<HeroDisplayFull {hero} {model} />
 				{/if}

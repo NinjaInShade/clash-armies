@@ -76,7 +76,6 @@ export const BANNERS = [
 export const ARMY_TAGS = ['CWL/War', 'Legends League', 'Farming', 'Beginner Friendly', 'Spam'] as const;
 export const USER_MAX_ARMIES = 40;
 export const VALID_UNIT_HOME = ['armyCamp', 'clanCastle'] as const;
-export const VALID_HEROES = ['Barbarian King', 'Archer Queen', 'Grand Warden', 'Royal Champion', 'Minion Prince', 'Dragon Duke'] as const;
 export const GUIDE_TEXT_CHAR_LIMIT = 3_000;
 export const YOUTUBE_URL_REGEX = /^https:\/\/(?:(?:www\.|m\.)?youtube\.com\/watch\?(?=.*v=([\w-]{11}))\S*|(?:www\.|m\.)?youtube\.com\/shorts\/([\w-]{11})(?:\?\S*)?|youtu\.be\/([\w-]{11})(?:\?\S*)?)$/;
 export const MAX_COMMENT_LENGTH = 2_000;
@@ -86,16 +85,6 @@ export const MAX_ARMY_TAGS = 3;
 export const PAGE_VIEW_METRIC = 'page-view';
 export const COPY_LINK_CLICK_METRIC = 'copy-link-click';
 export const OPEN_LINK_CLICK_METRIC = 'open-link-click';
-
-// Heroes aren't stored explicitly in the database so storing here instead (for now at least)
-export const HERO_CLASH_IDS = {
-	'Barbarian King': 0,
-	'Archer Queen': 1,
-	'Grand Warden': 2,
-	'Royal Champion': 4,
-	'Minion Prince': 6,
-	'Dragon Duke': 7,
-};
 
 /**
  * Encode a unit name for clean use in the browser URL.

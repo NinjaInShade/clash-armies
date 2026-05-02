@@ -2,12 +2,19 @@ import type { MySQL } from '@ninjalib/sql';
 import type { RequestEvent } from '@sveltejs/kit';
 import util from '@ninjalib/util';
 import { migration } from '$server/migration';
+import { GameData, type GameDataSettings } from '$server/game-data/GameData';
 import { ArmyAPI } from '$server/api/ArmyAPI';
 import { UserAPI } from '$server/api/UserAPI';
 import { NotificationAPI } from '$server/api/NotificationAPI';
 import { lucia } from '$server/auth/lucia';
-import { pluralize } from '$shared/utils';
 import { CronJob } from 'cron';
+
+/**
+ * Settings to configure the server.
+ */
+type ServerSettings = {
+	gameData?: GameDataSettings;
+};
 
 type GetSafeRedirectOptions = {
 	considerRedirectParam?: boolean;
@@ -26,16 +33,22 @@ export class Server {
 	public army: ArmyAPI;
 	public user: UserAPI;
 	public notification: NotificationAPI;
+	public gameData: GameData;
 
 	private hourlyTaskJob: CronJob;
 
-	constructor(db: MySQL) {
+	private settings: ServerSettings;
+
+	constructor(db: MySQL, settings: ServerSettings = {}) {
 		this.db = db;
+		this.settings = settings;
 		this.log = util.logger('clash-armies:server');
 
 		this.army = new ArmyAPI(this);
 		this.user = new UserAPI(this);
 		this.notification = new NotificationAPI(this);
+
+		this.gameData = new GameData(this, this.settings.gameData);
 
 		this.hourlyTaskJob = new CronJob('0 0 * * * *', async () => {
 			return this.hourlyTask();
@@ -45,6 +58,8 @@ export class Server {
 	public async init() {
 		await this.db.connect();
 		await this.db.migrate(migration);
+		await this.gameData.sync();
+		await this.gameData.loadData();
 
 		this.hourlyTaskJob.start();
 		this.hourlyTaskJob.fireOnTick();

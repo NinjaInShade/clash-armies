@@ -22,7 +22,7 @@ let reqAdminUser: User;
 beforeAll(async function () {
 	server = new Server(db);
 	await server.init();
-	gameData = server.army.gameData;
+	gameData = server.gameData.data;
 
 	await createUsers(server);
 });
@@ -46,6 +46,7 @@ beforeEach(async function () {
 
 describe('Saving', function () {
 	afterEach(async function () {
+		await server.db.delete('army_units');
 		await server.db.delete('armies');
 	});
 
@@ -350,6 +351,7 @@ describe('Saving', function () {
 
 describe('Fetching', function () {
 	afterEach(async function () {
+		await server.db.delete('army_units');
 		await server.db.delete('armies');
 	});
 
@@ -541,6 +543,11 @@ describe('Army comments', function () {
 		armyId2 = await server.army.saveArmy(req, data2);
 	});
 
+	afterAll(async function () {
+		await server.db.delete('army_units');
+		await server.db.delete('armies');
+	});
+
 	afterEach(async function () {
 		await server.db.delete('army_comments');
 	});
@@ -658,6 +665,11 @@ describe('Army notifications', function () {
 			units: [{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Barbarian', gameData).id, amount: 5 }],
 		});
 		armyId = await server.army.saveArmy(req, data);
+	});
+
+	afterAll(async function () {
+		await server.db.delete('army_units');
+		await server.db.delete('armies');
 	});
 
 	afterEach(async function () {

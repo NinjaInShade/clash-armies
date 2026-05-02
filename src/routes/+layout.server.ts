@@ -15,10 +15,11 @@ export const load: LayoutServerLoad = async (req) => {
 	}
 
 	return {
-		units: server.army.units,
-		equipment: server.army.equipment,
-		pets: server.army.pets,
-		townHalls: server.army.townHalls,
+		units: server.gameData.units,
+		equipment: server.gameData.equipment,
+		pets: server.gameData.pets,
+		townHalls: server.gameData.townHalls,
+		heroes: server.gameData.heroes,
 		user,
 		userNotifications,
 	};

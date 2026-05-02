@@ -1,5 +1,5 @@
 import type { Unit, UnitHome, Banner, StaticGameData, Pet, Equipment } from '$types';
-import { BANNERS, VALID_HEROES } from '$shared/utils';
+import { BANNERS } from '$shared/utils';
 import { UnitModel } from './Unit.svelte';
 import { PetModel } from './Pet.svelte';
 import { EquipmentModel } from './Equipment.svelte';
@@ -300,10 +300,11 @@ export class ArmyModel {
 	}
 
 	public getStats() {
+		const validHeroes = this.gameData.heroes.map((hero) => hero.name);
 		return {
 			type: this.getArmyType(),
 			hasClanCastle: this.ccUnits.length > 0,
-			hasHeroes: VALID_HEROES.some((hero) => this.hasHero(hero)),
+			hasHeroes: validHeroes.some((hero) => this.hasHero(hero)),
 			hasGuide: this.guide !== null,
 		};
 	}
@@ -337,29 +338,11 @@ export class ArmyModel {
 
 	public static getMaxHeroLevel(hero: string, townHall: number, gameData: StaticGameData) {
 		const thData = ArmyModel.requireTownHall(townHall, gameData);
-		if (!VALID_HEROES.includes(hero)) {
+		const validHeroes = gameData.heroes.map((hero) => hero.name);
+		if (!validHeroes.includes(hero)) {
 			return -1;
 		}
-		if (hero === 'Barbarian King') {
-			return thData.maxBarbarianKing ?? -1;
-		}
-		if (hero === 'Archer Queen') {
-			return thData.maxArcherQueen ?? -1;
-		}
-		if (hero === 'Grand Warden') {
-			return thData.maxGrandWarden ?? -1;
-		}
-		if (hero === 'Royal Champion') {
-			return thData.maxRoyalChampion ?? -1;
-		}
-		if (hero === 'Minion Prince') {
-			return thData.maxMinionPrince ?? -1;
-		}
-		if (hero === 'Dragon Duke') {
-			return thData.maxDragonDuke ?? -1;
-		}
-		// Should never happen?
-		return -1;
+		return thData.heroMaxLevels[hero] ?? -1;
 	}
 
 	public static requireTownHall(level: number, gameData: StaticGameData) {

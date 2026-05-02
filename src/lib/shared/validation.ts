@@ -1,5 +1,5 @@
 import type { StaticGameData } from '$types';
-import { BANNERS, VALID_UNIT_HOME, VALID_HEROES, GUIDE_TEXT_CHAR_LIMIT, YOUTUBE_URL_REGEX, MAX_COMMENT_LENGTH, MAX_ARMY_TAGS, ARMY_TAGS } from './utils';
+import { BANNERS, VALID_UNIT_HOME, GUIDE_TEXT_CHAR_LIMIT, YOUTUBE_URL_REGEX, MAX_COMMENT_LENGTH, MAX_ARMY_TAGS, ARMY_TAGS } from './utils';
 import { ArmyModel, UnitModel, PetModel, EquipmentModel, GuideModel } from '$models';
 import { parseHTML } from 'zeed-dom';
 import z from 'zod';
@@ -18,7 +18,7 @@ export const equipmentSchema = z.object({
 export const petSchema = z.object({
 	id: numberSchema.optional(),
 	petId: numberSchema,
-	hero: z.enum(VALID_HEROES),
+	hero: z.string(),
 });
 export const guideSchema = z.object({
 	id: numberSchema.optional(),
@@ -52,7 +52,8 @@ export function validateArmy(data: unknown, gameData: StaticGameData): ArmyModel
 	const army = armySchema.parse(data);
 	const model = new ArmyModel(gameData, army);
 
-	const heroesUsed = VALID_HEROES.filter((hero) => hasHero(hero, model)).length;
+	const validHeroes = gameData.heroes.map((hero) => hero.name);
+	const heroesUsed = validHeroes.filter((hero) => hasHero(hero, model)).length;
 	if (heroesUsed > 4) {
 		throw new Error('Cannot use more than 4 heroes');
 	}
@@ -170,6 +171,10 @@ export function validatePets(model: ArmyModel) {
 
 	for (const pet of model.pets) {
 		const hero = pet.hero.toLowerCase();
+		if (!model.gameData.heroes.find((heroData) => heroData.name === pet.hero)) {
+			throw new Error(`Invalid hero "${hero}"`);
+		}
+
 		const stashedPets = heroToPets[pet.hero] ?? [];
 		if (stashedPets.length === 1) {
 			throw new Error(`Hero ${hero} cannot have more than one pet`);

@@ -16,8 +16,8 @@ export const load: PageServerLoad = async (req) => {
 	return {
 		serverStats: stats,
 		appStats,
-		units: server.army.units,
-		townHalls: server.army.townHalls,
+		units: server.gameData.units,
+		townHalls: server.gameData.townHalls,
 	};
 };
 

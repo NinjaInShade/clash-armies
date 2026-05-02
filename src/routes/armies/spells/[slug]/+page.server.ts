@@ -5,7 +5,7 @@ import z from 'zod';
 export const load: PageServerLoad = async (req) => {
 	const slug = z.string().trim().min(1).parse(req.params.slug);
 	const server = req.locals.server;
-	const spell = server.army.spellSlugs.get(slug);
+	const spell = server.gameData.spellSlugs.get(slug);
 	if (!spell) {
 		return error(404);
 	}

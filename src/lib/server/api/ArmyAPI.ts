@@ -2,15 +2,13 @@ import type { Server } from '$server/api/Server';
 import { parseDBJsonField } from '$server/utils';
 import { ArmyMetricsAPI } from '$server/api/ArmyMetricsAPI';
 import type { RequestEvent } from '@sveltejs/kit';
-import z from 'zod';
-import { USER_MAX_ARMIES, VALID_HEROES, encodeUnitName } from '$shared/utils';
+import { USER_MAX_ARMIES } from '$shared/utils';
 import { validateArmy, numberSchema, commentSchema } from '$shared/validation';
 import { generateJSON, generateHTML } from '@tiptap/html';
 import { getExtensions } from '$shared/guideEditor';
 import { parseHTML } from 'zeed-dom';
 import { GuideModel } from '$models/Guide.svelte';
 import type { Army, ArmyComment } from '$models';
-import type { Unit, Equipment, Pet, TownHall, UnitType, StaticGameData } from '$types';
 
 type GetArmiesOptions = {
 	/** Returns the armies with these ID's */
@@ -47,60 +45,8 @@ type SaveVoteOptions = {
 	vote: number;
 };
 
-type GetUnitsOptions = {
-	type?: UnitType;
-};
-
 export class ArmyAPI {
 	public metrics: ArmyMetricsAPI;
-
-	/** Game units static data */
-	public units: Unit[] = [];
-	/** Game equipment static data */
-	public equipment: Equipment[] = [];
-	/** Game pets static data */
-	public pets: Pet[] = [];
-	/** Game town halls static data */
-	public townHalls: TownHall[] = [];
-
-	/**
-	 * Cached map of valid troop names to their database IDs.
-	 * NOTE: use `this.units` filtered by type if you need the full {@link Unit} object.
-	 */
-	public troopNames = new Map<string, number>();
-	/**
-	 * Cached map of valid spell names to their database IDs.
-	 * NOTE: use `this.units` filtered by type if you need the full {@link Unit} object.
-	 */
-	public spellNames = new Map<string, number>();
-	/**
-	 * Cached map of valid siege machine names to their database IDs.
-	 * NOTE: use `this.units` filtered by type if you need the full {@link Unit} object.
-	 */
-	public siegeNames = new Map<string, number>();
-	/**
-	 * Cached map of valid equipment names to their database IDs.
-	 * NOTE: use `this.equipment` if you need the full {@link Equipment} object.
-	 */
-	public equipmentNames = new Map<string, number>();
-	/**
-	 * Cached map of valid pet names to their database IDs.
-	 * NOTE: use `this.pets` if you need the full {@link Pet} object.
-	 */
-	public petNames = new Map<string, number>();
-	/**
-	 * Cached set of valid town halls (numeric value).
-	 * NOTE: use `this.townHalls` if you need the full {@link TownHall} object.
-	 */
-	public validTownHalls = new Set<number>();
-
-	/** Reverse lookup maps: URL slug → canonical display name */
-	public troopSlugs = new Map<string, string>();
-	public spellSlugs = new Map<string, string>();
-	public siegeSlugs = new Map<string, string>();
-	public equipmentSlugs = new Map<string, string>();
-	public petSlugs = new Map<string, string>();
-	public heroSlugs = new Map<string, string>();
 
 	private server: Server;
 
@@ -111,59 +57,15 @@ export class ArmyAPI {
 	}
 
 	public async init() {
-		this.units = await this.getUnitsData();
-		this.equipment = await this.getEquipmentData();
-		this.pets = await this.getPetsData();
-		this.townHalls = await this.getTownHallsData();
-
-		for (const unit of this.units) {
-			const slug = encodeUnitName(unit.name);
-			switch (unit.type) {
-				case 'Troop':
-					this.troopNames.set(unit.name, unit.id);
-					this.troopSlugs.set(slug, unit.name);
-					break;
-				case 'Spell':
-					this.spellNames.set(unit.name, unit.id);
-					this.spellSlugs.set(slug, unit.name);
-					break;
-				case 'Siege':
-					this.siegeNames.set(unit.name, unit.id);
-					this.siegeSlugs.set(slug, unit.name);
-					break;
-			}
-		}
-		for (const eq of this.equipment) {
-			this.equipmentNames.set(eq.name, eq.id);
-			this.equipmentSlugs.set(encodeUnitName(eq.name), eq.name);
-		}
-		for (const pet of this.pets) {
-			this.petNames.set(pet.name, pet.id);
-			this.petSlugs.set(encodeUnitName(pet.name), pet.name);
-		}
-		for (const hero of VALID_HEROES) {
-			this.heroSlugs.set(encodeUnitName(hero), hero);
-		}
-		for (const th of this.townHalls) {
-			this.validTownHalls.add(th.level);
-		}
+		//
 	}
 
 	public async dispose() {
 		//
 	}
 
-	/**
-	 * Static game data cache.
-	 * Populated during `Server.init()` via migration-only additions.
-	 * This DB data is immutable post-startup and should not be modified at runtime.
-	 *
-	 * Approximate RAM usage: ~185KB (at time of this commit). But unless big schema
-	 * changes happen in theory this shouldn't ever drastically increase.
-	 */
-	public get gameData(): StaticGameData {
-		const { units, equipment, pets, townHalls } = this;
-		return { units, equipment, pets, townHalls };
+	public get gameData() {
+		return this.server.gameData;
 	}
 
 	public async getArmies(req: RequestEvent, options: GetArmiesOptions = {}) {
@@ -328,7 +230,7 @@ export class ArmyAPI {
 		}
 
 		if (equipment) {
-			const eqId = this.equipmentNames.get(equipment);
+			const eqId = this.gameData.equipmentNames.get(equipment);
 			if (!eqId) {
 				throw new Error(`Unknown equipment: "${equipment}"`);
 			}
@@ -342,7 +244,7 @@ export class ArmyAPI {
 		}
 
 		if (pet) {
-			const petId = this.petNames.get(pet);
+			const petId = this.gameData.petNames.get(pet);
 			if (!petId) {
 				throw new Error(`Unknown pet: "${pet}"`);
 			}
@@ -356,7 +258,7 @@ export class ArmyAPI {
 		}
 
 		if (unit) {
-			const unitId = this.troopNames.get(unit) ?? this.spellNames.get(unit) ?? this.siegeNames.get(unit);
+			const unitId = this.gameData.troopNames.get(unit) ?? this.gameData.spellNames.get(unit) ?? this.gameData.siegeNames.get(unit);
 			if (!unitId) {
 				throw new Error(`Unknown unit: "${unit}"`);
 			}
@@ -474,7 +376,7 @@ export class ArmyAPI {
 	public async saveArmy(req: RequestEvent, data: unknown): Promise<number> {
 		const user = req.locals.requireAuth();
 
-		const model = validateArmy(data, this.gameData);
+		const model = validateArmy(data, this.gameData.data);
 		const { equipment, pets, guide, units, ccUnits, allUnits, tags } = model;
 
 		if (guide && typeof guide.textContent === 'string') {
@@ -726,117 +628,5 @@ export class ArmyAPI {
 		} else {
 			await this.server.db.upsert('army_votes', [{ armyId, votedBy: user.id, vote }]);
 		}
-	}
-
-	private async getUnitsData(options: GetUnitsOptions = {}) {
-		const { type } = options;
-
-		const args: (string | number)[] = [];
-		let query = `
-			SELECT
-				u.id,
-				u.type,
-				u.name,
-				u.clashId,
-				u.housingSpace,
-				u.productionBuilding,
-				u.isSuper,
-				u.isFlying,
-				u.isJumper,
-				u.airTargets,
-				u.groundTargets,
-				JSON_ARRAYAGG(JSON_OBJECT(
-					'id', ul.id,
-					'unitId', ul.unitId,
-					'level', ul.level,
-					'spellFactoryLevel', ul.spellFactoryLevel,
-					'barrackLevel', ul.barrackLevel,
-					'laboratoryLevel', ul.laboratoryLevel
-				)) AS levels
-			FROM units u
-			LEFT JOIN unit_levels ul ON ul.unitId = u.id
-			WHERE TRUE
-		`;
-
-		if (type) {
-			query += `
-				AND u.type = ?
-			`;
-			args.push(type);
-		}
-
-		query += `
-			GROUP BY u.id
-		`;
-
-		const units = await await this.server.db.query<Unit>(query, args);
-
-		for (const unit of units) {
-			unit.levels = parseDBJsonField(unit.levels);
-		}
-
-		return units;
-	}
-
-	private async getEquipmentData() {
-		// prettier-ignore
-		const equipment = await this.server.db.query<Equipment>(`
-			SELECT
-				eq.id,
-				eq.hero,
-				eq.name,
-				eq.clashId,
-				eq.epic,
-				JSON_ARRAYAGG(JSON_OBJECT(
-					'id', eql.id,
-					'equipmentId', eql.equipmentId,
-					'level', eql.level,
-					'blacksmithLevel', eql.blacksmithLevel
-				)) AS levels
-			FROM equipment eq
-			LEFT JOIN equipment_levels eql ON eql.equipmentId = eq.id
-			GROUP BY eq.id
-		`, []);
-
-		for (const eq of equipment) {
-			eq.levels = parseDBJsonField(eq.levels);
-		}
-
-		return equipment;
-	}
-
-	private async getPetsData() {
-		// prettier-ignore
-		const pets = await this.server.db.query<Pet>(`
-			SELECT
-				p.id,
-				p.name,
-				p.clashId,
-				JSON_ARRAYAGG(JSON_OBJECT(
-					'id', pl.id,
-					'petId', pl.petId,
-					'level', pl.level,
-					'petHouseLevel', pl.petHouseLevel
-				)) AS levels
-			FROM pets p
-			LEFT JOIN pet_levels pl ON pl.petId = p.id
-			GROUP BY p.id
-		`, []);
-
-		for (const pet of pets) {
-			pet.levels = parseDBJsonField(pet.levels);
-		}
-
-		return pets;
-	}
-
-	private async getTownHallsData() {
-		return this.server.db.query<TownHall>(
-			`
-			SELECT *, level AS id
-			FROM town_halls
-		`,
-			[]
-		);
 	}
 }
