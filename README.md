@@ -10,10 +10,13 @@ If you need extra help, or have suggestions on improving the dev workflow, give 
 
 ## Prerequisites
 
-- `npm` >= 10.5.0
+- `npm` >= 11.7.0
+- `pnpm` >= 11.0.3
 - `node` >= 24.11.0
-- `docker` >= 20.10.24
-- `docker compose` >= 2.20.3
+- `docker` >= 29.1.3
+- `docker compose` >= 5.1.3
+
+NOTE: the app may be able to run on lower versions of dependencies, but these are just the versions I am using and can say are "supported".
 
 ## Running app
 
@@ -45,13 +48,13 @@ You can see example values for reference in `.env.example`.
 Once all that is done, install the dependencies:
 
 ```bash
-npm i
+pnpm i
 ```
 
 And run the app:
 
 ```bash
-npm start
+pnpm start
 ```
 
 You should now have the app running locally on port 5173!

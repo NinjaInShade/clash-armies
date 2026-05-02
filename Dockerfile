@@ -1,20 +1,22 @@
 # Build: builds distribution code.
 FROM node:24-alpine AS build
 WORKDIR /app
+RUN npm install -g pnpm@11.0.3
 # Copy lockfile first so this layer caches when only source changes
-COPY package.json package-lock.json ./
-RUN npm ci
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+RUN pnpm install --frozen-lockfile
 COPY src ./src
 COPY static ./static
 COPY svelte.config.js vite.config.ts tsconfig.json CHANGELOG.md ./
-RUN npm run build
+RUN pnpm run build
 
 # Prod deps: a *separate* node_modules with only runtime deps.
 # Done in its own stage so dev deps never reach the final image.
 FROM node:24-alpine AS prod-deps
 WORKDIR /app
-COPY package.json package-lock.json ./
-RUN npm ci --omit=dev
+RUN npm install -g pnpm@11.0.3
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+RUN pnpm install --frozen-lockfile --prod
 
 # Runtime: minimal image, non-root, only what's needed to run.
 FROM node:24-alpine AS runtime

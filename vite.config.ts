@@ -16,7 +16,7 @@ export default defineConfig((env) => {
 	// When running `vite dev`
 	if (env.command === 'serve') {
 		// Useful to test certain APIs like `navigator.share` which are only available on HTTPS.
-		// Running `npm run start:https` will automatically use this flag
+		// Running `pnpm run start:https` will automatically use this flag
 		if (process.env.DEV_HTTPS) {
 			plugins.push(basicSsl());
 		}
