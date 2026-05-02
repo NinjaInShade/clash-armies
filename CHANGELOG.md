@@ -1,3 +1,7 @@
+## [0.8.2] - 2026-05-02
+
+- github actions CI test
+
 ## [0.8.1] - 2026-05-02
 
 - Add new Sky Wagon siege machine
