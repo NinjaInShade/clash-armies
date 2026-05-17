@@ -1,5 +1,4 @@
 import type { MigrationFn } from '@ninjalib/sql';
-import { insertInitialTownHalls, insertInitialUnits } from './util';
 
 // prettier-ignore
 export default function migration(runStep: MigrationFn) {
@@ -70,14 +69,8 @@ export default function migration(runStep: MigrationFn) {
             siegeCapacity SMALLINT
         )
     `);
-    runStep(7, async (db: MySQL) => {
-        // Insert initial town hall seed data
-        await insertInitialTownHalls(db);
-    })
-    runStep(8, async (db: MySQL) => {
-        // Insert initial units seed data
-        await insertInitialUnits(db);
-    }),
+    runStep(7, async () => { /* Historical artifact - see <REPLACE_COMMIT> */ });
+    runStep(8, async () => { /* Historical artifact - see <REPLACE_COMMIT> */ });
     runStep(9, `
         CREATE TABLE armies (
             id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,

@@ -1,5 +1,4 @@
-import type { MySQL, MigrationFn } from '@ninjalib/sql';
-import EquipmentLevelSeedData from './equipment-levels.json';
+import type { MigrationFn } from '@ninjalib/sql';
 
 // prettier-ignore
 export default function migration(runStep: MigrationFn) {
@@ -15,11 +14,5 @@ export default function migration(runStep: MigrationFn) {
             CONSTRAINT fk_equipment_levels_equipment_id FOREIGN KEY (equipmentId) REFERENCES equipment (id) ON DELETE CASCADE
         )
     `);
-    runStep(25, async (db: MySQL) => {
-        const equipment = await db.getRows('equipment');
-        for (const eq of equipment) {
-            const levels = EquipmentLevelSeedData[eq.name].map(lvl => ({ ...lvl, equipmentId: eq.id }));
-            await db.insertMany('equipment_levels', levels);
-        }
-    });
+    runStep(25, async () => { /* Historical artifact - see <REPLACE_COMMIT> */ });
 }

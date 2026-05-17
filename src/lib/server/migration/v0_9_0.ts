@@ -1,5 +1,5 @@
 import type { MySQL, MigrationFn } from '@ninjalib/sql';
-import { type Equipment, type Unit } from '$types';
+import type { Unit, Equipment } from '$types';
 
 // Mapping from old `town_halls` hero columns -> hero name.
 // Used to flatten denormalized columns into `town_hall_heroes_max`.
@@ -15,61 +15,76 @@ const TH_HERO_COLUMNS = [
 // prettier-ignore
 export default function migration(runStep: MigrationFn) {
     // 0) Fix existing bad data in prepartion for UNIQUE constraints in migration 71.
+    // NOTE: some of the queries below got guards added due to purging historical migrations.
+    // These queries still stay in case someone actually had that bad data, otherwise the
+    // upcoming UNIQUE constraint migration could fail - see <REPLACE_COMMIT> for more information.
     runStep(64, async (db: MySQL) => {
         // In the `v0_5_0.ts` migration file, a duplicate unit level was added for the "Ice Block" spell.
         // Remove this duplicate entry so the constraints can be made - for exactly this reason.
         const iceBlock = await db.getRow<Unit>('units', { name: 'Ice Block' });
-        await db.delete('unit_levels', {
-            unitId: iceBlock.id,
-            level: 4,
-            laboratoryLevel: 15,
-        })
+        if (iceBlock) {
+            await db.delete('unit_levels', {
+                unitId: iceBlock.id,
+                level: 4,
+                laboratoryLevel: 15,
+            })
+        }
 
         // Migration 25 from `v0_1_1.ts` inserted a duplicate level 5 row, and
         // also forgot to add a level 2 row, for the "Healer Puppet" equipment.
         const healerPuppet = await db.getRow<Equipment>('equipment', { name: 'Healer Puppet' });
-        await db.query('DELETE FROM equipment_levels WHERE equipmentId = ? AND level = 5 LIMIT 1', [healerPuppet.id])
-        await db.insertOne('equipment_levels', {
-            equipmentId: healerPuppet.id,
-            level: 2,
-            blacksmithLevel: 5
-        })
+        if (healerPuppet) {
+            await db.query('DELETE FROM equipment_levels WHERE equipmentId = ? AND level = 5 LIMIT 1', [healerPuppet.id])
+            await db.insertOne('equipment_levels', {
+                equipmentId: healerPuppet.id,
+                level: 2,
+                blacksmithLevel: 5
+            })
+        }
 
         // Same issue as with the "Healer Puppet" but for "Rage Gem"
         const rageGem = await db.getRow<Equipment>('equipment', { name: 'Rage Gem' });
-        await db.query('DELETE FROM equipment_levels WHERE equipmentId = ? AND level = 5 LIMIT 1', [rageGem.id])
-        await db.insertOne('equipment_levels', {
-            equipmentId: rageGem.id,
-            level: 2,
-            blacksmithLevel: 4
-        })
+        if (rageGem) {
+            await db.query('DELETE FROM equipment_levels WHERE equipmentId = ? AND level = 5 LIMIT 1', [rageGem.id])
+            await db.insertOne('equipment_levels', {
+                equipmentId: rageGem.id,
+                level: 2,
+                blacksmithLevel: 4
+            })
+        }
 
         // Same issue as with the "Healer Puppet" but for "Healing Tome"
         const healingTome = await db.getRow<Equipment>('equipment', { name: 'Healing Tome' });
-        await db.query('DELETE FROM equipment_levels WHERE equipmentId = ? AND level = 5 LIMIT 1', [healingTome.id])
-        await db.insertOne('equipment_levels', {
-            equipmentId: healingTome.id,
-            level: 2,
-            blacksmithLevel: 6
-        })
+        if (healingTome) {
+            await db.query('DELETE FROM equipment_levels WHERE equipmentId = ? AND level = 5 LIMIT 1', [healingTome.id])
+            await db.insertOne('equipment_levels', {
+                equipmentId: healingTome.id,
+                level: 2,
+                blacksmithLevel: 6
+            })
+        }
 
         // Same issue as with the "Healer Puppet" but for "Haste Vial"
         const hasteVial = await db.getRow<Equipment>('equipment', { name: 'Haste Vial' });
-        await db.query('DELETE FROM equipment_levels WHERE equipmentId = ? AND level = 5 LIMIT 1', [hasteVial.id])
-        await db.insertOne('equipment_levels', {
-            equipmentId: hasteVial.id,
-            level: 2,
-            blacksmithLevel: 8
-        })
+        if (hasteVial) {
+            await db.query('DELETE FROM equipment_levels WHERE equipmentId = ? AND level = 5 LIMIT 1', [hasteVial.id])
+            await db.insertOne('equipment_levels', {
+                equipmentId: hasteVial.id,
+                level: 2,
+                blacksmithLevel: 8
+            })
+        }
 
         // Same issue as with the "Healer Puppet" but for "Hog Rider Doll"
         const hogRiderDoll = await db.getRow<Equipment>('equipment', { name: 'Hog Rider Doll' });
-        await db.query('DELETE FROM equipment_levels WHERE equipmentId = ? AND level = 5 LIMIT 1', [hogRiderDoll.id])
-        await db.insertOne('equipment_levels', {
-            equipmentId: hogRiderDoll.id,
-            level: 2,
-            blacksmithLevel: 7
-        })
+        if (hogRiderDoll) {
+            await db.query('DELETE FROM equipment_levels WHERE equipmentId = ? AND level = 5 LIMIT 1', [hogRiderDoll.id])
+            await db.insertOne('equipment_levels', {
+                equipmentId: hogRiderDoll.id,
+                level: 2,
+                blacksmithLevel: 7
+            })
+        }
     });
     // 1) Heroes as a first-class entity.
     runStep(65, async (db: MySQL) => {
