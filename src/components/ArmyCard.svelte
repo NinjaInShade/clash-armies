@@ -16,6 +16,8 @@
 	};
 	const { model }: Props = $props();
 
+	const downloads = $derived(model.openLinkClicks + model.copyLinkClicks);
+
 	let menuBtn = $state<HTMLButtonElement>();
 	let menuOpen = $state(false);
 
@@ -45,6 +47,15 @@
 			<a class="title-container" href="/armies/{model.id}">
 				<img src="/town-halls/{model.townHall}_small.webp" alt="Town hall {model.townHall}" class="town-hall" title="Town hall {model.townHall}" />
 				<h3>{model.name}</h3>
+				<span class="downloads">
+					<svg width="14" height="15" viewBox="0 0 14 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+						<path
+							d="M0 12.6667H13.3333V14.6667H0V12.6667ZM12 4.66667V6H11.3333V6.66667H10.6667V7.33333H10V8H9.33333V8.66667H8.66667V9.33333H8V10H7.33333V10.6667H6V10H5.33333V9.33333H4.66667V8.66667H4V8H3.33333V7.33333H2.66667V6.66667H2V6H1.33333V4.66667H2V4H3.33333V4.66667H4V5.33333H4.66667V6H5.33333V0H8V6H8.66667V5.33333H9.33333V4.66667H10V4H11.3333V4.66667H12Z"
+							fill="currentColor"
+						/>
+					</svg>
+					{downloads}
+				</span>
 			</a>
 			<button class="context-menu-btn" aria-label="context-menu" bind:this={menuBtn} onclick={toggleContextMenu}>
 				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 5 16">
@@ -130,6 +141,7 @@
 				display: flex;
 				align-items: center;
 				gap: 4px;
+				min-width: 0;
 
 				& .town-hall {
 					flex-shrink: 0;
@@ -142,6 +154,28 @@
 					font-size: 18px;
 					line-height: 18px;
 					margin-left: 2px;
+					overflow: hidden;
+					white-space: nowrap;
+					text-overflow: ellipsis;
+				}
+
+				& .downloads {
+					display: flex;
+					align-items: center;
+					color: var(--grey-450);
+					font-size: var(--fs-sm);
+					line-height: var(--fs-sm);
+					font-family: 'Clash';
+					margin-left: 6px;
+					gap: 2.5px;
+
+					& svg {
+						position: relative;
+						/* Optical alignment */
+						bottom: 1px;
+						max-height: 13px;
+						width: auto;
+					}
 				}
 			}
 

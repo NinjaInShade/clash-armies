@@ -97,6 +97,10 @@ export class ArmyModel {
 	public userVote = $state(0);
 	public userBookmarked = $state(false);
 
+	public pageViews = $state(0);
+	public openLinkClicks = $state(0);
+	public copyLinkClicks = $state(0);
+
 	constructor(gameData: StaticGameData, data?: Partial<Army>) {
 		this.gameData = gameData;
 
@@ -159,6 +163,15 @@ export class ArmyModel {
 		}
 		if (data?.userBookmarked !== undefined) {
 			this.userBookmarked = data.userBookmarked;
+		}
+		if (data?.pageViews !== undefined) {
+			this.pageViews = data.pageViews;
+		}
+		if (data?.openLinkClicks !== undefined) {
+			this.openLinkClicks = data.openLinkClicks;
+		}
+		if (data?.copyLinkClicks !== undefined) {
+			this.copyLinkClicks = data.copyLinkClicks;
 		}
 	}
 
