@@ -1,4 +1,4 @@
-import type { HeroType, StaticGameData } from '$types';
+import type { StaticGameData } from '$types';
 import { BANNERS, VALID_UNIT_HOME, VALID_HEROES, GUIDE_TEXT_CHAR_LIMIT, YOUTUBE_URL_REGEX, MAX_COMMENT_LENGTH, MAX_ARMY_TAGS, ARMY_TAGS } from './utils';
 import { ArmyModel, UnitModel, PetModel, EquipmentModel, GuideModel } from '$models';
 import { parseHTML } from 'zeed-dom';
@@ -237,7 +237,7 @@ function findDuplicateUnits(units: UnitModel[]) {
  * Achieves the same function as the shared `hasHero` that takes in a fully saved `Army` type.
  * Unlike that function, this one can take in a `SaveArmy` so useful for validating a new/edited army.
  */
-export function hasHero(hero: HeroType, model: ArmyModel) {
+export function hasHero(hero: string, model: ArmyModel) {
 	for (const equipment of model.equipment) {
 		if (equipment.info.hero === hero) {
 			return hero;

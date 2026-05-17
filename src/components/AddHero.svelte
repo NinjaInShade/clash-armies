@@ -1,8 +1,6 @@
 <script lang="ts">
-	import type { HeroType } from '$types';
-
 	type Props = {
-		hero: HeroType;
+		hero: string;
 		onClick: () => void;
 		disabled?: boolean;
 		title?: string;

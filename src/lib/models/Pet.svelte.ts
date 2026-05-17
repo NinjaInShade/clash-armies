@@ -1,4 +1,4 @@
-import type { HeroType, Pet, Optional, StaticGameData } from '$types';
+import type { Pet, Optional, StaticGameData } from '$types';
 import { ArmyModel, type ArmyPet } from './Army.svelte';
 
 export class PetModel {
@@ -11,7 +11,7 @@ export class PetModel {
 	public id?: number;
 	public petId: number;
 	// @ts-expect-error this is set in the constructor
-	public hero: HeroType = $state();
+	public hero: string = $state();
 
 	public info: Pet;
 

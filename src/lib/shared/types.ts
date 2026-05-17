@@ -107,7 +107,6 @@ export type TownHall = {
 
 export type UnitType = 'Troop' | 'Siege' | 'Spell';
 export type UnitHome = (typeof VALID_UNIT_HOME)[number];
-export type HeroType = (typeof VALID_HEROES)[number];
 
 export type BlackSmithLevel = {
 	id: number;
@@ -154,7 +153,7 @@ export type Equipment = {
 	/** ID of the hero equipment in the `equipment` table */
 	id: number;
 	/** Which hero this equipment can be applied to */
-	hero: HeroType;
+	hero: string;
 	name: string;
 	clashId: number;
 	epic: boolean;

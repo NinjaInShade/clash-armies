@@ -1,12 +1,11 @@
 <script lang="ts">
-	import type { HeroType } from '$types';
 	import HeroDisplay from './HeroDisplay.svelte';
 	import EquipmentDisplay from './EquipmentDisplay.svelte';
 	import PetDisplay from './PetDisplay.svelte';
 	import type { ArmyModel } from '$models';
 
 	type Props = {
-		hero: HeroType;
+		hero: string;
 		model: ArmyModel;
 	};
 	const { hero, model }: Props = $props();

@@ -1,10 +1,10 @@
 <script lang="ts">
-	import type { AppState, HeroType } from '$types';
+	import type { AppState } from '$types';
 	import { getContext } from 'svelte';
 	import { ArmyModel } from '$models';
 
 	type Props = {
-		name: HeroType;
+		name: string;
 		level?: number;
 	};
 	const { name, level }: Props = $props();

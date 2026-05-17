@@ -1,4 +1,4 @@
-import type { Unit, UnitHome, HeroType, Banner, StaticGameData, Pet, Equipment } from '$types';
+import type { Unit, UnitHome, Banner, StaticGameData, Pet, Equipment } from '$types';
 import { BANNERS, VALID_HEROES } from '$shared/utils';
 import { UnitModel } from './Unit.svelte';
 import { PetModel } from './Pet.svelte';
@@ -62,7 +62,7 @@ export type ArmyEquipment = {
 export type ArmyPet = {
 	id: number;
 	petId: number;
-	hero: HeroType;
+	hero: string;
 };
 
 export type StructuredArmyComment = ArmyComment & {
@@ -222,7 +222,7 @@ export class ArmyModel {
 		return newUnit;
 	}
 
-	public addPet(pet: Pet, hero: HeroType) {
+	public addPet(pet: Pet, hero: string) {
 		const newPet = new PetModel(this.gameData, { hero, petId: pet.id });
 		this.pets.push(newPet);
 		return newPet;
@@ -277,7 +277,7 @@ export class ArmyModel {
 		this.equipment.splice(idx, 1);
 	}
 
-	public replacePet(name: string, replaceOnHero: HeroType) {
+	public replacePet(name: string, replaceOnHero: string) {
 		const selectedPet = this.pets.find((p) => p.info.name === name);
 		if (!selectedPet) {
 			throw new Error(`Pet "${name}" does not exist in this army`);
@@ -289,7 +289,7 @@ export class ArmyModel {
 		this.guide = null;
 	}
 
-	public hasHero(hero: HeroType) {
+	public hasHero(hero: string) {
 		if (this.equipment.find((eq) => eq.info.hero === hero)) {
 			return true;
 		}
@@ -335,7 +335,7 @@ export class ArmyModel {
 		return 'Hybrid';
 	}
 
-	public static getMaxHeroLevel(hero: HeroType, townHall: number, gameData: StaticGameData) {
+	public static getMaxHeroLevel(hero: string, townHall: number, gameData: StaticGameData) {
 		const thData = ArmyModel.requireTownHall(townHall, gameData);
 		if (!VALID_HEROES.includes(hero)) {
 			return -1;

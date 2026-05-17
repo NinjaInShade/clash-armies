@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { getContext } from 'svelte';
-	import type { AppState, HeroType, Pet } from '$types';
+	import type { AppState, Pet } from '$types';
 	import HeroDisplay from './HeroDisplay.svelte';
 	import ActionButton from './ActionButton.svelte';
 	import EquipmentDisplay from './EquipmentDisplay.svelte';
@@ -10,8 +10,8 @@
 
 	type Props = {
 		model: ArmyModel;
-		hero: HeroType;
-		shownHeroes: HeroType[];
+		hero: string;
+		shownHeroes: string[];
 	};
 	const { model, hero, shownHeroes = $bindable() }: Props = $props();
 	const app = getContext<AppState>('app');
