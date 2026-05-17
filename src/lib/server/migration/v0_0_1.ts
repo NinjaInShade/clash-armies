@@ -69,8 +69,8 @@ export default function migration(runStep: MigrationFn) {
             siegeCapacity SMALLINT
         )
     `);
-    runStep(7, async () => { /* Historical artifact - see <REPLACE_COMMIT> */ });
-    runStep(8, async () => { /* Historical artifact - see <REPLACE_COMMIT> */ });
+    runStep(7, async () => { /* Historical artifact - see 768be65 */ });
+    runStep(8, async () => { /* Historical artifact - see 768be65 */ });
     runStep(9, `
         CREATE TABLE armies (
             id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,

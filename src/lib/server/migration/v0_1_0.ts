@@ -65,7 +65,7 @@ export default function migration(runStep: MigrationFn) {
             CONSTRAINT fk_pet_levels_pet_id FOREIGN KEY (petId) REFERENCES pets (id) ON DELETE CASCADE
         )
     `);
-    runStep(20, async () => { /* Historical artifact - see <REPLACE_COMMIT> */ });
+    runStep(20, async () => { /* Historical artifact - see 768be65 */ });
     runStep(21, `
         CREATE TABLE army_equipment (
             id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,

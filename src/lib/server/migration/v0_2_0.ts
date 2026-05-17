@@ -2,7 +2,7 @@ import type { MigrationFn } from '@ninjalib/sql';
 
 // prettier-ignore
 export default function migration(runStep: MigrationFn) {
-	runStep(26, async () => { /* Historical artifact - see <REPLACE_COMMIT> */ });
+	runStep(26, async () => { /* Historical artifact - see 768be65 */ });
 
 	runStep(27, `
         CREATE TABLE army_guides (

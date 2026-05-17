@@ -17,7 +17,7 @@ export default function migration(runStep: MigrationFn) {
     // 0) Fix existing bad data in prepartion for UNIQUE constraints in migration 71.
     // NOTE: some of the queries below got guards added due to purging historical migrations.
     // These queries still stay in case someone actually had that bad data, otherwise the
-    // upcoming UNIQUE constraint migration could fail - see <REPLACE_COMMIT> for more information.
+    // upcoming UNIQUE constraint migration could fail - see 768be65 for more information.
     runStep(64, async (db: MySQL) => {
         // In the `v0_5_0.ts` migration file, a duplicate unit level was added for the "Ice Block" spell.
         // Remove this duplicate entry so the constraints can be made - for exactly this reason.

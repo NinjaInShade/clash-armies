@@ -14,5 +14,5 @@ export default function migration(runStep: MigrationFn) {
             CONSTRAINT fk_equipment_levels_equipment_id FOREIGN KEY (equipmentId) REFERENCES equipment (id) ON DELETE CASCADE
         )
     `);
-    runStep(25, async () => { /* Historical artifact - see <REPLACE_COMMIT> */ });
+    runStep(25, async () => { /* Historical artifact - see 768be65 */ });
 }

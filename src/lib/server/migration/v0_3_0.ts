@@ -2,11 +2,11 @@ import type { MySQL, MigrationFn } from '@ninjalib/sql';
 
 // prettier-ignore
 export default function migration(runStep: MigrationFn) {
-    runStep(29, async () => { /* Historical artifact - see <REPLACE_COMMIT> */ });
-    runStep(30, async () => { /* Historical artifact - see <REPLACE_COMMIT> */ });
-    runStep(31, async () => { /* Historical artifact - see <REPLACE_COMMIT> */ });
+    runStep(29, async () => { /* Historical artifact - see 768be65 */ });
+    runStep(30, async () => { /* Historical artifact - see 768be65 */ });
+    runStep(31, async () => { /* Historical artifact - see 768be65 */ });
     runStep(32, async (db: MySQL) => {
-        // NOTE: more queries were in this step previously - historical artifact - see <REPLACE_COMMIT>
+        // NOTE: more queries were in this step previously - historical artifact - see 768be65
         await db.query(`
             ALTER TABLE town_halls
             ADD COLUMN maxMinionPrince SMALLINT DEFAULT NULL AFTER maxRoyalChampion
@@ -89,7 +89,7 @@ export default function migration(runStep: MigrationFn) {
         DROP COLUMN trainingTime
     `);
     runStep(37, async (db: MySQL) => {
-        // NOTE: more queries were in this step previously - historical artifact - see <REPLACE_COMMIT>
+        // NOTE: more queries were in this step previously - historical artifact - see 768be65
         // Standardize "ObjectIds" to be called "clashId".
         await db.query(`
             ALTER TABLE units
@@ -98,7 +98,7 @@ export default function migration(runStep: MigrationFn) {
         await db.query('ALTER TABLE pets ADD COLUMN clashId INT UNSIGNED NOT NULL AFTER name');
         await db.query('ALTER TABLE equipment ADD COLUMN clashId INT UNSIGNED NOT NULL AFTER name');
     });
-    runStep(38, async () => { /* Historical artifact - see <REPLACE_COMMIT> */ });
-    runStep(39, async () => { /* Historical artifact - see <REPLACE_COMMIT> */ });
-    runStep(40, async () => { /* Historical artifact - see <REPLACE_COMMIT> */ });
+    runStep(38, async () => { /* Historical artifact - see 768be65 */ });
+    runStep(39, async () => { /* Historical artifact - see 768be65 */ });
+    runStep(40, async () => { /* Historical artifact - see 768be65 */ });
 }
