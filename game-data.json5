@@ -82,6 +82,12 @@
             ccTroopCapacity: 15,
             ccSpellCapacity: 0,
             ccSiegeCapacity: 0,
+            heroMaxLevels: [
+                {
+                    hero: 'Barbarian King',
+                    maxLevel: 1,
+                },
+            ],
         },
         {
             level: 5,
@@ -101,6 +107,12 @@
             ccTroopCapacity: 15,
             ccSpellCapacity: 0,
             ccSiegeCapacity: 0,
+            heroMaxLevels: [
+                {
+                    hero: 'Barbarian King',
+                    maxLevel: 1,
+                },
+            ],
         },
         {
             level: 6,
@@ -120,6 +132,12 @@
             ccTroopCapacity: 20,
             ccSpellCapacity: 0,
             ccSiegeCapacity: 0,
+            heroMaxLevels: [
+                {
+                    hero: 'Barbarian King',
+                    maxLevel: 1,
+                },
+            ],
         },
         {
             level: 7,
