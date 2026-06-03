@@ -190,30 +190,33 @@ describe('Saving', function () {
 		});
 
 		it('Should remove units that are no longer in the army', async function () {
+			const barbarian = UnitModel.requireTroopByName('Barbarian', gameData);
+			const archer = UnitModel.requireTroopByName('Archer', gameData);
+			const barbarianPuppet = EquipmentModel.requireByName('Barbarian Puppet', gameData);
+			const rageVial = EquipmentModel.requireByName('Rage Vial', gameData);
+			const lassi = PetModel.requireByName('Lassi', gameData);
+			const spiritFox = PetModel.requireByName('Spirit Fox', gameData);
 			const data = makeData({
 				name: 'test',
 				townHall: 16,
 				units: [
-					{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Barbarian', gameData).id, amount: 10 },
-					{ home: 'clanCastle', unitId: UnitModel.requireTroopByName('Barbarian', gameData).id, amount: 10 },
-					{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Archer', gameData).id, amount: 5 },
-					{ home: 'clanCastle', unitId: UnitModel.requireTroopByName('Archer', gameData).id, amount: 5 },
+					{ home: 'armyCamp', unitId: barbarian.id, amount: 10 },
+					{ home: 'clanCastle', unitId: barbarian.id, amount: 10 },
+					{ home: 'armyCamp', unitId: archer.id, amount: 5 },
+					{ home: 'clanCastle', unitId: archer.id, amount: 5 },
 				],
-				equipment: [
-					{ equipmentId: EquipmentModel.requireByName('Barbarian Puppet', gameData).id },
-					{ equipmentId: EquipmentModel.requireByName('Rage Vial', gameData).id },
-				],
+				equipment: [{ equipmentId: barbarianPuppet.id }, { equipmentId: rageVial.id }],
 				pets: [
-					{ hero: 'Barbarian King', petId: PetModel.requireByName('Lassi', gameData).id },
-					{ hero: 'Archer Queen', petId: PetModel.requireByName('Spirit Fox', gameData).id },
+					{ hero: 'Barbarian King', petId: lassi.id },
+					{ hero: 'Archer Queen', petId: spiritFox.id },
 				],
 			});
 			await server.army.saveArmy(req, data);
 			const army = (await server.army.getArmies(req))[0];
 			// Remove units
-			army.units = army.units.filter((u) => u.name !== 'Archer');
-			army.equipment = army.equipment.filter((eq) => eq.name !== 'Rage Vial');
-			army.pets = army.pets.filter((p) => p.name !== 'Spirit Fox');
+			army.units = army.units.filter((u) => u.unitId !== archer.id);
+			army.equipment = army.equipment.filter((eq) => eq.equipmentId !== rageVial.id);
+			army.pets = army.pets.filter((p) => p.petId !== spiritFox.id);
 			await server.army.saveArmy(req, army);
 			const armySaved = (await server.army.getArmies(req))[0];
 			assertArmies([armySaved], [army]);
@@ -281,22 +284,24 @@ describe('Saving', function () {
 		// Basically, make sure that if you delete a home unit, and at the same time remove and re-add the same type of
 		// unit in the clan castle, that the home unit definitely gets deleted, as there was a bug where it was kept.
 		it('should delete home unit if deleted and cc unit removed then re-added at the same time', async function () {
+			const barbarian = UnitModel.requireTroopByName('Barbarian', gameData);
+			const archer = UnitModel.requireTroopByName('Archer', gameData);
 			const data = makeData({
 				name: 'test',
 				townHall: 16,
 				units: [
 					// Just so we always have one unit in the home camp otherwise you can't save empty army
-					{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Barbarian', gameData).id, amount: 1 },
+					{ home: 'armyCamp', unitId: barbarian.id, amount: 1 },
 					// Same unit types but one for home camp, and one for clan castle
-					{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Archer', gameData).id, amount: 1 },
-					{ home: 'clanCastle', unitId: UnitModel.requireTroopByName('Archer', gameData).id, amount: 1 },
+					{ home: 'armyCamp', unitId: archer.id, amount: 1 },
+					{ home: 'clanCastle', unitId: archer.id, amount: 1 },
 				],
 			});
 			await server.army.saveArmy(req, data);
 
 			const army = (await server.army.getArmies(req))[0];
 			// Delete home unit from the army
-			army.units = army.units.filter((u) => u.home === 'clanCastle' || u.name !== 'Archer');
+			army.units = army.units.filter((u) => u.home === 'clanCastle' || u.unitId !== archer.id);
 			// Simulate removing and re-adding the clan castle unit by ensuring id is undefined
 			const ccUnit = army.units.find((u) => u.home === 'clanCastle');
 			ccUnit.id = undefined;
@@ -307,7 +312,7 @@ describe('Saving', function () {
 			// Assert home unit was deleted
 			const homeUnits = armyAfter.units.filter((u) => u.home === 'armyCamp');
 			assert.equal(homeUnits.length, 1);
-			assert.equal(homeUnits[0].name, 'Barbarian');
+			assert.equal(homeUnits[0].unitId, barbarian.id);
 			// This shouldn't have changed
 			const ccUnits = armyAfter.units.filter((u) => u.home === 'clanCastle');
 			assert.equal(ccUnits.length, 1);

@@ -105,23 +105,11 @@ export class ArmyAPI {
 					JSON_ARRAYAGG(JSON_OBJECT(
 						'id', au.id,
 						'home', au.home,
-						'armyId', a.id,
-						'unitId', un.id,
-						'amount', au.amount,
-						'name', un.name,
-						'type', un.type,
-						'clashId', un.clashId,
-						'housingSpace', un.housingSpace,
-						'productionBuilding', un.productionBuilding,
-						'isSuper', un.isSuper,
-						'isFlying', un.isFlying,
-						'isJumper', un.isJumper,
-						'airTargets', un.airTargets,
-						'groundTargets', un.groundTargets
+						'unitId', au.unitId,
+						'amount', au.amount
 					)) AS units
 				FROM armies a
 				LEFT JOIN army_units au ON au.armyId = a.id
-				LEFT JOIN units un ON un.id = au.unitId
 				WHERE au.id IS NOT NULL
 				GROUP BY a.id
 			) au ON au.id = a.id
@@ -130,16 +118,10 @@ export class ArmyAPI {
 					a.id,
 					JSON_ARRAYAGG(JSON_OBJECT(
 						'id', ae.id,
-						'armyId', a.id,
-						'equipmentId', eq.id,
-						'hero', eq.hero,
-						'name', eq.name,
-						'clashId', eq.clashId,
-						'epic', eq.epic
+						'equipmentId', ae.equipmentId
 					)) AS equipment
 				FROM armies a
 				LEFT JOIN army_equipment ae ON ae.armyId = a.id
-				LEFT JOIN equipment eq ON eq.id = ae.equipmentId
 				WHERE ae.id IS NOT NULL
 				GROUP BY a.id
 			) ae ON ae.id = a.id
@@ -149,14 +131,10 @@ export class ArmyAPI {
 					JSON_ARRAYAGG(JSON_OBJECT(
 						'id', ap.id,
 						'hero', ap.hero,
-						'armyId', a.id,
-						'petId', p.id,
-						'name', p.name,
-						'clashId', p.clashId
+						'petId', ap.petId
 					)) AS pets
 				FROM armies a
 				LEFT JOIN army_pets ap ON ap.armyId = a.id
-				LEFT JOIN pets p ON p.id = ap.petId
 				WHERE ap.id IS NOT NULL
 				GROUP BY a.id
 			) ap ON ap.id = a.id
@@ -270,10 +248,6 @@ export class ArmyAPI {
 			`;
 			args.push(unitId);
 		}
-
-		query += `
-			GROUP BY a.id
-		`;
 
 		if (sort === 'score') {
 			query += `
