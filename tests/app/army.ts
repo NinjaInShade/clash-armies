@@ -986,14 +986,14 @@ describe('Validation', function () {
 		it("Should not allow equipment for a hero that isn't unlocked yet", function () {
 			const data = makeData({
 				name: 'test',
-				townHall: 6,
+				townHall: 3,
 				units: [{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Barbarian', gameData).id, amount: 1 }],
 				equipment: [{ equipmentId: EquipmentModel.requireByName('Barbarian Puppet', gameData).id }],
 			});
 			// Should throw at town hall level 6 as king isn't unlocked yet
 			assert.throws(function () {
 				validateArmy(data, gameData);
-			}, `Equipment "Barbarian Puppet" can't be used as the barbarian king isn't unlocked at town hall 6`);
+			}, `Equipment "Barbarian Puppet" can't be used as the barbarian king isn't unlocked at town hall 3`);
 			// Should not throw at town hall 7 as king is unlocked
 			data.townHall = 7;
 			validateArmy(data, gameData);
