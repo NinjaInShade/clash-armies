@@ -1,3 +1,7 @@
+## [0.9.1] - 2026-06-03
+
+- Improve query performance, speeding up army pages loading
+
 ## [0.9.0] - 2026-06-03
 
 - Update Barbarian King to be available at Town Hall 4
