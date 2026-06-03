@@ -1,3 +1,9 @@
+## [0.9.0] - 2026-06-03
+
+- Update Barbarian King to be available at Town Hall 4
+- Display army downloads on army card
+- Internal: move to declarative game data file
+
 ## [0.8.3] - 2026-05-02
 
 - Switch to `pnpm` package manager
