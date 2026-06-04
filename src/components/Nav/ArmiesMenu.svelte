@@ -27,7 +27,7 @@
 	let visibleTownHalls = $state<TownHall[]>([]);
 </script>
 
-<Menu bind:open {elRef} placementOffset={0} placement="bottom-end" --menu-width="min(855px, 90dvw)" fixed>
+<Menu bind:open {elRef} placementOffset={0} placement="bottom-start" --menu-width="min(855px, 90dvw)" fixed>
 	<!-- svelte-ignore a11y_no_noninteractive_tabindex -->
 	<div class="ca-menu armies-menu" tabindex="0" transition:fade={{ duration: 100 }}>
 		<section>
