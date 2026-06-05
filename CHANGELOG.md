@@ -1,3 +1,8 @@
+## [0.9.2] - 2026-06-05
+
+- Update naming of "Rising armies" to "New armies"
+- Increase max armies a user can create
+
 ## [0.9.1] - 2026-06-03
 
 - Improve query performance, speeding up army pages loading
