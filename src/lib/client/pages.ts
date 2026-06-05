@@ -17,16 +17,16 @@ export const ARMY_PAGES = {
 			imgAlt: 'Clash of clans gem',
 		},
 	},
-	rising: {
+	latest: {
 		bannerOptions: {
-			title: 'Rising Armies',
+			title: 'New Armies',
 			description: '<b>Vote on new armies</b> and help shape the attacking meta!',
 			descriptionWidth: 275,
 			img: '/ui/leaf-badge.webp',
 			imgAlt: 'Badge with leaf emblem',
 		},
 		navOptions: {
-			title: 'Rising',
+			title: 'New',
 			description: 'Latest Armies',
 			img: '/ui/leaf-badge.webp',
 			imgAlt: 'Badge with leaf emblem',

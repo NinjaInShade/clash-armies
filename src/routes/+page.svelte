@@ -5,7 +5,7 @@
 	import ArmyList from '~/components/Armies/ArmyList.svelte';
 
 	const { data }: { data: PageData } = $props();
-	const risingArmiesMeta = ARMY_PAGES.rising;
+	const latestArmiesMeta = ARMY_PAGES.latest;
 </script>
 
 <svelte:head>
@@ -36,7 +36,7 @@
 
 <section class="top-armies">
 	<div class="container">
-		<ArmyList data={data.armies} bannerOptions={risingArmiesMeta.bannerOptions} />
+		<ArmyList data={data.armies} bannerOptions={latestArmiesMeta.bannerOptions} />
 	</div>
 </section>
 

@@ -27,7 +27,7 @@
 			href: '/army-builder',
 		},
 	]);
-	const armyLinks = [ARMY_PAGES.popular, ARMY_PAGES.rising, ARMY_PAGES.townHalls, ARMY_PAGES.browse];
+	const armyLinks = [ARMY_PAGES.popular, ARMY_PAGES.latest, ARMY_PAGES.townHalls, ARMY_PAGES.browse];
 	// prettier-ignore
 	const accountLinks = $derived([
 		...(app.user ? [

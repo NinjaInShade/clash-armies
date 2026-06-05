@@ -4,7 +4,7 @@
 	import ArmyList from '~/components/Armies/ArmyList.svelte';
 
 	const { data }: { data: PageData } = $props();
-	const pageMeta = ARMY_PAGES.rising;
+	const pageMeta = ARMY_PAGES.latest;
 </script>
 
 <svelte:head>
