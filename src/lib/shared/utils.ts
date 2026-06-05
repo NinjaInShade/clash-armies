@@ -74,7 +74,7 @@ export const BANNERS = [
 	'wild-west',
 ] as const;
 export const ARMY_TAGS = ['CWL/War', 'Legends League', 'Farming', 'Beginner Friendly', 'Spam'] as const;
-export const USER_MAX_ARMIES = 40;
+export const USER_MAX_ARMIES = 100;
 export const VALID_UNIT_HOME = ['armyCamp', 'clanCastle'] as const;
 export const GUIDE_TEXT_CHAR_LIMIT = 3_000;
 export const YOUTUBE_URL_REGEX = /^https:\/\/(?:(?:www\.|m\.)?youtube\.com\/watch\?(?=.*v=([\w-]{11}))\S*|(?:www\.|m\.)?youtube\.com\/shorts\/([\w-]{11})(?:\?\S*)?|youtu\.be\/([\w-]{11})(?:\?\S*)?)$/;
