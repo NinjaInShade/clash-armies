@@ -1,7 +1,8 @@
 import type { RequestEvent } from '@sveltejs/kit';
 import { OAuth2RequestError } from 'arctic';
 import type { User } from '$types';
-import { google, lucia } from '$server/auth/lucia';
+import { createSession, SESSION_COOKIE_NAME, getSessionCookieAttributes } from '$server/auth/session';
+import { google } from '$server/auth/oauth';
 import { db } from '$server/db';
 import { log } from '$server/auth/utils';
 
@@ -23,7 +24,7 @@ export async function GET(req: RequestEvent): Promise<Response> {
 	const storedState = req.cookies.get('google_oauth_state') ?? null;
 	const storedCodeVerifier = req.cookies.get('google_oauth_code_verifier') ?? null;
 
-	if (!code || !storedState || !storedCodeVerifier || state !== storedState) {
+	if (!code || !state || !storedState || !storedCodeVerifier || state !== storedState) {
 		return new Response(null, {
 			status: 400,
 		});
@@ -34,7 +35,7 @@ export async function GET(req: RequestEvent): Promise<Response> {
 
 	try {
 		parsedState = JSON.parse(state);
-	} catch (err) {
+	} catch {
 		// Pass
 	}
 
@@ -66,12 +67,8 @@ export async function GET(req: RequestEvent): Promise<Response> {
                     `, [existingUser.id, googleUser.email ?? null])
 				});
 			}
-			const session = await lucia.createSession(existingUser.id, {});
-			const sessionCookie = lucia.createSessionCookie(session.id);
-			req.cookies.set(sessionCookie.name, sessionCookie.value, {
-				path: '.',
-				...sessionCookie.attributes,
-			});
+			const { token } = await createSession(existingUser.id);
+			req.cookies.set(SESSION_COOKIE_NAME, token, getSessionCookieAttributes());
 			return new Response(null, {
 				status: 302,
 				headers: {
@@ -96,12 +93,8 @@ export async function GET(req: RequestEvent): Promise<Response> {
 				throw new Error('Expected user id');
 			}
 
-			const session = await lucia.createSession(userId, {});
-			const sessionCookie = lucia.createSessionCookie(session.id);
-			req.cookies.set(sessionCookie.name, sessionCookie.value, {
-				path: '.',
-				...sessionCookie.attributes,
-			});
+			const { token } = await createSession(userId);
+			req.cookies.set(SESSION_COOKIE_NAME, token, getSessionCookieAttributes());
 			return new Response(null, {
 				status: 302,
 				headers: {

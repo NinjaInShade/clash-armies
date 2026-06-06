@@ -3,7 +3,14 @@ import z from 'zod';
 import { v4 as uuidv4 } from 'uuid';
 import { json } from '@sveltejs/kit';
 import { hasAuth, requireAuth, hasRoles, requireRoles } from '$server/auth/utils';
-import { lucia } from '$server/auth/lucia';
+import {
+	SESSION_COOKIE_NAME,
+	validateSessionToken,
+	getSessionUser,
+	invalidateSession,
+	getSessionCookieAttributes,
+	getBlankSessionCookieAttributes,
+} from '$server/auth/session';
 import type { RequestEvent, Handle } from '@sveltejs/kit';
 import type { Server } from '$server/api/Server';
 import { dev } from '$app/environment';
@@ -119,30 +126,36 @@ export function handleUnexpectedError(req: RequestEvent, error: unknown, status:
 }
 
 export async function authMiddleware(req: RequestEvent) {
-	const sessionId = req.cookies.get(lucia.sessionCookieName);
-	if (!sessionId) {
+	const token = req.cookies.get(SESSION_COOKIE_NAME);
+	if (!token) {
 		req.locals.user = null;
 		req.locals.session = null;
-	} else {
-		const { session, user } = await lucia.validateSession(sessionId);
-		if (session && session.fresh) {
-			const sessionCookie = lucia.createSessionCookie(session.id);
-			req.cookies.set(sessionCookie.name, sessionCookie.value, {
-				path: '.',
-				...sessionCookie.attributes,
-			});
-		}
-		if (!session) {
-			const sessionCookie = lucia.createBlankSessionCookie();
-			req.cookies.set(sessionCookie.name, sessionCookie.value, {
-				path: '.',
-				...sessionCookie.attributes,
-			});
-		}
-
-		req.locals.user = user;
-		req.locals.session = session;
+		return;
 	}
+
+	const session = await validateSessionToken(token);
+	if (!session) {
+		req.cookies.set(SESSION_COOKIE_NAME, '', getBlankSessionCookieAttributes());
+		req.locals.user = null;
+		req.locals.session = null;
+		return;
+	}
+
+	const user = await getSessionUser(session.userId);
+	if (!user) {
+		// User no longer exists - drop the orphaned session.
+		await invalidateSession(session.id);
+		req.cookies.set(SESSION_COOKIE_NAME, '', getBlankSessionCookieAttributes());
+		req.locals.user = null;
+		req.locals.session = null;
+		return;
+	}
+
+	// Slide the cookie's client-side expiry forward to mirror the inactivity timeout.
+	req.cookies.set(SESSION_COOKIE_NAME, token, getSessionCookieAttributes());
+
+	req.locals.user = user;
+	req.locals.session = session;
 }
 
 /**

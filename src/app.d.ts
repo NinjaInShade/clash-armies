@@ -1,4 +1,5 @@
-import type { User, Session } from 'lucia';
+import type { Session } from '$types';
+import type { SessionUser } from '$server/auth/session';
 import type { Server } from '$server/api/Server';
 
 // See https://kit.svelte.dev/docs/types#app
@@ -31,7 +32,7 @@ export interface Request {
 	/**
 	 * Ensures user is authenticated and returns their user object. Redirects to `login` if un-authenticated.
 	 */
-	requireAuth: () => User;
+	requireAuth: () => SessionUser;
 	/**
 	 * Returns true if user is authenticated and has every role specified.
 	 */
@@ -39,8 +40,8 @@ export interface Request {
 	/**
 	 * Ensures user is authenticated and has all roles specified. Throws `403` if user doesn't any of the role/s .
 	 */
-	requireRoles: (...roles: string[]) => User;
-	user: User | null;
+	requireRoles: (...roles: string[]) => SessionUser;
+	user: SessionUser | null;
 	session: Session | null;
 }
 

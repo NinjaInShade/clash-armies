@@ -76,7 +76,8 @@ export type User = {
 export type Session = {
 	id: string;
 	userId: number;
-	expiresAt: Date;
+	lastVerifiedAt: Date;
+	createdAt: Date;
 };
 
 export type TownHall = {

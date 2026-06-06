@@ -1,6 +1,6 @@
 import type { RequestEvent } from '@sveltejs/kit';
 import { redirect } from '@sveltejs/kit';
-import { lucia } from '$server/auth/lucia';
+import { invalidateSession, SESSION_COOKIE_NAME, getBlankSessionCookieAttributes } from '$server/auth/session';
 
 export async function GET(req: RequestEvent): Promise<Response> {
 	const redirectTo = req.locals.server.getSafeRedirect(req, {
@@ -8,12 +8,8 @@ export async function GET(req: RequestEvent): Promise<Response> {
 	});
 
 	if (req.locals.session) {
-		await lucia.invalidateSession(req.locals.session.id);
-		const sessionCookie = lucia.createBlankSessionCookie();
-		req.cookies.set(sessionCookie.name, sessionCookie.value, {
-			path: '.',
-			...sessionCookie.attributes,
-		});
+		await invalidateSession(req.locals.session.id);
+		req.cookies.set(SESSION_COOKIE_NAME, '', getBlankSessionCookieAttributes());
 	}
 
 	return redirect(302, redirectTo);

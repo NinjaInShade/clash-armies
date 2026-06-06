@@ -6,7 +6,7 @@ import { GameData, type GameDataSettings } from '$server/game-data/GameData';
 import { ArmyAPI } from '$server/api/ArmyAPI';
 import { UserAPI } from '$server/api/UserAPI';
 import { NotificationAPI } from '$server/api/NotificationAPI';
-import { lucia } from '$server/auth/lucia';
+import { deleteExpiredSessions } from '$server/auth/session';
 import { CronJob } from 'cron';
 
 /**
@@ -125,7 +125,7 @@ export class Server {
 		const start = Date.now();
 		this.log.info('Deleting expired sessions...');
 
-		await lucia.deleteExpiredSessions();
+		await deleteExpiredSessions();
 
 		const duration = Date.now() - start;
 		this.log.info(`Deleted expired sessions in ${duration}ms`);
