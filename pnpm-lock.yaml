@@ -159,9 +159,6 @@ importers:
       prettier-plugin-svelte:
         specifier: ^3.4.0
         version: 3.5.1(prettier@3.8.3)(svelte@5.55.5(@typescript-eslint/types@8.59.0))
-      semver:
-        specifier: ^7.7.1
-        version: 7.7.4
       svelte:
         specifier: ^5.43.4
         version: 5.55.5(@typescript-eslint/types@8.59.0)
