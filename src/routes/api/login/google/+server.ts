@@ -17,9 +17,7 @@ export async function GET(req: RequestEvent): Promise<Response> {
 
 	const state = JSON.stringify({ r: redirectTo });
 	const codeVerifier = generateCodeVerifier();
-	const url = await google.createAuthorizationURL(state, codeVerifier, {
-		scopes: ['email'],
-	});
+	const url = google.createAuthorizationURL(state, codeVerifier, ['openid', 'email']);
 
 	req.cookies.set('google_oauth_state', state, {
 		path: '/',
