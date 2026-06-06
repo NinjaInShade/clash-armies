@@ -7,7 +7,7 @@ COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 RUN pnpm install --frozen-lockfile
 COPY src ./src
 COPY static ./static
-COPY svelte.config.js vite.config.ts tsconfig.json CHANGELOG.md ./
+COPY vite.config.ts tsconfig.json CHANGELOG.md ./
 RUN pnpm run build
 
 # Prod deps: a *separate* node_modules with only runtime deps.
