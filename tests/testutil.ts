@@ -3,12 +3,9 @@ import type { Army } from '$models';
 import { BANNERS } from '$shared/utils';
 import { v4 as uuidv4 } from 'uuid';
 import type { Server } from '$server/api/Server';
-import chaiSubset from 'chai-subset';
 import type { RequestEvent } from '@sveltejs/kit';
 import { hasAuth, requireAuth, hasRoles, requireRoles } from '$server/auth/utils';
 import * as vitest from 'vitest';
-
-vitest.chai.use(chaiSubset);
 
 export const USER = {
 	id: 1,
