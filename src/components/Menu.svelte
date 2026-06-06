@@ -79,6 +79,14 @@
 	function handleScroll() {
 		updateOpen(false);
 	}
+
+	function handleMenuClick(ev: MouseEvent) {
+		// Don't swallow clicks on links, otherwise they never reach SvelteKit's
+		// top-level HTML click handler and fall back to full-page reloads.
+		if (!(ev.target as Element).closest('a')) {
+			ev.stopPropagation();
+		}
+	}
 </script>
 
 <svelte:window onfocusout={handleFocusOutside} onclick={handleClickOutside} onkeydown={handleEscape} onscroll={handleScroll} />
@@ -90,7 +98,7 @@
 	class:fixed
 	class:hidden={!open || x === null || y === null}
 	style="--x: {x}px; --y: {y}px;"
-	onclick={(ev) => ev.stopPropagation()}
+	onclick={handleMenuClick}
 	bind:this={menuRef}
 >
 	{#if open}
