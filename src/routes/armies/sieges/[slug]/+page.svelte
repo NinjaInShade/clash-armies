@@ -11,7 +11,10 @@
 
 <svelte:head>
 	<title>ClashArmies • Best {data.name} armies - Clash of Clans</title>
-	<meta name="description" content="Browse top performing {data.name} armies. Find the best Clash of Clans strategies featuring the {data.name} siege machine." />
+	<meta
+		name="description"
+		content="Browse top performing {data.name} armies. Find the best Clash of Clans strategies featuring the {data.name} siege machine."
+	/>
 	<link rel="canonical" href="https://clasharmies.com/armies/sieges/{slug}" />
 </svelte:head>
 

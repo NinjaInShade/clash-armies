@@ -26,9 +26,7 @@ async function getAppStats(server: Server) {
 		server.db.query<{ count: number }>('SELECT COUNT(*) as count FROM users'),
 		server.db.query<{ count: number }>('SELECT COUNT(*) as count FROM armies'),
 		server.db.query<{ count: number }>('SELECT COUNT(*) as count FROM army_comments'),
-		server.db.query<{ townHall: number; count: number }>(
-			'SELECT townHall, COUNT(*) as count FROM armies GROUP BY townHall ORDER BY townHall ASC'
-		),
+		server.db.query<{ townHall: number; count: number }>('SELECT townHall, COUNT(*) as count FROM armies GROUP BY townHall ORDER BY townHall ASC'),
 	]);
 
 	return {
