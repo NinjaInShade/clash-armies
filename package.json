@@ -28,6 +28,7 @@
 		"@sveltejs/vite-plugin-svelte": "^7.1.2",
 		"@types/eslint": "9.6.1",
 		"@types/cookie-signature": "1.1.2",
+		"@types/node": "24.11.0",
 		"@typescript-eslint/eslint-plugin": "^8.60.1",
 		"@typescript-eslint/parser": "^8.60.1",
 		"@vitest/coverage-v8": "^4.1.8",
