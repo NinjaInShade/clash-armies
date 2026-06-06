@@ -150,7 +150,7 @@ export async function authMiddleware(req: RequestEvent) {
  * NOTE: don't use this for logging as it hides the error stack.
  */
 export function getDisplayZodError(error: z.ZodError) {
-	const { formErrors, fieldErrors } = error.flatten();
+	const { formErrors, fieldErrors } = z.flattenError(error);
 	return { form: formErrors, ...fieldErrors };
 }
 

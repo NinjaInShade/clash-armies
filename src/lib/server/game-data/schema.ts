@@ -12,18 +12,18 @@ const heroName = z.string().min(1);
 // Entities
 const HeroSchema = z.object({
 	name: heroName,
-	clashId: z.number().int().nonnegative().nullable(),
+	clashId: z.int().nonnegative().nullable(),
 });
 const UnitLevelSchema = z.object({
-	level: z.number().int().positive(),
-	buildingLevel: z.number().int().positive().nullable(),
-	laboratoryLevel: z.number().int().positive().nullable(),
+	level: z.int().positive(),
+	buildingLevel: z.int().positive().nullable(),
+	laboratoryLevel: z.int().positive().nullable(),
 });
 const UnitSchema = z.object({
 	name: slugString,
-	clashId: z.number().int().nonnegative().nullable(),
+	clashId: z.int().nonnegative().nullable(),
 	productionBuilding: z.string().min(1),
-	housingSpace: z.number().int().nonnegative(),
+	housingSpace: z.int().nonnegative(),
 	isSuper: z.boolean(),
 	isFlying: z.boolean(),
 	isJumper: z.boolean(),
@@ -32,47 +32,47 @@ const UnitSchema = z.object({
 	levels: z.array(UnitLevelSchema).min(1),
 });
 const PetLevelSchema = z.object({
-	level: z.number().int().positive(),
-	petHouseLevel: z.number().int().positive().nullable(),
+	level: z.int().positive(),
+	petHouseLevel: z.int().positive().nullable(),
 });
 const PetSchema = z.object({
 	name: slugString,
-	clashId: z.number().int().nonnegative().nullable(),
+	clashId: z.int().nonnegative().nullable(),
 	levels: z.array(PetLevelSchema).min(1),
 });
 const EquipmentLevelSchema = z.object({
-	level: z.number().int().positive(),
-	blacksmithLevel: z.number().int().positive().nullable(),
+	level: z.int().positive(),
+	blacksmithLevel: z.int().positive().nullable(),
 });
 const EquipmentSchema = z.object({
 	name: slugString,
 	hero: heroName,
 	epic: z.boolean(),
-	clashId: z.number().int().nonnegative().nullable(),
+	clashId: z.int().nonnegative().nullable(),
 	levels: z.array(EquipmentLevelSchema).min(1),
 });
 const TownHallHeroMaxSchema = z.object({
 	hero: heroName,
-	maxLevel: z.number().int().positive(),
+	maxLevel: z.int().positive(),
 });
 const TownHallSchema = z.object({
-	level: z.number().int().positive(),
-	maxBarracks: z.number().int().positive().nullable(),
-	maxDarkBarracks: z.number().int().positive().nullable(),
-	maxLaboratory: z.number().int().positive().nullable(),
-	maxSpellFactory: z.number().int().positive().nullable(),
-	maxDarkSpellFactory: z.number().int().positive().nullable(),
-	maxWorkshop: z.number().int().positive().nullable(),
-	maxCc: z.number().int().positive().nullable(),
-	maxBlacksmith: z.number().int().positive().nullable(),
-	maxPetHouse: z.number().int().positive().nullable(),
-	troopCapacity: z.number().int().nonnegative(),
-	spellCapacity: z.number().int().nonnegative(),
-	siegeCapacity: z.number().int().nonnegative(),
-	ccLaboratoryCap: z.number().int().nonnegative(),
-	ccTroopCapacity: z.number().int().nonnegative(),
-	ccSpellCapacity: z.number().int().nonnegative(),
-	ccSiegeCapacity: z.number().int().nonnegative(),
+	level: z.int().positive(),
+	maxBarracks: z.int().positive().nullable(),
+	maxDarkBarracks: z.int().positive().nullable(),
+	maxLaboratory: z.int().positive().nullable(),
+	maxSpellFactory: z.int().positive().nullable(),
+	maxDarkSpellFactory: z.int().positive().nullable(),
+	maxWorkshop: z.int().positive().nullable(),
+	maxCc: z.int().positive().nullable(),
+	maxBlacksmith: z.int().positive().nullable(),
+	maxPetHouse: z.int().positive().nullable(),
+	troopCapacity: z.int().nonnegative(),
+	spellCapacity: z.int().nonnegative(),
+	siegeCapacity: z.int().nonnegative(),
+	ccLaboratoryCap: z.int().nonnegative(),
+	ccTroopCapacity: z.int().nonnegative(),
+	ccSpellCapacity: z.int().nonnegative(),
+	ccSiegeCapacity: z.int().nonnegative(),
 	// Accept null/missing as "no heroes".
 	heroMaxLevels: z.optional(
 		z
