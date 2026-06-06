@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { HTMLButtonAttributes, HTMLAnchorAttributes } from 'svelte/elements';
-	import { type Snippet, tick } from 'svelte';
+	import { type Snippet } from 'svelte';
 
 	type Props = {
 		children: Snippet;
@@ -25,7 +25,6 @@
 </script>
 
 {#if asLink}
-	<!-- svelte-ignore a11y_no_static_element_interactions -->
 	<a class="btn {theme}" onclick={onClick} {...rest}>
 		<span>
 			{@render children()}

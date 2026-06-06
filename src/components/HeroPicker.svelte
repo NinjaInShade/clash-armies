@@ -108,7 +108,7 @@
 		{#if shown}
 			<div class="equipment">
 				<ul class="selected-equipment">
-					{#each new Array(2) as _, index}
+					{#each { length: 2 }, index}
 						{@const selected = _selectedEquipment[index]}
 						{#if selected}
 							<li>
@@ -122,7 +122,7 @@
 					{/each}
 				</ul>
 				<ul class="picker-list">
-					{#each sortedEquipment as equipment}
+					{#each sortedEquipment as equipment (equipment.name)}
 						{@const level = EquipmentModel.getMaxLevel(equipment.name, model.townHall, model.gameData)}
 						{@const title = getEquipmentTitle(level, equipment.name, _selectedEquipment)}
 						<li>
@@ -151,7 +151,7 @@
 						{/if}
 					</div>
 					<ul class="picker-list">
-						{#each app.pets as pet}
+						{#each app.pets as pet (pet.name)}
 							{@const level = PetModel.getMaxLevel(pet.name, model.townHall, model.gameData)}
 							{@const title = getPetTitle(level, pet.name, model.pets)}
 							{@const equippedHero = model.pets.find((p) => p.info.name === pet.name)?.hero}

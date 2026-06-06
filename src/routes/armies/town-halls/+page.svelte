@@ -18,7 +18,7 @@
 	<div class="container">
 		<Banner {...pageMeta.bannerOptions} />
 		<ul class="links">
-			{#each [...app.townHalls].reverse() as th}
+			{#each [...app.townHalls].reverse() as th (th.level)}
 				{@const { navOptions } = ARMY_PAGES.townHall(th.level)}
 				<li>
 					<a class="th-link-card" href={navOptions.href}>

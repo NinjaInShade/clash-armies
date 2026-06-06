@@ -74,7 +74,7 @@
 	<section>
 		<h3>General</h3>
 		<ul class="links" style="--grid-cols: 2">
-			{#each generalLinks as link}
+			{#each generalLinks as link (link.href)}
 				<li>
 					<LinkCard {...link} onClicked={onLinkClicked} />
 				</li>
@@ -84,7 +84,7 @@
 	<section>
 		<h3>Armies</h3>
 		<ul class="links" style="--grid-cols: 2">
-			{#each armyLinks as link}
+			{#each armyLinks as link (link.navOptions.href)}
 				<li>
 					<LinkCard {...link.navOptions} onClicked={onLinkClicked} />
 				</li>
@@ -94,7 +94,7 @@
 	<section>
 		<h3>Account</h3>
 		<ul class="links">
-			{#each accountLinks as link}
+			{#each accountLinks as link (link.href)}
 				<li>
 					<LinkCard {...link} onClicked={onLinkClicked} />
 				</li>

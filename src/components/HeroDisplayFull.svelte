@@ -19,7 +19,7 @@
 	<HeroDisplay name={hero} />
 	<div class="equipped">
 		<div class="equipment">
-			{#each new Array(2) as _, index}
+			{#each { length: 2 }, index}
 				{@const selected = _selectedEquipment[index]}
 				{#if selected}
 					<EquipmentDisplay name={selected.info.name} />

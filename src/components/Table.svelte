@@ -1,6 +1,6 @@
 <script lang="ts" module>
-	import type { ComponentType } from 'svelte';
-	type Component = [ComponentType, Record<string, any>];
+	import type { Component as SvelteComponent } from 'svelte';
+	type Component = [SvelteComponent, Record<string, unknown>];
 	export type Column<Row> = {
 		key: string;
 		label?: string;
@@ -14,18 +14,18 @@
 		/**
 		 * This can be used to override the value that is used for any sort of sorting/filtering
 		 * */
-		value?: ((row: Row) => any) | any;
+		value?: ((row: Row) => unknown) | unknown;
 		/** Used to override the value that is rendered in a cell */
-		render?: ((row: Row) => any) | any;
+		render?: ((row: Row) => unknown) | unknown;
 		/** Renders a component */
-		component?: ((row: Row) => Component | [Component, Record<string, any>]) | Component;
+		component?: ((row: Row) => Component | [Component, Record<string, unknown>]) | Component;
 		/** Styles the cell */
 		cellStyle?: string;
 	};
 </script>
 
 <script lang="ts">
-	type RowData = Record<string, any>;
+	type RowData = Record<string, unknown>;
 	type Row = $$Generic<RowData>;
 
 	type Props = {
@@ -173,7 +173,7 @@
 		if (!selectable) {
 			return;
 		}
-		let selectedRow: any | null = row;
+		let selectedRow: Row | null = row;
 		if (selectedKeys) {
 			if (e.ctrlKey && selectedKeys.includes(row.id)) {
 				selectedRow = null;
@@ -182,7 +182,7 @@
 				selectedKeys = [row.id];
 			}
 		}
-		if (onSelect) {
+		if (onSelect && selectedRow) {
 			await onSelect(selectedRow, e);
 		}
 	};
@@ -213,7 +213,7 @@
 	<table class="table" class:selectable>
 		<thead>
 			<tr>
-				{#each columns as col}
+				{#each columns as col (col.key)}
 					{@const style = getCellStyle(col)}
 					<th {style} class="th-cell">
 						<button style="cursor: {sortable ? 'pointer' : 'unset'}" onclick={() => setSort(col.key)}>
@@ -240,14 +240,14 @@
 			</tr>
 		</thead>
 		<tbody>
-			{#each tableData as row}
+			{#each tableData as row (row)}
 				<tr
 					class:selected={selectedKeys && selectedKeys.includes(row.id)}
 					onclick={async (e) => await handleSelect(row, e)}
 					onkeydown={async (e) => await handleEnter(row, e)}
 					tabindex={selectable ? 0 : null}
 				>
-					{#each columns as col}
+					{#each columns as col (col.key)}
 						{@const title = getTitle(row, col)}
 						{@const style = getCellStyle(col)}
 						{#if col.component}

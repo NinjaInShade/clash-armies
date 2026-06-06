@@ -25,9 +25,10 @@
 		{#if typeof errors === 'string'}
 			<li>{errors}</li>
 		{:else}
-			{#each Object.entries(errors) as [field, messages]}
+			{#each Object.entries(errors) as error (error)}
+				{@const [field, messages] = error}
 				{#if messages}
-					{#each messages as error}
+					{#each messages as error (error)}
 						<li>{`${field[0].toUpperCase()}${field.slice(1)}`}: <span>{error}</span></li>
 					{/each}
 				{/if}

@@ -16,7 +16,10 @@
 	</div>
 	<div class="content">
 		<h2>{title}</h2>
-		<p style="max-width: {descriptionWidth}px">{@html description}</p>
+		<p style="max-width: {descriptionWidth}px">
+			<!-- eslint-disable-next-line -->
+			{@html description}
+		</p>
 	</div>
 </header>
 

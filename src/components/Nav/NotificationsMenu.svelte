@@ -2,7 +2,7 @@
 	import type { AppState, ArmyNotification } from '$types';
 	import { getContext } from 'svelte';
 	import { formatDistanceToNow } from 'date-fns';
-	import { invalidateAll, goto } from '$app/navigation';
+	import { invalidateAll } from '$app/navigation';
 	import Menu from '../Menu.svelte';
 	import FocusTrap from '../FocusTrap.svelte';
 

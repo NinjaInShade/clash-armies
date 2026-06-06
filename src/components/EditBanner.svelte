@@ -44,7 +44,7 @@
 
 <C.Modal title="Select banner" {close} --modal-width="1250px">
 	<div class="banner-grid" bind:this={grid}>
-		{#each BANNERS as bannerName}
+		{#each BANNERS as bannerName (bannerName)}
 			<button onclick={() => selectBanner(bannerName)} class:selected={bannerName === banner}>
 				<img src="/banners/{bannerName}.webp" alt="Clash of clans banner artwork" />
 			</button>

@@ -182,7 +182,7 @@
 
 <svelte:window onkeydown={onKeyDown} />
 
-{#snippet filterBtn(text: string, isActive: boolean, onclick: Function)}
+{#snippet filterBtn(text: string, isActive: boolean, onclick: () => void)}
 	<ActionButton theme={isActive ? 'primary-dark' : 'grey'} class={isActive ? 'focus-primary' : 'focus-grey'} {onclick}>
 		{text}
 	</ActionButton>
@@ -190,7 +190,7 @@
 
 {#snippet unitList(picker: boolean)}
 	<ul class={picker ? 'picker-list' : 'units-list removable'}>
-		{#each picker ? sortedUnits : sortedPickedUnits as unit}
+		{#each picker ? sortedUnits : sortedPickedUnits as unit (unit.name)}
 			{@const { alreadySelected, disabled, title } = getUnitCardData(unit, filters)}
 			<li>
 				<button

@@ -114,7 +114,7 @@ export async function resolveRequest(req: RequestEvent, resolve: SvelteKitHandle
 	return response;
 }
 
-export function handleUnexpectedError(req: RequestEvent, error: unknown, status: number, message: string) {
+export function handleUnexpectedError(req: RequestEvent, error: unknown, _status: number, _message: string) {
 	const server = req.locals.server;
 	server.log.error('SvelteKit error:', {
 		requestId: req.locals.uuid,

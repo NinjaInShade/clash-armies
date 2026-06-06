@@ -33,7 +33,7 @@
 		<section>
 			<h3>Armies</h3>
 			<ul class="links">
-				{#each ARMY_LINKS as link}
+				{#each ARMY_LINKS as link (link.navOptions.href)}
 					<li>
 						<LinkCard {...link.navOptions} />
 					</li>
@@ -43,7 +43,7 @@
 		<section>
 			<h3>By Town Hall</h3>
 			<ul class="links" style="--column-gap: {TH_COL_GAP}px" bind:this={townHallsContainer}>
-				{#each visibleTownHalls as th}
+				{#each visibleTownHalls as th (th.level)}
 					{@const options = ARMY_PAGES.townHall(th.level)}
 					<li>
 						<LinkCard {...options.navOptions} />
@@ -60,7 +60,7 @@
 		<section>
 			<h3>Other</h3>
 			<ul class="links">
-				{#each OTHER_LINKS as link}
+				{#each OTHER_LINKS as link (link.navOptions.href)}
 					<li>
 						<LinkCard {...link.navOptions} />
 					</li>

@@ -225,7 +225,7 @@
 		</Fieldset>
 		<Fieldset label="Town hall:" htmlName="town-all" style="padding: 0 8px; margin-top: 16px;" --input-width="100%">
 			<div class="town-halls-grid">
-				{#each app.townHalls as th}
+				{#each app.townHalls as th (th.level)}
 					{@const isSelected = model.townHall === th.level}
 					{@const btnAttributes = { title: isSelected ? `Town hall ${th.level} is already selected` : `Town hall ${th.level}`, disabled: isSelected }}
 					<TownHall onclick={() => setTownHall(th.level)} level={th.level} {...btnAttributes} --width="100%" />
@@ -234,7 +234,7 @@
 		</Fieldset>
 		<Fieldset label="Tags (max {MAX_ARMY_TAGS}):" htmlName="tags" style="padding: 0 8px; margin-top: 16px;" --input-width="100%">
 			<ul class="army-tags">
-				{#each ARMY_TAGS as tag}
+				{#each ARMY_TAGS as tag (tag)}
 					{@const active = model.tags.includes(tag)}
 					<li>
 						<button class="army-tag" class:active disabled={!active && model.tags.length >= MAX_ARMY_TAGS} onclick={() => toggleTag(tag)}>
@@ -314,7 +314,7 @@
 					<ActionButton theme="danger" onclick={removeHeroes} class="title-action-btn">Remove</ActionButton>
 				</h2>
 			</div>
-			{#each app.heroNames as hero}
+			{#each app.heroNames as hero (hero)}
 				{#if model.thData && ArmyModel.getMaxHeroLevel(hero, model.townHall, model.gameData) !== -1}
 					<div class="hero-picker-container">
 						<HeroPicker {model} {hero} bind:shownHeroes />

@@ -1,4 +1,4 @@
-import type { User } from '$types';
+import type { SessionUser } from '$server/auth/session';
 import type { Army } from '$models';
 import { BANNERS } from '$shared/utils';
 import { v4 as uuidv4 } from 'uuid';
@@ -7,35 +7,29 @@ import type { RequestEvent } from '@sveltejs/kit';
 import { hasAuth, requireAuth, hasRoles, requireRoles } from '$server/auth/utils';
 import * as vitest from 'vitest';
 
-export const USER = {
+export const USER: SessionUser = {
 	id: 1,
-	googleId: '123',
 	username: 'test',
 	roles: ['user'],
 	playerTag: null,
-	level: null,
 };
-export const USER_2 = {
+export const USER_2: SessionUser = {
 	id: 2,
-	googleId: '123',
 	username: 'test-2',
 	roles: ['user'],
 	playerTag: null,
-	level: null,
 };
-export const USER_ADMIN = {
+export const USER_ADMIN: SessionUser = {
 	id: 3,
-	googleId: '123',
 	username: 'admin-test',
 	roles: ['user', 'admin'],
 	playerTag: null,
-	level: null,
 };
 
 /**
  * Sveltekit request object shim
  */
-export function createReq(user: User, server: Server) {
+export function createReq(user: SessionUser, server: Server) {
 	const uuid = uuidv4();
 	const req = {
 		locals: {
@@ -62,7 +56,7 @@ export async function createUsers(server: Server) {
 	const users = [USER, USER_2, USER_ADMIN];
 	await server.db.insertMany(
 		'users',
-		users.map((user) => ({ username: user.username, googleId: user.googleId }))
+		users.map((user) => ({ username: user.username, googleId: '123' }))
 	);
 	await server.db.insertMany(
 		'user_roles',
@@ -71,11 +65,11 @@ export async function createUsers(server: Server) {
 }
 
 /** Returns an army, defaulting certain fields with dummy data for convenience */
-export function makeData(data: Record<string, unknown>): Record<string, any> {
+export function makeData(data: Record<string, unknown>): Record<string, unknown> {
 	return { units: [], equipment: [], pets: [], tags: [], guide: null, banner: BANNERS[0], ...data };
 }
 
-export function assertArmies(actual: Army[], expected: Record<string, any>[]) {
+export function assertArmies(actual: Army[], expected: Record<string, unknown>[]) {
 	assert.lengthOf(actual, expected.length);
 	for (const army of actual) {
 		// Army names should be unique when testing to make the assertion easier

@@ -8,8 +8,6 @@
 	const { data }: { data: PageData } = $props();
 	const { serverStats, appStats, units, townHalls } = $derived(data);
 
-	$inspect('Server stat', serverStats);
-
 	const armiesByTHColumns = [
 		{
 			key: '',

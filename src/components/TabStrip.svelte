@@ -54,7 +54,7 @@
 </script>
 
 <div class="tabs {_class || ''}">
-	{#each tabs as tab, index}
+	{#each tabs as tab (tab.name)}
 		<button
 			class="tab"
 			class:active={currentTab?.name === tab.name}

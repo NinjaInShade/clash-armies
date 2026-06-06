@@ -1,5 +1,5 @@
 export type FetchOptions = {
-	data?: any;
+	data?: unknown;
 	headers?: Record<string, string>;
 };
 
@@ -44,7 +44,7 @@ export class HTTPApi {
 		try {
 			const response = await fetch(url, fetchOptions);
 
-			let body: any;
+			let body: unknown;
 			try {
 				body = response.status !== 204 ? await response.json() : null;
 			} catch {
@@ -58,7 +58,7 @@ export class HTTPApi {
 			}
 
 			return body as T;
-		} catch (err: any) {
+		} catch (err: unknown) {
 			if (err instanceof HTTPError) {
 				throw err;
 			}

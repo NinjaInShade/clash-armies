@@ -1,10 +1,8 @@
 import type { Server } from '$server/api/Server';
 import type { RequestEvent } from '@sveltejs/kit';
-import { parseDBJsonField } from '$server/utils';
 import type { ArmyNotification } from '$types';
 import { pluralize } from '$shared/utils';
 import util from '@ninjalib/util';
-import z from 'zod';
 
 type GetNotificationsOptions = {
 	/** Returns notifications for this user */
@@ -28,7 +26,7 @@ export class NotificationAPI {
 		//
 	}
 
-	public async getNotifications(req: RequestEvent, options: GetNotificationsOptions = {}) {
+	public async getNotifications(_req: RequestEvent, options: GetNotificationsOptions = {}) {
 		const { userId } = options;
 
 		const args: number[] = [];

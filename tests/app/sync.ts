@@ -52,7 +52,7 @@ describe('Game data sync', function () {
 		}
 	}
 
-	function omitKeys(rows: any[], keys: any[]) {
+	function omitKeys(rows: Record<string, unknown>[], keys: string[]) {
 		return rows.map((row) => Object.fromEntries(Object.entries(row).filter(([k]) => !keys.includes(k))));
 	}
 
@@ -73,7 +73,7 @@ describe('Game data sync', function () {
 	});
 
 	describe('Heroes sync', function () {
-		async function assertHeroes(expected: any) {
+		async function assertHeroes(expected: unknown[]) {
 			const data = await server.db.getRows('heroes');
 			assert.sameDeepMembers(data, expected);
 		}
@@ -125,12 +125,12 @@ describe('Game data sync', function () {
 	});
 
 	describe('Town halls sync', function () {
-		async function assertTownHalls(expected: any) {
+		async function assertTownHalls(expected: unknown[]) {
 			const data = await server.db.getRows('town_halls');
 			assert.sameDeepMembers(data, expected);
 		}
 
-		async function assertTownHallHeroRows(expected: any) {
+		async function assertTownHallHeroRows(expected: unknown[]) {
 			const data = await server.db.getRows('town_hall_heroes_max');
 			assert.sameDeepMembers(data, expected);
 		}
@@ -367,12 +367,12 @@ describe('Game data sync', function () {
 	});
 
 	describe('Units sync', function () {
-		async function assertUnits(expected: any, unitType: UnitType) {
+		async function assertUnits(expected: unknown[], unitType: UnitType) {
 			const data = await server.db.getRows('units', { type: unitType });
 			assert.sameDeepMembers(omitKeys(data, ['id']), expected);
 		}
 
-		async function assertUnitLevels(expected: any, unitType: UnitType) {
+		async function assertUnitLevels(expected: unknown[], unitType: UnitType) {
 			const data = await server.db.query(`
                 SELECT u.name AS unitName, ul.*
                 FROM unit_levels ul
@@ -719,12 +719,12 @@ describe('Game data sync', function () {
 	});
 
 	describe('Pets sync', function () {
-		async function assertPets(expected: any) {
+		async function assertPets(expected: unknown[]) {
 			const data = await server.db.getRows('pets');
 			assert.sameDeepMembers(omitKeys(data, ['id']), expected);
 		}
 
-		async function assertPetLevels(expected: any) {
+		async function assertPetLevels(expected: unknown[]) {
 			const data = await server.db.query(`
                 SELECT p.name AS petName, pl.*
                 FROM pet_levels pl
@@ -847,12 +847,12 @@ describe('Game data sync', function () {
 	});
 
 	describe('Equipment sync', function () {
-		async function assertEq(expected: any) {
+		async function assertEq(expected: unknown[]) {
 			const data = await server.db.getRows('equipment');
 			assert.sameDeepMembers(omitKeys(data, ['id']), expected);
 		}
 
-		async function assertEqLevels(expected: any) {
+		async function assertEqLevels(expected: unknown[]) {
 			const data = await server.db.query(`
                 SELECT eq.name AS eqName, eql.*
                 FROM equipment_levels eql

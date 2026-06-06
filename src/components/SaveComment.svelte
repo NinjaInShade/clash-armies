@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { getContext, onMount } from 'svelte';
+	import { getContext } from 'svelte';
 	import type { AppState } from '$types';
 	import { MAX_COMMENT_LENGTH } from '$shared/utils';
 	import { invalidateAll } from '$app/navigation';

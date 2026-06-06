@@ -351,7 +351,7 @@ export class ArmyAPI {
 		const user = req.locals.requireAuth();
 
 		const model = validateArmy(data, this.gameData.data);
-		const { equipment, pets, guide, units, ccUnits, allUnits, tags } = model;
+		const { equipment, pets, guide, allUnits, tags } = model;
 
 		if (guide && typeof guide.textContent === 'string') {
 			// Escapes/sanitizes the HTML for security reasons (converting to JSON and back to HTML achieves this)

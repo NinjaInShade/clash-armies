@@ -17,7 +17,7 @@
 		/** Sets the title of the modal */
 		title?: string;
 		/** Function that closes the modal */
-		close: (rtn?: any) => void;
+		close: (rtn?: unknown) => void;
 		/** Optional controls snippet, rendered in the footer */
 		controls?: Snippet;
 	} & (ComponentRendering | ChildrenRendering);

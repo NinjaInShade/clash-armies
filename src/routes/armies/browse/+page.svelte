@@ -26,7 +26,7 @@
 			<section>
 				<h3>Heroes</h3>
 				<ul class="links">
-					{#each app.heroNames as hero}
+					{#each app.heroNames as hero (hero)}
 						{@render linkCard(ARMY_PAGES.hero(hero).navOptions)}
 					{/each}
 				</ul>
@@ -35,7 +35,7 @@
 			<section>
 				<h3>Troops</h3>
 				<ul class="links">
-					{#each troops as troop}
+					{#each troops as troop (troop.name)}
 						{@render linkCard(ARMY_PAGES.troop(troop.name).navOptions)}
 					{/each}
 				</ul>
@@ -44,7 +44,7 @@
 			<section>
 				<h3>Spells</h3>
 				<ul class="links">
-					{#each spells as spell}
+					{#each spells as spell (spell.name)}
 						{@render linkCard(ARMY_PAGES.spell(spell.name).navOptions)}
 					{/each}
 				</ul>
@@ -53,7 +53,7 @@
 			<section>
 				<h3>Siege Machines</h3>
 				<ul class="links">
-					{#each sieges as siege}
+					{#each sieges as siege (siege.name)}
 						{@render linkCard(ARMY_PAGES.siege(siege.name).navOptions)}
 					{/each}
 				</ul>
@@ -62,7 +62,7 @@
 			<section>
 				<h3>Equipment</h3>
 				<ul class="links">
-					{#each app.equipment as eq}
+					{#each app.equipment as eq (eq.name)}
 						{@render linkCard(ARMY_PAGES.equipment(eq.name).navOptions)}
 					{/each}
 				</ul>
@@ -71,7 +71,7 @@
 			<section>
 				<h3>Pets</h3>
 				<ul class="links">
-					{#each app.pets as pet}
+					{#each app.pets as pet (pet.name)}
 						{@render linkCard(ARMY_PAGES.pet(pet.name).navOptions)}
 					{/each}
 				</ul>

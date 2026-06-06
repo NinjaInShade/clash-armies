@@ -60,7 +60,7 @@
 
 		try {
 			await app.http.delete('/api/armies', model.id);
-		} catch (err) {
+		} catch {
 			app.notify({
 				title: 'Failed action',
 				description: `There was a problem deleting this army`,

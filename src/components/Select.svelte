@@ -6,17 +6,17 @@
 <script lang="ts">
 	import type { Component } from 'svelte';
 
-	type SelectData = { value: any; label: string; component?: [Component, Record<string, any>] };
+	type SelectData = { value: unknown; label: string; component?: [Component, Record<string, unknown>] };
 
 	import { onMount, getContext } from 'svelte';
 
 	type Props = {
 		/** Sets the bound value */
-		value?: any | any[];
+		value?: unknown | unknown[];
 		/** Data that can be selected */
 		data: SelectData[];
 		/** Function that runs when you select an item */
-		onSelect?: (newValue: any) => Promise<void> | void;
+		onSelect?: (newValue: unknown) => Promise<void> | void;
 		/** Sets the disabled state */
 		disabled?: boolean;
 		/** Sets the tooltip */
@@ -36,6 +36,9 @@
 	let selectButton = $state<HTMLElement>();
 
 	onMount(() => {
+		if (!selectContainer) {
+			return;
+		}
 		selectInstances.push([selectContainer, () => (open = false)]);
 	});
 
@@ -44,7 +47,7 @@
 	let component = $derived(data.find((item) => item.value === value)?.component);
 
 	// Calculates if an item is active
-	const isActive = (itemValue: any) => {
+	const isActive = (itemValue: unknown) => {
 		return itemValue === value;
 	};
 
@@ -75,7 +78,7 @@
 		open = false;
 	};
 
-	const handleSelect = async (ev: MouseEvent | KeyboardEvent, newValue: any) => {
+	const handleSelect = async (ev: MouseEvent | KeyboardEvent, newValue: unknown) => {
 		ev.stopPropagation();
 		if (!newValue) {
 			value = null;
@@ -125,7 +128,7 @@
 		<!-- Select menu -->
 		<ul class="select-menu" class:open>
 			<!-- Forces re-evaluation of active item (might need to re-think approach for larger datasets) -->
-			{#each data as item}
+			{#each data as item (item.value)}
 				<li>
 					<button
 						type="button"

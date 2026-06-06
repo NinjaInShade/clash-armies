@@ -43,7 +43,7 @@
 <Menu bind:open={menuOpen} elRef={menuRef}>
 	<div class="ca-menu th-menu">
 		<ul class="ca-menu-list">
-			{#each [...app.townHalls].reverse() as th}
+			{#each [...app.townHalls].reverse() as th (th.level)}
 				{@const isSelected = value === th.level}
 				<li>
 					<button

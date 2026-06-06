@@ -1,6 +1,7 @@
 import { describe, it, beforeEach, beforeAll, afterAll, afterEach } from 'vitest';
 import { assert, createReq, USER, USER_2, USER_ADMIN, createUsers, makeData, assertArmies } from '../testutil';
-import type { User, UnitType, StaticGameData } from '$types';
+import type { UnitType, StaticGameData } from '$types';
+import type { SessionUser } from '$server/auth/session';
 import { ArmyModel, UnitModel, PetModel, EquipmentModel } from '$models';
 import { validateArmy } from '$shared/validation';
 import { GUIDE_TEXT_CHAR_LIMIT } from '$shared/utils';
@@ -15,9 +16,9 @@ let req: RequestEvent;
 let req2: RequestEvent;
 let reqAdmin: RequestEvent;
 
-let reqUser: User;
-let req2User: User;
-let reqAdminUser: User;
+let reqUser: SessionUser;
+let req2User: SessionUser;
+let _reqAdminUser: SessionUser;
 
 beforeAll(async function () {
 	server = new Server(db);
@@ -36,12 +37,9 @@ beforeEach(async function () {
 	req2 = createReq(USER_2, server);
 	reqAdmin = createReq(USER_ADMIN, server);
 
-	// @ts-expect-error
 	reqUser = req.locals.requireAuth();
-	// @ts-expect-error
 	req2User = req2.locals.requireAuth();
-	// @ts-expect-error
-	reqAdminUser = reqAdmin.locals.requireAuth();
+	_reqAdminUser = reqAdmin.locals.requireAuth();
 });
 
 describe('Saving', function () {

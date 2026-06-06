@@ -39,7 +39,7 @@
 	function willOverflowHousingSpace(unit: Unit) {
 		// Register selected units and amount as reactive deps
 		for (const selected of selectedUnits) {
-			selected.amount;
+			void selected.amount;
 		}
 		return untrack(() => {
 			const copy = selectedUnits.map((u) => new UnitModel(model.gameData, u));
@@ -109,7 +109,7 @@
 
 <h3>{heading}</h3>
 <ul class="picker-list">
-	{#each sortedUnits as unit}
+	{#each sortedUnits as unit (unit.name)}
 		{@const disableSuper = shouldDisableSuper(unit, selectedUnits)}
 		{@const level = getLevel(unit)}
 		{@const reachedMaxAmount = willOverflowHousingSpace(unit)}

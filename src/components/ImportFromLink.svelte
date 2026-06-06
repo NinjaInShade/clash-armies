@@ -27,7 +27,7 @@
 				return;
 			}
 			close(importedModel);
-		} catch (err: any) {
+		} catch (err: unknown) {
 			error = err.message;
 			return;
 		}

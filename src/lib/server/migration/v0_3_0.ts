@@ -54,7 +54,7 @@ export default function migration(runStep: MigrationFn) {
             ) ca ON ca.id = ac.armyId
         `, []);
 
-        const notifications: any[] = [];
+        const notifications: Record<string, unknown>[] = [];
 
         for (const comment of comments) {
             const notification = {

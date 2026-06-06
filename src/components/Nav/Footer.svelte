@@ -173,7 +173,7 @@
 		</div>
 		<small>
 			This content is not affiliated with, endorsed, sponsored, or specifically approved by Supercell and Supercell is not responsible for it. For more
-			information see <a href="https://supercell.com/en/fan-content-policy/" target="_blank">Supercell’s Fan Content Policy</a>.
+			information see <a href="https://supercell.com/en/fan-content-policy/" target="_blank">Supercell’s Fan Content Policy</a>.
 			<span class="copyright">
 				<br />Copyright © {new Date().getFullYear()} | All Rights Reserved
 			</span>

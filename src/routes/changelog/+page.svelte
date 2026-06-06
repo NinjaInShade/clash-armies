@@ -5,6 +5,7 @@
 	 * Super basic markdown processor so that CHANGELOG can be styled nice
 	 */
 	function processMarkdown() {
+		// eslint-disable-next-line
 		const split = __CHANGELOG__.split('\n');
 		const mapped = split.map((line) => {
 			if (line.startsWith('##')) {
@@ -27,6 +28,7 @@
 
 <section>
 	<div class="container">
+		<!-- eslint-disable-next-line -->
 		{@html changelog}
 	</div>
 </section>

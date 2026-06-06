@@ -10,7 +10,7 @@
 </script>
 
 <ul class="tags">
-	{#each getTags(model) as tag}
+	{#each getTags(model) as tag (tag)}
 		<li style={tagStyle}>
 			{#if tag.icon}
 				<tag.icon></tag.icon>

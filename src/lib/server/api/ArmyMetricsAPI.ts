@@ -1,7 +1,6 @@
 import util from '@ninjalib/util';
 import type { Server } from '$server/api/Server';
 import type { RequestEvent } from '@sveltejs/kit';
-import type { MySQL } from '@ninjalib/sql';
 import { pluralize, HOUR, DAY, PAGE_VIEW_METRIC, COPY_LINK_CLICK_METRIC, OPEN_LINK_CLICK_METRIC } from '$shared/utils';
 import { KNOWN_BOT_UAS } from '$server/utils';
 import { env } from '$env/dynamic/private';

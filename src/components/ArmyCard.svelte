@@ -34,7 +34,7 @@
 			<img src="/ui/clan-castle.webp" alt="Clash of clans clan castle" title="Has clan castle" />
 		</li>
 	{/if}
-	{#each app.heroNames as hero}
+	{#each app.heroNames as hero (hero)}
 		{#if model.hasHero(hero)}
 			<li>
 				<HeroDisplay name={hero} />

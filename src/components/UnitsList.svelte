@@ -66,7 +66,7 @@
 	{#if extraUnits}
 		{@render extraUnits()}
 	{/if}
-	{#each [...troopUnits, ...spellUnits, ...siegeUnits] as unit}
+	{#each [...troopUnits, ...spellUnits, ...siegeUnits] as unit (unit.unitId)}
 		<li>
 			<button
 				type="button"

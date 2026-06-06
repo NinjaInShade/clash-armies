@@ -110,7 +110,7 @@
 			</h2>
 		</header>
 		<div class="heroes-list">
-			{#each app.heroNames as hero}
+			{#each app.heroNames as hero (hero)}
 				{#if model.hasHero(hero)}
 					<HeroDisplayFull {hero} {model} />
 				{/if}
