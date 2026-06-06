@@ -12,7 +12,7 @@ If you need extra help, or have suggestions on improving the dev workflow, give 
 
 - `npm` >= 11.7.0
 - `pnpm` >= 11.0.3
-- `node` >= 24.11.0
+- `node` >= 26.3.0
 - `docker` >= 29.1.3
 - `docker compose` >= 5.1.3
 

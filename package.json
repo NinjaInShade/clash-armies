@@ -18,7 +18,7 @@
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json src"
 	},
 	"engines": {
-		"node": ">=24.11.0"
+		"node": ">=26.3.0"
 	},
 	"packageManager": "pnpm@11.0.3",
 	"devDependencies": {
@@ -28,7 +28,7 @@
 		"@sveltejs/vite-plugin-svelte": "^7.1.2",
 		"@types/eslint": "9.6.1",
 		"@types/cookie-signature": "1.1.2",
-		"@types/node": "24.11.0",
+		"@types/node": "25.9.2",
 		"@typescript-eslint/eslint-plugin": "^8.60.1",
 		"@typescript-eslint/parser": "^8.60.1",
 		"@vitest/coverage-v8": "^4.1.8",

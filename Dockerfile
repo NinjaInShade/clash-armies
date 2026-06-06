@@ -1,5 +1,5 @@
 # Build: builds distribution code.
-FROM node:24-alpine AS build
+FROM node:26.3.0-alpine AS build
 WORKDIR /app
 RUN npm install -g pnpm@11.0.3
 # Copy lockfile first so this layer caches when only source changes
@@ -12,14 +12,14 @@ RUN pnpm run build
 
 # Prod deps: a *separate* node_modules with only runtime deps.
 # Done in its own stage so dev deps never reach the final image.
-FROM node:24-alpine AS prod-deps
+FROM node:26.3.0-alpine AS prod-deps
 WORKDIR /app
 RUN npm install -g pnpm@11.0.3
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 RUN pnpm install --frozen-lockfile --prod
 
 # Runtime: minimal image, non-root, only what's needed to run.
-FROM node:24-alpine AS runtime
+FROM node:26.3.0-alpine AS runtime
 WORKDIR /app
 ENV NODE_ENV=production
 ENV PORT=3000
