@@ -1,14 +1,151 @@
-# Introduction
+<h3 align="center">
+  <img src="static/ui/swords.webp" alt="Logo" width="28.58" height="24" style="vertical-align: -6px;">
+  Clash Armies
+</h3>
 
-Clash Armies is a website where users can find, create, share and learn clash of clans armies.
+<p align="center">
+  <a href="https://svelte.dev/docs/svelte/overview">
+    <img src="https://img.shields.io/badge/Svelte-FF3E00?style=flat&logo=svelte&logoColor=white" alt="Svelte badge">
+  </a>
+  <a href="https://svelte.dev/docs/kit/introduction">
+    <img src="https://img.shields.io/badge/SvelteKit-%23f1413d.svg?logo=svelte&logoColor=white" alt="SvelteKit badge">
+  </a>
+  <a href="https://mariadb.org/">
+    <img src="https://img.shields.io/badge/MariaDB-003545?logo=mariadb&logoColor=white" alt="MariaDB badge">
+  </a>
+  <a href="https://www.docker.com/">
+    <img src="https://img.shields.io/badge/Docker-2496ED?logo=docker&logoColor=fff" alt="Docker badge">
+  </a>
+  <a href="https://vite.dev/">
+    <img src="https://img.shields.io/badge/Vite-646CFF?logo=vite&logoColor=fff" alt="Vite badge">
+  </a>
+  <a href="https://pnpm.io/">
+    <img src="https://img.shields.io/badge/pnpm-F69220?logo=pnpm&logoColor=fff" alt="PNPM badge">
+  </a>
+</p>
+
+<p align="center">
+    The number one tool to find, create and share the best armies in the game.
+    <br />
+    <a href="https://clasharmies.com">Live website</a>
+    &middot;
+    <a href="#screenshots">Screenshots</a>
+    &middot;
+    <a href="https://discord.gg/9wCmfXhZM6">Discord server</a>
+</p>
+
+<details>
+  <summary>Table of contents</summary>
+  <ol>
+    <li>
+      <a href="#about-the-project">About the project</a>
+    </li>
+    <li>
+      <a href="#getting-started">Getting started</a>
+      <ul>
+        <li><a href="#prerequisites">Prerequisites</a></li>
+        <li><a href="#installation">Installation</a></li>
+      </ul>
+    </li>
+    <li><a href="#contributing">Contributing</a></li>
+    <li><a href="#license">License</a></li>
+    <li><a href="#contact">Contact</a></li>
+    <li><a href="#acknowledgments">Acknowledgments</a></li>
+  </ol>
+</details>
+
+## About the project
+
+[![Clash Armies popular armies page](screenshots/popular-armies-short.webp)](https://clasharmies.com/armies/popular)
+
+<details id="screenshots">
+  <summary>More screenshots</summary>
+
+  <a href="https://clasharmies.com">
+    <img src="./screenshots/homepage.webp" alt="Clash Armies home page">
+    Home page
+  </a>
+  <br />
+  <br />
+
+  <a href="https://clasharmies.com/armies/popular">
+    <img src="./screenshots/popular-armies.webp" alt="Clash Armies popular armies page">
+    Popular armies page
+  </a>
+  <br />
+  <br />
+
+  <a href="https://clasharmies.com/army-builder">
+    <img src="./screenshots/army-builder-details-and-units.webp" alt="Clash Armies army builder page focusing on army details and units">
+    Army builder page (details+units)
+  </a>
+  <br />
+  <br />
+
+  <a href="https://clasharmies.com/army-builder">
+    <img src="./screenshots/army-builder-heroes-and-guide.webp" alt="Clash Armies army builder page focusing on army heroes and guide">
+    Army builder page (heroes+guide)
+  </a>
+  <br />
+  <br />
+
+  <a href="https://clasharmies.com/armies/browse">
+    <img src="./screenshots/browse.webp" alt="Clash Armies browse page">
+    Browse page
+  </a>
+  <br />
+  <br />
+
+  <a href="https://clasharmies.com/armies/town-halls">
+    <img src="./screenshots/town-halls.webp" alt="Clash Armies town halls page">
+    Town halls page
+  </a>
+  <br />
+  <br />
+
+  <a href="https://clasharmies.com/armies/406">
+    <img src="./screenshots/view-army.webp" alt="Clash Armies army page">
+    Army page
+  </a>
+  <br />
+  <br />
+
+  <a href="https://clasharmies.com/armies/344#comments">
+    <img src="./screenshots/view-army-comments.webp" alt="Clash Armies army page (comments)">
+    Army page (comments)
+  </a>
+  <br />
+  <br />
+
+  <div>
+    <img src="./screenshots/filters.webp" alt="Clash Armies filters popup">
+    Armies filter popup
+  </div>
+</details>
+
+<br />
+
+Clash Armies is a (web) project that aims to make finding, learning and discussing Clash Of Clans armies as easy as possible. It also adds in social features such as voting and commenting to spark discussion between users.
+
+- simple and convenient army viewer
+  - easily copy an army link for sharing with others
+  - open in game button which imports an army directly into Clash Of Clans
+  - ability to vote on other users' armies and add/reply to comments
+- interactive army builder for creating a full army (troops, spells, siege machines, clan castle, heroes, pets and equipment)
+  - guide system allowing users to attach a formatted text or video guide describing exactly how to use an army
+  - import from link feature allowing users to copy an army from in-game directly into the site
+- various filterable pages and functionality to help make finding an army easy, such as:
+  - new and popular armies
+  - browse pages (find armies by a specific unit or town hall)
+  - filtering by exact parameters (by tag, has guide, has no equipment, includes specific combination of troops, etc...)
 
 Join the [discord server](https://discord.gg/9wCmfXhZM6) to keep up to date with discussions, sneak peaks and releases!
 
-# Run locally
+## Getting Started
 
-If you need extra help, or have suggestions on improving the dev workflow, give me a message on discord/github.
+If you need help running Clash Armies locally, or have suggestions on improving the dev workflow, give me a message on discord/github.
 
-## Prerequisites
+### Prerequisites
 
 - `npm` >= 11.7.0
 - `pnpm` >= 11.0.3
@@ -16,187 +153,58 @@ If you need extra help, or have suggestions on improving the dev workflow, give 
 - `docker` >= 29.1.3
 - `docker compose` >= 5.1.3
 
-NOTE: the app may be able to run on lower versions of dependencies, but these are just the versions I am using and can say are "supported".
+### Installation
 
-## Running app
+1. Clone the repo
+   ```bash
+   git clone https://github.com/NinjaInShade/clash-armies.git
+   ```
+2. Create and populate `.env`, following `.env.example` as a guide ([see here](#setting-up-google-oauth) for setting up Google oAuth env variables)
+3. Install dependencies
+   ```bash
+   pnpm i
+   ```
+4. Start the app
+   ```sh
+   pnpm start
+   ```
 
-Clone the repo and go into:
+### Setting up Google oAuth
 
-```bash
-git clone https://github.com/NinjaInShade/clash-armies.git
-cd clash-armies
-```
+To be able to run the app and have authentication, you currently need to create a google oAuth project and generate a client id and secret which you place in your `.env` file.
 
-The first setup step before being able to run the app and have it function is to create a google oAuth project and generate a client id and secret which are needed for the login to work. This is totally free. These are the steps:
+Setting this up is totally free. These are the steps:
 
 - Go to the [Google API dashboard](https://console.cloud.google.com/apis/dashboard)
 - Go to `credentials` and create an oAuth client id/secret. In the setup wizard add `http://localhost:5173` as an authorized javascript origin, and `http://localhost:5173/api/login/google/callback` as an authorized redirect URI.
 - Go to `oAuth consent screen` and customize the oAuth consent screen to your liking
 
-Next thing you will need to do is create a `.env` file at the root of the project with the following vars:
+### Running tests
 
-- DB_PORT
-- DB_ROOT_PASSWORD
-- DB_USER
-- DB_PASSWORD
-- ORIGIN
-- GOOGLE_AUTH_CLIENT_ID (use the google client id from before)
-- GOOGLE_AUTH_SECRET (use the google secret from before)
+Before running tests, you should create an `.env.test` file which largely can be the exact same as your `.env` file, but specifying a different `DB_PORT` is recommended.
 
-You can see example values for reference in `.env.example`.
+You can run tests with the `pnpm run test` script, or `pnpm run test:coverage` which also generates a coverage report in `coverage/`.
 
-Once all that is done, install the dependencies:
+Some users may enjoy the vitest visual web interface, which you can start and access via `pnpm run test:ui`.
 
-```bash
-pnpm i
-```
+## Contributing
 
-And run the app:
+Any contributions you make are **greatly appreciated**.
 
-```bash
-pnpm start
-```
+If you have a suggestion that would improve Clash Armies, don't hesitate to fork the repo and create a pull request. You can also open a github issue beforehand if you'd like to discuss anything.
 
-You should now have the app running locally on port 5173!
+## License
 
-# Contributing
+Distributed under the GNU General Public License version 3 (GPLv3) license. See [LICENSE](./LICENSE) for more information.
 
-I appreciate any contributions, I find it really cool people can help make the project better for everyone.
+## Contact
 
-If you wish to contribute, give me a shout on discord/github and we can discuss the idea/fix you want to do (or I can help with ideas).
+- Email: support@clasharmies.com
+- Discord: https://discord.gg/9wCmfXhZM6
 
-# Useful documentation/reading
+## Acknowledgments
 
-During the making of this I had to find resources myself so for anyone making a similar tool, or even anything to do with clash of clans, these may be useful.
-
-## Army links
-
-Found on the [Clash API Developers discord](https://discord.gg/clashapi) FAQs. For internal troop/spell ID's see [Static data](./README.md#static-data)
-
-> Army Link URLs enable sharing of army compositions externally from the Clash of Clans game client. Other players can then use the link to import the army composition to one of their army slots in game. These URLs can be generated programmatically if you know the troop and spell IDs.
->
-> Example of a simple army link breakdown:
->
-> https://link.clashofclans.com/en?action=CopyArmy&army=u10x0-2x3s1x9-3x2
->
-> First are troops, (prefixed with the "u" character):<br />
-> First item is 10 troops with id 0, which are Barbarians.<br />
-> Next item is 2 troops with id 3, which are Giants.<br />
->
-> Then come the spells (starting with the s character):<br />
-> First is 1 spell with id 9, which is a Poison Spell.<br />
-> Second is 3 spells with id 2, which is a Rage Spell.<br />
->
-> The army= query string value can be parsed with regex into two groups (troops and spells):
->
-> u([\d+x-]+)s([\d+x-]+)
-
-## Static data
-
-To achieve this I needed the metadata for things such as troops, spools etc. I realized early on this wasn't going to be feasible, maintainable and prone to error if I tried to manually enter data myself from wikis etc. Also some of the properties like internal troop IDs aren't easy to find.
-
-I found some resources from [Clash API Developers discord](https://discord.gg/clashapi) FAQs:
-
-## Sanitised JSON Files
-
-> Provided by @Magic?! | ClashKing (docs)
->
-> https://api.clashking.xyz/json/troops <br/> > https://api.clashking.xyz/json/spells <br/> > https://api.clashking.xyz/json/heroes <br/> > https://api.clashking.xyz/json/buildings <br/> > https://api.clashking.xyz/json/pets <br/> > https://api.clashking.xyz/json/supers <br/> > https://api.clashking.xyz/json/translations <br/>
->
-> https://api.clashking.xyz/assets (Zip File of Game Assets) <br/> > https://api.clashking.xyz/csv (Zip File of all Game CSV's) <br/>
-
-### Raw JSON Conversions
-
-> Provided by @spAnser
->
-> Root URL path: https://coc.guide/static/json/
->
-> Followed by:
->
-> capital_buildings.json<br />
-> capital_characters.json<br />
-> capital_obstacles.json<br />
-> capital_projectiles.json<br />
-> capital_spells.json<br />
-> capital_traps.json<br />
-> characters.json<br />
-> client_globals.json<br />
-> globals.json<br />
-> heroes.json<br />
-> languages.json<br />
-> object_ids.json<br />
-> obstacles.json<br />
-> pass_tasks.json<br />
-> pets.json<br />
-> projectiles.json<br />
-> replay.json<br />
-> spells.json<br />
-> supers.json<br />
-> tasks.json<br />
-> townhall_levels.json<br />
-> traps.json<br />
-> upgrade_tasks.json<br />
-> weapons.json<br />
->
-> Localisation:
->
-> lang/texts_AR.json<br />
-> lang/texts_CN.json<br />
-> lang/texts_CNT.json<br />
-> lang/texts_DE.json<br />
-> lang/texts_EN.json<br />
-> lang/texts_ES.json<br />
-> lang/texts_FA.json<br />
-> lang/texts_FI.json<br />
-> lang/texts_FR.json<br />
-> lang/texts_ID.json<br />
-> lang/texts_IT.json<br />
-> lang/texts_JP.json<br />
-> lang/texts_KR.json<br />
-> lang/texts_MS.json<br />
-> lang/texts_NL.json<br />
-> lang/texts_NO.json<br />
-> lang/texts_PT.json<br />
-> lang/texts_RU.json<br />
-> lang/texts_TH.json<br />
-> lang/texts_VI.json<br />
-> lang/texts_TR.json<br />
-
-## Official API considerations
-
-This refers to the [Official API](https://developer.clashofclans.com/#/).
-
-**Response caching**
-
-Found on the [Clash API Developers discord](https://discord.gg/clashapi) FAQs:
-
-> Each API response from the Clash of Clans API is cached for a certain amount of time. This means that the response will not change until the cache timer has expired, therefore there isn't any benefit from repeating the request again until this time. The cache timer varies by API endpoint:
->
-> Clan - 120 seconds (2 minutes)<br />
-> Current War (Classic) - 120 seconds (2 minutes)<br />
-> Other War (CWL) - 600 seconds (10 minutes)<br />
-> Player - 60 seconds (1 minute)<br />
->
-> When making an API request, you can check the response headers for a cache-control header and the value of this is the number of seconds until the cache expires.
-
-**Rate limit**
-
-Found on the [Clash API Developers discord](https://discord.gg/clashapi) FAQs:
-
-> Each API Token for the Clash of Clans API is to rate limitations. There isn't an official rate limit figure provided, however we have tested 30-40 requests per second without issues.
->
-> If you exceed the rate limit, the API will respond with a 429 error and you will be temporarily unable to make API requests with that token (it can last 1 hour).
-
-**IP restrictions**
-
-Found on the [Clash API Developers discord](https://discord.gg/clashapi) FAQs:
-
-> Each API Tokens for the Clash of Clans API is restricted to specific IP addresses (IPv4). This can cause issues when attempting to access it from a connection with a dynamic IP address. There are a couple workarounds:
->
-> 1. Use a library with dynamic IP address support
->
-> A number of the community created API libraries have the ability to create and use a new API token each time your IP address changes. This happens seamlessly with each request, so enable you to make API requests without needing to manually create a new API Token each time your IP changes.
->
-> 2. Use an API proxy
->
-> Making your API requests via a proxy will mean that the API will "see" the requests as coming from the IP address of the proxy service. If you create your token using the IP address of the proxy service and then make your API calls via that service, you will be able to make API requests from any IP address.
+- [Clash API Developers discord](https://discord.gg/clashapi)
+- [Official API](https://developer.clashofclans.com/#/)
+- [ClashKing](https://github.com/ClashKingInc)
+- [COC guide](https://coc.guide/)
