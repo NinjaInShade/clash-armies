@@ -1,3 +1,11 @@
+## [0.10.0] - 2026-06-07
+
+- Add LICENSE
+- Update README
+- Fix links inside menu's blocking client-side rendering
+- Update various dependencies
+- Improve robustness of authentication (session invalidation is required)
+
 ## [0.9.2] - 2026-06-05
 
 - Update naming of "Rising armies" to "New armies"
