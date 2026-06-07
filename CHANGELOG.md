@@ -1,3 +1,7 @@
+## [0.10.1] - 2026-06-07
+
+- Fix google login failing in some cases
+
 ## [0.10.0] - 2026-06-07
 
 - Add LICENSE
