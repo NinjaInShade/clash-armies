@@ -64,7 +64,7 @@ export async function GET(req: RequestEvent): Promise<Response> {
                         UPDATE users
                         SET googleEmail = ?
                         WHERE id = ?
-                    `, [existingUser.id, googleUser.email ?? null])
+                    `, [googleUser.email ?? null, existingUser.id])
 				});
 			}
 			const { token } = await createSession(existingUser.id);
