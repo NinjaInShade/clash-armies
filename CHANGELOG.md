@@ -1,3 +1,7 @@
+## [0.10.2] - 2026-06-09
+
+- Add new Monolith Arrow equipment
+
 ## [0.10.1] - 2026-06-07
 
 - Fix google login failing in some cases
