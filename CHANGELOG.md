@@ -1,3 +1,10 @@
+## [0.10.3] - 2026-06-17
+
+- Add new Angry Spell spell
+- Add new Ruin Witch troop
+- Add new dark barrack and dark spell factory levels
+- Add new BK/AQ/GW hero levels
+
 ## [0.10.2] - 2026-06-09
 
 - Add new Monolith Arrow equipment
