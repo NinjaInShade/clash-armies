@@ -4121,6 +4121,39 @@
 			],
 		},
 		{
+			name: 'Angry Spell',
+			clashId: 123,
+			productionBuilding: 'Dark Spell Factory',
+			housingSpace: 1,
+			isSuper: false,
+			isFlying: false,
+			isJumper: false,
+			airTargets: false,
+			groundTargets: false,
+			levels: [
+				{
+					level: 1,
+					buildingLevel: 8,
+					laboratoryLevel: 1,
+				},
+				{
+					level: 2,
+					buildingLevel: 8,
+					laboratoryLevel: 14,
+				},
+				{
+					level: 3,
+					buildingLevel: 8,
+					laboratoryLevel: 15,
+				},
+				{
+					level: 4,
+					buildingLevel: 8,
+					laboratoryLevel: 16,
+				},
+			],
+		},
+		{
 			name: 'Totem',
 			clashId: 120,
 			productionBuilding: 'Spell Factory',
