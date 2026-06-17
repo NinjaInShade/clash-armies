@@ -571,11 +571,11 @@
 			heroMaxLevels: [
 				{
 					hero: 'Archer Queen',
-					maxLevel: 105,
+					maxLevel: 110,
 				},
 				{
 					hero: 'Barbarian King',
-					maxLevel: 105,
+					maxLevel: 110,
 				},
 				{
 					hero: 'Dragon Duke',
@@ -583,7 +583,7 @@
 				},
 				{
 					hero: 'Grand Warden',
-					maxLevel: 80,
+					maxLevel: 85,
 				},
 				{
 					hero: 'Minion Prince',
