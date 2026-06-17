@@ -2504,6 +2504,39 @@
 			],
 		},
 		{
+			name: 'Ruin Witch',
+			clashId: 109,
+			productionBuilding: 'Dark Elixir Barrack',
+			housingSpace: 26,
+			isSuper: false,
+			isFlying: false,
+			isJumper: false,
+			airTargets: false,
+			groundTargets: true,
+			levels: [
+				{
+					level: 1,
+					buildingLevel: 13,
+					laboratoryLevel: 14,
+				},
+				{
+					level: 2,
+					buildingLevel: 13,
+					laboratoryLevel: 14,
+				},
+				{
+					level: 3,
+					buildingLevel: 13,
+					laboratoryLevel: 15,
+				},
+				{
+					level: 4,
+					buildingLevel: 13,
+					laboratoryLevel: 16,
+				},
+			],
+		},
+		{
 			name: 'Meteor Golem',
 			clashId: 177,
 			productionBuilding: 'Barrack',
