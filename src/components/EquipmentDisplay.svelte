@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { getContext } from 'svelte';
 	import type { AppState } from '$types';
+	import { equipmentImgURL } from '$client/assets';
 
 	type Props = {
 		name: string;
@@ -27,7 +28,7 @@
 	{#if level && level > 0}
 		<b class="lvl" class:max={isMaxLevel}>{level}</b>
 	{/if}
-	<img src="/heroes/equipment/{name}_small.webp" alt={name} />
+	<img src={equipmentImgURL(name, 'small')} alt={name} />
 </div>
 
 <style>

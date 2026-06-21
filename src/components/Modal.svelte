@@ -2,6 +2,7 @@
 	import type { Snippet, Component } from 'svelte';
 	import FocusTrap from './FocusTrap.svelte';
 	import Button from './Button.svelte';
+	import ImgClose from '$assets/ui/close.webp';
 
 	type ComponentRendering = {
 		/** Sets the component the modal renders. Uses children as fallback */
@@ -38,7 +39,7 @@
 		<div class="modal-header">
 			<h2 class="modal-title">{title ?? ''}</h2>
 			<button type="button" class="close-btn" onclick={() => close()}>
-				<img src="/ui/close.webp" alt="Close icon" />
+				<img src={ImgClose} alt="Close icon" />
 			</button>
 		</div>
 		<div class="modal-content">

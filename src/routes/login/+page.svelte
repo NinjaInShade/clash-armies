@@ -1,5 +1,6 @@
 <script lang="ts">
 	import GoogleLoginButton from '$components/GoogleLoginButton.svelte';
+	import ImgSwords from '$assets/ui/swords.webp';
 </script>
 
 <svelte:head>
@@ -15,7 +16,7 @@
 	<div class="container">
 		<div class="login-card">
 			<header class="info">
-				<img src="/ui/swords.webp" alt="Clash of clans overlapping swords" class="logo" />
+				<img src={ImgSwords} alt="Clash of clans overlapping swords" class="logo" />
 				<h2>Log in</h2>
 				<p>By logging in, you will be able to start creating armies!</p>
 			</header>

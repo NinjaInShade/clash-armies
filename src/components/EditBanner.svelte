@@ -2,6 +2,7 @@
 	import { onMount } from 'svelte';
 	import type { Banner } from '$types';
 	import { BANNERS } from '$shared/utils';
+	import { bannerImgURL } from '$client/assets';
 	import C from '$components';
 
 	type Props = {
@@ -46,7 +47,7 @@
 	<div class="banner-grid" bind:this={grid}>
 		{#each BANNERS as bannerName (bannerName)}
 			<button onclick={() => selectBanner(bannerName)} class:selected={bannerName === banner}>
-				<img src="/banners/{bannerName}.webp" alt="Clash of clans banner artwork" />
+				<img src={bannerImgURL(bannerName)} alt="Clash of clans banner artwork" />
 			</button>
 		{/each}
 	</div>

@@ -3,6 +3,10 @@
 	import type { AppState } from '$types';
 	import LinkCard from './LinkCard.svelte';
 	import { ARMY_PAGES } from '$client/pages';
+	import ImgSignpost from '$assets/ui/signpost.webp';
+	import ImgHammerAndSaw from '$assets/ui/hammer-and-saw.webp';
+	import ImgClashProfile from '$assets/ui/clash-profile.webp';
+	import ImgAdmin from '$assets/ui/admin.webp';
 
 	type Props = {
 		open: boolean;
@@ -15,14 +19,14 @@
 		{
 			title: 'Home',
 			description: 'Home page',
-			img: '/ui/signpost.webp',
+			img: ImgSignpost,
 			imgAlt: 'Wooden signpost',
 			href: '/',
 		},
 		{
 			title: 'Army Builder',
 			description: 'Share your army!',
-			img: '/ui/hammer-and-saw.webp',
+			img: ImgHammerAndSaw,
 			imgAlt: 'Hammer and saw crossed over each other',
 			href: '/army-builder',
 		},
@@ -34,7 +38,7 @@
 				{
 					title: 'Profile',
 					description: 'View Profile',
-					img: '/ui/clash-profile.webp',
+					img: ImgClashProfile,
 					imgAlt: 'Profile',
 					href: `/users/${app.user?.username}`,
 				}]
@@ -43,7 +47,7 @@
 			{
 				title: 'Admin',
 				description: 'Admin Panel',
-				img: '/ui/admin.webp',
+				img: ImgAdmin,
 				imgAlt: 'Admin badge',
 				href: '/admin',
 			}]

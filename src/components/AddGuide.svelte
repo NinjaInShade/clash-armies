@@ -1,4 +1,6 @@
 <script lang="ts">
+	import ImgBBDuel from '$assets/ui/bb-duel.webp';
+
 	type Props = {
 		onClick: () => void;
 	};
@@ -7,7 +9,7 @@
 
 <div class="not-added">
 	<div class="guide-img-container">
-		<img src="/ui/bb-duel.webp" alt="Clash of clans builder base two swords" />
+		<img src={ImgBBDuel} alt="Clash of clans builder base two swords" />
 	</div>
 	<h2>Add guide</h2>
 	<button class="add-guide-btn" onclick={onClick} aria-label="Displays the guide editor">

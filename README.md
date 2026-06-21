@@ -1,5 +1,5 @@
 <h3 align="center">
-  <img src="static/ui/swords.webp" alt="Logo" width="28.58" height="24" style="vertical-align: -6px;">
+  <img src="src/lib/assets/ui/swords.webp" alt="Logo" width="28.58" height="24" style="vertical-align: -6px;">
   Clash Armies
 </h3>
 

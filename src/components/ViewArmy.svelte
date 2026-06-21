@@ -3,6 +3,7 @@
 	import { YOUTUBE_URL_REGEX } from '$shared/utils';
 	import type { AppState } from '$types';
 	import { ArmyModel, type Army } from '$models';
+	import { bannerImgURL, thImgURL, heroImgURL } from '$client/assets';
 	import UnitTotals from './UnitTotals.svelte';
 	import Votes from './Votes.svelte';
 	import UnitsList from './UnitsList.svelte';
@@ -16,6 +17,10 @@
 	import CtxMenu from './ArmyActionsMenu.svelte';
 	import CommentsList from './CommentsList.svelte';
 	import AddComment from './SaveComment.svelte';
+	import ImgArmyCamp from '$assets/ui/army-camp.webp';
+	import ImgClanCastle from '$assets/ui/clan-castle.webp';
+	import ImgBBDuel from '$assets/ui/bb-duel.webp';
+	import IconYoutube from '$assets/icons/youtube-coloured.png';
 
 	type Props = { army: Army };
 	const { army }: Props = $props();
@@ -52,14 +57,14 @@
 
 <section class="banner">
 	<picture>
-		<source srcset="/banners/{model.banner}.webp" media="(max-width: 900px)" />
-		<img class="banner-img" src="/banners/{model.banner}_large.webp" alt="Clash of clans banner artwork" />
+		<source srcset={bannerImgURL(model.banner)} media="(max-width: 900px)" />
+		<img class="banner-img" src={bannerImgURL(model.banner, 'large')} alt="Clash of clans banner artwork" />
 	</picture>
 	<div class="banner-overlay"></div>
 	<div class="banner-content">
 		<div class="left">
 			<div class="title-container">
-				<img src="/town-halls/{model.townHall}.webp" alt="Town hall {model.townHall}" class="town-hall" />
+				<img src={thImgURL(model.townHall)} alt="Town hall {model.townHall}" class="town-hall" />
 				<h1>{model.name}</h1>
 			</div>
 			<p class="author">Assembled by <a href="/users/{model.username}">@{model.username}</a></p>
@@ -76,7 +81,7 @@
 <section class="dashed dashed-section units">
 	<header>
 		<h2 class="dashed dashed-title">
-			<img src="/ui/army-camp.webp" alt="Clash of clans army camp" />
+			<img src={ImgArmyCamp} alt="Clash of clans army camp" />
 			Army camp
 		</h2>
 		<UnitTotals {model} housedIn="armyCamp" />
@@ -90,7 +95,7 @@
 	<section class="dashed dashed-section units">
 		<header>
 			<h2 class="dashed dashed-title">
-				<img src="/ui/clan-castle.webp" alt="Clash of clans clan castle" />
+				<img src={ImgClanCastle} alt="Clash of clans clan castle" />
 				Clan castle
 			</h2>
 			<UnitTotals {model} housedIn="clanCastle" />
@@ -105,7 +110,7 @@
 	<section class="dashed dashed-section units heroes">
 		<header>
 			<h2 class="dashed dashed-title">
-				<img src="/heroes/Barbarian King.webp" alt="Clash of clans barbarian king hero" />
+				<img src={heroImgURL('Barbarian King')} alt="Clash of clans barbarian king hero" />
 				Heroes
 			</h2>
 		</header>
@@ -123,7 +128,7 @@
 	<section class="dashed dashed-section guide">
 		<header>
 			<h2 class="dashed dashed-title">
-				<img src="/ui/bb-duel.webp" alt="Clash of clans builder base swords" />
+				<img src={ImgBBDuel} alt="Clash of clans builder base swords" />
 				Guide
 			</h2>
 		</header>
@@ -135,7 +140,7 @@
 		{#if model.guide.youtubeUrl}
 			<div class="guide-youtube-container">
 				<h2 class="dashed-title">
-					<img src="/icons/youtube-coloured.png" alt="Youtube icon" />
+					<img src={IconYoutube} alt="Youtube icon" />
 					Video guide
 				</h2>
 				<iframe

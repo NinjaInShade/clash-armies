@@ -5,6 +5,7 @@
 	import { invalidateAll } from '$app/navigation';
 	import Menu from '../Menu.svelte';
 	import FocusTrap from '../FocusTrap.svelte';
+	import ImgBarb from '$assets/ui/barbarian.webp';
 
 	type Props = {
 		open: boolean;
@@ -66,7 +67,7 @@
 			</header>
 			{#each notifications as notif (notif.id)}
 				<div class="notification">
-					<img src="/ui/barbarian.webp" alt="Clash of clans barbarian" />
+					<img src={ImgBarb} alt="Clash of clans barbarian" />
 					<div class="notification-content">
 						<a href={getNotificationLink(notif)} onclick={() => openNotification(notif)} class="notification-title" class:seen={notif.seen}>
 							{#if notif.type === 'comment'}

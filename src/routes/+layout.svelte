@@ -9,6 +9,8 @@
 	import { page } from '$app/state';
 	import C from '$components';
 	import FeedbackBanner from '$components/FeedbackBanner.svelte';
+	import '$assets/css/base.css';
+	import '$assets/css/common.css';
 
 	type Props = {
 		data: LayoutData;

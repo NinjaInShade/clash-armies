@@ -2,6 +2,7 @@
 	import { getContext } from 'svelte';
 	import type { AppState } from '$types';
 	import { ArmyModel } from '$models';
+	import { heroImgURL } from '$client/assets';
 
 	type Props = {
 		model: ArmyModel;
@@ -18,10 +19,10 @@
 
 <div class="not-added">
 	<div class="heroes-img-container">
-		<img src="/heroes/Barbarian King.webp" alt="Clash of clans barbarian king hero" />
-		<img src="/heroes/Archer Queen.webp" alt="Clash of clans archer queen hero" />
-		<img src="/heroes/Grand Warden.webp" alt="Clash of clans grand warden hero" />
-		<img src="/heroes/Royal Champion.webp" alt="Clash of clans royal champion hero" />
+		<img src={heroImgURL('Barbarian King')} alt="Clash of clans barbarian king hero" />
+		<img src={heroImgURL('Archer Queen')} alt="Clash of clans archer queen hero" />
+		<img src={heroImgURL('Grand Warden')} alt="Clash of clans grand warden hero" />
+		<img src={heroImgURL('Royal Champion')} alt="Clash of clans royal champion hero" />
 	</div>
 	{#if model.townHall >= requiredThLvl}
 		<h2>Add hero pets/equipment</h2>

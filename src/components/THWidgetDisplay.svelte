@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { thImgURL } from '$client/assets';
+
 	type Props = {
 		level: number;
 		height?: number;
@@ -7,7 +9,7 @@
 	let { level, height, displayLevel }: Props = $props();
 </script>
 
-<img src="/town-halls/{level}.webp" alt="Town hall {level}" style="--height: {height ?? 38}px" />
+<img src={thImgURL(level)} alt="Town hall {level}" style="--height: {height ?? 38}px" />
 
 {#if displayLevel}
 	<p>TH{level}</p>

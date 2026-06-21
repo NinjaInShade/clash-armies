@@ -1,3 +1,7 @@
+<script lang="ts">
+	import ImgBarbGold from '$assets/ui/barb-gold.webp';
+</script>
+
 <svelte:head>
 	<title>ClashArmies • Roadmap</title>
 	<meta name="description" content="Explore upcoming features and planned improvements to the Clash Armies tool. See what's next and help shape the future." />
@@ -6,7 +10,7 @@
 
 <section>
 	<div class="container">
-		<img src="/ui/barb-gold.webp" alt="Barbarian looking at a gold coin" />
+		<img src={ImgBarbGold} alt="Barbarian looking at a gold coin" />
 		<h1>Coming soon...</h1>
 		<p>If you would like to follow development check out the <a href="https://discord.gg/9wCmfXhZM6" target="_blank">discord server</a></p>
 	</div>

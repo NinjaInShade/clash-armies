@@ -9,6 +9,7 @@
 	import Banner from './Banner.svelte';
 	import Controls from './Controls.svelte';
 	import { ArmyModel } from '$models';
+	import ImgPekka from '$assets/ui/pekka.webp';
 
 	type BannerOptions = {
 		title: string;
@@ -93,7 +94,7 @@
 
 		{#if !displayArmies.length}
 			<div class="no-data">
-				<img src="/ui/pekka.webp" alt="PEKKA" />
+				<img src={ImgPekka} alt="PEKKA" />
 				<h2>There are no armies matching this criteria warrior!</h2>
 				<div class="reset-filters">
 					<Button onClick={resetFilters}>Reset all filters</Button>

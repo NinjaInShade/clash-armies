@@ -2,6 +2,7 @@
 	import { getContext } from 'svelte';
 	import type { AppState } from '$types';
 	import { ArmyModel } from '$models';
+	import { thImgURL } from '$client/assets';
 	import HeroDisplay from './HeroDisplay.svelte';
 	import UnitTotals from './UnitTotals.svelte';
 	import UnitsList from './UnitsList.svelte';
@@ -11,6 +12,7 @@
 	import CommentsCount from './CommentsCount.svelte';
 	import ShareButton from './ShareButton.svelte';
 	import CtxMenu from './ArmyActionsMenu.svelte';
+	import ImgClanCastle from '$assets/ui/clan-castle.webp';
 
 	type Props = {
 		model: ArmyModel;
@@ -31,7 +33,7 @@
 {#snippet extraUnits()}
 	{#if model.ccUnits.length > 0}
 		<li class="clan-castle">
-			<img src="/ui/clan-castle.webp" alt="Clash of clans clan castle" title="Has clan castle" />
+			<img src={ImgClanCastle} alt="Clash of clans clan castle" title="Has clan castle" />
 		</li>
 	{/if}
 	{#each app.heroNames as hero (hero)}
@@ -47,7 +49,7 @@
 	<header class="header">
 		<div class="top">
 			<a class="title-container" href="/armies/{model.id}">
-				<img src="/town-halls/{model.townHall}_small.webp" alt="Town hall {model.townHall}" class="town-hall" title="Town hall {model.townHall}" />
+				<img src={thImgURL(model.townHall, 'small')} alt="Town hall {model.townHall}" class="town-hall" title="Town hall {model.townHall}" />
 				<h3>{model.name}</h3>
 				<span class="downloads">
 					<svg width="14" height="15" viewBox="0 0 14 15" fill="none" xmlns="http://www.w3.org/2000/svg">

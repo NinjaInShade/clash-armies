@@ -2,6 +2,7 @@
 	import { getContext } from 'svelte';
 	import type { AppState } from '$types';
 	import type { ArmyModel } from '$models';
+	import ImgClanCastle from '$assets/ui/clan-castle.webp';
 
 	type Props = {
 		model: ArmyModel;
@@ -16,7 +17,7 @@
 
 <div class="not-added">
 	<div class="cc-img-container">
-		<img src="/ui/clan-castle.webp" alt="Clash of clans clan castle" />
+		<img src={ImgClanCastle} alt="Clash of clans clan castle" />
 	</div>
 	{#if ccUnlocked}
 		<h2>Add clan castle</h2>

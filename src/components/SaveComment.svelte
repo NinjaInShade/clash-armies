@@ -6,6 +6,7 @@
 	import TextArea from './TextArea.svelte';
 	import Button from './Button.svelte';
 	import type { ArmyModel, ArmyComment } from '$models';
+	import ImgBarbKing2 from '$assets/ui/barb-king-2.webp';
 
 	type Props = {
 		model: ArmyModel;
@@ -104,7 +105,7 @@
 		</div>
 	{:else}
 		<div class="requires-auth">
-			<img src="/ui/barb-king-2.webp" alt="Clash of Clans Barbarian King" />
+			<img src={ImgBarbKing2} alt="Clash of Clans Barbarian King" />
 			<div>
 				<h2>What's your take?</h2>
 				<p class="body">

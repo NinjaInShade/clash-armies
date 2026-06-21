@@ -2,6 +2,7 @@
 	import type { AppState } from '$types';
 	import { getContext } from 'svelte';
 	import { ArmyModel } from '$models';
+	import { heroImgURL } from '$client/assets';
 
 	type Props = {
 		name: string;
@@ -18,7 +19,7 @@
 	{#if level && level > 0}
 		<b class="lvl" class:max={isMaxLevel}>{level}</b>
 	{/if}
-	<img src="/heroes/{name} Full Height.webp" alt={`Clash of clans "${name}" hero`} />
+	<img src={heroImgURL(name, 'full-height')} alt={`Clash of clans "${name}" hero`} />
 </div>
 
 <style>

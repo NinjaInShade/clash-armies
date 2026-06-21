@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { version } from '$app/environment';
+	import ImgSwords from '$assets/ui/swords.webp';
 
 	type Props = {
 		/**
@@ -14,7 +15,7 @@
 
 <div class="logo-container">
 	<a class="logo" href="/">
-		<img src="/ui/swords.webp" alt="Clash of clans overlapping swords" />
+		<img src={ImgSwords} alt="Clash of clans overlapping swords" />
 		Clash <span>Armies</span>
 	</a>
 	{#if showVersion}

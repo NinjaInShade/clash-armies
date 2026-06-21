@@ -3,6 +3,7 @@
 	import type { AppState, User } from '$types';
 	import type { ArmyModel } from '$models';
 	import C from '$components';
+	import ImgFallingBarb from '$assets/ui/falling-barb.webp';
 
 	type Props = {
 		savedArmies: ArmyModel[];
@@ -24,7 +25,7 @@
 	</ul>
 {:else}
 	<div class="no-armies">
-		<img src="/ui/falling-barb.webp" alt="Falling barbarian" />
+		<img src={ImgFallingBarb} alt="Falling barbarian" />
 		<h2>
 			{#if currentUser === username}
 				You haven't saved any armies warrior!

@@ -28,6 +28,7 @@ export default defineConfig((env) => {
 				'~': 'src',
 				$types: 'src/lib/shared/types',
 				$components: 'src/components',
+				$assets: 'src/lib/assets',
 				$models: 'src/lib/models',
 				$client: 'src/lib/client',
 				$server: 'src/lib/server',

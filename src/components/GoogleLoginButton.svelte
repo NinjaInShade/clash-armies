@@ -1,5 +1,9 @@
+<script lang="ts">
+	import IconGoogleLogo from '$assets/icons/google-logo.svg';
+</script>
+
 <a href="/api/login/google" class="login-btn">
-	<img src="/icons/google-logo.svg" alt="Google logo" />
+	<img src={IconGoogleLogo} alt="Google logo" />
 	Sign in with Google
 </a>
 

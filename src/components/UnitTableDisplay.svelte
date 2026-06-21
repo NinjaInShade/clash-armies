@@ -1,11 +1,13 @@
 <script lang="ts">
+	import { unitImgURL } from '$client/assets';
+
 	type Props = {
 		name: string;
 	};
 	let { name }: Props = $props();
 </script>
 
-<img src="/units/{name}.webp" alt="Unit: {name}" />
+<img src={unitImgURL(name)} alt="Unit: {name}" />
 
 <style>
 	img {

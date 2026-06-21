@@ -3,6 +3,9 @@
 	import type { PageData } from './$types';
 	import { ARMY_PAGES } from '$client/pages';
 	import ArmyList from '~/components/Armies/ArmyList.svelte';
+	import ImgLeagueKing from '$assets/ui/league-king.webp';
+	import ImgLeagueKingLarge from '$assets/ui/league-king_large.webp';
+	import ImgHeaderBarbLarge from '$assets/ui/header-barbarian_large.webp';
 
 	const { data }: { data: PageData } = $props();
 	const latestArmiesMeta = ARMY_PAGES.latest;
@@ -27,9 +30,9 @@
 		</div>
 
 		<picture>
-			<source srcset="/ui/league-king.webp" media="(max-width: 400px)" />
-			<source srcset="/ui/league-king_large.webp" media="(max-width: 625px)" />
-			<img class="graphic" src="/ui/header-barbarian_large.webp" alt="Clash of Clans unit" />
+			<source srcset={ImgLeagueKing} media="(max-width: 400px)" />
+			<source srcset={ImgLeagueKingLarge} media="(max-width: 625px)" />
+			<img class="graphic" src={ImgHeaderBarbLarge} alt="Clash of Clans unit" />
 		</picture>
 	</div>
 </header>
@@ -42,7 +45,7 @@
 
 <style>
 	header {
-		background: repeat-x 0 25% url('/ui/stones-background.webp');
+		background: repeat-x 0 25% url('$assets/ui/stones-background.webp');
 		padding: 0 var(--side-padding);
 		overflow: hidden;
 	}
@@ -83,7 +86,7 @@
 
 	@media (max-width: 1000px) {
 		header {
-			background: repeat-x 0 15% url('/ui/stones-background.webp');
+			background: repeat-x 0 15% url('$assets/ui/stones-background.webp');
 		}
 
 		header .container {
@@ -104,7 +107,7 @@
 
 	@media (max-width: 625px) {
 		header {
-			background: repeat-x 0 7% url('/ui/stones-background.webp');
+			background: repeat-x 0 7% url('$assets/ui/stones-background.webp');
 		}
 
 		.graphic {

@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { heroImgURL } from '$client/assets';
+
 	type Props = {
 		hero: string;
 		onClick: () => void;
@@ -10,7 +12,7 @@
 
 <div class="not-added">
 	<div class="hero-img-container">
-		<img src="/heroes/{hero}.webp" alt="Clash of clans {hero.toLowerCase()} hero" />
+		<img src={heroImgURL(hero)} alt="Clash of clans {hero.toLowerCase()} hero" />
 	</div>
 	<h2>Add {hero.toLowerCase()}</h2>
 	<button class="add-btn" onclick={onClick} {title} {disabled} aria-label="Displays the hero equipment/pets editor">

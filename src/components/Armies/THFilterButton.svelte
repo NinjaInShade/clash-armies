@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { AppState } from '$types';
+	import { thImgURL } from '$client/assets';
 	import { getContext } from 'svelte';
 	import Menu from '../Menu.svelte';
 
@@ -32,10 +33,10 @@
 	onclick={toggleMenu}
 >
 	{#if value === undefined}
-		<img src="/town-halls/17_small.webp" alt="Town hall 17" />
+		<img src={thImgURL(17, 'small')} alt="Town hall 17" />
 		TH
 	{:else}
-		<img src="/town-halls/{value}_small.webp" alt="Town hall {value}" />
+		<img src={thImgURL(value, 'small')} alt="Town hall {value}" />
 		TH{value}
 	{/if}
 </button>
@@ -53,7 +54,7 @@
 						title={isSelected ? `Town hall ${th.level} is already selected` : `Town hall ${th.level}`}
 					>
 						<div class="flex">
-							<img src="/town-halls/{th.level}_small.webp" alt="Town hall {th.level}" />
+							<img src={thImgURL(th.level, 'small')} alt="Town hall {th.level}" />
 							<p class="body">{th.level}</p>
 						</div>
 						{#if value === th.level}

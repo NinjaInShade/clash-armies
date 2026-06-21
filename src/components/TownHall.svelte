@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { thImgURL } from '$client/assets';
+
 	type Props = {
 		/** Town hall level */
 		level: number;
@@ -18,7 +20,7 @@
 </script>
 
 <button class="town-hall {theme}" onclick={handleSelect} title="Town hall {level}" {...rest}>
-	<img src="/town-halls/{level}_small.webp" alt="Town hall {level}" />
+	<img src={thImgURL(level, 'small')} alt="Town hall {level}" />
 	<p class="body">{level}</p>
 </button>
 

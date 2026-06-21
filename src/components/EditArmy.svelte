@@ -5,6 +5,7 @@
 	import { HTTPError, type APIErrors } from '$shared/http';
 	import type { AppState, Banner } from '$types';
 	import { ArmyModel, type Army } from '$models';
+	import { bannerImgURL, heroImgURL } from '$client/assets';
 	import ImportFromLink from './ImportFromLink.svelte';
 	import EditBanner from './EditBanner.svelte';
 	import Fieldset from './Fieldset.svelte';
@@ -21,6 +22,10 @@
 	import GuideEditor from './GuideEditor.svelte';
 	import Errors from './Errors.svelte';
 	import Button from './Button.svelte';
+	import ImgHammerAndSaw from '$assets/ui/hammer-and-saw.webp';
+	import ImgArmyCamp from '$assets/ui/army-camp.webp';
+	import ImgClanCastle from '$assets/ui/clan-castle.webp';
+	import ImgBBDuel from '$assets/ui/bb-duel.webp';
 
 	type Props = { army?: Army };
 
@@ -188,8 +193,8 @@
 
 <section class="banner">
 	<picture>
-		<source srcset="/banners/{model.banner}.webp" media="(max-width: 900px)" />
-		<img class="banner-img" src="/banners/{model.banner}_large.webp" alt="Clash of clans banner artwork" />
+		<source srcset={bannerImgURL(model.banner)} media="(max-width: 900px)" />
+		<img class="banner-img" src={bannerImgURL(model.banner, 'large')} alt="Clash of clans banner artwork" />
 	</picture>
 	<button class="banner-select-btn" type="button" onclick={editBanner} aria-label="Opens up army banner selection modal">
 		<svg width="27" height="27" viewBox="0 0 27 27" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -205,7 +210,7 @@
 	<div>
 		<div class="title">
 			<h2>
-				<img src="/ui/hammer-and-saw.webp" alt="Hammer and saw crossed over each other" />
+				<img src={ImgHammerAndSaw} alt="Hammer and saw crossed over each other" />
 				Army
 				<ActionButton theme="primary-dark" onclick={importUnits} class="title-action-btn">
 					<svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -251,7 +256,7 @@
 	<div>
 		<div class="title">
 			<h2>
-				<img src="/ui/army-camp.webp" alt="Clash of clans army camp" />
+				<img src={ImgArmyCamp} alt="Clash of clans army camp" />
 				Army camp
 			</h2>
 			<UnitTotals {model} housedIn="armyCamp" />
@@ -278,7 +283,7 @@
 		<div>
 			<div class="title">
 				<h2>
-					<img src="/ui/clan-castle.webp" alt="Clash of clans clan castle" />
+					<img src={ImgClanCastle} alt="Clash of clans clan castle" />
 					Clan castle
 					<ActionButton theme="danger" onclick={removeClanCastle} class="title-action-btn">Remove</ActionButton>
 				</h2>
@@ -309,7 +314,7 @@
 		<div>
 			<div class="title">
 				<h2>
-					<img src="/heroes/Barbarian King.webp" alt="Clash of clans barbarian king hero" />
+					<img src={heroImgURL('Barbarian King')} alt="Clash of clans barbarian king hero" />
 					Heroes
 					<ActionButton theme="danger" onclick={removeHeroes} class="title-action-btn">Remove</ActionButton>
 				</h2>
@@ -332,7 +337,7 @@
 		<div>
 			<div class="title">
 				<h2>
-					<img src="/ui/bb-duel.webp" alt="Clash of clans builder base swords" />
+					<img src={ImgBBDuel} alt="Clash of clans builder base swords" />
 					Guide
 					<ActionButton theme="danger" onclick={removeGuide} class="title-action-btn">Remove</ActionButton>
 				</h2>

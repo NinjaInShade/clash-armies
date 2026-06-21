@@ -3,6 +3,7 @@
 	import { getContext } from 'svelte';
 	import type { AppState, User } from '$types';
 	import type { ArmyModel } from '$models';
+	import ImgFallingBarb from '$assets/ui/falling-barb.webp';
 
 	type Props = {
 		armies: ArmyModel[];
@@ -29,7 +30,7 @@
 	</ul>
 {:else}
 	<div class="no-armies">
-		<img src="/ui/falling-barb.webp" alt="Falling barbarian" />
+		<img src={ImgFallingBarb} alt="Falling barbarian" />
 		<h2>
 			{#if currentUser === username}
 				You haven't created any armies warrior!
