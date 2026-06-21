@@ -13,7 +13,7 @@
 		name="description"
 		content="Browse the most popular Clash of Clans armies. Find what's working best across all Town Hall levels, for war, farming, and more!"
 	/>
-	<link rel="canonical" href="https://clasharmies.com/popular" />
+	<link rel="canonical" href="https://clasharmies.com/armies/popular" />
 </svelte:head>
 
 <section class="armies">
