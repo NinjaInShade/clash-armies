@@ -1,3 +1,8 @@
+## [0.10.4] - 2026-06-21
+
+- Allow app assets to be better optimised and cached
+- Fix canonical popular armies page URL
+
 ## [0.10.3] - 2026-06-17
 
 - Add new Angry Spell spell
