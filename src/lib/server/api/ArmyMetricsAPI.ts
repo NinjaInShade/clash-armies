@@ -3,6 +3,7 @@ import type { Server } from '$server/api/Server';
 import type { RequestEvent } from '@sveltejs/kit';
 import { pluralize, HOUR, DAY, PAGE_VIEW_METRIC, COPY_LINK_CLICK_METRIC, OPEN_LINK_CLICK_METRIC } from '$shared/utils';
 import { KNOWN_BOT_UAS } from '$server/utils';
+import { helpers } from '$server/db';
 import { env } from '$env/dynamic/private';
 import { v4 as uuidv4, validate as isUuid } from 'uuid';
 import { sign, unsign } from 'cookie-signature';
@@ -54,7 +55,7 @@ export class ArmyMetricsAPI {
 	}
 
 	public async getMetricWeights() {
-		const metrics = await this.server.db.getRows<Metric>('metrics');
+		const metrics: Metric[] = await this.server.db.selectFrom('metrics').selectAll().execute();
 
 		const requireMetric = (name: string) => {
 			const metric = metrics.find((metric) => metric.name === name);
@@ -110,12 +111,11 @@ export class ArmyMetricsAPI {
 		// Example: page view counts once every 12 hours, if we delete events <= 1 hour old, 12x as many page view metrics could be accepted...
 		const maxAgeHours = await this.getMetricTypesMaxAge();
 
-		// prettier-ignore
-		const queryResult = await this.server.db.query(`
-			DELETE FROM army_metric_events
-			WHERE lastSeen < NOW() - INTERVAL ${maxAgeHours + 1} HOUR
-		`, []);
-		const deletedRows = queryResult?.affectedRows ?? '<unknown>';
+		const deleteResult = await this.server.db
+			.deleteFrom('army_metric_events')
+			.where('lastSeen', '<', helpers.ago(`${maxAgeHours + 1} HOUR`))
+			.executeTakeFirst();
+		const deletedRows = Number(deleteResult.numDeletedRows);
 
 		const duration = Date.now() - start;
 		const pluralized = pluralize('event', deletedRows);
@@ -142,15 +142,15 @@ export class ArmyMetricsAPI {
 		const metricEvent = await this.getArmyMetricEvent(visitorUUID, metricId);
 
 		if (!metricEvent || +now - +metricEvent.lastSeen > minAgeMs) {
-			await this.server.db.transaction(async (tx) => {
-				// prettier-ignore
-				await tx.query(`
-					UPDATE army_metrics
-						SET value = value + 1
-					WHERE id = ?
-				`, [metricId]);
+			await this.server.db.transaction().execute(async (tx) => {
+				await tx
+					.updateTable('army_metrics')
+					.where('id', '=', metricId)
+					.set((eb) => ({ value: eb('value', '+', 1) }))
+					.execute();
 
-				await tx.upsert('army_metric_events', [{ visitorUUID, armyMetricId: metricId, lastSeen: now }]);
+				const metricEvent = { visitorUUID, armyMetricId: metricId, lastSeen: now };
+				await helpers.upsert(tx, 'army_metric_events', metricEvent);
 			});
 		} else {
 			// Event is repeat or spam, ignore
@@ -158,35 +158,48 @@ export class ArmyMetricsAPI {
 	}
 
 	private async getArmyMetricId(armyId: number, metricName: string) {
-		const army = await this.server.db.query('SELECT id FROM armies WHERE id = ?', [armyId]);
-		if (!army.length) {
+		const army = await this.server.db.selectFrom('armies').where('id', '=', armyId).select('id').executeTakeFirst();
+		if (!army) {
 			throw new Error('Invalid army id');
 		}
-		const armyMetric = await this.server.db.getRow<ArmyMetric, null>('army_metrics', { armyId, name: metricName });
+		const armyMetric: ArmyMetric | undefined = await this.server.db
+			.selectFrom('army_metrics')
+			.where('armyId', '=', armyId)
+			.where('name', '=', metricName)
+			.selectAll()
+			.executeTakeFirst();
+
 		if (armyMetric) {
 			return armyMetric.id;
 		} else {
-			return this.server.db.insertOne('army_metrics', { armyId, name: metricName });
+			const insertResult = await this.server.db.insertInto('army_metrics').values({ armyId, name: metricName }).executeTakeFirst();
+			return Number(insertResult.insertId);
 		}
 	}
 
 	private async getArmyMetricEvent(visitorUUID: string, armyMetricId: number) {
-		return this.server.db.getRow<ArmyMetricEvent, null>('army_metric_events', { visitorUUID: visitorUUID, armyMetricId });
+		const metricEvent: ArmyMetricEvent | undefined = await this.server.db
+			.selectFrom('army_metric_events')
+			.where('visitorUUID', '=', visitorUUID)
+			.where('armyMetricId', '=', armyMetricId)
+			.selectAll()
+			.executeTakeFirst();
+		return metricEvent;
 	}
 
 	/**
 	 * Given all available metric types, return the maximum minAgeHours.
 	 */
 	private async getMetricTypesMaxAge() {
-		const result = await this.server.db.query<{ maxAgeHours: number }>(`
-			SELECT MAX(minAgeHours) as maxAgeHours
-			FROM metrics
-		`);
-		return result[0].maxAgeHours;
+		const { maxAgeHours } = await this.server.db
+			.selectFrom('metrics')
+			.select((eb) => eb.fn.max('minAgeHours').as('maxAgeHours'))
+			.executeTakeFirstOrThrow();
+		return maxAgeHours;
 	}
 
 	private async requireMetric(name: string) {
-		const metric = await this.server.db.getRow<Metric, null>('metrics', { name });
+		const metric: Metric | undefined = await this.server.db.selectFrom('metrics').where('name', '=', name).selectAll().executeTakeFirst();
 		if (!metric) {
 			throw new Error(`Invalid metric "${name}"`);
 		}

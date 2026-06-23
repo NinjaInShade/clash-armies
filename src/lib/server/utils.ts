@@ -167,18 +167,6 @@ export function getDisplayZodError(error: z.ZodError) {
 	return { form: formErrors, ...fieldErrors };
 }
 
-/**
- * Unfortunately we have to parse JSON field values ourself.
- * Related to the underlying mysql2 package not correctly handling this for MariaDB.
- * See https://github.com/sidorares/node-mysql2/issues/1287
- */
-export function parseDBJsonField(data: any) {
-	if (data === undefined) {
-		return undefined;
-	}
-	return JSON.parse(data);
-}
-
 export const KNOWN_BOT_UAS = [
 	// Search engine bots
 	'Googlebot',

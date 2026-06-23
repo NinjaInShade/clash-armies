@@ -1,6 +1,6 @@
 import crypto from 'node:crypto';
 import type { Session, User } from '$types';
-import { db } from '$server/db';
+import { db, helpers } from '$server/db';
 import { dev } from '$app/environment';
 
 // Various implementation functions for session based authentication, following lucia guide(s):
@@ -107,13 +107,16 @@ export async function createSession(userId: number): Promise<{ token: string; se
 
 	const token = `${id}.${secret}`;
 
-	await db.insertOne('sessions', {
-		id,
-		userId,
-		secretHash: Buffer.from(secretHash).toString('hex'),
-		lastVerifiedAt: now,
-		createdAt: now,
-	});
+	await db
+		.insertInto('sessions')
+		.values({
+			id,
+			userId,
+			secretHash: Buffer.from(secretHash).toString('hex'),
+			lastVerifiedAt: now,
+			createdAt: now,
+		})
+		.execute();
 
 	return { token, session: { id, userId, createdAt: now, lastVerifiedAt: now } };
 }
@@ -147,7 +150,7 @@ export async function validateSessionToken(token: string): Promise<Session | nul
 	// Slide the session forward once the recorded activity is stale enough.
 	if (now.getTime() - session.lastVerifiedAt.getTime() >= SESSION_ACTIVITY_CHECK_INTERVAL_SECONDS * 1000) {
 		session.lastVerifiedAt = now;
-		await db.query('UPDATE sessions SET lastVerifiedAt = ? WHERE id = ?', [now, sessionId]);
+		await db.updateTable('sessions').set({ lastVerifiedAt: now }).where('id', '=', sessionId).execute();
 	}
 
 	return { id: session.id, userId: session.userId, lastVerifiedAt: session.lastVerifiedAt, createdAt: session.createdAt };
@@ -160,7 +163,7 @@ export async function validateSessionToken(token: string): Promise<Session | nul
 async function getSession(sessionId: string): Promise<SessionRow | null> {
 	const now = Date.now();
 
-	const row = await db.getRow<SessionRow, null>('sessions', { id: sessionId });
+	const row = await db.selectFrom('sessions').where('id', '=', sessionId).selectAll().executeTakeFirst();
 	if (!row) {
 		return null;
 	}
@@ -185,11 +188,11 @@ async function getSession(sessionId: string): Promise<SessionRow | null> {
  * Resolves the user attributes exposed on `locals.user` for a validated session.
  */
 export async function getSessionUser(userId: number): Promise<SessionUser | null> {
-	const user = await db.getRow<User, null>('users', { id: userId });
+	const user = await db.selectFrom('users').where('id', '=', userId).selectAll().executeTakeFirst();
 	if (!user) {
 		return null;
 	}
-	const userRoles = await db.getRows<{ userId: number; role: string }>('user_roles', { userId: user.id });
+	const userRoles = await db.selectFrom('user_roles').where('userId', '=', user.id).selectAll().execute();
 	return {
 		id: user.id,
 		username: user.username,
@@ -199,16 +202,16 @@ export async function getSessionUser(userId: number): Promise<SessionUser | null
 }
 
 export async function invalidateSession(sessionId: string): Promise<void> {
-	await db.query('DELETE FROM sessions WHERE id = ?', [sessionId]);
+	await db.deleteFrom('sessions').where('id', '=', sessionId).execute();
 }
 
 export async function invalidateUserSessions(userId: number): Promise<void> {
-	await db.query('DELETE FROM sessions WHERE userId = ?', [userId]);
+	await db.deleteFrom('sessions').where('userId', '=', userId).execute();
 }
 
 export async function deleteExpiredSessions(): Promise<void> {
 	const cutoff = new Date(Date.now() - SESSION_INACTIVITY_TIMEOUT_SECONDS * 1000);
-	await db.query('DELETE FROM sessions WHERE lastVerifiedAt <= ?', [cutoff]);
+	await db.deleteFrom('sessions').where('lastVerifiedAt', '<=', cutoff).execute();
 }
 
 /**

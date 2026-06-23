@@ -44,8 +44,8 @@ beforeEach(async function () {
 
 describe('Saving', function () {
 	afterEach(async function () {
-		await server.db.delete('army_units');
-		await server.db.delete('armies');
+		await server.db.deleteFrom('army_units').execute();
+		await server.db.deleteFrom('armies').execute();
 	});
 
 	describe('New', function () {
@@ -270,9 +270,9 @@ describe('Saving', function () {
 			await server.army.saveArmy(req, data);
 
 			// Ensure no duplicates were entered into the db
-			const unitsCount = await server.db.getRows('army_units');
-			const equipmentCount = await server.db.getRows('army_equipment');
-			const petsCount = await server.db.getRows('army_pets');
+			const unitsCount = await server.db.selectFrom('army_units').selectAll().execute();
+			const equipmentCount = await server.db.selectFrom('army_equipment').selectAll().execute();
+			const petsCount = await server.db.selectFrom('army_pets').selectAll().execute();
 			assert.equal(unitsCount.length, 1);
 			assert.equal(equipmentCount.length, 1);
 			assert.equal(petsCount.length, 1);
@@ -354,8 +354,8 @@ describe('Saving', function () {
 
 describe('Fetching', function () {
 	afterEach(async function () {
-		await server.db.delete('army_units');
-		await server.db.delete('armies');
+		await server.db.deleteFrom('army_units').execute();
+		await server.db.deleteFrom('armies').execute();
 	});
 
 	it('Should not return duplicate entries for JSON fields', async function () {
@@ -547,12 +547,12 @@ describe('Army comments', function () {
 	});
 
 	afterAll(async function () {
-		await server.db.delete('army_units');
-		await server.db.delete('armies');
+		await server.db.deleteFrom('army_units').execute();
+		await server.db.deleteFrom('armies').execute();
 	});
 
 	afterEach(async function () {
-		await server.db.delete('army_comments');
+		await server.db.deleteFrom('army_comments').execute();
 	});
 
 	it('Should be able to create a comment', async function () {
@@ -562,7 +562,7 @@ describe('Army comments', function () {
 			replyTo: null,
 		};
 		const id = await server.army.saveComment(req, data);
-		const comment = await server.db.getRow('army_comments', { id });
+		const comment = await server.db.selectFrom('army_comments').where('id', '=', id).selectAll().executeTakeFirstOrThrow();
 		assert.include(comment, {
 			armyId,
 			comment: 'Test comment',
@@ -580,7 +580,7 @@ describe('Army comments', function () {
 		const id = await server.army.saveComment(req, data);
 		const newData = { ...data, id, comment: 'Test comment updated' };
 		await server.army.saveComment(req, newData);
-		const comment = await server.db.getRow('army_comments', { id });
+		const comment = await server.db.selectFrom('army_comments').where('id', '=', id).selectAll().executeTakeFirstOrThrow();
 		assert.include(comment, {
 			armyId,
 			comment: 'Test comment updated',
@@ -623,7 +623,7 @@ describe('Army comments', function () {
 			replyTo: id,
 		};
 		const replyId = await server.army.saveComment(req, replyingData);
-		const comment = await server.db.getRow('army_comments', { id: replyId });
+		const comment = await server.db.selectFrom('army_comments').where('id', '=', replyId).selectAll().executeTakeFirstOrThrow();
 		assert.include(comment, {
 			armyId,
 			comment: 'Replying',
@@ -647,13 +647,13 @@ describe('Army comments', function () {
 		} catch (err: any) {
 			assert.equal(err.body.message, "You don't have permission to do this warrior!");
 			// Assert comment was not changed
-			const comment = await server.db.getRow('army_comments', { id });
+			const comment = await server.db.selectFrom('army_comments').where('id', '=', id).selectAll().executeTakeFirstOrThrow();
 			assert.include(comment, { ...data, createdBy: reqUser.id });
 		}
 
 		// Admin should be able to save any comment
 		await server.army.saveComment(reqAdmin, { ...data, id, comment: 'Updated ' });
-		const comment = await server.db.getRow('army_comments', { id });
+		const comment = await server.db.selectFrom('army_comments').where('id', '=', id).selectAll().executeTakeFirstOrThrow();
 		assert.include(comment, { ...data, createdBy: reqUser.id, comment: 'Updated' });
 	});
 });
@@ -671,13 +671,13 @@ describe('Army notifications', function () {
 	});
 
 	afterAll(async function () {
-		await server.db.delete('army_units');
-		await server.db.delete('armies');
+		await server.db.deleteFrom('army_units').execute();
+		await server.db.deleteFrom('armies').execute();
 	});
 
 	afterEach(async function () {
-		await server.db.delete('army_comments');
-		await server.db.delete('army_notifications');
+		await server.db.deleteFrom('army_comments').execute();
+		await server.db.deleteFrom('army_notifications').execute();
 	});
 
 	describe('Comment', function () {

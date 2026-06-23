@@ -1,6 +1,6 @@
 import type { Server } from '$server/api/Server';
-import { parseDBJsonField } from '$server/utils';
 import { ArmyMetricsAPI } from '$server/api/ArmyMetricsAPI';
+import { helpers } from '$server/db';
 import type { RequestEvent } from '@sveltejs/kit';
 import { USER_MAX_ARMIES } from '$shared/utils';
 import { validateArmy, numberSchema, commentSchema } from '$shared/validation';
@@ -9,6 +9,7 @@ import { getExtensions } from '$shared/guideEditor';
 import { parseHTML } from 'zeed-dom';
 import { GuideModel } from '$models/Guide.svelte';
 import type { Army, ArmyComment } from '$models';
+import { sql } from 'kysely';
 
 type GetArmiesOptions = {
 	/** Returns the armies with these ID's */
@@ -71,140 +72,163 @@ export class ArmyAPI {
 	public async getArmies(req: RequestEvent, options: GetArmiesOptions = {}) {
 		const { ids, username, sort, townHall, hero, equipment, pet, unit } = options;
 		const userId = req.locals.user?.id ?? null;
+		const weights = await this.metrics.getMetricWeights();
 
-		const args: (number | number[] | string | null)[] = [userId, userId];
-		let query = `
-			SELECT
-				a.*,
-				am.score,
-				am.votes,
-				am.pageViews,
-				am.openLinkClicks,
-				am.copyLinkClicks,
-				u.username,
-				au.units,
-				ae.equipment,
-				ap.pets,
-				at.tags,
-				ac.comments,
-				IF(ag.id, JSON_OBJECT(
-					'id', ag.id,
-					'textContent', ag.textContent,
-					'youtubeUrl', ag.youtubeUrl
-				), NULL) as guide,
-				COALESCE(uv.vote, 0) AS userVote,
-				sa.id IS NOT NULL AS userBookmarked
-			FROM armies a
-			LEFT JOIN (
-				${await this.getArmyScoresQuery()}
-			) am ON am.armyId = a.id
-			LEFT JOIN users u ON u.id = a.createdBy
-			LEFT JOIN (
-				SELECT
-					a.id,
-					JSON_ARRAYAGG(JSON_OBJECT(
-						'id', au.id,
-						'home', au.home,
-						'unitId', au.unitId,
-						'amount', au.amount
-					)) AS units
-				FROM armies a
-				LEFT JOIN army_units au ON au.armyId = a.id
-				WHERE au.id IS NOT NULL
-				GROUP BY a.id
-			) au ON au.id = a.id
-			LEFT JOIN (
-				SELECT
-					a.id,
-					JSON_ARRAYAGG(JSON_OBJECT(
-						'id', ae.id,
-						'equipmentId', ae.equipmentId
-					)) AS equipment
-				FROM armies a
-				LEFT JOIN army_equipment ae ON ae.armyId = a.id
-				WHERE ae.id IS NOT NULL
-				GROUP BY a.id
-			) ae ON ae.id = a.id
-			LEFT JOIN (
-				SELECT
-					a.id,
-					JSON_ARRAYAGG(JSON_OBJECT(
-						'id', ap.id,
-						'hero', ap.hero,
-						'petId', ap.petId
-					)) AS pets
-				FROM armies a
-				LEFT JOIN army_pets ap ON ap.armyId = a.id
-				WHERE ap.id IS NOT NULL
-				GROUP BY a.id
-			) ap ON ap.id = a.id
-			LEFT JOIN (
-				SELECT
-					a.id,
-					JSON_ARRAYAGG(JSON_OBJECT(
-						'id', ac.id,
-						'armyId', ac.armyId,
-						'comment', ac.comment,
-						'replyTo', ac.replyTo,
-						'username', u.username,
-						'createdBy', ac.createdBy,
-						'createdTime', ac.createdTime,
-						'updatedTime', ac.updatedTime
-					)) AS comments
-				FROM armies a
-				LEFT JOIN army_comments ac ON ac.armyId = a.id
-				LEFT JOIN users u ON u.id = ac.createdBy
-				WHERE ac.id IS NOT NULL
-				GROUP BY a.id
-			) ac ON ac.id = a.id
-			LEFT JOIN (
-				SELECT armyId, JSON_ARRAYAGG(tag) AS tags
-				FROM army_tags
-				GROUP BY armyId
-			) at ON at.armyId = a.id
-			LEFT JOIN army_guides ag ON ag.armyId = a.id
-			LEFT JOIN army_votes uv ON uv.armyId = a.id AND uv.votedBy = ?
-			LEFT JOIN saved_armies sa ON sa.armyId = a.id AND sa.userId = ?
-			WHERE TRUE
-		`;
+		let query = this.server.db
+			.selectFrom('armies as a')
+			.leftJoin(
+				(eb) =>
+					eb
+						.selectFrom('armies as a')
+						.leftJoin(
+							(eb) =>
+								eb
+									.selectFrom('army_votes')
+									.select((eb) => ['armyId', eb.fn.coalesce(eb.fn.sum('vote'), sql.lit(0)).as('votes')])
+									.groupBy('armyId')
+									.as('av'),
+							(join) => join.onRef('av.armyId', '=', 'a.id')
+						)
+						.leftJoin('army_metrics as metric_pv', (join) => join.onRef('metric_pv.armyId', '=', 'a.id').on('metric_pv.name', '=', 'page-view'))
+						.leftJoin('army_metrics as metric_cl', (join) => join.onRef('metric_cl.armyId', '=', 'a.id').on('metric_cl.name', '=', 'copy-link-click'))
+						.leftJoin('army_metrics as metric_ol', (join) => join.onRef('metric_ol.armyId', '=', 'a.id').on('metric_ol.name', '=', 'open-link-click'))
+						.select((eb) => [
+							'a.id as armyId',
+							sql<number>`(
+								(COALESCE(av.votes, 0) * ${weights.vote}) +
+								(COALESCE(metric_pv.value, 0) * ${weights.pageView}) +
+								(COALESCE(metric_cl.value, 0) * ${weights.copyLinkClick}) +
+								(COALESCE(metric_ol.value, 0) * ${weights.openLinkClick})
+							)`.as('score'),
+							eb.fn.coalesce('av.votes', sql.lit(0)).as('votes'),
+							eb.fn.coalesce('metric_pv.value', sql.lit(0)).as('pageViews'),
+							eb.fn.coalesce('metric_ol.value', sql.lit(0)).as('openLinkClicks'),
+							eb.fn.coalesce('metric_cl.value', sql.lit(0)).as('copyLinkClicks'),
+						])
+						.as('am'),
+				(join) => join.onRef('am.armyId', '=', 'a.id')
+			)
+			.leftJoin(
+				(eb) =>
+					eb
+						.selectFrom('armies as a')
+						.leftJoin('army_units as au', 'au.armyId', 'a.id')
+						.where('au.id', 'is not', null)
+						.groupBy('a.id')
+						.select([
+							'a.id',
+							helpers
+								.jsonAggObj({
+									id: 'au.id',
+									home: 'au.home',
+									unitId: 'au.unitId',
+									amount: 'au.amount',
+								})
+								.as('units'),
+						])
+						.as('au'),
+				(join) => join.onRef('au.id', '=', 'a.id')
+			)
+			.leftJoin(
+				(eb) =>
+					eb
+						.selectFrom('armies as a')
+						.leftJoin('army_equipment as ae', 'ae.armyId', 'a.id')
+						.where('ae.id', 'is not', null)
+						.groupBy('a.id')
+						.select([
+							'a.id',
+							helpers
+								.jsonAggObj({
+									id: 'ae.id',
+									equipmentId: 'ae.equipmentId',
+								})
+								.as('equipment'),
+						])
+						.as('ae'),
+				(join) => join.onRef('ae.id', '=', 'a.id')
+			)
+			.leftJoin(
+				(eb) =>
+					eb
+						.selectFrom('armies as a')
+						.leftJoin('army_pets as ap', 'ap.armyId', 'a.id')
+						.where('ap.id', 'is not', null)
+						.groupBy('a.id')
+						.select([
+							'a.id',
+							helpers
+								.jsonAggObj({
+									id: 'ap.id',
+									hero: 'ap.hero',
+									petId: 'ap.petId',
+								})
+								.as('pets'),
+						])
+						.as('ap'),
+				(join) => join.onRef('ap.id', '=', 'a.id')
+			)
+			.leftJoin(
+				(eb) =>
+					eb
+						.selectFrom('armies as a')
+						.leftJoin('army_comments as ac', 'ac.armyId', 'a.id')
+						.leftJoin('users as u', 'u.id', 'ac.createdBy')
+						.where('ac.id', 'is not', null)
+						.groupBy('a.id')
+						.select([
+							'a.id',
+							helpers
+								.jsonAggObj({
+									id: 'ac.id',
+									armyId: 'ac.armyId',
+									comment: 'ac.comment',
+									replyTo: 'ac.replyTo',
+									username: 'u.username',
+									createdBy: 'ac.createdBy',
+									createdTime: 'ac.createdTime',
+									updatedTime: 'ac.updatedTime',
+								})
+								.as('comments'),
+						])
+						.as('ac'),
+				(join) => join.onRef('ac.id', '=', 'a.id')
+			)
+			.leftJoin(
+				(eb) =>
+					eb
+						.selectFrom('army_tags as art')
+						.groupBy('art.armyId')
+						.select(['art.armyId', helpers.jsonAgg('art.tag').as('tags')])
+						.as('art'),
+				(join) => join.onRef('art.armyId', '=', 'a.id')
+			)
+			.leftJoin('army_guides as ag', 'ag.armyId', 'a.id')
+			.leftJoin('army_votes as uv', (join) => join.onRef('uv.armyId', '=', 'a.id').on('uv.votedBy', '=', userId))
+			.leftJoin('saved_armies as sa', (join) => join.onRef('sa.armyId', '=', 'a.id').on('sa.userId', '=', userId))
+			.leftJoin('users as u', 'u.id', 'a.createdBy');
 
 		if (ids && ids.length) {
-			query += `
-				AND a.id IN (?)
-			`;
-			args.push(ids);
+			query = query.where('a.id', 'in', ids);
 		}
-
 		if (username) {
-			query += `
-				AND u.username = ?
-			`;
-			args.push(username);
+			query = query.where('u.username', '=', username);
 		}
-
 		if (townHall) {
-			query += `
-				AND a.townHall = ?
-			`;
-			args.push(townHall);
+			query = query.where('a.townHall', '=', townHall);
 		}
 
 		if (hero) {
-			query += `
-				AND (
-					a.id IN (
-						SELECT ae2.armyId FROM army_equipment ae2
-						INNER JOIN equipment eq2 ON eq2.id = ae2.equipmentId
-						WHERE eq2.hero = ?
-					)
-					OR a.id IN (
-						SELECT ap2.armyId FROM army_pets ap2
-						WHERE ap2.hero = ?
-					)
-				)
-			`;
-			args.push(hero);
-			args.push(hero);
+			query = query.where((eb) =>
+				eb.or([
+					eb(
+						'a.id',
+						'in',
+						eb.selectFrom('army_equipment as ae2').innerJoin('equipment as eq2', 'eq2.id', 'ae2.equipmentId').where('eq2.hero', '=', hero).select('ae2.armyId')
+					),
+					eb('a.id', 'in', eb.selectFrom('army_pets as ap2').where('ap2.hero', '=', hero).select('ap2.armyId')),
+				])
+			);
 		}
 
 		if (equipment) {
@@ -212,13 +236,7 @@ export class ArmyAPI {
 			if (!eqId) {
 				throw new Error(`Unknown equipment: "${equipment}"`);
 			}
-			query += `
-				AND a.id IN (
-					SELECT ae2.armyId FROM army_equipment ae2
-					WHERE ae2.equipmentId = ?
-				)
-			`;
-			args.push(eqId);
+			query = query.where('a.id', 'in', (eb) => eb.selectFrom('army_equipment as ae2').where('ae2.equipmentId', '=', eqId).select('ae2.armyId'));
 		}
 
 		if (pet) {
@@ -226,13 +244,7 @@ export class ArmyAPI {
 			if (!petId) {
 				throw new Error(`Unknown pet: "${pet}"`);
 			}
-			query += `
-				AND a.id IN (
-					SELECT ap2.armyId FROM army_pets ap2
-					WHERE ap2.petId = ?
-				)
-			`;
-			args.push(petId);
+			query = query.where('a.id', 'in', (eb) => eb.selectFrom('army_pets as ap2').where('ap2.petId', '=', petId).select('ap2.armyId'));
 		}
 
 		if (unit) {
@@ -240,94 +252,71 @@ export class ArmyAPI {
 			if (!unitId) {
 				throw new Error(`Unknown unit: "${unit}"`);
 			}
-			query += `
-				AND a.id IN (
-					SELECT au2.armyId FROM army_units au2
-					WHERE au2.unitId = ? AND au2.home = 'armyCamp'
-				)
-			`;
-			args.push(unitId);
+			query = query.where('a.id', 'in', (eb) =>
+				eb.selectFrom('army_units as au2').where('au2.unitId', '=', unitId).where('au2.home', '=', 'armyCamp').select('au2.armyId')
+			);
 		}
 
 		if (sort === 'score') {
-			query += `
-				ORDER BY score DESC, a.createdTime DESC
-			`;
+			query = query.orderBy('score', 'desc').orderBy('createdTime', 'desc');
 		} else {
-			query += `
-				ORDER BY a.createdTime DESC
-			`;
+			query = query.orderBy('createdTime', 'desc');
 		}
 
-		const armies = await this.server.db.query<Army>(query, args);
+		const armies = await query
+			.groupBy('a.id')
+			.selectAll('a')
+			.select((eb) => [
+				// TODO: should not have to CAST, needs investigating
+				sql<number>`CAST(am.score AS INTEGER)`.as('score'),
+				sql<number>`CAST(am.votes AS INTEGER)`.as('votes'),
+				sql<number>`CAST(am.pageViews AS INTEGER)`.as('pageViews'),
+				sql<number>`CAST(am.openLinkClicks AS INTEGER)`.as('openLinkClicks'),
+				sql<number>`CAST(am.copyLinkClicks AS INTEGER)`.as('copyLinkClicks'),
+				'u.username',
+				'au.units',
+				'ae.equipment',
+				'ap.pets',
+				'ac.comments',
+				'art.tags',
+				sql<Army['guide']>`IF(ag.id, JSON_OBJECT(
+					'id', ag.id,
+					'textContent', ag.textContent,
+					'youtubeUrl', ag.youtubeUrl
+				), NULL)`.as('guide'),
+				sql<boolean>`(sa.id IS NOT NULL)`.as('userBookmarked'),
+				eb.fn.coalesce('uv.vote', sql.lit(0)).as('userVote'),
+			])
+			.execute();
 
 		for (const army of armies) {
-			army.units = parseDBJsonField(army.units);
-			army.equipment = parseDBJsonField(army.equipment) ?? [];
-			army.pets = parseDBJsonField(army.pets) ?? [];
+			army.equipment ??= [];
+			army.pets ??= [];
+			army.tags ??= [];
+			army.comments ??= [];
 
-			if (army.guide) {
-				army.guide = parseDBJsonField(army.guide);
-			}
-
-			army.tags = parseDBJsonField(army.tags) ?? [];
-			army.comments = parseDBJsonField(army.comments) ?? [];
 			for (const comment of army.comments) {
 				// JSON agg objects lose date type casting
 				comment.createdTime = new Date(`${comment.createdTime}Z`);
 				comment.updatedTime = new Date(`${comment.updatedTime}Z`);
 			}
 
-			// TODO: should not have to do this, needs investigating
-			army.score = +army.score;
-			army.pageViews = +army.pageViews;
-			army.openLinkClicks = +army.openLinkClicks;
-			army.copyLinkClicks = +army.copyLinkClicks;
-			army.votes = +army.votes;
 			// @ts-expect-error data is 0/1 number when it's queried from the database // TODO: I think TINYINT(1) should just be returning a boolean?
-			army.userBookmarked = army.userBookmarked === 1 ? true : false;
+			army.userBookmarked = army.userBookmarked === 1;
 		}
 
 		return armies;
 	}
 
-	public async getArmyScoresQuery() {
-		const weights = await this.metrics.getMetricWeights();
-		return `
-			SELECT
-				a.id AS armyId,
-				(
-					(COALESCE(av.votes, 0) * ${weights.vote}) +
-					(COALESCE(metric_pv.value, 0) * ${weights.pageView}) +
-					(COALESCE(metric_cl.value, 0) * ${weights.copyLinkClick}) +
-					(COALESCE(metric_ol.value, 0) * ${weights.openLinkClick})
-				) AS score,
-				COALESCE(av.votes, 0) AS votes,
-				COALESCE(metric_pv.value, 0) AS pageViews,
-				COALESCE(metric_ol.value, 0) AS openLinkClicks,
-				COALESCE(metric_cl.value, 0) AS copyLinkClicks
-			FROM armies a
-			LEFT JOIN (
-				SELECT armyId, COALESCE(SUM(vote), 0) AS votes
-				FROM army_votes
-				GROUP BY armyId
-			) av ON av.armyId = a.id
-			LEFT JOIN army_metrics metric_pv ON metric_pv.armyId = a.id AND metric_pv.name = 'page-view'
-			LEFT JOIN army_metrics metric_cl ON metric_cl.armyId = a.id AND metric_cl.name = 'copy-link-click'
-			LEFT JOIN army_metrics metric_ol ON metric_ol.armyId = a.id AND metric_ol.name = 'open-link-click'
-		`;
-	}
-
 	public async getSavedArmies(req: RequestEvent, options: GetSavedArmiesOptions) {
 		const { username } = options;
 
-		// prettier-ignore
-		const savedArmyIds = await this.server.db.query<{ armyId: number }>(`
-			SELECT sa.armyId
-			FROM saved_armies sa
-			LEFT JOIN users u ON u.username = ?
-			WHERE sa.userId = u.id
-		`, [username]);
+		const savedArmyIds = await this.server.db
+			.selectFrom('saved_armies as sa')
+			.leftJoin('users as u', (join) => join.on('u.username', '=', username))
+			.whereRef('sa.userId', '=', 'u.id')
+			.select('sa.armyId')
+			.execute();
 		const savedArmyIdsArr = savedArmyIds.map((row) => row.armyId);
 
 		if (!savedArmyIdsArr.length) {
@@ -367,35 +356,50 @@ export class ArmyAPI {
 
 		if (!model.id) {
 			// Creating army
-			const userArmies = await this.server.db.getRows('armies', { createdBy: user.id });
+			const userArmies = await this.server.db.selectFrom('armies').where('createdBy', '=', user.id).selectAll().execute();
 			if (userArmies.length === USER_MAX_ARMIES) {
 				throw new Error(`Maximum armies reached (${USER_MAX_ARMIES}/${USER_MAX_ARMIES})`);
 			}
 
-			return this.server.db.transaction(async (tx) => {
-				const armyId = await tx.insertOne('armies', {
-					name: model.name,
-					townHall: model.townHall,
-					banner: model.banner,
-					createdBy: user.id,
-				});
+			return this.server.db.transaction().execute(async (tx) => {
+				const insertResult = await tx
+					.insertInto('armies')
+					.values({
+						name: model.name,
+						townHall: model.townHall,
+						banner: model.banner,
+						createdBy: user.id,
+					})
+					.executeTakeFirstOrThrow();
+				const armyId = Number(insertResult.insertId);
 
 				const armyUnits = allUnits.map((u) => ({ armyId, home: u.home, unitId: u.unitId, amount: u.amount }));
 				const armyEquipment = equipment.map((eq) => ({ armyId, equipmentId: eq.equipmentId }));
 				const armyPets = pets.map((p) => ({ armyId, petId: p.petId, hero: p.hero }));
 				const armyTags = tags.map((tag) => ({ armyId, tag }));
 
-				await tx.insertMany('army_units', armyUnits);
-				await tx.insertMany('army_equipment', armyEquipment);
-				await tx.insertMany('army_pets', armyPets);
-				await tx.insertMany('army_tags', armyTags);
+				if (armyUnits.length) {
+					await tx.insertInto('army_units').values(armyUnits).execute();
+				}
+				if (armyEquipment.length) {
+					await tx.insertInto('army_equipment').values(armyEquipment).execute();
+				}
+				if (armyPets.length) {
+					await tx.insertInto('army_pets').values(armyPets).execute();
+				}
+				if (armyTags.length) {
+					await tx.insertInto('army_tags').values(armyTags).execute();
+				}
 
 				if (guide) {
-					await tx.insertOne('army_guides', {
-						armyId,
-						textContent: guide.textContent,
-						youtubeUrl: guide.youtubeUrl,
-					});
+					await tx
+						.insertInto('army_guides')
+						.values({
+							armyId,
+							textContent: guide.textContent,
+							youtubeUrl: guide.youtubeUrl,
+						})
+						.execute();
 				}
 
 				return armyId;
@@ -404,7 +408,7 @@ export class ArmyAPI {
 
 		// Updating existing army
 		const armyId = numberSchema.parse(model.id);
-		const existing = await this.server.db.getRow<Army, null>('armies', { id: armyId });
+		const existing = await this.server.db.selectFrom('armies').where('id', '=', armyId).selectAll().executeTakeFirst();
 		if (!existing) {
 			throw new Error("This army doesn't exist");
 		}
@@ -416,39 +420,39 @@ export class ArmyAPI {
 			req.locals.requireRoles('admin');
 		}
 
-		return this.server.db.transaction(async (tx) => {
-			const armyUnits = allUnits.map((u) => ({ id: u.id ?? null, armyId, home: u.home, unitId: u.unitId, amount: u.amount }));
-			const armyEquipment = equipment.map((eq) => ({ id: eq.id ?? null, armyId, equipmentId: eq.equipmentId }));
-			const armyPets = pets.map((p) => ({ id: p.id ?? null, armyId, petId: p.petId, hero: p.hero }));
+		return this.server.db.transaction().execute(async (tx) => {
+			const armyUnits = allUnits.map((u) => ({ id: u.id, armyId, home: u.home, unitId: u.unitId, amount: u.amount }));
+			const armyEquipment = equipment.map((eq) => ({ id: eq.id, armyId, equipmentId: eq.equipmentId }));
+			const armyPets = pets.map((p) => ({ id: p.id, armyId, petId: p.petId, hero: p.hero }));
 			const armyTags = tags.map((tag) => ({ armyId, tag }));
 
-			// Update army
-			const updateQuery = `
-					UPDATE armies SET
-						name = ?,
-						townHall = ?,
-						banner = ?
-					WHERE id = ?
-			`;
-			await tx.query(updateQuery, [model.name, model.townHall, model.banner, armyId]);
+			await tx.updateTable('armies').where('id', '=', armyId).set({ name: model.name, townHall: model.townHall, banner: model.banner }).execute();
 
-			await tx.delete('army_units', { armyId });
-			await tx.insertMany('army_units', armyUnits);
+			await tx.deleteFrom('army_units').where('armyId', '=', armyId).execute();
+			if (armyUnits.length) {
+				await tx.insertInto('army_units').values(armyUnits).execute();
+			}
 
-			await tx.delete('army_equipment', { armyId });
-			await tx.insertMany('army_equipment', armyEquipment);
+			await tx.deleteFrom('army_equipment').where('armyId', '=', armyId).execute();
+			if (armyEquipment.length) {
+				await tx.insertInto('army_equipment').values(armyEquipment).execute();
+			}
 
-			await tx.delete('army_pets', { armyId });
-			await tx.insertMany('army_pets', armyPets);
+			await tx.deleteFrom('army_pets').where('armyId', '=', armyId).execute();
+			if (armyPets.length) {
+				await tx.insertInto('army_pets').values(armyPets).execute();
+			}
 
-			await tx.delete('army_tags', { armyId });
-			await tx.insertMany('army_tags', armyTags);
+			await tx.deleteFrom('army_tags').where('armyId', '=', armyId).execute();
+			if (armyTags.length) {
+				await tx.insertInto('army_tags').values(armyTags).execute();
+			}
 
 			if (guide) {
-				const guideData = [{ id: guide.id ?? null, armyId, textContent: guide.textContent, youtubeUrl: guide.youtubeUrl }];
-				await tx.upsert('army_guides', guideData);
+				const guideData = { id: guide.id, armyId, textContent: guide.textContent, youtubeUrl: guide.youtubeUrl };
+				await helpers.upsert(tx, 'army_guides', guideData);
 			} else {
-				await tx.delete('army_guides', { armyId });
+				await tx.deleteFrom('army_guides').where('armyId', '=', armyId).execute();
 			}
 
 			return armyId;
@@ -458,7 +462,7 @@ export class ArmyAPI {
 	public async deleteArmy(req: RequestEvent, armyId: number) {
 		const user = req.locals.requireAuth();
 
-		const existing = await this.server.db.getRow<Army, null>('armies', { id: armyId });
+		const existing = await this.server.db.selectFrom('armies').where('id', '=', armyId).selectAll().executeTakeFirst();
 		if (!existing) {
 			throw new Error("This army doesn't exist");
 		}
@@ -470,7 +474,7 @@ export class ArmyAPI {
 			req.locals.requireRoles('admin');
 		}
 
-		await this.server.db.query('DELETE FROM armies WHERE id = ?', [armyId]);
+		await this.server.db.deleteFrom('armies').where('id', '=', armyId).execute();
 	}
 
 	public async saveComment(req: RequestEvent, data: unknown) {
@@ -484,35 +488,48 @@ export class ArmyAPI {
 
 		if (!comment.id) {
 			// Creating new comment
-			return this.server.db.transaction(async (tx) => {
-				const commentId = await tx.insertOne('army_comments', {
-					armyId: comment.armyId,
-					comment: comment.comment,
-					replyTo: comment.replyTo,
-					createdBy: user.id,
-				});
+			return this.server.db.transaction().execute(async (tx) => {
+				const insertResult = await tx
+					.insertInto('army_comments')
+					.values({
+						armyId: comment.armyId,
+						comment: comment.comment,
+						replyTo: comment.replyTo,
+						createdBy: user.id,
+					})
+					.executeTakeFirst();
+				const commentId = Number(insertResult.insertId);
 				const notification = {
 					armyId: army.id,
 					triggeringUserId: user.id,
 					commentId,
 				};
 				if (comment.replyTo) {
-					const parentComment = await tx.getRow<ArmyComment, null>('army_comments', { id: comment.replyTo });
+					const parentComment = await tx.selectFrom('army_comments').where('id', '=', comment.replyTo).selectAll().executeTakeFirst();
 					if (!parentComment) {
 						throw new Error('Parent comment does not exist');
 					}
 					if (parentComment.createdBy !== user.id) {
 						// Notify the person to which this comment is replying to (but not if replying to yourself)
-						await tx.insertOne('army_notifications', { ...notification, type: 'comment-reply', recipientId: parentComment.createdBy });
+						await tx
+							.insertInto('army_notifications')
+							.values({ ...notification, type: 'comment-reply', recipientId: parentComment.createdBy })
+							.execute();
 					}
 					if (parentComment.createdBy !== army.createdBy && user.id !== army.createdBy) {
 						// Notify the army creator someone commented if the reply wasn't already to the creator
-						await tx.insertOne('army_notifications', { ...notification, type: 'comment', recipientId: army.createdBy });
+						await tx
+							.insertInto('army_notifications')
+							.values({ ...notification, type: 'comment', recipientId: army.createdBy })
+							.execute();
 					}
 				} else {
 					if (user.id !== army.createdBy) {
 						// Notify the army creator someone commented
-						await tx.insertOne('army_notifications', { ...notification, type: 'comment', recipientId: army.createdBy });
+						await tx
+							.insertInto('army_notifications')
+							.values({ ...notification, type: 'comment', recipientId: army.createdBy })
+							.execute();
 					}
 				}
 				return commentId;
@@ -520,7 +537,7 @@ export class ArmyAPI {
 		}
 
 		const commentId = numberSchema.parse(comment.id);
-		const existing = await this.server.db.getRow<ArmyComment, null>('army_comments', { id: commentId });
+		const existing = await this.server.db.selectFrom('army_comments').where('id', '=', commentId).selectAll().executeTakeFirst();
 		if (!existing) {
 			throw new Error("This comment doesn't exist");
 		}
@@ -536,22 +553,17 @@ export class ArmyAPI {
 			throw new Error('Moving comments is not allowed');
 		}
 
-		return this.server.db.transaction(async (tx) => {
-			// prettier-ignore
-			await tx.query(`
-				UPDATE army_comments SET
-					comment = ?
-				WHERE id = ?
-			`, [comment.comment, commentId]);
-
-			return commentId;
+		await this.server.db.transaction().execute(async (tx) => {
+			await tx.updateTable('army_comments').where('id', '=', commentId).set({ comment: comment.comment }).execute();
 		});
+
+		return commentId;
 	}
 
 	public async deleteComment(req: RequestEvent, commentId: number) {
 		const user = req.locals.requireAuth();
 
-		const existing = await this.server.db.getRow<ArmyComment, null>('army_comments', { id: commentId });
+		const existing = await this.server.db.selectFrom('army_comments').where('id', '=', commentId).selectAll().executeTakeFirst();
 		if (!existing) {
 			throw new Error("This comment doesn't exist");
 		}
@@ -563,7 +575,7 @@ export class ArmyAPI {
 			req.locals.requireRoles('admin');
 		}
 
-		await this.server.db.delete('army_comments', { id: commentId });
+		await this.server.db.deleteFrom('army_comments').where('id', '=', commentId).execute();
 	}
 
 	public async bookmark(req: RequestEvent, armyId: number) {
@@ -574,13 +586,12 @@ export class ArmyAPI {
 			throw new Error('Could not find army');
 		}
 
-		await this.server.db.insertOne('saved_armies', { armyId, userId: user.id });
+		await this.server.db.insertInto('saved_armies').values({ armyId, userId: user.id }).execute();
 	}
 
 	public async removeBookmark(req: RequestEvent, armyId: number) {
 		const user = req.locals.requireAuth();
-
-		await this.server.db.query('DELETE FROM saved_armies WHERE armyId = ? AND userId = ?', [armyId, user.id]);
+		await this.server.db.deleteFrom('saved_armies').where('armyId', '=', armyId).where('userId', '=', user.id).execute();
 	}
 
 	public async saveVote(req: RequestEvent, options: SaveVoteOptions) {
@@ -598,9 +609,9 @@ export class ArmyAPI {
 		}
 
 		if (vote === 0) {
-			await this.server.db.query('DELETE FROM army_votes WHERE votedBy = ?', [user.id]);
+			await this.server.db.deleteFrom('army_votes').where('votedBy', '=', user.id).execute();
 		} else {
-			await this.server.db.upsert('army_votes', [{ armyId, votedBy: user.id, vote }]);
+			await helpers.upsert(this.server.db, 'army_votes', { armyId, votedBy: user.id, vote });
 		}
 	}
 }

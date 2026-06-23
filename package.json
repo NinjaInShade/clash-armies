@@ -11,6 +11,7 @@
 		"production": "vite preview",
 		"build": "vite build",
 		"build:dev-image": "docker build -t clash-armies:devel .",
+		"build:db-types": "scripts/build-db-types.sh",
 		"test:before": "docker compose --env-file=.env.test --file=compose.test.yaml down -v && docker compose --env-file=.env.test --file=compose.test.yaml up -d",
 		"test:coverage": "pnpm run test:before && vitest run --coverage",
 		"test:ui": "pnpm run test:before && vitest --ui --coverage.enabled=true",
@@ -47,11 +48,11 @@
 		"typescript": "^6.0.3",
 		"typescript-eslint": "^8.60.1",
 		"vite": "^8.0.16",
-		"vitest": "^4.1.8"
+		"vitest": "^4.1.8",
+		"kysely-codegen": "^0.20.0"
 	},
 	"dependencies": {
 		"@floating-ui/dom": "^1.7.4",
-		"@ninjalib/sql": "^0.5.1",
 		"@tiptap/core": "^3.26.0",
 		"@tiptap/extension-bold": "^3.26.0",
 		"@tiptap/extension-character-count": "^3.26.0",
@@ -77,6 +78,8 @@
 		"date-fns": "4.4.0",
 		"json5": "^2.2.3",
 		"uuid": "^14.0.0",
+		"kysely": "^0.29.2",
+		"mysql2": "^3.22.5",
 		"cookie-signature": "1.2.2",
 		"zod": "4.4.3"
 	}

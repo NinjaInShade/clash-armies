@@ -1,4 +1,4 @@
-import type { MigrationFn } from '@ninjalib/sql';
+import type { MigrationFn } from '$server/migration/migrator';
 
 // prettier-ignore
 export default function migration(runStep: MigrationFn) {

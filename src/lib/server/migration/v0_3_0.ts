@@ -1,17 +1,17 @@
-import type { MySQL, MigrationFn } from '@ninjalib/sql';
+import type { MigrationFn } from '$server/migration/migrator';
+import type { Database } from '$server/db';
+import { sql } from 'kysely';
 
 // prettier-ignore
 export default function migration(runStep: MigrationFn) {
     runStep(29, async () => { /* Historical artifact - see 768be65 */ });
     runStep(30, async () => { /* Historical artifact - see 768be65 */ });
     runStep(31, async () => { /* Historical artifact - see 768be65 */ });
-    runStep(32, async (db: MySQL) => {
-        // NOTE: more queries were in this step previously - historical artifact - see 768be65
-        await db.query(`
-            ALTER TABLE town_halls
-            ADD COLUMN maxMinionPrince SMALLINT DEFAULT NULL AFTER maxRoyalChampion
-        `, []);
-    });
+    // NOTE: more queries were in this step previously - historical artifact - see 768be65
+    runStep(32, `
+        ALTER TABLE town_halls
+        ADD COLUMN maxMinionPrince SMALLINT DEFAULT NULL AFTER maxRoyalChampion
+    `);
     runStep(33, `
         ALTER TABLE users
         ADD COLUMN googleEmail VARCHAR(255) DEFAULT NULL AFTER googleId
@@ -32,27 +32,29 @@ export default function migration(runStep: MigrationFn) {
             CONSTRAINT fk_army_notifications_comment_id FOREIGN KEY (commentId) REFERENCES army_comments (id) ON DELETE CASCADE
         )
     `);
-    runStep(35, async (db: MySQL) => {
+    runStep(35, async (db: Database) => {
         // Back-insert notifications for already existing comments before army notifications were implemented
-        const comments = await db.query(`
-            SELECT
-                ac.id,
-                ac.armyId,
-                ac.replyTo,
-                ac.createdTime,
-                ac.createdBy,
-                pc.createdBy as parentCreatedBy,
-                ca.createdBy as armyCreatedBy
-            FROM army_comments ac
-            LEFT JOIN (
-                SELECT id, createdBy
-                FROM army_comments
-            ) pc ON pc.id = ac.replyTo
-            LEFT JOIN (
-                SELECT id, createdBy
-                FROM armies
-            ) ca ON ca.id = ac.armyId
-        `, []);
+        const { rows: comments } = await sql<{
+            id: number;
+            armyId: number;
+            replyTo: number | null;
+            createdTime: Date;
+            createdBy: number;
+            parentCreatedBy: number | null;
+            armyCreatedBy: number;
+        }>`
+    		SELECT
+    			ac.id,
+    			ac.armyId,
+    			ac.replyTo,
+    			ac.createdTime,
+    			ac.createdBy,
+    			pc.createdBy AS parentCreatedBy,
+    			ca.createdBy AS armyCreatedBy
+    		FROM army_comments ac
+    		LEFT JOIN (SELECT id, createdBy FROM army_comments) pc ON pc.id = ac.replyTo
+    		LEFT JOIN (SELECT id, createdBy FROM armies) ca ON ca.id = ac.armyId
+    	`.execute(db);
 
         const notifications: Record<string, unknown>[] = [];
 
@@ -81,22 +83,22 @@ export default function migration(runStep: MigrationFn) {
         }
 
         if (notifications.length) {
-            await db.insertMany('army_notifications', notifications)
+            await db.insertInto('army_notifications').values(notifications).execute();
         }
     });
     runStep(36, `
         ALTER TABLE units
         DROP COLUMN trainingTime
     `);
-    runStep(37, async (db: MySQL) => {
+    runStep(37, async (db: Database) => {
         // NOTE: more queries were in this step previously - historical artifact - see 768be65
         // Standardize "ObjectIds" to be called "clashId".
-        await db.query(`
+        await sql`
             ALTER TABLE units
             RENAME COLUMN objectId TO clashId
-        `);
-        await db.query('ALTER TABLE pets ADD COLUMN clashId INT UNSIGNED NOT NULL AFTER name');
-        await db.query('ALTER TABLE equipment ADD COLUMN clashId INT UNSIGNED NOT NULL AFTER name');
+        `.execute(db);
+        await sql`ALTER TABLE pets ADD COLUMN clashId INT UNSIGNED NOT NULL AFTER name`.execute(db);
+        await sql`ALTER TABLE equipment ADD COLUMN clashId INT UNSIGNED NOT NULL AFTER name`.execute(db);
     });
     runStep(38, async () => { /* Historical artifact - see 768be65 */ });
     runStep(39, async () => { /* Historical artifact - see 768be65 */ });

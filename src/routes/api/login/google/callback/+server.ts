@@ -1,6 +1,5 @@
 import type { RequestEvent } from '@sveltejs/kit';
 import { OAuth2RequestError } from 'arctic';
-import type { User } from '$types';
 import { createSession, SESSION_COOKIE_NAME, getSessionCookieAttributes } from '$server/auth/session';
 import { google } from '$server/auth/oauth';
 import { db } from '$server/db';
@@ -53,18 +52,13 @@ export async function GET(req: RequestEvent): Promise<Response> {
 		});
 		const googleUser: GoogleUser = await response.json();
 		const googleId = googleUser.sub;
-		const googleEmail = googleUser.email;
+		const googleEmail = googleUser.email ?? null;
 
-		const existingUser = await db.getRow<User>('users', { googleId });
+		const existingUser = await db.selectFrom('users').where('googleId', '=', googleId).selectAll().executeTakeFirst();
 		if (existingUser) {
 			if (googleEmail) {
-				await db.transaction(async (tx) => {
-					// prettier-ignore
-					await tx.query(`
-                        UPDATE users
-                        SET googleEmail = ?
-                        WHERE id = ?
-                    `, [googleUser.email ?? null, existingUser.id])
+				await db.transaction().execute(async (tx) => {
+					await tx.updateTable('users').set({ googleEmail }).where('id', '=', existingUser.id).execute();
 				});
 			}
 			const { token } = await createSession(existingUser.id);
@@ -76,22 +70,20 @@ export async function GET(req: RequestEvent): Promise<Response> {
 				},
 			});
 		} else {
-			// default username, user will be able to change this after (TODO: in the future allow user to set username on creation)
-			const maxId = (await db.query<{ maxId: number }>('SELECT MAX(id) AS maxId FROM users'))[0].maxId;
-			const username = `Warrior-${maxId + 1}`;
+			const { userId, username } = await db.transaction().execute(async (tx) => {
+				// default username, user will be able to change this after (TODO: in the future allow user to set username on creation)
+				const maxIdResult = await db
+					.selectFrom('users')
+					.select((eb) => eb.fn.max('id').as('maxId'))
+					.executeTakeFirst();
+				const maxId = maxIdResult?.maxId ?? 0;
+				const username = `Warrior-${maxId + 1}`;
 
-			let userId: number | null = null;
-			await db.transaction(async (tx) => {
-				userId = await tx.insertOne('users', {
-					username,
-					googleId,
-					googleEmail,
-				});
-				await tx.insertOne('user_roles', { userId, role: 'user' });
+				const userResult = await tx.insertInto('users').values({ username, googleId, googleEmail }).executeTakeFirst();
+				const userId = Number(userResult.insertId);
+				await tx.insertInto('user_roles').values({ userId, role: 'user' }).execute();
+				return { userId, username };
 			});
-			if (!userId) {
-				throw new Error('Expected user id');
-			}
 
 			const { token } = await createSession(userId);
 			req.cookies.set(SESSION_COOKIE_NAME, token, getSessionCookieAttributes());

@@ -1,6 +1,7 @@
-import type { MySQL } from '@ninjalib/sql';
 import type { RequestEvent } from '@sveltejs/kit';
 import { logger, type Logger } from '$server/logger';
+import { waitForDatabase, type Database } from '$server/db';
+import { migrate } from '$server/migration/migrator';
 import { migration } from '$server/migration';
 import { GameData, type GameDataSettings } from '$server/game-data/GameData';
 import { ArmyAPI } from '$server/api/ArmyAPI';
@@ -27,7 +28,7 @@ type GetSafeRedirectOptions = {
  * Currently doesn't handle any of the request cycle, but up for consideration (could help with testing).
  */
 export class Server {
-	public db: MySQL;
+	public db: Database;
 	public log: Logger;
 
 	public army: ArmyAPI;
@@ -39,7 +40,7 @@ export class Server {
 
 	private settings: ServerSettings;
 
-	constructor(db: MySQL, settings: ServerSettings = {}) {
+	constructor(db: Database, settings: ServerSettings = {}) {
 		this.db = db;
 		this.settings = settings;
 		this.log = logger('clash-armies:server');
@@ -56,8 +57,9 @@ export class Server {
 	}
 
 	public async init() {
-		await this.db.connect();
-		await this.db.migrate(migration);
+		await waitForDatabase(this.db);
+		await migrate(migration, this.db);
+
 		await this.gameData.sync();
 		await this.gameData.loadData();
 
@@ -78,7 +80,7 @@ export class Server {
 		await this.army.dispose();
 
 		this.hourlyTaskJob.stop();
-		await this.db.dispose();
+		await this.db.destroy();
 
 		const duration = Date.now() - start;
 		this.log.info(`Server disposed in ${duration}ms ${reason ? `[${reason}]` : ''}`);

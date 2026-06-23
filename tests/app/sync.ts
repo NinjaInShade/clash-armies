@@ -46,9 +46,9 @@ describe('Game data sync', function () {
 			'town_hall_heroes_max',
 			'town_halls',
 			'heroes',
-		];
+		] as const;
 		for (const tbl of deleteTables) {
-			await server.db.delete(tbl);
+			await server.db.deleteFrom(tbl).execute();
 		}
 	}
 
@@ -74,7 +74,7 @@ describe('Game data sync', function () {
 
 	describe('Heroes sync', function () {
 		async function assertHeroes(expected: unknown[]) {
-			const data = await server.db.getRows('heroes');
+			const data = await server.db.selectFrom('heroes').selectAll().execute();
 			assert.sameDeepMembers(data, expected);
 		}
 
@@ -126,12 +126,12 @@ describe('Game data sync', function () {
 
 	describe('Town halls sync', function () {
 		async function assertTownHalls(expected: unknown[]) {
-			const data = await server.db.getRows('town_halls');
+			const data = await server.db.selectFrom('town_halls').selectAll().execute();
 			assert.sameDeepMembers(data, expected);
 		}
 
 		async function assertTownHallHeroRows(expected: unknown[]) {
-			const data = await server.db.getRows('town_hall_heroes_max');
+			const data = await server.db.selectFrom('town_hall_heroes_max').selectAll().execute();
 			assert.sameDeepMembers(data, expected);
 		}
 
@@ -368,17 +368,19 @@ describe('Game data sync', function () {
 
 	describe('Units sync', function () {
 		async function assertUnits(expected: unknown[], unitType: UnitType) {
-			const data = await server.db.getRows('units', { type: unitType });
+			const data = await server.db.selectFrom('units').where('type', '=', unitType).selectAll().execute();
 			assert.sameDeepMembers(omitKeys(data, ['id']), expected);
 		}
 
 		async function assertUnitLevels(expected: unknown[], unitType: UnitType) {
-			const data = await server.db.query(`
-                SELECT u.name AS unitName, ul.*
-                FROM unit_levels ul
-                JOIN units u ON u.id = ul.unitId AND u.type = '${unitType}'
-                ORDER BY u.order, ul.level
-            `);
+			const data = await server.db
+				.selectFrom('unit_levels as ul')
+				.innerJoin('units as u', (join) => join.onRef('u.id', '=', 'ul.unitId').on('u.type', '=', unitType))
+				.select('u.name as unitName')
+				.selectAll('ul')
+				.orderBy('u.order')
+				.orderBy('ul.level')
+				.execute();
 			assert.sameDeepMembers(omitKeys(data, ['id', 'unitId']), expected);
 		}
 
@@ -720,17 +722,19 @@ describe('Game data sync', function () {
 
 	describe('Pets sync', function () {
 		async function assertPets(expected: unknown[]) {
-			const data = await server.db.getRows('pets');
+			const data = await server.db.selectFrom('pets').selectAll().execute();
 			assert.sameDeepMembers(omitKeys(data, ['id']), expected);
 		}
 
 		async function assertPetLevels(expected: unknown[]) {
-			const data = await server.db.query(`
-                SELECT p.name AS petName, pl.*
-                FROM pet_levels pl
-                JOIN pets p ON p.id = pl.petId
-                ORDER BY p.order, pl.level
-            `);
+			const data = await server.db
+				.selectFrom('pet_levels as pl')
+				.innerJoin('pets as p', 'p.id', 'pl.petId')
+				.select('p.name as petName')
+				.selectAll('pl')
+				.orderBy('p.order')
+				.orderBy('pl.level')
+				.execute();
 			assert.sameDeepMembers(omitKeys(data, ['id', 'petId']), expected);
 		}
 
@@ -848,17 +852,19 @@ describe('Game data sync', function () {
 
 	describe('Equipment sync', function () {
 		async function assertEq(expected: unknown[]) {
-			const data = await server.db.getRows('equipment');
+			const data = await server.db.selectFrom('equipment').selectAll().execute();
 			assert.sameDeepMembers(omitKeys(data, ['id']), expected);
 		}
 
 		async function assertEqLevels(expected: unknown[]) {
-			const data = await server.db.query(`
-                SELECT eq.name AS eqName, eql.*
-                FROM equipment_levels eql
-                JOIN equipment eq ON eq.id = eql.equipmentId
-                ORDER BY eq.order, eql.level
-            `);
+			const data = await server.db
+				.selectFrom('equipment_levels as eql')
+				.innerJoin('equipment as eq', 'eq.id', 'eql.equipmentId')
+				.select('eq.name as eqName')
+				.selectAll('eql')
+				.orderBy('eq.order')
+				.orderBy('eql.level')
+				.execute();
 			assert.sameDeepMembers(omitKeys(data, ['id', 'equipmentId']), expected);
 		}
 

@@ -1,18 +1,20 @@
-import type { MySQL, MigrationFn } from '@ninjalib/sql';
+import type { MigrationFn } from '$server/migration/migrator';
+import type { Database } from '$server/db';
+import { sql } from 'kysely';
 
 // prettier-ignore
 export default function migration(runStep: MigrationFn) {
-    runStep(73, async (db: MySQL) => {
+    runStep(73, async (db: Database) => {
         // As part of the move away from using lucia as an npm package and moving to
         // their new, secure, recommended API, all sessions need to be invalidated:
-        await db.delete('sessions');
+        await db.deleteFrom('sessions').execute();
         // The new secure API also changes the schema of sessions slightly as well.
-        await db.query(`
+        await sql`
             ALTER TABLE sessions
             DROP COLUMN expiresAt,
             ADD COLUMN secretHash VARCHAR(64) NOT NULL,
             ADD COLUMN lastVerifiedAt TIMESTAMP NOT NULL DEFAULT NOW(),
             ADD COLUMN createdAt TIMESTAMP NOT NULL DEFAULT NOW()
-        `);
+        `.execute(db);
     });
 }

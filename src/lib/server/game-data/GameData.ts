@@ -1,14 +1,13 @@
 import { logger, type Logger } from '$server/logger';
-import type { MySQL } from '@ninjalib/sql';
 import type { Server } from '$server/api/Server';
 import type { Unit, Equipment, Pet, TownHall, StaticGameData, Hero, UnitType } from '$types';
 import { GameDataSchema, type GameData as GameDataType, type GameDataUnit } from './schema';
-import { parseDBJsonField } from '$server/utils';
 import { encodeUnitName } from '$shared/utils';
 import JSON5 from 'json5';
 import path from 'node:path';
 import fsp from 'node:fs/promises';
 import { createHash } from 'node:crypto';
+import { helpers, type Database } from '$server/db';
 
 export type GameDataSettings = {
 	/**
@@ -115,7 +114,7 @@ export class GameData {
 		const gameDataContent = await fsp.readFile(this.gameDataPath, 'utf8');
 		const hash = createHash('sha256').update(gameDataContent).digest('hex');
 
-		const existing = await db.getRow<{ hash: string }>('game_data_sync', { id: 1 });
+		const existing = await db.selectFrom('game_data_sync').selectAll().executeTakeFirst();
 		if (existing?.hash === hash) {
 			this.log.info('Game data unchanged, skipping sync');
 			return;
@@ -127,7 +126,7 @@ export class GameData {
 		const raw = JSON5.parse(gameDataContent);
 		const data = GameDataSchema.parse(raw);
 
-		await db.transaction(async (tx) => {
+		await db.transaction().execute(async (tx) => {
 			await this.syncHeroes(tx, data);
 			await this.syncTownHalls(tx, data);
 			await this.syncUnits(tx, 'Troop', data.troops);
@@ -135,7 +134,7 @@ export class GameData {
 			await this.syncUnits(tx, 'Siege', data.sieges);
 			await this.syncPets(tx, data);
 			await this.syncEquipment(tx, data);
-			await tx.upsert('game_data_sync', [{ id: 1, hash }]);
+			await helpers.upsert(tx, 'game_data_sync', [{ id: 1, hash }]);
 		});
 
 		const t1 = performance.now();
@@ -186,14 +185,14 @@ export class GameData {
 		}
 	}
 
-	private async syncHeroes(db: MySQL, data: GameDataType) {
+	private async syncHeroes(db: Database, data: GameDataType) {
 		const heroRows = data.heroes.map((h, idx) => {
 			return { name: h.name, clashId: h.clashId, order: idx };
 		});
-		await db.upsert('heroes', heroRows);
+		await helpers.upsert(db, 'heroes', heroRows);
 	}
 
-	private async syncTownHalls(db: MySQL, data: GameDataType) {
+	private async syncTownHalls(db: Database, data: GameDataType) {
 		const thRows = data.townHalls.map((th) => {
 			return {
 				level: th.level,
@@ -215,7 +214,7 @@ export class GameData {
 				ccSiegeCapacity: th.ccSiegeCapacity,
 			};
 		});
-		await db.upsert('town_halls', thRows);
+		await helpers.upsert(db, 'town_halls', thRows);
 
 		// Heroes moving between town hall levels is the most likely balance change to occur.
 		// We delete+re-insert (cost of this is negligable) to allow deletions to this part of the game data.
@@ -227,11 +226,13 @@ export class GameData {
 				return { townHall: th.level, heroName: h.hero, maxLevel: h.maxLevel };
 			});
 		});
-		await db.query('DELETE FROM town_hall_heroes_max');
-		await db.insertMany('town_hall_heroes_max', heroMaxRows);
+		await db.deleteFrom('town_hall_heroes_max').execute();
+		if (heroMaxRows.length) {
+			await db.insertInto('town_hall_heroes_max').values(heroMaxRows).execute();
+		}
 	}
 
-	private async syncUnits(db: MySQL, type: 'Troop' | 'Spell' | 'Siege', units: GameDataUnit[]) {
+	private async syncUnits(db: Database, type: 'Troop' | 'Spell' | 'Siege', units: GameDataUnit[]) {
 		const unitRows = units.map((u, idx) => {
 			return {
 				type,
@@ -247,9 +248,9 @@ export class GameData {
 				order: idx,
 			};
 		});
-		await db.upsert('units', unitRows);
+		await helpers.upsert(db, 'units', unitRows);
 
-		const idRows = await db.getRows('units', { type });
+		const idRows = await db.selectFrom('units').where('type', '=', type).selectAll().execute();
 		const idByName = new Map(idRows.map((r) => [r.name, r.id]));
 
 		const levelRows = units.flatMap((u) => {
@@ -266,16 +267,16 @@ export class GameData {
 				};
 			});
 		});
-		await db.upsert('unit_levels', levelRows);
+		await helpers.upsert(db, 'unit_levels', levelRows);
 	}
 
-	private async syncPets(db: MySQL, data: GameDataType) {
+	private async syncPets(db: Database, data: GameDataType) {
 		const petRows = data.pets.map((p, idx) => {
 			return { name: p.name, clashId: p.clashId, order: idx };
 		});
-		await db.upsert('pets', petRows);
+		await helpers.upsert(db, 'pets', petRows);
 
-		const idRows = await db.getRows('pets');
+		const idRows = await db.selectFrom('pets').selectAll().execute();
 		const idByName = new Map(idRows.map((r) => [r.name, r.id]));
 
 		const levelRows = data.pets.flatMap((p) => {
@@ -291,10 +292,10 @@ export class GameData {
 				};
 			});
 		});
-		await db.upsert('pet_levels', levelRows);
+		await helpers.upsert(db, 'pet_levels', levelRows);
 	}
 
-	private async syncEquipment(db: MySQL, data: GameDataType) {
+	private async syncEquipment(db: Database, data: GameDataType) {
 		const equipmentRows = data.equipment.map((e, idx) => {
 			return {
 				hero: e.hero,
@@ -304,9 +305,9 @@ export class GameData {
 				order: idx,
 			};
 		});
-		await db.upsert('equipment', equipmentRows);
+		await helpers.upsert(db, 'equipment', equipmentRows);
 
-		const idRows = await db.getRows('equipment');
+		const idRows = await db.selectFrom('equipment').selectAll().execute();
 		const idByKey = new Map();
 		for (const row of idRows) {
 			idByKey.set(`${row.hero}:${row.name}`, row.id);
@@ -326,122 +327,113 @@ export class GameData {
 				};
 			});
 		});
-		await db.upsert('equipment_levels', levelRows);
+		await helpers.upsert(db, 'equipment_levels', levelRows);
 	}
 
 	private async getUnitsData(options: GetUnitsOptions = {}) {
 		const { type } = options;
 
-		const args: (string | number)[] = [];
-		let query = `
-			SELECT
-				u.id,
-				u.type,
-				u.name,
-				u.clashId,
-				u.order,
-				u.housingSpace,
-				u.productionBuilding,
-				u.isSuper,
-				u.isFlying,
-				u.isJumper,
-				u.airTargets,
-				u.groundTargets,
-				JSON_ARRAYAGG(JSON_OBJECT(
-					'id', ul.id,
-					'unitId', ul.unitId,
-					'level', ul.level,
-					'buildingLevel', ul.buildingLevel,
-					'laboratoryLevel', ul.laboratoryLevel
-				) ORDER BY ul.level) AS levels
-			FROM units u
-			LEFT JOIN unit_levels ul ON ul.unitId = u.id
-			WHERE TRUE
-		`;
+		let query = this.server.db.selectFrom('units as u').leftJoin('unit_levels as ul', 'ul.unitId', 'u.id');
 
 		if (type) {
-			query += `
-				AND u.type = ?
-			`;
-			args.push(type);
+			query = query.where('u.type', '=', type);
 		}
 
-		query += `
-			GROUP BY u.id
-			ORDER BY u.order
-		`;
-
-		const units = await this.server.db.query<Unit>(query, args);
-
-		for (const unit of units) {
-			unit.levels = parseDBJsonField(unit.levels);
-		}
+		const units: Unit[] = await query
+			.select([
+				'u.id',
+				'u.type',
+				'u.name',
+				'u.clashId',
+				'u.order',
+				'u.housingSpace',
+				'u.productionBuilding',
+				'u.isSuper',
+				'u.isFlying',
+				'u.isJumper',
+				'u.airTargets',
+				'u.groundTargets',
+				helpers
+					.jsonAggObj(
+						{
+							id: 'ul.id',
+							unitId: 'ul.unitId',
+							level: 'ul.level',
+							buildingLevel: 'ul.buildingLevel',
+							laboratoryLevel: 'ul.laboratoryLevel',
+						},
+						{ order: 'ul.level' }
+					)
+					.as('levels'),
+			])
+			.groupBy('u.id')
+			.orderBy('u.order')
+			.execute();
 
 		return units;
 	}
 
 	private async getEquipmentData() {
-		// prettier-ignore
-		const equipment = await this.server.db.query<Equipment>(`
-			SELECT
-				eq.id,
-				eq.hero,
-				eq.name,
-				eq.clashId,
-				eq.order,
-				eq.epic,
-				JSON_ARRAYAGG(JSON_OBJECT(
-					'id', eql.id,
-					'equipmentId', eql.equipmentId,
-					'level', eql.level,
-					'blacksmithLevel', eql.blacksmithLevel
-				) ORDER BY eql.level) AS levels
-			FROM equipment eq
-			LEFT JOIN equipment_levels eql ON eql.equipmentId = eq.id
-			GROUP BY eq.id
-			ORDER BY eq.order
-		`, []);
-
-		for (const eq of equipment) {
-			eq.levels = parseDBJsonField(eq.levels);
-		}
+		const equipment: Equipment[] = await this.server.db
+			.selectFrom('equipment as eq')
+			.leftJoin('equipment_levels as eql', 'eql.equipmentId', 'eq.id')
+			.select([
+				'eq.id',
+				'eq.hero',
+				'eq.name',
+				'eq.clashId',
+				'eq.order',
+				'eq.epic',
+				helpers
+					.jsonAggObj(
+						{
+							id: 'eql.id',
+							equipmentId: 'eql.equipmentId',
+							level: 'eql.level',
+							blacksmithLevel: 'eql.blacksmithLevel',
+						},
+						{ order: 'eql.level' }
+					)
+					.as('levels'),
+			])
+			.groupBy('eq.id')
+			.orderBy('eq.order')
+			.execute();
 
 		return equipment;
 	}
 
 	private async getPetsData() {
-		// prettier-ignore
-		const pets = await this.server.db.query<Pet>(`
-			SELECT
-				p.id,
-				p.name,
-				p.clashId,
-				p.order,
-				JSON_ARRAYAGG(JSON_OBJECT(
-					'id', pl.id,
-					'petId', pl.petId,
-					'level', pl.level,
-					'petHouseLevel', pl.petHouseLevel
-				) ORDER BY pl.level) AS levels
-			FROM pets p
-			LEFT JOIN pet_levels pl ON pl.petId = p.id
-			GROUP BY p.id
-			ORDER BY p.order
-		`, []);
-
-		for (const pet of pets) {
-			pet.levels = parseDBJsonField(pet.levels);
-		}
+		const pets: Pet[] = await this.server.db
+			.selectFrom('pets as p')
+			.leftJoin('pet_levels as pl', 'pl.petId', 'p.id')
+			.select([
+				'p.id',
+				'p.name',
+				'p.clashId',
+				'p.order',
+				helpers
+					.jsonAggObj(
+						{
+							id: 'pl.id',
+							petId: 'pl.petId',
+							level: 'pl.level',
+							petHouseLevel: 'pl.petHouseLevel',
+						},
+						{ order: 'pl.level' }
+					)
+					.as('levels'),
+			])
+			.groupBy('p.id')
+			.orderBy('p.order')
+			.execute();
 
 		return pets;
 	}
 
 	private async getTownHallsData(): Promise<TownHall[]> {
-		const ths = await this.server.db.query<Omit<TownHall, 'heroMaxLevels'>>(`SELECT *, level AS id FROM town_halls ORDER BY level`, []);
-		const maxes = await this.server.db.query<{ townHall: number; heroName: string; maxLevel: number }>(
-			`SELECT townHall, heroName, maxLevel FROM town_hall_heroes_max`,
-			[]
-		);
+		const ths = await this.server.db.selectFrom('town_halls').selectAll().select('level as id').orderBy('level').execute();
+		const maxes = await this.server.db.selectFrom('town_hall_heroes_max').select(['townHall', 'heroName', 'maxLevel']).execute();
 
 		const maxesByTH = new Map<number, Partial<Record<string, number>>>();
 		for (const m of maxes) {
@@ -460,11 +452,7 @@ export class GameData {
 	}
 
 	private async getHeroesData(): Promise<Hero[]> {
-		return this.server.db.query<Hero>(`
-            SELECT h.name, h.clashId, h.order
-            FROM heroes h
-            ORDER BY h.order
-        `);
+		return this.server.db.selectFrom('heroes as h').select(['name', 'clashId', 'order']).orderBy('order').execute();
 	}
 
 	private get gameDataPath() {

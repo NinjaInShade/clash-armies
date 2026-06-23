@@ -1,4 +1,6 @@
-import type { MySQL, MigrationFn } from '@ninjalib/sql';
+import type { MigrationFn } from '$server/migration/migrator';
+import type { Database } from '$server/db';
+import { sql } from 'kysely';
 
 // prettier-ignore
 export default function migration(runStep: MigrationFn) {
@@ -6,7 +8,7 @@ export default function migration(runStep: MigrationFn) {
         ALTER TABLE army_comments
         MODIFY comment TEXT DEFAULT NULL
     `);
-    runStep(42, async (db: MySQL) => {
+    runStep(42, async (db: Database) => {
         // Fix unique units/equipment/pets being duped within armies.
         // This was a bug originally identified by removing an existing unit and then re-adding it (meaning id became undefined).
         // The upsert thus didn't detect the id PK conflict and so didn't "update" it, but instead added a dupe.
@@ -14,7 +16,7 @@ export default function migration(runStep: MigrationFn) {
         // So we will now add UNIQUE constraints which include the unit/eq/pet IDs which means upsert's will always work correctly.
         // Before we do this, so the UNIQUE migrations don't fail, we will delete all bugged data.
 
-        await db.query(`
+        await sql`
             DELETE FROM army_units
             WHERE id NOT IN (
                 SELECT min_id FROM (
@@ -23,8 +25,8 @@ export default function migration(runStep: MigrationFn) {
                     GROUP BY armyId, unitId, home
                 ) as sub
             );
-        `);
-        await db.query(`
+        `.execute(db);
+        await sql`
             DELETE FROM army_equipment
             WHERE id NOT IN (
                 SELECT min_id FROM (
@@ -33,8 +35,8 @@ export default function migration(runStep: MigrationFn) {
                     GROUP BY armyId, equipmentId
                 ) as sub
             );
-        `);
-        await db.query(`
+        `.execute(db);
+        await sql`
             DELETE FROM army_pets
             WHERE id NOT IN (
                 SELECT min_id FROM (
@@ -43,20 +45,20 @@ export default function migration(runStep: MigrationFn) {
                     GROUP BY armyId, petId, hero
                 ) as sub
             );
-        `);
+        `.execute(db);
 
-        await db.query(`
+        await sql`
             ALTER TABLE army_units
             ADD CONSTRAINT unique_army_units_unit_id UNIQUE (armyId, unitId, home)
-        `);
-        await db.query(`
+        `.execute(db);
+        await sql`
             ALTER TABLE army_equipment
             ADD CONSTRAINT unique_army_equipment_equipment_id UNIQUE (armyId, equipmentId)
-        `);
-        await db.query(`
+        `.execute(db);
+        await sql`
             ALTER TABLE army_pets
             ADD CONSTRAINT unique_army_pets_pet_id UNIQUE (armyId, petId, hero)
-        `);
+        `.execute(db);
     });
     runStep(43, `
         CREATE TABLE metrics (

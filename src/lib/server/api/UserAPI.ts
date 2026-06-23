@@ -1,7 +1,7 @@
 import type { Server } from '$server/api/Server';
 import type { RequestEvent } from '@sveltejs/kit';
 import type { User } from '$types';
-import { parseDBJsonField } from '$server/utils';
+import { helpers } from '$server/db';
 import z from 'zod';
 
 type GetUsersOptions = {
@@ -33,44 +33,22 @@ export class UserAPI {
 		const { username, ids } = options;
 		const userId = req.locals.user?.id ?? null;
 
-		const args: (number | number[] | string)[] = [];
-		let query = `
-            SELECT
-                u.googleId,
-                u.id,
-                u.googleId,
-                JSON_ARRAYAGG(ur.role) AS roles,
-                u.username,
-                u.playerTag,
-                u.createdTime
-            FROM users u
-            LEFT JOIN user_roles ur ON ur.userId = u.id
-            WHERE TRUE
-        `;
+		let query = this.server.db.selectFrom('users as u').leftJoin('user_roles as ur', 'ur.userId', 'u.id');
 
 		if (username) {
-			query += `
-                AND u.username = ?
-            `;
-			args.push(username);
+			query = query.where('u.username', '=', username);
 		}
 
 		if (ids && ids.length) {
-			query += `
-				AND u.id IN (?)
-			`;
-			args.push(ids);
+			query = query.where('u.id', 'in', ids);
 		}
 
-		query += `
-            GROUP BY u.id
-        `;
-
-		const users = await this.server.db.query<User>(query, args);
+		const users: User[] = await query
+			.select(['u.googleId', 'u.id', helpers.jsonAgg('ur.role').as('roles'), 'u.username', 'u.playerTag', 'u.createdTime'])
+			.groupBy('u.id')
+			.execute();
 
 		for (const user of users) {
-			user.roles = parseDBJsonField(user.roles) ?? [];
-
 			// TODO: fetch player level (and other stats if added) from clash of clans API if player tag is defined
 			user.level = null;
 
@@ -140,12 +118,6 @@ export class UserAPI {
 			throw new Error('This username is already taken');
 		}
 
-		// prettier-ignore
-		await this.server.db.query(`
-            UPDATE users SET
-                username = ?,
-                playerTag = ?
-            WHERE id = ?
-        `, [username, playerTag, user.id]);
+		await this.server.db.updateTable('users').where('id', '=', user.id).set({ username, playerTag }).execute();
 	}
 }

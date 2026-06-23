@@ -54,14 +54,14 @@ export function createReq(user: SessionUser, server: Server) {
 export async function createUsers(server: Server) {
 	// Create test users
 	const users = [USER, USER_2, USER_ADMIN];
-	await server.db.insertMany(
-		'users',
-		users.map((user) => ({ username: user.username, googleId: '123' }))
-	);
-	await server.db.insertMany(
-		'user_roles',
-		users.flatMap((user) => user.roles.map((role) => ({ userId: user.id, role })))
-	);
+	await server.db
+		.insertInto('users')
+		.values(users.map((user) => ({ username: user.username, googleId: '123' })))
+		.execute();
+	await server.db
+		.insertInto('user_roles')
+		.values(users.flatMap((user) => user.roles.map((role) => ({ userId: user.id, role }))))
+		.execute();
 }
 
 /** Returns an army, defaulting certain fields with dummy data for convenience */

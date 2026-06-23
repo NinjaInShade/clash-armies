@@ -1,4 +1,4 @@
-import type { MySQL, MigrationFn } from '@ninjalib/sql';
+import type { MigrationFn } from '$server/migration/migrator';
 
 // prettier-ignore
 export default function migration(runStep: MigrationFn) {
@@ -27,14 +27,12 @@ export default function migration(runStep: MigrationFn) {
 	runStep(54, async () => { /* Historical artifact - see 768be65 */ });
 	runStep(55, async () => { /* Historical artifact - see 768be65 */ });
 	runStep(56, async () => { /* Historical artifact - see 768be65 */ });
-    runStep(57, async (db: MySQL) => {
-        // NOTE: more queries were in this step previously - historical artifact - see 768be65
-        // Add "Dragon Duke" hero
-        await db.query(`
-            ALTER TABLE town_halls
-            ADD COLUMN maxDragonDuke SMALLINT DEFAULT NULL AFTER maxMinionPrince
-        `, []);
-    });
+    // NOTE: more queries were in this step previously - historical artifact - see 768be65
+    // Add "Dragon Duke" hero
+    runStep(57, `
+        ALTER TABLE town_halls
+        ADD COLUMN maxDragonDuke SMALLINT DEFAULT NULL AFTER maxMinionPrince
+    `);
     runStep(58, async () => { /* Historical artifact - see 768be65 */ });
     runStep(59, async () => { /* Historical artifact - see 768be65 */ });
     runStep(60, async () => { /* Historical artifact - see 768be65 */ });
