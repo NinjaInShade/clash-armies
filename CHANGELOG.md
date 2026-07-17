@@ -1,3 +1,7 @@
+## [0.11.0] - 2026-07-17
+
+- Replace historical dependencies with more robust options
+
 ## [0.10.4] - 2026-06-21
 
 - Allow app assets to be better optimised and cached
