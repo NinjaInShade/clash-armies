@@ -1,3 +1,9 @@
+## [0.11.1] - 2026-07-17
+
+- Update various dependencies
+- Make "Find army" home page button navigate to popular armies page
+- Fix admin page queries
+
 ## [0.11.0] - 2026-07-17
 
 - Replace historical dependencies with more robust options
