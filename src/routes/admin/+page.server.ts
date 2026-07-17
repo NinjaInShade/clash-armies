@@ -23,10 +23,24 @@ export const load: PageServerLoad = async (req) => {
 
 async function getAppStats(server: Server) {
 	const [usersResult, armiesResult, commentsResult, armiesByTHResult] = await Promise.all([
-		server.db.query<{ count: number }>('SELECT COUNT(*) as count FROM users'),
-		server.db.query<{ count: number }>('SELECT COUNT(*) as count FROM armies'),
-		server.db.query<{ count: number }>('SELECT COUNT(*) as count FROM army_comments'),
-		server.db.query<{ townHall: number; count: number }>('SELECT townHall, COUNT(*) as count FROM armies GROUP BY townHall ORDER BY townHall ASC'),
+		server.db
+			.selectFrom('users')
+			.select((eb) => eb.fn.countAll().as('count'))
+			.execute(),
+		server.db
+			.selectFrom('armies')
+			.select((eb) => eb.fn.countAll().as('count'))
+			.execute(),
+		server.db
+			.selectFrom('army_comments')
+			.select((eb) => eb.fn.countAll().as('count'))
+			.execute(),
+		server.db
+			.selectFrom('armies')
+			.select((eb) => ['townHall', eb.fn.countAll().as('count')])
+			.groupBy('townHall')
+			.orderBy('townHall', 'asc')
+			.execute(),
 	]);
 
 	return {
