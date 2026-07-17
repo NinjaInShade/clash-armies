@@ -24,8 +24,9 @@ services:
       MARIADB_DATABASE: clash-armies
     volumes:
       - clash-armies-db:/var/lib/mysql
-    # No exposed ports, db is only reachable on internal compose network.
-    # Use `docker compose exec db mariadb --user=$DB_USER --database=clash-armies -p` for a shell.
+    ports:
+      # Port only exposed for easier debugging (note it's only exposed on loopback).
+      - '127.0.0.1:20001:3306'
     healthcheck:
       test: ['CMD', 'healthcheck.sh', '--connect', '--innodb_initialized']
       interval: 10s
