@@ -52,7 +52,7 @@
 		"kysely-codegen": "^0.20.0"
 	},
 	"dependencies": {
-		"@floating-ui/dom": "^1.7.4",
+		"@floating-ui/dom": "^1.8.0",
 		"@tiptap/core": "^3.28.0",
 		"@tiptap/extension-bold": "^3.28.0",
 		"@tiptap/extension-character-count": "^3.28.0",
