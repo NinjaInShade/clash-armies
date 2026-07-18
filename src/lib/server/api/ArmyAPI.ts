@@ -79,44 +79,10 @@ export class ArmyAPI {
 			.leftJoin(
 				(eb) =>
 					eb
-						.selectFrom('armies as a')
-						.leftJoin(
-							(eb) =>
-								eb
-									.selectFrom('army_votes')
-									.select((eb) => ['armyId', eb.fn.coalesce(eb.fn.sum('vote'), sql.lit(0)).as('votes')])
-									.groupBy('armyId')
-									.as('av'),
-							(join) => join.onRef('av.armyId', '=', 'a.id')
-						)
-						.leftJoin('army_metrics as metric_pv', (join) => join.onRef('metric_pv.armyId', '=', 'a.id').on('metric_pv.name', '=', 'page-view'))
-						.leftJoin('army_metrics as metric_cl', (join) => join.onRef('metric_cl.armyId', '=', 'a.id').on('metric_cl.name', '=', 'copy-link-click'))
-						.leftJoin('army_metrics as metric_ol', (join) => join.onRef('metric_ol.armyId', '=', 'a.id').on('metric_ol.name', '=', 'open-link-click'))
-						.select((eb) => [
-							'a.id as armyId',
-							sql<number>`(
-								(COALESCE(av.votes, 0) * ${weights.vote}) +
-								(COALESCE(metric_pv.value, 0) * ${weights.pageView}) +
-								(COALESCE(metric_cl.value, 0) * ${weights.copyLinkClick}) +
-								(COALESCE(metric_ol.value, 0) * ${weights.openLinkClick})
-							)`.as('score'),
-							eb.fn.coalesce('av.votes', sql.lit(0)).as('votes'),
-							eb.fn.coalesce('metric_pv.value', sql.lit(0)).as('pageViews'),
-							eb.fn.coalesce('metric_ol.value', sql.lit(0)).as('openLinkClicks'),
-							eb.fn.coalesce('metric_cl.value', sql.lit(0)).as('copyLinkClicks'),
-						])
-						.as('am'),
-				(join) => join.onRef('am.armyId', '=', 'a.id')
-			)
-			.leftJoin(
-				(eb) =>
-					eb
-						.selectFrom('armies as a')
-						.leftJoin('army_units as au', 'au.armyId', 'a.id')
-						.where('au.id', 'is not', null)
-						.groupBy('a.id')
+						.selectFrom('army_units as au')
+						.groupBy('au.armyId')
 						.select([
-							'a.id',
+							'au.armyId',
 							helpers
 								.jsonAggObj({
 									id: 'au.id',
@@ -127,17 +93,15 @@ export class ArmyAPI {
 								.as('units'),
 						])
 						.as('au'),
-				(join) => join.onRef('au.id', '=', 'a.id')
+				(join) => join.onRef('au.armyId', '=', 'a.id')
 			)
 			.leftJoin(
 				(eb) =>
 					eb
-						.selectFrom('armies as a')
-						.leftJoin('army_equipment as ae', 'ae.armyId', 'a.id')
-						.where('ae.id', 'is not', null)
-						.groupBy('a.id')
+						.selectFrom('army_equipment as ae')
+						.groupBy('ae.armyId')
 						.select([
-							'a.id',
+							'ae.armyId',
 							helpers
 								.jsonAggObj({
 									id: 'ae.id',
@@ -146,17 +110,15 @@ export class ArmyAPI {
 								.as('equipment'),
 						])
 						.as('ae'),
-				(join) => join.onRef('ae.id', '=', 'a.id')
+				(join) => join.onRef('ae.armyId', '=', 'a.id')
 			)
 			.leftJoin(
 				(eb) =>
 					eb
-						.selectFrom('armies as a')
-						.leftJoin('army_pets as ap', 'ap.armyId', 'a.id')
-						.where('ap.id', 'is not', null)
-						.groupBy('a.id')
+						.selectFrom('army_pets as ap')
+						.groupBy('ap.armyId')
 						.select([
-							'a.id',
+							'ap.armyId',
 							helpers
 								.jsonAggObj({
 									id: 'ap.id',
@@ -166,18 +128,16 @@ export class ArmyAPI {
 								.as('pets'),
 						])
 						.as('ap'),
-				(join) => join.onRef('ap.id', '=', 'a.id')
+				(join) => join.onRef('ap.armyId', '=', 'a.id')
 			)
 			.leftJoin(
 				(eb) =>
 					eb
-						.selectFrom('armies as a')
-						.leftJoin('army_comments as ac', 'ac.armyId', 'a.id')
+						.selectFrom('army_comments as ac')
 						.leftJoin('users as u', 'u.id', 'ac.createdBy')
-						.where('ac.id', 'is not', null)
-						.groupBy('a.id')
+						.groupBy('ac.armyId')
 						.select([
-							'a.id',
+							'ac.armyId',
 							helpers
 								.jsonAggObj({
 									id: 'ac.id',
@@ -192,7 +152,7 @@ export class ArmyAPI {
 								.as('comments'),
 						])
 						.as('ac'),
-				(join) => join.onRef('ac.id', '=', 'a.id')
+				(join) => join.onRef('ac.armyId', '=', 'a.id')
 			)
 			.leftJoin(
 				(eb) =>
@@ -206,7 +166,19 @@ export class ArmyAPI {
 			.leftJoin('army_guides as ag', 'ag.armyId', 'a.id')
 			.leftJoin('army_votes as uv', (join) => join.onRef('uv.armyId', '=', 'a.id').on('uv.votedBy', '=', userId))
 			.leftJoin('saved_armies as sa', (join) => join.onRef('sa.armyId', '=', 'a.id').on('sa.userId', '=', userId))
-			.leftJoin('users as u', 'u.id', 'a.createdBy');
+			.leftJoin('users as u', 'u.id', 'a.createdBy')
+			.leftJoin(
+				(eb) =>
+					eb
+						.selectFrom('army_votes')
+						.select((eb) => ['armyId', eb.fn.coalesce(eb.fn.sum('vote'), sql.lit(0)).as('votes')])
+						.groupBy('armyId')
+						.as('av'),
+				(join) => join.onRef('av.armyId', '=', 'a.id')
+			)
+			.leftJoin('army_metrics as metric_pv', (join) => join.onRef('metric_pv.armyId', '=', 'a.id').on('metric_pv.name', '=', 'page-view'))
+			.leftJoin('army_metrics as metric_cl', (join) => join.onRef('metric_cl.armyId', '=', 'a.id').on('metric_cl.name', '=', 'copy-link-click'))
+			.leftJoin('army_metrics as metric_ol', (join) => join.onRef('metric_ol.armyId', '=', 'a.id').on('metric_ol.name', '=', 'open-link-click'));
 
 		if (ids && ids.length) {
 			query = query.where('a.id', 'in', ids);
@@ -258,6 +230,9 @@ export class ArmyAPI {
 		}
 
 		if (sort === 'score') {
+			// `score` shows a TS error but is a valid column - it's just not yet selected in Kysely's eyes.
+			// Putting the `orderBy` after `select` would fix it but you can't simply chain it without losing
+			// type safety of your results (it seems possible with weird workarounds, but I'd rather not at this time).
 			query = query.orderBy('score', 'desc').orderBy('createdTime', 'desc');
 		} else {
 			query = query.orderBy('createdTime', 'desc');
@@ -268,11 +243,16 @@ export class ArmyAPI {
 			.selectAll('a')
 			.select((eb) => [
 				// TODO: should not have to CAST, needs investigating
-				sql<number>`CAST(am.score AS INTEGER)`.as('score'),
-				sql<number>`CAST(am.votes AS INTEGER)`.as('votes'),
-				sql<number>`CAST(am.pageViews AS INTEGER)`.as('pageViews'),
-				sql<number>`CAST(am.openLinkClicks AS INTEGER)`.as('openLinkClicks'),
-				sql<number>`CAST(am.copyLinkClicks AS INTEGER)`.as('copyLinkClicks'),
+				sql<number>`CAST((
+					(COALESCE(av.votes, 0) * ${weights.vote}) +
+					(COALESCE(metric_pv.value, 0) * ${weights.pageView}) +
+					(COALESCE(metric_cl.value, 0) * ${weights.copyLinkClick}) +
+					(COALESCE(metric_ol.value, 0) * ${weights.openLinkClick})
+				) AS INTEGER)`.as('score'),
+				eb.cast(eb.fn.coalesce('av.votes', sql.lit(0)), 'integer').as('votes'),
+				eb.cast(eb.fn.coalesce('metric_pv.value', sql.lit(0)), 'integer').as('pageViews'),
+				eb.cast(eb.fn.coalesce('metric_ol.value', sql.lit(0)), 'integer').as('openLinkClicks'),
+				eb.cast(eb.fn.coalesce('metric_cl.value', sql.lit(0)), 'integer').as('copyLinkClicks'),
 				'u.username',
 				'au.units',
 				'ae.equipment',
