@@ -1,3 +1,7 @@
+## [0.11.2] - 2026-07-18
+
+- Improve query performance
+
 ## [0.11.1] - 2026-07-17
 
 - Update various dependencies
