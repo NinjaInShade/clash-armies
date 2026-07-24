@@ -1,21 +1,44 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { fade } from 'svelte/transition';
+	import { add, isAfter, type Duration } from 'date-fns';
 
 	const STORAGE_KEY = 'ca:feedback-banner-dismissed';
+	const SHOW_AGAIN_AFTER: Duration = { months: 2 };
 
 	let visible = $state(false);
 
 	onMount(() => {
 		// Use onMount to access localStorage due to SSR
-		if (!localStorage.getItem(STORAGE_KEY)) {
+		let dismissedTime = localStorage.getItem(STORAGE_KEY);
+		if (dismissedTime === '1') {
+			// We used to store absolute "dismissed or not" state,
+			// but now want to store when banner was dismissed.
+			const nowStr = Date.now().toString();
+			dismissedTime = nowStr;
+			localStorage.setItem(STORAGE_KEY, nowStr);
+		}
+
+		if (!dismissedTime) {
 			visible = true;
+		} else {
+			const dismissedAt = new Date(+dismissedTime);
+			if (shouldShowAgain(dismissedAt)) {
+				visible = true;
+				localStorage.removeItem(STORAGE_KEY);
+			}
 		}
 	});
 
 	function dismiss() {
 		visible = false;
-		localStorage.setItem(STORAGE_KEY, '1');
+		localStorage.setItem(STORAGE_KEY, Date.now().toString());
+	}
+
+	function shouldShowAgain(date: Date) {
+		const now = new Date();
+		const showAgainAfterDismissedAt = add(date, SHOW_AGAIN_AFTER);
+		return isAfter(now, showAgainAfterDismissedAt);
 	}
 </script>
 
