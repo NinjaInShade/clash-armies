@@ -7,8 +7,13 @@
 	type Props = {
 		value: number | undefined;
 		onChange: (value: number | undefined) => void;
+		/**
+		 * Use the shorthand `TH{value}` label instead of the full "Town Hall {value}".
+		 * @default false
+		 */
+		short?: boolean;
 	};
-	const { value, onChange }: Props = $props();
+	const { value, onChange, short = false }: Props = $props();
 	const app = getContext<AppState>('app');
 
 	let menuRef = $state<HTMLButtonElement>();
@@ -22,11 +27,22 @@
 		onChange(value === level ? undefined : level);
 		menuOpen = false;
 	}
+
+	/** Scrolls the currently selected town hall into view when the menu opens */
+	function scrollIntoView(node: HTMLElement, isSelected: boolean) {
+		const container = node.closest('.th-menu');
+		if (!isSelected || !container) {
+			return;
+		}
+		const containerRect = container.getBoundingClientRect();
+		const nodeRect = node.getBoundingClientRect();
+		container.scrollTop += nodeRect.top - containerRect.top - containerRect.height / 2 + nodeRect.height / 2;
+	}
 </script>
 
 <button
 	class="utility-btn regular th-btn"
-	style="--bg-clr: var(--grey-850); --bg-clr-hover: var(--grey-900); --gap: 4px; --fs: 15px; --fs-weight: 500;"
+	style="--bg-clr: var(--grey-800); --bg-clr-hover: var(--grey-850); --gap: 4px; --fs: 15px; --fs-weight: 500;"
 	class:active={value !== undefined}
 	type="button"
 	bind:this={menuRef}
@@ -34,19 +50,19 @@
 >
 	{#if value === undefined}
 		<img src={thImgURL(17, 'small')} alt="Town hall 17" />
-		TH
+		{short ? 'TH' : 'Town Hall'}
 	{:else}
 		<img src={thImgURL(value, 'small')} alt="Town hall {value}" />
-		TH{value}
+		{short ? `TH${value}` : `Town Hall ${value}`}
 	{/if}
 </button>
 
-<Menu bind:open={menuOpen} elRef={menuRef}>
+<Menu bind:open={menuOpen} elRef={menuRef} matchWidth>
 	<div class="ca-menu th-menu">
 		<ul class="ca-menu-list">
 			{#each [...app.townHalls].reverse() as th (th.level)}
 				{@const isSelected = value === th.level}
-				<li>
+				<li use:scrollIntoView={isSelected}>
 					<button
 						type="button"
 						class="town-hall {isSelected ? 'disabled' : ''} focus-grey"
@@ -71,8 +87,11 @@
 
 <style>
 	.th-btn {
+		display: flex;
+		justify-content: flex-start;
 		text-transform: none;
 		color: var(--grey-400);
+		width: 100%;
 		height: var(--controls-height);
 
 		& img {

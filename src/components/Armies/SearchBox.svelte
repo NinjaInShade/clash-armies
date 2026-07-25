@@ -1,5 +1,6 @@
 <script lang="ts">
 	import Input from '../Input.svelte';
+	import { MAX_FILTER_SEARCH_LENGTH } from '$shared/utils';
 
 	type Props = {
 		value: string | null | undefined;
@@ -8,7 +9,7 @@
 	const { value, onChange }: Props = $props();
 </script>
 
-<Input {value} {onChange} placeholder="Search armies" icon={searchIcon} containerClass="searchbox" --input-width="100%" />
+<Input {value} {onChange} placeholder="Search armies" icon={searchIcon} containerClass="searchbox" maxlength={MAX_FILTER_SEARCH_LENGTH} --input-width="100%" />
 
 {#snippet searchIcon()}
 	<svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -22,7 +23,7 @@
 <style>
 	:global(.searchbox .input) {
 		border-style: dashed;
-		background-color: var(--grey-850);
+		background-color: var(--grey-800);
 		height: var(--controls-height);
 	}
 </style>

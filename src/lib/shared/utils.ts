@@ -137,10 +137,19 @@ export function pluralize(string: string, count: number, suffix = 's') {
 export function debounce<F extends (...args: Parameters<F>) => ReturnType<F>>(fn: F, ms: number) {
 	let timeoutId: ReturnType<typeof setTimeout>;
 
-	return function (this: any, ...args: Parameters<F>) {
+	const debounced = function (this: any, ...args: Parameters<F>) {
 		clearTimeout(timeoutId);
 		timeoutId = setTimeout(() => {
 			fn.apply(this, args);
 		}, ms);
 	};
+
+	/**
+	 * Drops any call that's still waiting to fire.
+	 */
+	debounced.cancel = function () {
+		clearTimeout(timeoutId);
+	};
+
+	return debounced;
 }
