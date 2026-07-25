@@ -4,7 +4,15 @@ import type { UnitType, StaticGameData } from '$types';
 import type { SessionUser } from '$server/auth/session';
 import { ArmyModel, UnitModel, PetModel, EquipmentModel } from '$models';
 import { validateArmy } from '$shared/validation';
-import { GUIDE_TEXT_CHAR_LIMIT } from '$shared/utils';
+import {
+	GUIDE_TEXT_CHAR_LIMIT,
+	ARMY_TAGS,
+	ARMY_TAG_CODES,
+	MAX_FILTER_SEARCH_LENGTH,
+	MAX_FILTER_UNITS,
+	MAX_FILTER_EQUIPMENTS,
+	MAX_FILTER_PETS,
+} from '$shared/utils';
 import { db } from '$server/db';
 import { Server } from '$server/api/Server';
 import type { RequestEvent } from '@sveltejs/kit';
@@ -387,10 +395,11 @@ describe('Fetching', function () {
 	});
 
 	it('Should filter armies by unit', async function () {
+		const barbarianId = UnitModel.requireTroopByName('Barbarian', gameData).id;
 		const data1 = makeData({
 			name: 'with-barbarian',
 			townHall: 16,
-			units: [{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Barbarian', gameData).id, amount: 10 }],
+			units: [{ home: 'armyCamp', unitId: barbarianId, amount: 10 }],
 		});
 		const data2 = makeData({
 			name: 'with-archer',
@@ -400,17 +409,41 @@ describe('Fetching', function () {
 		await server.army.saveArmy(req, data1);
 		await server.army.saveArmy(req, data2);
 
-		const armies = await server.army.getArmies(req, { unit: 'Barbarian' });
+		const armies = await server.army.getArmies(req, { units: [barbarianId] });
+		assertArmies(armies, [data1]);
+	});
+
+	it('Should filter armies by multiple units, matching only armies with all of them', async function () {
+		const barbarianId = UnitModel.requireTroopByName('Barbarian', gameData).id;
+		const archerId = UnitModel.requireTroopByName('Archer', gameData).id;
+		const data1 = makeData({
+			name: 'with-both',
+			townHall: 16,
+			units: [
+				{ home: 'armyCamp', unitId: barbarianId, amount: 10 },
+				{ home: 'armyCamp', unitId: archerId, amount: 10 },
+			],
+		});
+		const data2 = makeData({
+			name: 'with-barbarian-only',
+			townHall: 16,
+			units: [{ home: 'armyCamp', unitId: barbarianId, amount: 10 }],
+		});
+		await server.army.saveArmy(req, data1);
+		await server.army.saveArmy(req, data2);
+
+		const { armies } = await server.army.getArmies(req, { units: [barbarianId, archerId] });
 		assertArmies(armies, [data1]);
 	});
 
 	it('Should filter armies by spell', async function () {
+		const healingId = UnitModel.requireSpellByName('Healing', gameData).id;
 		const data1 = makeData({
 			name: 'with-heal',
 			townHall: 16,
 			units: [
 				{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Barbarian', gameData).id, amount: 10 },
-				{ home: 'armyCamp', unitId: UnitModel.requireSpellByName('Healing', gameData).id, amount: 1 },
+				{ home: 'armyCamp', unitId: healingId, amount: 1 },
 			],
 		});
 		const data2 = makeData({
@@ -421,16 +454,17 @@ describe('Fetching', function () {
 		await server.army.saveArmy(req, data1);
 		await server.army.saveArmy(req, data2);
 
-		const armies = await server.army.getArmies(req, { unit: 'Healing' });
+		const armies = await server.army.getArmies(req, { units: [healingId] });
 		assertArmies(armies, [data1]);
 	});
 
 	it('Should filter armies by equipment', async function () {
+		const barbarianPuppetId = EquipmentModel.requireByName('Barbarian Puppet', gameData).id;
 		const data1 = makeData({
 			name: 'with-puppet',
 			townHall: 16,
 			units: [{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Barbarian', gameData).id, amount: 10 }],
-			equipment: [{ equipmentId: EquipmentModel.requireByName('Barbarian Puppet', gameData).id }],
+			equipment: [{ equipmentId: barbarianPuppetId }],
 		});
 		const data2 = makeData({
 			name: 'with-vial',
@@ -441,16 +475,39 @@ describe('Fetching', function () {
 		await server.army.saveArmy(req, data1);
 		await server.army.saveArmy(req, data2);
 
-		const armies = await server.army.getArmies(req, { equipment: 'Barbarian Puppet' });
+		const armies = await server.army.getArmies(req, { equipments: [barbarianPuppetId] });
+		assertArmies(armies, [data1]);
+	});
+
+	it('Should filter armies by multiple equipment, matching only armies with all of them', async function () {
+		const barbarianPuppetId = EquipmentModel.requireByName('Barbarian Puppet', gameData).id;
+		const giantGauntletId = EquipmentModel.requireByName('Giant Gauntlet', gameData).id;
+		const data1 = makeData({
+			name: 'with-both-equipment',
+			townHall: 16,
+			units: [{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Barbarian', gameData).id, amount: 10 }],
+			equipment: [{ equipmentId: barbarianPuppetId }, { equipmentId: giantGauntletId }],
+		});
+		const data2 = makeData({
+			name: 'with-puppet-only',
+			townHall: 16,
+			units: [{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Barbarian', gameData).id, amount: 10 }],
+			equipment: [{ equipmentId: barbarianPuppetId }],
+		});
+		await server.army.saveArmy(req, data1);
+		await server.army.saveArmy(req, data2);
+
+		const { armies } = await server.army.getArmies(req, { equipments: [barbarianPuppetId, giantGauntletId] });
 		assertArmies(armies, [data1]);
 	});
 
 	it('Should filter armies by pet', async function () {
+		const lassiId = PetModel.requireByName('Lassi', gameData).id;
 		const data1 = makeData({
 			name: 'with-lassi',
 			townHall: 16,
 			units: [{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Barbarian', gameData).id, amount: 10 }],
-			pets: [{ hero: 'Barbarian King', petId: PetModel.requireByName('Lassi', gameData).id }],
+			pets: [{ hero: 'Barbarian King', petId: lassiId }],
 		});
 		const data2 = makeData({
 			name: 'with-fox',
@@ -461,7 +518,32 @@ describe('Fetching', function () {
 		await server.army.saveArmy(req, data1);
 		await server.army.saveArmy(req, data2);
 
-		const armies = await server.army.getArmies(req, { pet: 'Lassi' });
+		const armies = await server.army.getArmies(req, { pets: [lassiId] });
+		assertArmies(armies, [data1]);
+	});
+
+	it('Should filter armies by multiple pets, matching only armies with all of them', async function () {
+		const lassiId = PetModel.requireByName('Lassi', gameData).id;
+		const spiritFoxId = PetModel.requireByName('Spirit Fox', gameData).id;
+		const data1 = makeData({
+			name: 'with-both-pets',
+			townHall: 16,
+			units: [{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Barbarian', gameData).id, amount: 10 }],
+			pets: [
+				{ hero: 'Barbarian King', petId: lassiId },
+				{ hero: 'Archer Queen', petId: spiritFoxId },
+			],
+		});
+		const data2 = makeData({
+			name: 'with-lassi-only',
+			townHall: 16,
+			units: [{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Barbarian', gameData).id, amount: 10 }],
+			pets: [{ hero: 'Barbarian King', petId: lassiId }],
+		});
+		await server.army.saveArmy(req, data1);
+		await server.army.saveArmy(req, data2);
+
+		const { armies } = await server.army.getArmies(req, { pets: [lassiId, spiritFoxId] });
 		assertArmies(armies, [data1]);
 	});
 
@@ -494,6 +576,7 @@ describe('Fetching', function () {
 	});
 
 	it('Should return empty when no armies match filter', async function () {
+		const archerId = UnitModel.requireTroopByName('Archer', gameData).id;
 		const data = makeData({
 			name: 'no-match',
 			townHall: 16,
@@ -501,28 +584,232 @@ describe('Fetching', function () {
 		});
 		await server.army.saveArmy(req, data);
 
-		const armies = await server.army.getArmies(req, { unit: 'Archer' });
+		const armies = await server.army.getArmies(req, { units: [archerId] });
 		assertArmies(armies, []);
 	});
 
 	it('Should not match units in clan castle when filtering by unit', async function () {
+		const barbarianId = UnitModel.requireTroopByName('Barbarian', gameData).id;
+		const archerId = UnitModel.requireTroopByName('Archer', gameData).id;
 		const data = makeData({
 			name: 'cc-only',
+			townHall: 16,
+			units: [
+				{ home: 'armyCamp', unitId: barbarianId, amount: 10 },
+				{ home: 'clanCastle', unitId: archerId, amount: 5 },
+			],
+		});
+		await server.army.saveArmy(req, data);
+
+		// Should not match Archer since it's only in clan castle
+		const armies = await server.army.getArmies(req, { units: [archerId] });
+		assertArmies(armies, []);
+
+		// Should match Barbarian since it's in army camp
+		const armies2 = await server.army.getArmies(req, { units: [barbarianId] });
+		assertArmies(armies2, [data]);
+	});
+
+	it('Should filter armies by search term (case-insensitive + partially match)', async function () {
+		const data1 = makeData({
+			name: 'Fast Dragon Rush',
+			townHall: 16,
+			units: [{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Barbarian', gameData).id, amount: 10 }],
+		});
+		const data2 = makeData({
+			name: 'Fast Barbarian Rush',
+			townHall: 16,
+			units: [{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Barbarian', gameData).id, amount: 10 }],
+		});
+		await server.army.saveArmy(req, data1);
+		await server.army.saveArmy(req, data2);
+
+		const { armies } = await server.army.getArmies(req, { search: 'dragon' });
+		assertArmies(armies, [data1]);
+	});
+
+	it('Should filter armies by attack type', async function () {
+		const barbarianId = UnitModel.requireTroopByName('Barbarian', gameData).id;
+		const balloonId = UnitModel.requireTroopByName('Balloon', gameData).id;
+		const dataAir = makeData({
+			name: 'all-air',
+			townHall: 16,
+			units: [{ home: 'armyCamp', unitId: balloonId, amount: 10 }],
+		});
+		const dataGround = makeData({
+			name: 'all-ground',
+			townHall: 16,
+			units: [{ home: 'armyCamp', unitId: barbarianId, amount: 10 }],
+		});
+		const dataHybrid = makeData({
+			name: 'half-air-half-ground',
+			townHall: 16,
+			// 50% air/ground:
+			// - Balloon housing space 5 * 1
+			// - Barbarian housing space 1 * 5
+			units: [
+				{ home: 'armyCamp', unitId: balloonId, amount: 1 },
+				{ home: 'armyCamp', unitId: barbarianId, amount: 5 },
+			],
+		});
+		await server.army.saveArmy(req, dataAir);
+		await server.army.saveArmy(req, dataGround);
+		await server.army.saveArmy(req, dataHybrid);
+
+		const { armies: airArmies } = await server.army.getArmies(req, { attackType: 'Air' });
+		assertArmies(airArmies, [dataAir]);
+
+		const { armies: groundArmies } = await server.army.getArmies(req, { attackType: 'Ground' });
+		assertArmies(groundArmies, [dataGround]);
+
+		const { armies: hybridArmies } = await server.army.getArmies(req, { attackType: 'Hybrid' });
+		assertArmies(hybridArmies, [dataHybrid]);
+	});
+
+	it('Should filter armies that have a guide', async function () {
+		const dataWithGuide = makeData({
+			name: 'with-guide',
+			townHall: 16,
+			units: [{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Barbarian', gameData).id, amount: 10 }],
+			guide: { textContent: '<p>Guide!</p>', youtubeUrl: null },
+		});
+		const dataWithoutGuide = makeData({
+			name: 'without-guide',
+			townHall: 16,
+			units: [{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Barbarian', gameData).id, amount: 10 }],
+		});
+		await server.army.saveArmy(req, dataWithGuide);
+		await server.army.saveArmy(req, dataWithoutGuide);
+
+		const { armies } = await server.army.getArmies(req, { hasGuide: true });
+		assertArmies(armies, [dataWithGuide]);
+	});
+
+	it('Should filter out armies with super troops', async function () {
+		const data1 = makeData({
+			name: 'with-super-troop',
+			townHall: 16,
+			units: [{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Super Barbarian', gameData).id, amount: 1 }],
+		});
+		const data2 = makeData({
+			name: 'without-super-troop',
+			townHall: 16,
+			units: [{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Barbarian', gameData).id, amount: 10 }],
+		});
+		await server.army.saveArmy(req, data1);
+		await server.army.saveArmy(req, data2);
+
+		const { armies } = await server.army.getArmies(req, { noSuperTroops: true });
+		assertArmies(armies, [data2]);
+	});
+
+	it('Should filter out armies with epic equipment', async function () {
+		const data1 = makeData({
+			name: 'with-epic-equipment',
+			townHall: 16,
+			units: [{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Barbarian', gameData).id, amount: 10 }],
+			equipment: [{ equipmentId: EquipmentModel.requireByName('Giant Gauntlet', gameData).id }],
+		});
+		const data2 = makeData({
+			name: 'without-epic-equipment',
+			townHall: 16,
+			units: [{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Barbarian', gameData).id, amount: 10 }],
+			equipment: [{ equipmentId: EquipmentModel.requireByName('Barbarian Puppet', gameData).id }],
+		});
+		await server.army.saveArmy(req, data1);
+		await server.army.saveArmy(req, data2);
+
+		const { armies } = await server.army.getArmies(req, { noEpicEquipment: true });
+		assertArmies(armies, [data2]);
+	});
+
+	it('Should filter armies with/without clan castle', async function () {
+		const data1 = makeData({
+			name: 'with-cc',
 			townHall: 16,
 			units: [
 				{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Barbarian', gameData).id, amount: 10 },
 				{ home: 'clanCastle', unitId: UnitModel.requireTroopByName('Archer', gameData).id, amount: 5 },
 			],
 		});
-		await server.army.saveArmy(req, data);
+		const data2 = makeData({
+			name: 'without-cc',
+			townHall: 16,
+			units: [{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Barbarian', gameData).id, amount: 10 }],
+		});
+		await server.army.saveArmy(req, data1);
+		await server.army.saveArmy(req, data2);
 
-		// Should not match Archer since it's only in clan castle
-		const armies = await server.army.getArmies(req, { unit: 'Archer' });
-		assertArmies(armies, []);
+		const { armies: withCC } = await server.army.getArmies(req, { hasClanCastle: true });
+		assertArmies(withCC, [data1]);
 
-		// Should match Barbarian since it's in army camp
-		const armies2 = await server.army.getArmies(req, { unit: 'Barbarian' });
-		assertArmies(armies2, [data]);
+		const { armies: withoutCC } = await server.army.getArmies(req, { hasClanCastle: false });
+		assertArmies(withoutCC, [data2]);
+	});
+
+	it('Should filter armies with/without equipment', async function () {
+		const data1 = makeData({
+			name: 'with-equipment',
+			townHall: 16,
+			units: [{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Barbarian', gameData).id, amount: 10 }],
+			equipment: [{ equipmentId: EquipmentModel.requireByName('Barbarian Puppet', gameData).id }],
+		});
+		const data2 = makeData({
+			name: 'without-equipment',
+			townHall: 16,
+			units: [{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Barbarian', gameData).id, amount: 10 }],
+		});
+		await server.army.saveArmy(req, data1);
+		await server.army.saveArmy(req, data2);
+
+		const { armies: withEquipment } = await server.army.getArmies(req, { hasEquipment: true });
+		assertArmies(withEquipment, [data1]);
+
+		const { armies: withoutEquipment } = await server.army.getArmies(req, { hasEquipment: false });
+		assertArmies(withoutEquipment, [data2]);
+	});
+
+	it('Should filter armies with/without pets', async function () {
+		const data1 = makeData({
+			name: 'with-pet',
+			townHall: 16,
+			units: [{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Barbarian', gameData).id, amount: 10 }],
+			pets: [{ hero: 'Barbarian King', petId: PetModel.requireByName('Lassi', gameData).id }],
+		});
+		const data2 = makeData({
+			name: 'without-pet',
+			townHall: 16,
+			units: [{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Barbarian', gameData).id, amount: 10 }],
+		});
+		await server.army.saveArmy(req, data1);
+		await server.army.saveArmy(req, data2);
+
+		const { armies: withPets } = await server.army.getArmies(req, { hasPets: true });
+		assertArmies(withPets, [data1]);
+
+		const { armies: withoutPets } = await server.army.getArmies(req, { hasPets: false });
+		assertArmies(withoutPets, [data2]);
+	});
+
+	it('Should filter armies by multiple tags, matching only armies with all of them', async function () {
+		const [tag1, tag2] = ARMY_TAGS;
+		const data1 = makeData({
+			name: 'with-both-tags',
+			townHall: 16,
+			units: [{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Barbarian', gameData).id, amount: 10 }],
+			tags: [tag1, tag2],
+		});
+		const data2 = makeData({
+			name: 'with-one-tag',
+			townHall: 16,
+			units: [{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Barbarian', gameData).id, amount: 10 }],
+			tags: [tag1],
+		});
+		await server.army.saveArmy(req, data1);
+		await server.army.saveArmy(req, data2);
+
+		const { armies } = await server.army.getArmies(req, { tags: [tag1, tag2] });
+		assertArmies(armies, [data1]);
 	});
 });
 
@@ -1239,5 +1526,82 @@ describe('Army model', function () {
 			model.remove('Giant', 'armyCamp');
 			model.remove('Balloon', 'armyCamp');
 		});
+	});
+});
+
+describe('Army list query parsing', function () {
+	function parse(query: string) {
+		return server.army.parseArmyListQuery(new URLSearchParams(query));
+	}
+
+	it('Should parse units, equipment and pets out of the `units` param', function () {
+		const barbarianId = UnitModel.requireTroopByName('Barbarian', gameData).id;
+		const puppetId = EquipmentModel.requireByName('Barbarian Puppet', gameData).id;
+		const lassiId = PetModel.requireByName('Lassi', gameData).id;
+
+		const query = parse(`units=u${barbarianId}-e${puppetId}-p${lassiId}`);
+
+		assert.deepEqual(query.units, [barbarianId]);
+		assert.deepEqual(query.equipments, [puppetId]);
+		assert.deepEqual(query.pets, [lassiId]);
+	});
+
+	it('Should drop malformed `units` parts individually, keeping the valid ones', function () {
+		const barbarianId = UnitModel.requireTroopByName('Barbarian', gameData).id;
+		const archerId = UnitModel.requireTroopByName('Archer', gameData).id;
+
+		const query = parse(`units=u${barbarianId}-uNOPE-u-u1.5-u-3-x9-u${archerId}`);
+
+		assert.deepEqual(query.units, [barbarianId, archerId]);
+		assert.strictEqual(query.equipments, undefined);
+		assert.strictEqual(query.pets, undefined);
+	});
+
+	it('Should cap each pick type at its own maximum rather than dropping the filter', function () {
+		const units = Array.from({ length: MAX_FILTER_UNITS + 10 }, (_, i) => `u${i + 1}`);
+		const equipment = Array.from({ length: MAX_FILTER_EQUIPMENTS + 10 }, (_, i) => `e${i + 1}`);
+		const pets = Array.from({ length: MAX_FILTER_PETS + 10 }, (_, i) => `p${i + 1}`);
+
+		const query = parse(`units=${[...units, ...equipment, ...pets].join('-')}`);
+
+		assert.lengthOf(query.units ?? [], MAX_FILTER_UNITS);
+		assert.lengthOf(query.equipments ?? [], MAX_FILTER_EQUIPMENTS);
+		assert.lengthOf(query.pets ?? [], MAX_FILTER_PETS);
+	});
+
+	it('Should map tag codes back to tags, ignoring unknown codes', function () {
+		const [tag1, tag2] = ARMY_TAGS;
+
+		const query = parse(`tags=${ARMY_TAG_CODES[tag1]}-NotATag-${ARMY_TAG_CODES[tag2]}`);
+
+		assert.deepEqual(query.tags, [tag1, tag2]);
+		assert.strictEqual(parse('tags=NotATag').tags, undefined);
+	});
+
+	it('Should coerce boolean filters and ignore junk values', function () {
+		assert.equal(parse('hasClanCastle=true').hasClanCastle, true);
+		assert.equal(parse('hasClanCastle=FALSE').hasClanCastle, false);
+		assert.strictEqual(parse('hasClanCastle=maybe').hasClanCastle, undefined);
+		// These only ever narrow, so only "true" means anything
+		assert.equal(parse('noSuperTroops=true').noSuperTroops, true);
+		assert.strictEqual(parse('noSuperTroops=false').noSuperTroops, undefined);
+	});
+
+	it('Should ignore out-of-range or non-numeric town halls', function () {
+		assert.equal(parse('townHall=16').townHall, 16);
+		assert.strictEqual(parse('townHall=abc').townHall, undefined);
+		assert.strictEqual(parse('townHall=0').townHall, undefined);
+		assert.strictEqual(parse('townHall=-3').townHall, undefined);
+	});
+
+	it('Should ignore an unknown attack type', function () {
+		assert.equal(parse('attackType=Air').attackType, 'Air');
+		assert.strictEqual(parse('attackType=Underground').attackType, undefined);
+	});
+
+	it('Should drop a search term longer than the maximum', function () {
+		assert.equal(parse(`search=${'a'.repeat(MAX_FILTER_SEARCH_LENGTH)}`).search, 'a'.repeat(MAX_FILTER_SEARCH_LENGTH));
+		assert.strictEqual(parse(`search=${'a'.repeat(MAX_FILTER_SEARCH_LENGTH + 1)}`).search, undefined);
+		assert.strictEqual(parse('search=').search, undefined);
 	});
 });

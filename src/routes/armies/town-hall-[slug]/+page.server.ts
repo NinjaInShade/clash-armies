@@ -8,6 +8,7 @@ export const load: PageServerLoad = async (req) => {
 	if (!server.gameData.validTownHalls.has(townHall)) {
 		return error(404);
 	}
-	const armies = await server.army.getArmies(req, { townHall, sort: 'score' });
+	const query = server.army.parseArmyListQuery(req.url.searchParams);
+	const armies = await server.army.getArmies(req, { ...query, townHall, sort: 'score' });
 	return { armies };
 };

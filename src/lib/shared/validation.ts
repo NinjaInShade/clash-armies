@@ -255,3 +255,39 @@ export function hasHero(hero: string, model: ArmyModel) {
 	}
 	return false;
 }
+
+/**
+ * Parse a value, adhering to its `schema`.
+ * If parsing fails, returns `undefined` rather than throwing.
+ */
+export function parseField<T>(schema: z.ZodType<T>, value: unknown): T | undefined {
+	const result = schema.safeParse(value);
+	return result.success ? result.data : undefined;
+}
+
+/**
+ * Tries to coerce a raw query param string to a boolean.
+ * Only recognises "true" and "false" (in any case).
+ */
+export function coerceBoolean(value: string | null): boolean | undefined {
+	const valueLower = value?.toLowerCase();
+	if (valueLower === 'true') {
+		return true;
+	}
+	if (valueLower === 'false') {
+		return false;
+	}
+	return undefined;
+}
+
+/**
+ * Tries to coerce a raw query param string to a number.
+ * Deals with null properly.
+ */
+export function coerceNumber(value: string | null): number | undefined {
+	if (value === null) {
+		return undefined;
+	}
+	const n = Number(value);
+	return Number.isNaN(n) ? undefined : n;
+}

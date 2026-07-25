@@ -2,14 +2,23 @@ import type { Server } from '$server/api/Server';
 import { ArmyMetricsAPI } from '$server/api/ArmyMetricsAPI';
 import { helpers } from '$server/db';
 import type { RequestEvent } from '@sveltejs/kit';
-import { USER_MAX_ARMIES } from '$shared/utils';
-import { validateArmy, numberSchema, commentSchema } from '$shared/validation';
+import {
+	USER_MAX_ARMIES,
+	ARMY_TAGS,
+	ARMY_TAGS_BY_CODE,
+	MAX_FILTER_SEARCH_LENGTH,
+	MAX_FILTER_UNITS,
+	MAX_FILTER_EQUIPMENTS,
+	MAX_FILTER_PETS,
+} from '$shared/utils';
+import { validateArmy, numberSchema, commentSchema, parseField, coerceBoolean, coerceNumber } from '$shared/validation';
 import { generateJSON, generateHTML } from '@tiptap/html';
 import { getExtensions } from '$shared/guideEditor';
 import { parseHTML } from 'zeed-dom';
 import { GuideModel } from '$models/Guide.svelte';
 import type { Army, ArmyComment } from '$models';
 import { sql } from 'kysely';
+import z from 'zod';
 
 type GetArmiesOptions = {
 	/** Returns the armies with these ID's */
@@ -21,17 +30,38 @@ type GetArmiesOptions = {
 	/** Only fetch armies for this town hall */
 	townHall?: number;
 	/**
-	 * Only fetch armies containing this unit (by name).
+	 * Only fetch armies containing *all* of these units (by id).
 	 * A unit can be a troop, spell or a siege machine.
 	 * NOTE: units in the army's clan castle are *not* considered a match.
 	 */
-	unit?: string;
+	units?: number[];
 	/** Only fetch armies featuring this hero (by name, based on existence of hero's equipment or pets) */
 	hero?: string;
-	/** Only fetch armies with this equipment (by name) */
-	equipment?: string;
-	/** Only fetch armies with this pet (by name) */
-	pet?: string;
+	/** Only fetch armies containing *all* of these equipments (by id) */
+	equipments?: number[];
+	/** Only fetch armies containing *all* of these pets (by id) */
+	pets?: number[];
+	/** Only fetch armies whose name contains this (case-insensitive) */
+	search?: string;
+	/**
+	 * Only fetch armies of this composition, based on the housing space ratio of flying vs ground units
+	 * NOTE: the ratio is calculated based on both army camp + clan castle units.
+	 */
+	attackType?: 'Ground' | 'Air' | 'Hybrid';
+	/** Only fetch armies which have a guide */
+	hasGuide?: true;
+	/** Only fetch armies which do *not* contain any super troops */
+	noSuperTroops?: true;
+	/** Only fetch armies which do *not* contain any epic equipment */
+	noEpicEquipment?: true;
+	/** Only fetch armies with (true) or without (false) any clan castle units */
+	hasClanCastle?: boolean;
+	/** Only fetch armies with (true) or without (false) any equipment */
+	hasEquipment?: boolean;
+	/** Only fetch armies with (true) or without (false) any pets */
+	hasPets?: boolean;
+	/** Only fetch armies tagged with *all* of these tags */
+	tags?: string[];
 };
 
 type GetSavedArmiesOptions = {
@@ -44,6 +74,23 @@ type SaveVoteOptions = {
 	armyId: number;
 	/** Wherever an upvote (1), downvote (-1), or neutral (0) */
 	vote: number;
+};
+
+// Each field is it's own zod schema and not one `z.object` so we can parse each field independently.
+const armyListQueryFieldSchemas = {
+	search: z.string().trim().min(1).max(MAX_FILTER_SEARCH_LENGTH),
+	townHall: z.number().int().positive(),
+	attackType: z.enum(['Ground', 'Air', 'Hybrid']),
+	hasGuide: z.literal(true),
+	noSuperTroops: z.literal(true),
+	noEpicEquipment: z.literal(true),
+	hasClanCastle: z.boolean(),
+	hasEquipment: z.boolean(),
+	hasPets: z.boolean(),
+	units: z.array(z.number().int().positive()).min(1).max(MAX_FILTER_UNITS),
+	equipments: z.array(z.number().int().positive()).min(1).max(MAX_FILTER_EQUIPMENTS),
+	pets: z.array(z.number().int().positive()).min(1).max(MAX_FILTER_PETS),
+	tags: z.array(z.enum(ARMY_TAGS)).min(1).max(ARMY_TAGS.length),
 };
 
 export class ArmyAPI {
@@ -69,8 +116,77 @@ export class ArmyAPI {
 		return this.server.gameData;
 	}
 
+	/**
+	 * Parse and validate army list query from search parameters, to be used by army querying.
+	 *
+	 * Unknown or malformed values are silently dropped rather than throwing.
+	 */
+	public parseArmyListQuery(searchParams: URLSearchParams) {
+		const unitIds: number[] = [];
+		const equipmentIds: number[] = [];
+		const petIds: number[] = [];
+		const units = searchParams.get('units') ?? '';
+		for (const part of units.split('-')) {
+			const type = part[0];
+			const id = +part.substring(1);
+			// Drop malformed parts individually rather than letting one void the whole filter
+			if (!Number.isInteger(id) || id < 1) {
+				continue;
+			}
+			if (type === 'u' && unitIds.length < MAX_FILTER_UNITS) {
+				unitIds.push(id);
+			} else if (type === 'e' && equipmentIds.length < MAX_FILTER_EQUIPMENTS) {
+				equipmentIds.push(id);
+			} else if (type === 'p' && petIds.length < MAX_FILTER_PETS) {
+				petIds.push(id);
+			}
+		}
+
+		const tagsQuery = searchParams.get('tags') ?? '';
+		const tags = tagsQuery
+			.split('-')
+			.filter(Boolean)
+			.map((code) => ARMY_TAGS_BY_CODE[code])
+			.filter(Boolean);
+
+		const schema = armyListQueryFieldSchemas;
+		return {
+			search: parseField(schema.search, searchParams.get('search')),
+			townHall: parseField(schema.townHall, coerceNumber(searchParams.get('townHall'))),
+			attackType: parseField(schema.attackType, searchParams.get('attackType')),
+			hasGuide: parseField(schema.hasGuide, coerceBoolean(searchParams.get('hasGuide'))),
+			noSuperTroops: parseField(schema.noSuperTroops, coerceBoolean(searchParams.get('noSuperTroops'))),
+			noEpicEquipment: parseField(schema.noEpicEquipment, coerceBoolean(searchParams.get('noEpicEquipment'))),
+			hasClanCastle: parseField(schema.hasClanCastle, coerceBoolean(searchParams.get('hasClanCastle'))),
+			hasEquipment: parseField(schema.hasEquipment, coerceBoolean(searchParams.get('hasEquipment'))),
+			hasPets: parseField(schema.hasPets, coerceBoolean(searchParams.get('hasPets'))),
+			units: parseField(schema.units, unitIds),
+			equipments: parseField(schema.equipments, equipmentIds),
+			pets: parseField(schema.pets, petIds),
+			tags: parseField(schema.tags, tags),
+		};
+	}
+
 	public async getArmies(req: RequestEvent, options: GetArmiesOptions = {}) {
-		const { ids, username, sort, townHall, hero, equipment, pet, unit } = options;
+		const {
+			ids,
+			username,
+			townHall,
+			hero,
+			equipments = [],
+			pets = [],
+			units = [],
+			search,
+			attackType,
+			hasGuide,
+			noSuperTroops,
+			noEpicEquipment,
+			hasClanCastle,
+			hasEquipment,
+			hasPets,
+			tags = [],
+			sort,
+		} = options;
 		const userId = req.locals.user?.id ?? null;
 		const weights = await this.metrics.getMetricWeights();
 
@@ -189,7 +305,13 @@ export class ArmyAPI {
 		if (townHall) {
 			query = query.where('a.townHall', '=', townHall);
 		}
-
+		if (search) {
+			// Escape LIKE wildcards in the (user-provided) search term.
+			// Note this is so that a search term like "50%" matches as the
+			// user specified it, not interpreted as "50 followed by anything".
+			const escaped = search.replace(/[\\%_]/g, '\\$&');
+			query = query.where('a.name', 'like', `%${escaped}%`);
+		}
 		if (hero) {
 			query = query.where((eb) =>
 				eb.or([
@@ -202,30 +324,125 @@ export class ArmyAPI {
 				])
 			);
 		}
-
-		if (equipment) {
-			const eqId = this.gameData.equipmentNames.get(equipment);
-			if (!eqId) {
-				throw new Error(`Unknown equipment: "${equipment}"`);
-			}
-			query = query.where('a.id', 'in', (eb) => eb.selectFrom('army_equipment as ae2').where('ae2.equipmentId', '=', eqId).select('ae2.armyId'));
+		if (equipments.length) {
+			const uniqueEquipments = Array.from(new Set(equipments));
+			query = query.where((eb) =>
+				eb.exists(
+					eb
+						.selectFrom('army_equipment as ae2')
+						.whereRef('ae2.armyId', '=', 'a.id')
+						.where('ae2.equipmentId', 'in', uniqueEquipments)
+						.having((eb) => eb.fn.count('ae2.equipmentId').distinct(), '=', uniqueEquipments.length)
+						.select(sql.lit(1).as('exists'))
+				)
+			);
 		}
-
-		if (pet) {
-			const petId = this.gameData.petNames.get(pet);
-			if (!petId) {
-				throw new Error(`Unknown pet: "${pet}"`);
-			}
-			query = query.where('a.id', 'in', (eb) => eb.selectFrom('army_pets as ap2').where('ap2.petId', '=', petId).select('ap2.armyId'));
+		if (pets.length) {
+			const uniquePets = Array.from(new Set(pets));
+			query = query.where((eb) =>
+				eb.exists(
+					eb
+						.selectFrom('army_pets as ap2')
+						.whereRef('ap2.armyId', '=', 'a.id')
+						.where('ap2.petId', 'in', uniquePets)
+						.having((eb) => eb.fn.count('ap2.petId').distinct(), '=', uniquePets.length)
+						.select(sql.lit(1).as('exists'))
+				)
+			);
 		}
-
-		if (unit) {
-			const unitId = this.gameData.troopNames.get(unit) ?? this.gameData.spellNames.get(unit) ?? this.gameData.siegeNames.get(unit);
-			if (!unitId) {
-				throw new Error(`Unknown unit: "${unit}"`);
+		if (units.length) {
+			const uniqueUnits = Array.from(new Set(units));
+			query = query.where((eb) =>
+				eb.exists(
+					eb
+						.selectFrom('army_units as au2')
+						.whereRef('au2.armyId', '=', 'a.id')
+						.where('au2.home', '=', 'armyCamp')
+						.where('au2.unitId', 'in', uniqueUnits)
+						.having((eb) => eb.fn.count('au2.unitId').distinct(), '=', uniqueUnits.length)
+						.select(sql.lit(1).as('exists'))
+				)
+			);
+		}
+		if (attackType) {
+			// Mirrors `ArmyModel.getArmyType` logic for calculating the composition of the army.
+			// Consider making this a dedicated column updated on save, as the computation below can be quite inefficient.
+			let ratioCondition: ReturnType<typeof sql<boolean>>;
+			switch (attackType) {
+				case 'Air':
+					ratioCondition = sql<boolean>`SUM(CASE WHEN u2.isFlying = 1 THEN au2.amount * u2.housingSpace ELSE 0 END) > 0.6 * SUM(au2.amount * u2.housingSpace)`;
+					break;
+				case 'Ground':
+					ratioCondition = sql<boolean>`SUM(CASE WHEN u2.isFlying = 1 THEN au2.amount * u2.housingSpace ELSE 0 END) < 0.4 * SUM(au2.amount * u2.housingSpace)`;
+					break;
+				case 'Hybrid':
+					ratioCondition = sql<boolean>`SUM(CASE WHEN u2.isFlying = 1 THEN au2.amount * u2.housingSpace ELSE 0 END) BETWEEN 0.4 * SUM(au2.amount * u2.housingSpace) AND 0.6 * SUM(au2.amount * u2.housingSpace)`;
+					break;
 			}
-			query = query.where('a.id', 'in', (eb) =>
-				eb.selectFrom('army_units as au2').where('au2.unitId', '=', unitId).where('au2.home', '=', 'armyCamp').select('au2.armyId')
+			query = query.where((eb) =>
+				eb.exists(
+					eb
+						.selectFrom('army_units as au2')
+						.innerJoin('units as u2', 'u2.id', 'au2.unitId')
+						.whereRef('au2.armyId', '=', 'a.id')
+						.where('u2.type', '!=', 'Spell')
+						.having(ratioCondition)
+						.select(sql.lit(1).as('exists'))
+				)
+			);
+		}
+		if (hasGuide) {
+			query = query.where('ag.id', 'is not', null);
+		}
+		if (noSuperTroops) {
+			query = query.where((eb) => {
+				const hasSuperTroops = eb.exists(
+					eb
+						.selectFrom('army_units as au2')
+						.innerJoin('units as u2', 'u2.id', 'au2.unitId')
+						.whereRef('au2.armyId', '=', 'a.id')
+						.where('u2.isSuper', '=', 1)
+						.select('au2.armyId')
+				);
+				return eb.not(hasSuperTroops);
+			});
+		}
+		if (noEpicEquipment) {
+			query = query.where((eb) => {
+				const hasEpicEquipment = eb.exists(
+					eb
+						.selectFrom('army_equipment as ae2')
+						.innerJoin('equipment as eq2', 'eq2.id', 'ae2.equipmentId')
+						.whereRef('ae2.armyId', '=', 'a.id')
+						.where('eq2.epic', '=', 1)
+						.select('ae2.armyId')
+				);
+				return eb.not(hasEpicEquipment);
+			});
+		}
+		if (hasClanCastle !== undefined) {
+			query = query.where((eb) => {
+				const hasClanCastleUnits = eb.exists(eb.selectFrom('army_units').whereRef('armyId', '=', 'a.id').where('home', '=', 'clanCastle').select('armyId'));
+				return hasClanCastle ? hasClanCastleUnits : eb.not(hasClanCastleUnits);
+			});
+		}
+		if (hasEquipment !== undefined) {
+			query = query.where('ae.armyId', hasEquipment ? 'is not' : 'is', null);
+		}
+		if (hasPets !== undefined) {
+			query = query.where('ap.armyId', hasPets ? 'is not' : 'is', null);
+		}
+		if (tags.length) {
+			const uniqueTags = Array.from(new Set(tags));
+			query = query.where((eb) =>
+				eb.exists(
+					eb
+						.selectFrom('army_tags')
+						.whereRef('armyId', '=', 'a.id')
+						.where('tag', 'in', uniqueTags)
+						.having((eb) => eb.fn.count('tag').distinct(), '=', uniqueTags.length)
+						.select(sql.lit(1).as('exists'))
+				)
 			);
 		}
 

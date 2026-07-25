@@ -73,7 +73,22 @@ export const BANNERS = [
 	'th-15',
 	'wild-west',
 ] as const;
+
 export const ARMY_TAGS = ['CWL/War', 'Legends League', 'Farming', 'Beginner Friendly', 'Spam'] as const;
+export type ArmyTag = (typeof ARMY_TAGS)[number];
+/**
+ * Short, URL-safe codes for `ARMY_TAGS`, so the `tags` filter query param stays clean,
+ * preventing having to percent encode the spaces/slash in the full labels, which is ugly.
+ */
+export const ARMY_TAG_CODES: Record<ArmyTag, string> = {
+	'CWL/War': 'CWL',
+	'Legends League': 'Legends',
+	Farming: 'Farming',
+	'Beginner Friendly': 'Beginner',
+	Spam: 'Spam',
+};
+export const ARMY_TAGS_BY_CODE = Object.fromEntries<ArmyTag>(Object.entries(ARMY_TAG_CODES).map(([tag, code]) => [code, tag as ArmyTag]));
+
 export const USER_MAX_ARMIES = 100;
 export const VALID_UNIT_HOME = ['armyCamp', 'clanCastle'] as const;
 export const GUIDE_TEXT_CHAR_LIMIT = 3_000;
@@ -81,6 +96,20 @@ export const YOUTUBE_URL_REGEX =
 	/^https:\/\/(?:(?:www\.|m\.)?youtube\.com\/watch\?(?=.*v=([\w-]{11}))\S*|(?:www\.|m\.)?youtube\.com\/shorts\/([\w-]{11})(?:\?\S*)?|youtu\.be\/([\w-]{11})(?:\?\S*)?)$/;
 export const MAX_COMMENT_LENGTH = 2_000;
 export const MAX_ARMY_TAGS = 3;
+/** Max length of the `search` army list filter */
+export const MAX_FILTER_SEARCH_LENGTH = 50;
+/** Max number of units that can be picked at once for the `units` army list filter (generously high) */
+export const MAX_FILTER_UNITS = 50;
+/**
+ * Max number of equipments that can be picked at once for the `equipments` army list filter.
+ * Max 4 heroes * 2 equipments each - an army can never have more, so matching more would match nothing.
+ */
+export const MAX_FILTER_EQUIPMENTS = 8;
+/**
+ * Max number of pets that can be picked at once for the `pets` army list filter.
+ * Max 4 heroes * 1 pet each - an army can never have more, so matching more would match nothing.
+ */
+export const MAX_FILTER_PETS = 4;
 
 // Should match metric name in `metrics` table
 export const PAGE_VIEW_METRIC = 'page-view';

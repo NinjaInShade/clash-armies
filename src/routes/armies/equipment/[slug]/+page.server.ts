@@ -5,10 +5,12 @@ import z from 'zod';
 export const load: PageServerLoad = async (req) => {
 	const slug = z.string().trim().min(1).parse(req.params.slug);
 	const server = req.locals.server;
-	const equipment = server.gameData.equipmentSlugs.get(slug);
-	if (!equipment) {
+	const equipmentName = server.gameData.equipmentSlugs.get(slug);
+	const equipmentId = equipmentName ? server.gameData.equipmentNames.get(equipmentName) : undefined;
+	if (equipmentId === undefined) {
 		return error(404);
 	}
-	const armies = await server.army.getArmies(req, { equipment, sort: 'score' });
-	return { armies, name: equipment };
+	const query = server.army.parseArmyListQuery(req.url.searchParams);
+	const armies = await server.army.getArmies(req, { ...query, equipments: [...(query.equipments ?? []), equipmentId], sort: 'score' });
+	return { armies, name: equipmentName };
 };

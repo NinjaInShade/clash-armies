@@ -39,17 +39,18 @@
 		allowFilters?: boolean;
 	};
 	const { data, bannerOptions, armiesPerPage = 10, allowSearch = false, allowTHFilter = false, allowFilters = false }: Props = $props();
+
 	const app = getContext<AppState>('app');
+
+	let controlsRef = $state<Controls>();
+	let pageNumber = $state<number>(getInitialPageNumber());
+
 	const armies = $derived.by(() => {
 		return data.map((army) => {
 			return untrack(() => new ArmyModel(app, army));
 		});
 	});
-
-	let controlsRef = $state<Controls>();
-	let pageNumber = $state<number>(getInitialPageNumber());
-	let filteredArmies = $state<ArmyModel[] | null>(null);
-	let displayArmies = $derived.by(() => (filteredArmies ?? []).slice(0, pageNumber * armiesPerPage));
+	const displayArmies = $derived(armies.slice(0, pageNumber * armiesPerPage));
 
 	function getInitialPageNumber() {
 		const pageParam = page.url.searchParams.get('page');
@@ -80,33 +81,27 @@
 	{/if}
 
 	<div class="controls">
-		<Controls bind:this={controlsRef} {armies} bind:filteredArmies {allowSearch} {allowTHFilter} {allowFilters} />
+		<Controls bind:this={controlsRef} {allowSearch} {allowTHFilter} {allowFilters} />
 	</div>
 
-	{#if filteredArmies === null}
-		<div class="spinner-container">
-			<span class="spinner"></span>
-		</div>
-	{:else}
-		<ul class="armies-list">
-			{#each displayArmies as model (model.id)}
-				<ArmyCard {model} />
-			{/each}
-		</ul>
+	<ul class="armies-list">
+		{#each displayArmies as model (model.id)}
+			<ArmyCard {model} />
+		{/each}
+	</ul>
 
-		{#if displayArmies.length && displayArmies.length < filteredArmies.length}
-			<Button onClick={loadMore} style="display: block; margin: 16px auto 0 auto;">Load more</Button>
-		{/if}
+	{#if displayArmies.length && displayArmies.length < armies.length}
+		<Button onClick={loadMore} style="display: block; margin: 16px auto 0 auto;">Load more</Button>
+	{/if}
 
-		{#if !displayArmies.length}
-			<div class="no-data">
-				<img src={ImgPekka} alt="PEKKA" />
-				<h2>There are no armies matching this criteria warrior!</h2>
-				<div class="reset-filters">
-					<Button onClick={resetFilters}>Reset all filters</Button>
-				</div>
+	{#if !displayArmies.length}
+		<div class="no-data">
+			<img src={ImgPekka} alt="PEKKA" />
+			<h2>There are no armies matching this criteria warrior!</h2>
+			<div class="reset-filters">
+				<Button onClick={resetFilters}>Reset all filters</Button>
 			</div>
-		{/if}
+		</div>
 	{/if}
 </div>
 
@@ -128,25 +123,6 @@
 		flex-flow: column nowrap;
 		margin-top: 10px;
 		gap: 10px;
-	}
-
-	.spinner-container {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		margin-top: 24px;
-		flex: 1 0 0px;
-
-		& .spinner {
-			width: 24px;
-			height: 24px;
-			border: 5px solid var(--grey-500);
-			border-bottom-color: transparent;
-			border-radius: 50%;
-			display: inline-block;
-			box-sizing: border-box;
-			animation: spin 1s linear infinite;
-		}
 	}
 
 	.no-data {

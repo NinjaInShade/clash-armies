@@ -15,25 +15,19 @@
 </script>
 
 <script lang="ts">
-	import { getContext, untrack } from 'svelte';
-	import type { ArmyModel } from '$models';
+	import { getContext } from 'svelte';
 	import { mkParamStore } from '$client/utils';
 	import { pluralize } from '$shared/utils';
 	import SearchBox from './SearchBox.svelte';
 	import THFilterButton from './THFilterButton.svelte';
 	import FiltersPopup from './FiltersPopup.svelte';
-	import { getTags } from '$client/army';
 
 	type Props = {
-		/** The full list of armies */
-		armies: ArmyModel[];
-		/** The bound list of armies that have been filtered */
-		filteredArmies: ArmyModel[] | null;
 		allowSearch: boolean;
 		allowTHFilter: boolean;
 		allowFilters: boolean;
 	};
-	let { armies, filteredArmies = $bindable(), allowSearch, allowTHFilter, allowFilters }: Props = $props();
+	let { allowSearch, allowTHFilter, allowFilters }: Props = $props();
 
 	const app = getContext<AppState>('app');
 	const showControls = $derived(allowSearch || allowTHFilter || allowFilters);
@@ -109,68 +103,6 @@
 			return v !== undefined;
 		}).length
 	);
-
-	$effect(() => {
-		// Register the dependencies we care about
-		void armies;
-		void filters;
-		void $search;
-		void $townHall;
-
-		// Untrack the actual filtering to guarantee we avoid
-		// any deep reactive reads on ArmyModel properties
-		filteredArmies = untrack(() => {
-			return armies.filter(filterFn);
-		});
-	});
-
-	function filterFn(army: ArmyModel) {
-		const tags = getTags(army);
-		const { units, ccUnits } = army;
-
-		if (typeof $townHall === 'number' && army.townHall !== $townHall) {
-			return false;
-		}
-		if ($search && !army.name?.toLowerCase().includes($search.toLowerCase())) {
-			return false;
-		}
-		if (filters.hasGuide === true && army.guide === null) {
-			return false;
-		}
-		if (filters.attackType !== undefined && !tags.map((t) => t.label).includes(filters.attackType)) {
-			return false;
-		}
-		if (filters.noSuperTroops === true && units.some((u) => u.info.isSuper)) {
-			return false;
-		}
-		if (filters.hasClanCastle !== undefined && (filters.hasClanCastle === true ? ccUnits.length < 1 : ccUnits.length > 0)) {
-			return false;
-		}
-		if (filters.noEpicEquipment === true && army.equipment.some((eq) => eq.info.epic)) {
-			return false;
-		}
-		if (filters.hasEquipment !== undefined && (filters.hasEquipment === true ? army.equipment.length < 1 : army.equipment.length > 0)) {
-			return false;
-		}
-		if (filters.hasPets !== undefined && (filters.hasPets === true ? army.pets.length < 1 : army.pets.length > 0)) {
-			return false;
-		}
-		for (const unit of filters.units ?? []) {
-			let hasUnit = false;
-			if (unit.pickType === 'unit') {
-				hasUnit = units.find((u) => u.unitId === unit.id) !== undefined;
-			} else if (unit.pickType === 'equipment') {
-				hasUnit = army.equipment.find((u) => u.equipmentId === unit.id) !== undefined;
-			} else if (unit.pickType === 'pet') {
-				hasUnit = army.pets.find((u) => u.petId === unit.id) !== undefined;
-			}
-			if (!hasUnit) {
-				return false;
-			}
-		}
-
-		return true;
-	}
 
 	async function openFiltersPopup() {
 		const newFilters = await app.openModalAsync<Filters>(FiltersPopup, { filters });

@@ -5,10 +5,12 @@ import z from 'zod';
 export const load: PageServerLoad = async (req) => {
 	const slug = z.string().trim().min(1).parse(req.params.slug);
 	const server = req.locals.server;
-	const pet = server.gameData.petSlugs.get(slug);
-	if (!pet) {
+	const petName = server.gameData.petSlugs.get(slug);
+	const petId = petName ? server.gameData.petNames.get(petName) : undefined;
+	if (petId === undefined) {
 		return error(404);
 	}
-	const armies = await server.army.getArmies(req, { pet, sort: 'score' });
-	return { armies, name: pet };
+	const query = server.army.parseArmyListQuery(req.url.searchParams);
+	const armies = await server.army.getArmies(req, { ...query, pets: [...(query.pets ?? []), petId], sort: 'score' });
+	return { armies, name: petName };
 };

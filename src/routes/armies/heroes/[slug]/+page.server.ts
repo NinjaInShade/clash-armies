@@ -9,6 +9,7 @@ export const load: PageServerLoad = async (req) => {
 	if (!hero) {
 		return error(404);
 	}
-	const armies = await server.army.getArmies(req, { hero, sort: 'score' });
+	const query = server.army.parseArmyListQuery(req.url.searchParams);
+	const armies = await server.army.getArmies(req, { ...query, hero, sort: 'score' });
 	return { armies, name: hero };
 };
