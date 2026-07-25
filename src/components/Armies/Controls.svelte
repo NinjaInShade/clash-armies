@@ -16,7 +16,7 @@
 
 <script lang="ts">
 	import { getContext } from 'svelte';
-	import { mkParamStore } from '$client/utils';
+	import { mkParamStore } from '$client/utils.svelte';
 	import { pluralize } from '$shared/utils';
 	import SearchBox from './SearchBox.svelte';
 	import THFilterButton from './THFilterButton.svelte';
@@ -32,68 +32,76 @@
 	const app = getContext<AppState>('app');
 	const showControls = $derived(allowSearch || allowTHFilter || allowFilters);
 
-	const search = mkParamStore('search', 'string');
-	const townHall = mkParamStore('townHall', 'number');
+	// Changing any filter resets pagination back to page 1, since the current page may no longer exist
+	const resetsPage = { resetKeys: ['page'] };
 
-	const hasGuide = mkParamStore('hasGuide', 'boolean');
-	const attackType = mkParamStore('attackType', 'string');
-	const noSuperTroops = mkParamStore('noSuperTroops', 'boolean');
-	const noEpicEquipment = mkParamStore('noEpicEquipment', 'boolean');
-	const hasClanCastle = mkParamStore('hasClanCastle', 'boolean');
-	const hasEquipment = mkParamStore('hasEquipment', 'boolean');
-	const hasPets = mkParamStore('hasPets', 'boolean');
-	const units = mkParamStore<PickUnit[]>('units', 'custom', {
-		// This can be improved - right now *every* unit gets a prefix,
-		// but we really only need to specify prefix once and group them (e.g. u1-u2-e5 -> u1-2e5)
-		serialize(value) {
-			let encoded: string[] = [];
-			for (const unit of value) {
-				encoded.push(`${unit.pickType[0]}${unit.id}`);
-			}
-			return encoded.join('-');
-		},
-		deserialize(value) {
-			if (!value) return [];
-			const split = value.split('-');
-			const units: PickUnit[] = [];
-			for (const unit of split) {
-				const pickType = unit[0];
-				const id = unit.substring(1);
-				let found: PickUnit | undefined;
-				if (pickType === 'u') {
-					const _found = app.units.find((u) => u.id === +id);
-					if (_found) {
-						found = { pickType: 'unit', ..._found };
+	const search = mkParamStore('search', 'string', resetsPage);
+	const townHall = mkParamStore('townHall', 'number', resetsPage);
+
+	const hasGuide = mkParamStore('hasGuide', 'boolean', resetsPage);
+	const attackType = mkParamStore('attackType', 'string', resetsPage);
+	const noSuperTroops = mkParamStore('noSuperTroops', 'boolean', resetsPage);
+	const noEpicEquipment = mkParamStore('noEpicEquipment', 'boolean', resetsPage);
+	const hasClanCastle = mkParamStore('hasClanCastle', 'boolean', resetsPage);
+	const hasEquipment = mkParamStore('hasEquipment', 'boolean', resetsPage);
+	const hasPets = mkParamStore('hasPets', 'boolean', resetsPage);
+	const units = mkParamStore<PickUnit[]>(
+		'units',
+		'custom',
+		{
+			// This can be improved - right now *every* unit gets a prefix,
+			// but we really only need to specify prefix once and group them (e.g. u1-u2-e5 -> u1-2e5)
+			serialize(value) {
+				let encoded: string[] = [];
+				for (const unit of value) {
+					encoded.push(`${unit.pickType[0]}${unit.id}`);
+				}
+				return encoded.join('-');
+			},
+			deserialize(value) {
+				if (!value) return [];
+				const split = value.split('-');
+				const units: PickUnit[] = [];
+				for (const unit of split) {
+					const pickType = unit[0];
+					const id = unit.substring(1);
+					let found: PickUnit | undefined;
+					if (pickType === 'u') {
+						const _found = app.units.find((u) => u.id === +id);
+						if (_found) {
+							found = { pickType: 'unit', ..._found };
+						}
+					} else if (pickType === 'e') {
+						const _found = app.equipment.find((u) => u.id === +id);
+						if (_found) {
+							found = { pickType: 'equipment', ..._found };
+						}
+					} else if (pickType === 'p') {
+						const _found = app.pets.find((u) => u.id === +id);
+						if (_found) {
+							found = { pickType: 'pet', ..._found };
+						}
 					}
-				} else if (pickType === 'e') {
-					const _found = app.equipment.find((u) => u.id === +id);
-					if (_found) {
-						found = { pickType: 'equipment', ..._found };
-					}
-				} else if (pickType === 'p') {
-					const _found = app.pets.find((u) => u.id === +id);
-					if (_found) {
-						found = { pickType: 'pet', ..._found };
+					if (found) {
+						units.push(found);
 					}
 				}
-				if (found) {
-					units.push(found);
-				}
-			}
-			return units;
+				return units;
+			},
 		},
-	});
+		resetsPage
+	);
 
 	// Convenience object
 	const filters = $derived({
-		hasGuide: $hasGuide,
-		attackType: $attackType,
-		noSuperTroops: $noSuperTroops,
-		noEpicEquipment: $noEpicEquipment,
-		hasClanCastle: $hasClanCastle,
-		hasEquipment: $hasEquipment,
-		hasPets: $hasPets,
-		units: $units,
+		hasGuide: hasGuide.value,
+		attackType: attackType.value,
+		noSuperTroops: noSuperTroops.value,
+		noEpicEquipment: noEpicEquipment.value,
+		hasClanCastle: hasClanCastle.value,
+		hasEquipment: hasEquipment.value,
+		hasPets: hasPets.value,
+		units: units.value,
 	});
 	const filtersLength = $derived(
 		Object.values(filters).filter((v) => {
@@ -109,27 +117,27 @@
 		if (newFilters === undefined) {
 			return;
 		}
-		$hasGuide = newFilters.hasGuide;
-		$attackType = newFilters.attackType;
-		$noSuperTroops = newFilters.noSuperTroops;
-		$noEpicEquipment = newFilters.noEpicEquipment;
-		$hasClanCastle = newFilters.hasClanCastle;
-		$hasEquipment = newFilters.hasEquipment;
-		$hasPets = newFilters.hasPets;
-		$units = newFilters.units;
+		hasGuide.value = newFilters.hasGuide;
+		attackType.value = newFilters.attackType;
+		noSuperTroops.value = newFilters.noSuperTroops;
+		noEpicEquipment.value = newFilters.noEpicEquipment;
+		hasClanCastle.value = newFilters.hasClanCastle;
+		hasEquipment.value = newFilters.hasEquipment;
+		hasPets.value = newFilters.hasPets;
+		units.value = newFilters.units;
 	}
 
 	export function resetAllFilters() {
-		$search = undefined;
-		$townHall = undefined;
-		$hasGuide = undefined;
-		$attackType = undefined;
-		$noSuperTroops = undefined;
-		$noEpicEquipment = undefined;
-		$hasClanCastle = undefined;
-		$hasEquipment = undefined;
-		$hasPets = undefined;
-		$units = [];
+		search.value = undefined;
+		townHall.value = undefined;
+		hasGuide.value = undefined;
+		attackType.value = undefined;
+		noSuperTroops.value = undefined;
+		noEpicEquipment.value = undefined;
+		hasClanCastle.value = undefined;
+		hasEquipment.value = undefined;
+		hasPets.value = undefined;
+		units.value = [];
 	}
 </script>
 
@@ -138,13 +146,13 @@
 		<div class="left">
 			{#if allowSearch}
 				<div class="search-box">
-					<SearchBox value={$search} onChange={(value) => ($search = value ?? undefined)} />
+					<SearchBox value={search.value} onChange={(value) => (search.value = value ?? undefined)} />
 				</div>
 			{/if}
 		</div>
 		<div class="right">
 			{#if allowTHFilter}
-				<THFilterButton value={$townHall} onChange={(value) => ($townHall = value ?? undefined)} />
+				<THFilterButton value={townHall.value} onChange={(value) => (townHall.value = value ?? undefined)} />
 			{/if}
 			{#if allowFilters}
 				<button

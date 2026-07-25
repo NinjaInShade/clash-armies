@@ -3,6 +3,7 @@
 	import { page } from '$app/state';
 	import { ARMY_PAGES } from '$client/pages';
 	import ArmyList from '~/components/Armies/ArmyList.svelte';
+	import PaginatedCanonical from '~/components/Armies/PaginatedCanonical.svelte';
 
 	const { data }: { data: PageData } = $props();
 	const slug = $derived(page.params.slug!);
@@ -15,12 +16,13 @@
 		name="description"
 		content="Browse top performing {data.name} armies. Find the best Clash of Clans strategies featuring the {data.name} siege machine."
 	/>
-	<link rel="canonical" href="https://clasharmies.com/armies/sieges/{slug}" />
 </svelte:head>
+
+<PaginatedCanonical href="https://clasharmies.com/armies/sieges/{slug}" />
 
 <section class="armies">
 	<div class="container">
-		<ArmyList data={data.armies} bannerOptions={pageMeta.bannerOptions} allowSearch allowFilters />
+		<ArmyList data={data.armies} total={data.total} bannerOptions={pageMeta.bannerOptions} allowSearch allowFilters />
 	</div>
 </section>
 

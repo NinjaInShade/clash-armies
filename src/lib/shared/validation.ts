@@ -45,6 +45,12 @@ export const commentSchema = z.object({
 });
 
 /**
+ * Highest 1-indexed page number a paginated list will actually serve.
+ * Bounds how deep an OFFSET any single request can ask the database for.
+ */
+export const MAX_PAGE = 1_000;
+
+/**
  * Validates data for a saved or unsaved army, returning a validated, ready for saving to the db, `ArmyModel`, if successful.
  * Also validates business logic rules such as making sure units are unlocked for the town hall etc...
  */
@@ -290,4 +296,20 @@ export function coerceNumber(value: string | null): number | undefined {
 	}
 	const n = Number(value);
 	return Number.isNaN(n) ? undefined : n;
+}
+
+/**
+ * Parses a raw `page` query param into a 1-indexed page number, or `undefined` to mean page 1.
+ *
+ * Invalid (missing, non-integer, below 1) falls back to page 1.
+ *
+ * A page beyond MAX_PAGE is deliberately kept *out of range* instead (MAX_PAGE+1) so queries will
+ * return no armies alongside a valid total, but means we don't allow the database a silly OFFSET number.
+ */
+export function parsePageParam(value: string | null): number | undefined {
+	const parsed = coerceNumber(value);
+	if (parsed === undefined || !Number.isInteger(parsed) || parsed < 1) {
+		return undefined;
+	}
+	return Math.min(parsed, MAX_PAGE + 1);
 }

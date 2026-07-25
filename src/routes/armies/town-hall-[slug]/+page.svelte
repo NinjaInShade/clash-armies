@@ -3,6 +3,7 @@
 	import { page } from '$app/state';
 	import { ARMY_PAGES } from '$client/pages';
 	import ArmyList from '~/components/Armies/ArmyList.svelte';
+	import PaginatedCanonical from '~/components/Armies/PaginatedCanonical.svelte';
 
 	const { data }: { data: PageData } = $props();
 	const townHall = $derived(+page.params.slug!);
@@ -15,12 +16,13 @@
 		name="description"
 		content="Browse top performing Town Hall {townHall} armies. Perfect your TH{townHall} attacks for war, farming, and CWL with tested strategies."
 	/>
-	<link rel="canonical" href="https://clasharmies.com/armies/town-hall-{townHall}" />
 </svelte:head>
+
+<PaginatedCanonical href="https://clasharmies.com/armies/town-hall-{townHall}" />
 
 <section class="armies">
 	<div class="container">
-		<ArmyList data={data.armies} bannerOptions={pageMeta.bannerOptions} allowSearch allowFilters />
+		<ArmyList data={data.armies} total={data.total} bannerOptions={pageMeta.bannerOptions} allowSearch allowFilters />
 	</div>
 </section>
 

@@ -3,7 +3,7 @@ import { assert, createReq, USER, USER_2, USER_ADMIN, createUsers, makeData, ass
 import type { UnitType, StaticGameData } from '$types';
 import type { SessionUser } from '$server/auth/session';
 import { ArmyModel, UnitModel, PetModel, EquipmentModel } from '$models';
-import { validateArmy } from '$shared/validation';
+import { validateArmy, MAX_PAGE } from '$shared/validation';
 import {
 	GUIDE_TEXT_CHAR_LIMIT,
 	ARMY_TAGS,
@@ -67,7 +67,7 @@ describe('Saving', function () {
 				],
 			});
 			await server.army.saveArmy(req, data);
-			const armies = await server.army.getArmies(req);
+			const { armies } = await server.army.getArmies(req);
 			assertArmies(armies, [data]);
 		});
 
@@ -83,7 +83,7 @@ describe('Saving', function () {
 				],
 			});
 			await server.army.saveArmy(req, data);
-			const armies = await server.army.getArmies(req);
+			const { armies } = await server.army.getArmies(req);
 			assertArmies(armies, [data]);
 		});
 
@@ -103,7 +103,7 @@ describe('Saving', function () {
 				],
 			});
 			await server.army.saveArmy(req, data);
-			const armies = await server.army.getArmies(req);
+			const { armies } = await server.army.getArmies(req);
 			assertArmies(armies, [data]);
 		});
 
@@ -127,7 +127,7 @@ describe('Saving', function () {
 				],
 			});
 			await server.army.saveArmy(req, data);
-			const armies = await server.army.getArmies(req);
+			const { armies } = await server.army.getArmies(req);
 			assertArmies(armies, [data]);
 		});
 
@@ -142,7 +142,7 @@ describe('Saving', function () {
 				},
 			});
 			await server.army.saveArmy(req, data);
-			const armies = await server.army.getArmies(req);
+			const { armies } = await server.army.getArmies(req);
 			assertArmies(armies, [data]);
 		});
 
@@ -162,7 +162,7 @@ describe('Saving', function () {
 				},
 			});
 			await server.army.saveArmy(req, data);
-			const armies = await server.army.getArmies(req);
+			const { armies } = await server.army.getArmies(req);
 			// Expect one empty tag
 			data.guide.textContent = '<p></p>';
 			assertArmies(armies, [data]);
@@ -182,7 +182,7 @@ describe('Saving', function () {
 				pets: [{ hero: 'Barbarian King', petId: PetModel.requireByName('Lassi', gameData).id }],
 			});
 			await server.army.saveArmy(req, data);
-			const army = (await server.army.getArmies(req))[0];
+			const army = (await server.army.getArmies(req)).armies[0];
 			// Add units
 			army.units.push(
 				{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Archer', gameData).id, amount: 5 },
@@ -191,7 +191,7 @@ describe('Saving', function () {
 			army.equipment.push({ equipmentId: EquipmentModel.requireByName('Rage Vial', gameData).id });
 			army.pets.push({ hero: 'Archer Queen', petId: PetModel.requireByName('Spirit Fox', gameData).id });
 			await server.army.saveArmy(req, army);
-			const armySaved = (await server.army.getArmies(req))[0];
+			const armySaved = (await server.army.getArmies(req)).armies[0];
 			assertArmies([armySaved], [army]);
 		});
 
@@ -218,13 +218,13 @@ describe('Saving', function () {
 				],
 			});
 			await server.army.saveArmy(req, data);
-			const army = (await server.army.getArmies(req))[0];
+			const army = (await server.army.getArmies(req)).armies[0];
 			// Remove units
 			army.units = army.units.filter((u) => u.unitId !== archer.id);
 			army.equipment = army.equipment.filter((eq) => eq.equipmentId !== rageVial.id);
 			army.pets = army.pets.filter((p) => p.petId !== spiritFox.id);
 			await server.army.saveArmy(req, army);
-			const armySaved = (await server.army.getArmies(req))[0];
+			const armySaved = (await server.army.getArmies(req)).armies[0];
 			assertArmies([armySaved], [army]);
 		});
 
@@ -247,13 +247,13 @@ describe('Saving', function () {
 				],
 			});
 			await server.army.saveArmy(req, data);
-			const army = (await server.army.getArmies(req))[0];
+			const army = (await server.army.getArmies(req)).armies[0];
 			// Remove all units (you need to keep the army camp units otherwise army can't be saved but that's okay)
 			army.units = army.units.filter((u) => u.home === 'armyCamp');
 			army.equipment = [];
 			army.pets = [];
 			await server.army.saveArmy(req, army);
-			const armySaved = (await server.army.getArmies(req))[0];
+			const armySaved = (await server.army.getArmies(req)).armies[0];
 			assertArmies([armySaved], [army]);
 		});
 
@@ -305,7 +305,7 @@ describe('Saving', function () {
 			});
 			await server.army.saveArmy(req, data);
 
-			const army = (await server.army.getArmies(req))[0];
+			const army = (await server.army.getArmies(req)).armies[0];
 			// Delete home unit from the army
 			army.units = army.units.filter((u) => u.home === 'clanCastle' || u.unitId !== archer.id);
 			// Simulate removing and re-adding the clan castle unit by ensuring id is undefined
@@ -313,7 +313,7 @@ describe('Saving', function () {
 			ccUnit.id = undefined;
 
 			await server.army.saveArmy(req, army);
-			const armyAfter = (await server.army.getArmies(req))[0];
+			const armyAfter = (await server.army.getArmies(req)).armies[0];
 
 			// Assert home unit was deleted
 			const homeUnits = armyAfter.units.filter((u) => u.home === 'armyCamp');
@@ -331,11 +331,11 @@ describe('Saving', function () {
 				units: [{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Barbarian', gameData).id, amount: 10 }],
 			});
 			await server.army.saveArmy(req, data);
-			const army = (await server.army.getArmies(req))[0];
+			const army = (await server.army.getArmies(req)).armies[0];
 			// Update amount
 			army.units[0].amount = 20;
 			await server.army.saveArmy(req, army);
-			const armySaved = (await server.army.getArmies(req))[0];
+			const armySaved = (await server.army.getArmies(req)).armies[0];
 			assertArmies([armySaved], [army]);
 		});
 
@@ -350,11 +350,11 @@ describe('Saving', function () {
 				},
 			});
 			await server.army.saveArmy(req, data);
-			const army = (await server.army.getArmies(req))[0];
+			const army = (await server.army.getArmies(req)).armies[0];
 			// Remove guide
 			army.guide = null;
 			await server.army.saveArmy(req, army);
-			const armySaved = (await server.army.getArmies(req))[0];
+			const armySaved = (await server.army.getArmies(req)).armies[0];
 			assertArmies([armySaved], [army]);
 		});
 	});
@@ -390,7 +390,7 @@ describe('Fetching', function () {
 		await server.army.saveArmy(req, data);
 		await server.army.saveArmy(req, data2);
 		// Assert  units/equipment/pets length matches for each army (assertArmies handles this)
-		const armies = await server.army.getArmies(req);
+		const { armies } = await server.army.getArmies(req);
 		assertArmies(armies, [data, data2]);
 	});
 
@@ -409,7 +409,7 @@ describe('Fetching', function () {
 		await server.army.saveArmy(req, data1);
 		await server.army.saveArmy(req, data2);
 
-		const armies = await server.army.getArmies(req, { units: [barbarianId] });
+		const { armies } = await server.army.getArmies(req, { units: [barbarianId] });
 		assertArmies(armies, [data1]);
 	});
 
@@ -454,7 +454,7 @@ describe('Fetching', function () {
 		await server.army.saveArmy(req, data1);
 		await server.army.saveArmy(req, data2);
 
-		const armies = await server.army.getArmies(req, { units: [healingId] });
+		const { armies } = await server.army.getArmies(req, { units: [healingId] });
 		assertArmies(armies, [data1]);
 	});
 
@@ -475,7 +475,7 @@ describe('Fetching', function () {
 		await server.army.saveArmy(req, data1);
 		await server.army.saveArmy(req, data2);
 
-		const armies = await server.army.getArmies(req, { equipments: [barbarianPuppetId] });
+		const { armies } = await server.army.getArmies(req, { equipments: [barbarianPuppetId] });
 		assertArmies(armies, [data1]);
 	});
 
@@ -518,7 +518,7 @@ describe('Fetching', function () {
 		await server.army.saveArmy(req, data1);
 		await server.army.saveArmy(req, data2);
 
-		const armies = await server.army.getArmies(req, { pets: [lassiId] });
+		const { armies } = await server.army.getArmies(req, { pets: [lassiId] });
 		assertArmies(armies, [data1]);
 	});
 
@@ -571,7 +571,7 @@ describe('Fetching', function () {
 		await server.army.saveArmy(req, data3);
 
 		// Barbarian King filter should match armies with BK equipment or BK pets
-		const armies = await server.army.getArmies(req, { hero: 'Barbarian King' });
+		const { armies } = await server.army.getArmies(req, { hero: 'Barbarian King' });
 		assertArmies(armies, [data1, data2]);
 	});
 
@@ -584,7 +584,7 @@ describe('Fetching', function () {
 		});
 		await server.army.saveArmy(req, data);
 
-		const armies = await server.army.getArmies(req, { units: [archerId] });
+		const { armies } = await server.army.getArmies(req, { units: [archerId] });
 		assertArmies(armies, []);
 	});
 
@@ -602,11 +602,11 @@ describe('Fetching', function () {
 		await server.army.saveArmy(req, data);
 
 		// Should not match Archer since it's only in clan castle
-		const armies = await server.army.getArmies(req, { units: [archerId] });
+		const { armies } = await server.army.getArmies(req, { units: [archerId] });
 		assertArmies(armies, []);
 
 		// Should match Barbarian since it's in army camp
-		const armies2 = await server.army.getArmies(req, { units: [barbarianId] });
+		const { armies: armies2 } = await server.army.getArmies(req, { units: [barbarianId] });
 		assertArmies(armies2, [data]);
 	});
 
@@ -810,6 +810,93 @@ describe('Fetching', function () {
 
 		const { armies } = await server.army.getArmies(req, { tags: [tag1, tag2] });
 		assertArmies(armies, [data1]);
+	});
+
+	it('Should return the total count of matching armies even when not paginating', async function () {
+		const barbarianId = UnitModel.requireTroopByName('Barbarian', gameData).id;
+		const data1 = makeData({ name: 'total-1', townHall: 16, units: [{ home: 'armyCamp', unitId: barbarianId, amount: 10 }] });
+		const data2 = makeData({ name: 'total-2', townHall: 16, units: [{ home: 'armyCamp', unitId: barbarianId, amount: 10 }] });
+		const data3 = makeData({ name: 'total-3', townHall: 16, units: [{ home: 'armyCamp', unitId: barbarianId, amount: 10 }] });
+		await server.army.saveArmy(req, data1);
+		await server.army.saveArmy(req, data2);
+		await server.army.saveArmy(req, data3);
+
+		const { armies, total } = await server.army.getArmies(req);
+		assert.lengthOf(armies, 3);
+		assert.equal(total, 3);
+	});
+
+	it('Should paginate armies using page/limit', async function () {
+		const barbarianId = UnitModel.requireTroopByName('Barbarian', gameData).id;
+		const names = ['paginated-1', 'paginated-2', 'paginated-3', 'paginated-4', 'paginated-5'];
+		for (const name of names) {
+			await server.army.saveArmy(req, makeData({ name, townHall: 16, units: [{ home: 'armyCamp', unitId: barbarianId, amount: 10 }] }));
+		}
+
+		const { armies: page1, total: total1 } = await server.army.getArmies(req, { limit: 2, page: 1 });
+		const { armies: page2, total: total2 } = await server.army.getArmies(req, { limit: 2, page: 2 });
+		const { armies: page3, total: total3 } = await server.army.getArmies(req, { limit: 2, page: 3 });
+
+		assert.lengthOf(page1, 2);
+		assert.lengthOf(page2, 2);
+		assert.lengthOf(page3, 1);
+		assert.equal(total1, 5);
+		assert.equal(total2, 5);
+		assert.equal(total3, 5);
+		assert.deepEqual(page1.map((a) => a.name).toSorted(), [names[0], names[1]]);
+		assert.deepEqual(page2.map((a) => a.name).toSorted(), [names[2], names[3]]);
+		assert.deepEqual(page3.map((a) => a.name).toSorted(), [names[4]]);
+	});
+
+	it('Should default to page 1 when limit is set without a page', async function () {
+		const barbarianId = UnitModel.requireTroopByName('Barbarian', gameData).id;
+		await server.army.saveArmy(req, makeData({ name: 'page-default-1', townHall: 16, units: [{ home: 'armyCamp', unitId: barbarianId, amount: 10 }] }));
+		await server.army.saveArmy(req, makeData({ name: 'page-default-2', townHall: 16, units: [{ home: 'armyCamp', unitId: barbarianId, amount: 10 }] }));
+
+		const { armies: withoutPage } = await server.army.getArmies(req, { limit: 1 });
+		const { armies: withPage1 } = await server.army.getArmies(req, { limit: 1, page: 1 });
+
+		assert.lengthOf(withoutPage, 1);
+		assert.equal(withoutPage[0].name, withPage1[0].name);
+	});
+
+	it('Should base total on the filtered result count, not all armies', async function () {
+		const barbarianId = UnitModel.requireTroopByName('Barbarian', gameData).id;
+		const data1 = makeData({ name: 'th16-a', townHall: 16, units: [{ home: 'armyCamp', unitId: barbarianId, amount: 10 }] });
+		const data2 = makeData({ name: 'th16-b', townHall: 16, units: [{ home: 'armyCamp', unitId: barbarianId, amount: 10 }] });
+		const data3 = makeData({ name: 'th10-a', townHall: 10, units: [{ home: 'armyCamp', unitId: barbarianId, amount: 10 }] });
+		await server.army.saveArmy(req, data1);
+		await server.army.saveArmy(req, data2);
+		await server.army.saveArmy(req, data3);
+
+		const { armies, total } = await server.army.getArmies(req, { townHall: 16, limit: 1, page: 1 });
+		assert.lengthOf(armies, 1);
+		assert.equal(total, 2);
+	});
+
+	it('Should still report the total when the requested page is out of range', async function () {
+		const barbarianId = UnitModel.requireTroopByName('Barbarian', gameData).id;
+		for (const name of ['oor-1', 'oor-2', 'oor-3']) {
+			await server.army.saveArmy(req, makeData({ name, townHall: 16, units: [{ home: 'armyCamp', unitId: barbarianId, amount: 10 }] }));
+		}
+
+		const { armies, total } = await server.army.getArmies(req, { limit: 2, page: 50 });
+		assert.lengthOf(armies, 0);
+		assert.equal(total, 3);
+	});
+
+	it('Should treat a page beyond the max as out of range, not as page one', async function () {
+		const barbarianId = UnitModel.requireTroopByName('Barbarian', gameData).id;
+		for (const name of ['cap-1', 'cap-2', 'cap-3']) {
+			await server.army.saveArmy(req, makeData({ name, townHall: 16, units: [{ home: 'armyCamp', unitId: barbarianId, amount: 10 }] }));
+		}
+
+		const query = server.army.parseArmyListQuery(new URLSearchParams(`page=${MAX_PAGE + 500}`));
+		const { armies, total } = await server.army.getArmies(req, { ...query, limit: 2 });
+
+		// Silently serving page 1 here would leave the UI claiming a page number it isn't showing
+		assert.lengthOf(armies, 0);
+		assert.equal(total, 3);
 	});
 });
 
@@ -1603,5 +1690,21 @@ describe('Army list query parsing', function () {
 		assert.equal(parse(`search=${'a'.repeat(MAX_FILTER_SEARCH_LENGTH)}`).search, 'a'.repeat(MAX_FILTER_SEARCH_LENGTH));
 		assert.strictEqual(parse(`search=${'a'.repeat(MAX_FILTER_SEARCH_LENGTH + 1)}`).search, undefined);
 		assert.strictEqual(parse('search=').search, undefined);
+	});
+
+	it('Should fall back to page one for a missing or malformed page', function () {
+		assert.strictEqual(parse('').page, undefined);
+		assert.strictEqual(parse('page=abc').page, undefined);
+		assert.strictEqual(parse('page=0').page, undefined);
+		assert.strictEqual(parse('page=-2').page, undefined);
+		assert.strictEqual(parse('page=1.5').page, undefined);
+		assert.equal(parse('page=3').page, 3);
+	});
+
+	it('Should keep a page beyond the max out of range instead of falling back to page one', function () {
+		assert.equal(parse(`page=${MAX_PAGE}`).page, MAX_PAGE);
+		// Clamped just past the last servable page, so it returns nothing (with a real total) but keeps the OFFSET bounded
+		assert.equal(parse(`page=${MAX_PAGE + 1}`).page, MAX_PAGE + 1);
+		assert.equal(parse('page=999999999').page, MAX_PAGE + 1);
 	});
 });

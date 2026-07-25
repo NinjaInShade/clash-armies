@@ -2,14 +2,16 @@
 	import C from '$components';
 	import { getContext } from 'svelte';
 	import type { AppState, User } from '$types';
-	import type { ArmyModel } from '$models';
+	import type { Army } from '$models';
+	import ArmyList from '$components/Armies/ArmyList.svelte';
 	import ImgFallingBarb from '$assets/ui/falling-barb.webp';
 
 	type Props = {
-		armies: ArmyModel[];
+		armies: Army[];
+		total: number;
 		user: User;
 	};
-	const { armies, user }: Props = $props();
+	const { armies, total, user }: Props = $props();
 
 	const app = getContext<AppState>('app');
 	const username = $derived(user.username);
@@ -18,17 +20,14 @@
 
 <div class="header">
 	<h2>Created armies</h2>
-	{#if currentUser === username && armies.length > 0}
+	{#if currentUser === username && total > 0}
 		<C.ActionButton asLink href="/army-builder" theme="success">Create army</C.ActionButton>
 	{/if}
 </div>
-{#if armies.length}
-	<ul class="armies-list">
-		{#each armies as model (model.id)}
-			<C.ArmyCard {model} />
-		{/each}
-	</ul>
-{:else}
+
+<ArmyList data={armies} {total} paginationScrollTarget={120} {emptyState} />
+
+{#snippet emptyState()}
 	<div class="no-armies">
 		<img src={ImgFallingBarb} alt="Falling barbarian" />
 		<h2>
@@ -42,7 +41,7 @@
 			<C.Button asLink href="/army-builder">Create army</C.Button>
 		{/if}
 	</div>
-{/if}
+{/snippet}
 
 <style>
 	.header {
@@ -51,12 +50,6 @@
 		align-items: center;
 		margin-bottom: 1em;
 		gap: 0.5em;
-	}
-
-	.armies-list {
-		display: flex;
-		flex-flow: column nowrap;
-		gap: 10px;
 	}
 
 	.no-armies {

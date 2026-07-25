@@ -2,6 +2,7 @@
 	import type { PageData } from './$types';
 	import { ARMY_PAGES } from '$client/pages';
 	import ArmyList from '~/components/Armies/ArmyList.svelte';
+	import PaginatedCanonical from '~/components/Armies/PaginatedCanonical.svelte';
 
 	const { data }: { data: PageData } = $props();
 	const pageMeta = ARMY_PAGES.popular;
@@ -13,12 +14,13 @@
 		name="description"
 		content="Browse the most popular Clash of Clans armies. Find what's working best across all Town Hall levels, for war, farming, and more!"
 	/>
-	<link rel="canonical" href="https://clasharmies.com/armies/popular" />
 </svelte:head>
+
+<PaginatedCanonical href="https://clasharmies.com/armies/popular" />
 
 <section class="armies">
 	<div class="container">
-		<ArmyList data={data.armies} bannerOptions={pageMeta.bannerOptions} allowSearch allowTHFilter allowFilters />
+		<ArmyList data={data.armies} total={data.total} bannerOptions={pageMeta.bannerOptions} allowSearch allowTHFilter allowFilters />
 	</div>
 </section>
 

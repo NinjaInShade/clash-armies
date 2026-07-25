@@ -2,6 +2,7 @@
 	import type { PageData } from './$types';
 	import { ARMY_PAGES } from '$client/pages';
 	import ArmyList from '~/components/Armies/ArmyList.svelte';
+	import PaginatedCanonical from '~/components/Armies/PaginatedCanonical.svelte';
 
 	const { data }: { data: PageData } = $props();
 	const pageMeta = ARMY_PAGES.latest;
@@ -13,12 +14,13 @@
 		name="description"
 		content="Browse hundreds of user-created Clash of Clans armies. Filter by town hall, strategy, troop types, and more to find the perfect attack for any war or farming goal."
 	/>
-	<link rel="canonical" href="https://clasharmies.com/armies" />
 </svelte:head>
+
+<PaginatedCanonical href="https://clasharmies.com/armies" />
 
 <section class="armies">
 	<div class="container">
-		<ArmyList data={data.armies} bannerOptions={pageMeta.bannerOptions} allowSearch allowTHFilter allowFilters />
+		<ArmyList data={data.armies} total={data.total} bannerOptions={pageMeta.bannerOptions} allowSearch allowTHFilter allowFilters />
 	</div>
 </section>
 

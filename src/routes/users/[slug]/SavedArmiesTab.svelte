@@ -1,15 +1,16 @@
 <script lang="ts">
 	import { getContext } from 'svelte';
 	import type { AppState, User } from '$types';
-	import type { ArmyModel } from '$models';
-	import C from '$components';
+	import type { Army } from '$models';
+	import ArmyList from '$components/Armies/ArmyList.svelte';
 	import ImgFallingBarb from '$assets/ui/falling-barb.webp';
 
 	type Props = {
-		savedArmies: ArmyModel[];
+		savedArmies: Army[];
+		total: number;
 		user: User;
 	};
-	const { savedArmies, user }: Props = $props();
+	const { savedArmies, total, user }: Props = $props();
 
 	const app = getContext<AppState>('app');
 	const username = $derived(user.username);
@@ -17,13 +18,10 @@
 </script>
 
 <h2 class="title">Saved armies</h2>
-{#if savedArmies.length}
-	<ul class="armies-list">
-		{#each savedArmies as model (model.id)}
-			<C.ArmyCard {model} />
-		{/each}
-	</ul>
-{:else}
+
+<ArmyList data={savedArmies} {total} pageParam="savedPage" paginationScrollTarget={120} {emptyState} />
+
+{#snippet emptyState()}
 	<div class="no-armies">
 		<img src={ImgFallingBarb} alt="Falling barbarian" />
 		<h2>
@@ -34,15 +32,9 @@
 			{/if}
 		</h2>
 	</div>
-{/if}
+{/snippet}
 
 <style>
-	.armies-list {
-		display: flex;
-		flex-flow: column nowrap;
-		gap: 10px;
-	}
-
 	.title {
 		margin-bottom: 16px;
 	}

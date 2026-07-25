@@ -110,6 +110,8 @@ export const MAX_FILTER_EQUIPMENTS = 8;
  * Max 4 heroes * 1 pet each - an army can never have more, so matching more would match nothing.
  */
 export const MAX_FILTER_PETS = 4;
+/** How many armies are shown per page in a paginated army list */
+export const ARMIES_PAGE_SIZE = 20;
 
 // Should match metric name in `metrics` table
 export const PAGE_VIEW_METRIC = 'page-view';

@@ -6,6 +6,7 @@
 	import ImgLeagueKing from '$assets/ui/league-king.webp';
 	import ImgLeagueKingLarge from '$assets/ui/league-king_large.webp';
 	import ImgHeaderBarbLarge from '$assets/ui/header-barbarian_large.webp';
+	import PaginatedCanonical from '~/components/Armies/PaginatedCanonical.svelte';
 
 	const { data }: { data: PageData } = $props();
 	const latestArmiesMeta = ARMY_PAGES.latest;
@@ -17,8 +18,9 @@
 		name="description"
 		content="Discover the best Clash of Clans armies - ranked, curated, and constantly updated. Explore top picks for CWL, trending, in-meta strategies, rising comps, and more to dominate every attack."
 	/>
-	<link rel="canonical" href="https://clasharmies.com" />
 </svelte:head>
+
+<PaginatedCanonical href="https://clasharmies.com" />
 
 <header>
 	<div class="container">
@@ -39,7 +41,7 @@
 
 <section class="top-armies">
 	<div class="container">
-		<ArmyList data={data.armies} bannerOptions={latestArmiesMeta.bannerOptions} />
+		<ArmyList data={data.armies} total={data.total} bannerOptions={latestArmiesMeta.bannerOptions} paginationScrollTarget={275} />
 	</div>
 </section>
 

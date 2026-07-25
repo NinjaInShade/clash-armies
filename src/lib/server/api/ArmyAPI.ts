@@ -11,7 +11,7 @@ import {
 	MAX_FILTER_EQUIPMENTS,
 	MAX_FILTER_PETS,
 } from '$shared/utils';
-import { validateArmy, numberSchema, commentSchema, parseField, coerceBoolean, coerceNumber } from '$shared/validation';
+import { validateArmy, numberSchema, commentSchema, parsePageParam, parseField, coerceBoolean, coerceNumber } from '$shared/validation';
 import { generateJSON, generateHTML } from '@tiptap/html';
 import { getExtensions } from '$shared/guideEditor';
 import { parseHTML } from 'zeed-dom';
@@ -62,9 +62,20 @@ type GetArmiesOptions = {
 	hasPets?: boolean;
 	/** Only fetch armies tagged with *all* of these tags */
 	tags?: string[];
+	/**
+	 * 1-indexed page number, used together with `limit` to paginate results.
+	 * Ignored if `limit` isn't also set.
+	 * Uses simple LIMIT/OFFSET pagination, not cursor-based pagination.
+	 */
+	page?: number;
+	/**
+	 * Max number of armies to return.
+	 * @default 500
+	 */
+	limit?: number;
 };
 
-type GetSavedArmiesOptions = {
+type GetSavedArmiesOptions = Pick<GetArmiesOptions, 'page' | 'limit'> & {
 	/** Returns the armies saved by this username */
 	username: string;
 };
@@ -164,6 +175,7 @@ export class ArmyAPI {
 			equipments: parseField(schema.equipments, equipmentIds),
 			pets: parseField(schema.pets, petIds),
 			tags: parseField(schema.tags, tags),
+			page: parsePageParam(searchParams.get('page')),
 		};
 	}
 
@@ -186,6 +198,8 @@ export class ArmyAPI {
 			hasPets,
 			tags = [],
 			sort,
+			page,
+			limit = 500,
 		} = options;
 		const userId = req.locals.user?.id ?? null;
 		const weights = await this.metrics.getMetricWeights();
@@ -455,6 +469,10 @@ export class ArmyAPI {
 			query = query.orderBy('createdTime', 'desc');
 		}
 
+		if (limit) {
+			query = query.limit(limit).offset(((page ?? 1) - 1) * limit);
+		}
+
 		const armies = await query
 			.groupBy('a.id')
 			.selectAll('a')
@@ -483,8 +501,26 @@ export class ArmyAPI {
 				), NULL)`.as('guide'),
 				sql<boolean>`(sa.id IS NOT NULL)`.as('userBookmarked'),
 				eb.fn.coalesce('uv.vote', sql.lit(0)).as('userVote'),
+				// Total rows matching the filters *before* the LIMIT/OFFSET are applied above.
+				// Uses window function to prevent running another query, with the trade-off that every row will get a `total` field.
+				eb.fn.countAll<number>().over().as('total'),
 			])
 			.execute();
+
+		let total = armies[0]?.total ?? 0;
+
+		// The window function only produces a total when at least one row comes back, so an offset past
+		// the end (stale bookmark, armies since deleted, etc...) would report zero and leave the client
+		// with no pagination controls to get back to a valid page.
+		if (!armies.length && limit && (page ?? 1) > 1) {
+			const counted = await query
+				.clearLimit()
+				.clearOffset()
+				.clearOrderBy()
+				.select((eb) => eb.fn.count<number>('a.id').distinct().as('total'))
+				.executeTakeFirst();
+			total = Number(counted?.total ?? 0);
+		}
 
 		for (const army of armies) {
 			army.equipment ??= [];
@@ -502,11 +538,11 @@ export class ArmyAPI {
 			army.userBookmarked = army.userBookmarked === 1;
 		}
 
-		return armies;
+		return { armies, total };
 	}
 
 	public async getSavedArmies(req: RequestEvent, options: GetSavedArmiesOptions) {
-		const { username } = options;
+		const { username, page, limit } = options;
 
 		const savedArmyIds = await this.server.db
 			.selectFrom('saved_armies as sa')
@@ -517,13 +553,13 @@ export class ArmyAPI {
 		const savedArmyIdsArr = savedArmyIds.map((row) => row.armyId);
 
 		if (!savedArmyIdsArr.length) {
-			return [];
+			return { armies: [], total: 0 };
 		}
-		return this.getArmies(req, { ids: savedArmyIdsArr });
+		return this.getArmies(req, { ids: savedArmyIdsArr, page, limit });
 	}
 
 	public async getArmy(req: RequestEvent, id: number) {
-		const armies = await this.getArmies(req, { ids: [id] });
+		const { armies } = await this.getArmies(req, { ids: [id] });
 		if (!armies.length) {
 			return null;
 		}

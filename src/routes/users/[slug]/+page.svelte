@@ -1,9 +1,8 @@
 <script lang="ts">
 	import C from '$components';
-	import { getContext, untrack } from 'svelte';
+	import { getContext } from 'svelte';
 	import type { AppState } from '$types';
 	import type { PageData } from './$types';
-	import { ArmyModel } from '$models';
 	import { format } from 'date-fns';
 	import EditUser from './EditUser.svelte';
 	import CreatedArmiesTab from './CreatedArmiesTab.svelte';
@@ -17,17 +16,6 @@
 	const app = getContext<AppState>('app');
 	const username = $derived(user.username);
 	const currentUser = $derived(app.user ? app.user.username : null);
-
-	const savedArmies = $derived(
-		data.savedArmies.map((army) => {
-			return untrack(() => new ArmyModel(app, army));
-		})
-	);
-	const armies = $derived(
-		data.armies.map((army) => {
-			return untrack(() => new ArmyModel(app, army));
-		})
-	);
 
 	function editUser() {
 		app.openModal(EditUser, { user });
@@ -71,8 +59,18 @@
 	<div class="container">
 		<C.TabStrip
 			tabs={[
-				{ name: 'created', label: `Created (${armies.length})`, component: CreatedArmiesTab, componentProps: { armies, user } },
-				{ name: 'saved', label: `Saved (${savedArmies.length})`, component: SavedArmiesTab, componentProps: { savedArmies, user } },
+				{
+					name: 'created',
+					label: `Created (${data.total})`,
+					component: CreatedArmiesTab,
+					componentProps: { armies: data.armies, total: data.total, user },
+				},
+				{
+					name: 'saved',
+					label: `Saved (${data.savedTotal})`,
+					component: SavedArmiesTab,
+					componentProps: { savedArmies: data.savedArmies, total: data.savedTotal, user },
+				},
 			]}
 		/>
 	</div>
