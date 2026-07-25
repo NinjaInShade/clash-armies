@@ -41,7 +41,7 @@
 
 <section class="top-armies">
 	<div class="container">
-		<ArmyList data={data.armies} total={data.total} bannerOptions={latestArmiesMeta.bannerOptions} paginationScrollTarget={275} />
+		<ArmyList data={data.armies} total={data.total} bannerOptions={latestArmiesMeta.bannerOptions} allowSearch allowFilters paginationScrollTarget={275} />
 	</div>
 </section>
 

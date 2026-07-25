@@ -22,7 +22,7 @@
 
 <section class="armies">
 	<div class="container">
-		<ArmyList data={data.armies} total={data.total} bannerOptions={pageMeta.bannerOptions} allowSearch allowFilters />
+		<ArmyList data={data.armies} total={data.total} bannerOptions={pageMeta.bannerOptions} allowSearch allowFilters={{ showTHFilter: false }} />
 	</div>
 </section>
 

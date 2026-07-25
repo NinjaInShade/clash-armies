@@ -49,6 +49,41 @@
 	}
 }
 
+/*
+    Responsive version of `.picker-list`.
+    Units grow to fill the available width, between --unit-min-size (default 46px) and --unit-max-size (default 56px)
+    TODO: clean up and standardise this.
+*/
+.unit-picker-list {
+	--_unit-min-size: var(--unit-min-size, 46px);
+	--_unit-max-size: var(--unit-max-size, 56px);
+	--gap: 6px;
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(var(--_unit-min-size), 1fr));
+	justify-items: center;
+	gap: var(--gap);
+	overflow-y: auto;
+	max-height: var(--max-height, none);
+
+	& li {
+		position: relative;
+		width: 100%;
+		max-width: var(--_unit-max-size);
+		aspect-ratio: 1;
+
+		> button:not(.replace-pet) {
+			display: block;
+			width: 100%;
+			height: 100%;
+		}
+
+		& button:disabled,
+		& button.visually-disabled {
+			filter: grayscale(1);
+		}
+	}
+}
+
 .ca-menu {
 	background-color: var(--grey-850);
 	border: 1px dashed var(--grey-500);

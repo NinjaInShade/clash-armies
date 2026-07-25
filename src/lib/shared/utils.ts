@@ -112,6 +112,20 @@ export const MAX_FILTER_EQUIPMENTS = 8;
 export const MAX_FILTER_PETS = 4;
 /** How many armies are shown per page in a paginated army list */
 export const ARMIES_PAGE_SIZE = 20;
+/** Max length of the `search` army list filter */
+export const MAX_FILTER_SEARCH_LENGTH = 50;
+/** Max number of units that can be picked at once for the `units` army list filter (generously high) */
+export const MAX_FILTER_UNITS = 50;
+/**
+ * Max number of equipments that can be picked at once for the `equipments` army list filter.
+ * Max 4 heroes * 2 equipments each - an army can never have more, so matching more would match nothing.
+ */
+export const MAX_FILTER_EQUIPMENTS = 8;
+/**
+ * Max number of pets that can be picked at once for the `pets` army list filter.
+ * Max 4 heroes * 1 pet each - an army can never have more, so matching more would match nothing.
+ */
+export const MAX_FILTER_PETS = 4;
 
 // Should match metric name in `metrics` table
 export const PAGE_VIEW_METRIC = 'page-view';
@@ -137,10 +151,19 @@ export function pluralize(string: string, count: number, suffix = 's') {
 export function debounce<F extends (...args: Parameters<F>) => ReturnType<F>>(fn: F, ms: number) {
 	let timeoutId: ReturnType<typeof setTimeout>;
 
-	return function (this: any, ...args: Parameters<F>) {
+	const debounced = function (this: any, ...args: Parameters<F>) {
 		clearTimeout(timeoutId);
 		timeoutId = setTimeout(() => {
 			fn.apply(this, args);
 		}, ms);
 	};
+
+	/**
+	 * Drops any call that's still waiting to fire.
+	 */
+	debounced.cancel = function () {
+		clearTimeout(timeoutId);
+	};
+
+	return debounced;
 }

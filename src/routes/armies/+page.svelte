@@ -20,7 +20,7 @@
 
 <section class="armies">
 	<div class="container">
-		<ArmyList data={data.armies} total={data.total} bannerOptions={pageMeta.bannerOptions} allowSearch allowTHFilter allowFilters />
+		<ArmyList data={data.armies} total={data.total} bannerOptions={pageMeta.bannerOptions} allowSearch allowFilters />
 	</div>
 </section>
 

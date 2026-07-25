@@ -8,10 +8,21 @@
 		fixed?: boolean;
 		placement?: Placement;
 		placementOffset?: number;
+		/** Forces the menu's width to match the ref element's width, instead of shrinking to fit its content */
+		matchWidth?: boolean;
 		onClose?: () => void;
 		children: Snippet;
 	};
-	let { open = $bindable(), elRef, fixed = false, children, placement = 'bottom', placementOffset = 2, onClose = () => {} }: Props = $props();
+	let {
+		open = $bindable(),
+		elRef,
+		fixed = false,
+		children,
+		placement = 'bottom',
+		placementOffset = 2,
+		matchWidth = false,
+		onClose = () => {},
+	}: Props = $props();
 
 	// This shouldn't be state as $effect will infinitely re-run otherwise
 	let autoUpdateDispose = () => {};
@@ -19,6 +30,7 @@
 	let menuRef = $state<HTMLElement | undefined>();
 	let x = $state<number | null>(null);
 	let y = $state<number | null>(null);
+	let width = $state<number | null>(null);
 
 	onDestroy(unregisterAutoUpdate);
 
@@ -42,6 +54,7 @@
 		const pos = await computePosition(el, menu, { placement, middleware });
 		x = pos.x;
 		y = pos.y;
+		width = matchWidth ? el.getBoundingClientRect().width : null;
 	}
 
 	async function updateOpen(shouldOpen: boolean) {
@@ -97,11 +110,16 @@
 	class="menu focus-grey"
 	class:fixed
 	class:hidden={!open || x === null || y === null}
-	style="--x: {x}px; --y: {y}px;"
+	style="--x: {x}px; --y: {y}px; {width !== null ? `width: ${width}px; max-width: ${width}px;` : ''}"
 	onclick={handleMenuClick}
 	bind:this={menuRef}
 >
-	{#if open}
+	<!--
+	    Guarded on x/y too, not just open - on a given instance's first-ever open these start `null`
+	    since the position isn't known until `computePosition` resolves, so mounting on `open` alone briefly
+	    renders children while this div is still `display: none`, breaking any layout measurement they may do on mount
+	 -->
+	{#if open && x !== null && y !== null}
 		{@render children()}
 	{/if}
 </div>
