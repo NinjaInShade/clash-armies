@@ -6,29 +6,36 @@
 	import type { AppState } from '$types';
 	import Button from '../Button.svelte';
 	import ArmyCard from '../ArmyCard.svelte';
-	import Banner from './Banner.svelte';
+	import Banner, { type BannerOptions } from './Banner.svelte';
 	import Controls from './Controls.svelte';
 	import { ArmyModel } from '$models';
 	import ImgPekka from '$assets/ui/pekka.webp';
 
-	type BannerOptions = {
-		title: string;
-		description: string;
-		descriptionWidth: number;
-		img: string;
-		imgAlt: string;
-	};
 	type Props = {
+		/** Armies to display in the list */
 		data: Army[];
+		/** Optional and customisable banner to display above the army list */
 		bannerOptions?: BannerOptions;
 		/**
-		 * How many armies to show per "page".
+		 * How many armies are shown per page.
 		 * Once this limit is hit the user can click a button to display more.
 		 * @default 10
 		 */
 		armiesPerPage?: number;
+		/**
+		 * Whether to show a search box to further filter results.
+		 * @default false
+		 */
 		allowSearch?: boolean;
+		/**
+		 * Whether to show a town hall filter control.
+		 * @default false
+		 */
 		allowTHFilter?: boolean;
+		/**
+		 * Whether to show the filters button that opens up an advanced filtering popup.
+		 * @default false
+		 */
 		allowFilters?: boolean;
 	};
 	const { data, bannerOptions, armiesPerPage = 10, allowSearch = false, allowTHFilter = false, allowFilters = false }: Props = $props();
@@ -69,8 +76,7 @@
 
 <div class="army-list">
 	{#if bannerOptions}
-		{@const { title, description, descriptionWidth, img, imgAlt } = bannerOptions}
-		<Banner {title} {description} {descriptionWidth} {img} {imgAlt} style="margin-bottom: 10px" />
+		<Banner {...bannerOptions} style="margin-bottom: 10px" />
 	{/if}
 
 	<div class="controls">

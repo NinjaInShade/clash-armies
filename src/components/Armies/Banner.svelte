@@ -1,5 +1,5 @@
-<script lang="ts">
-	type Props = {
+<script lang="ts" module>
+	export type BannerOptions = {
 		title: string;
 		description: string;
 		descriptionWidth?: number;
@@ -7,6 +7,10 @@
 		imgAlt: string;
 		style?: string;
 	};
+</script>
+
+<script lang="ts">
+	type Props = BannerOptions;
 	const { title, description, descriptionWidth = 275, img, imgAlt, style }: Props = $props();
 </script>
 
