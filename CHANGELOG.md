@@ -1,3 +1,8 @@
+## [0.11.3] - 2026-07-26
+
+- Fix bug with space to enter newline erroring in the guide editor
+- Show feedback banner if user dismissed it at least two months ago
+
 ## [0.11.2] - 2026-07-18
 
 - Improve query performance
