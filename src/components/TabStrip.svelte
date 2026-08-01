@@ -1,7 +1,6 @@
 <script lang="ts">
-	import { page } from '$app/state';
-	import { goto } from '$app/navigation';
-	import { onMount, type Component } from 'svelte';
+	import { mkParamStore } from '~/lib/client/params.svelte';
+	import type { Component } from 'svelte';
 
 	type Tab = {
 		name: string;
@@ -15,41 +14,12 @@
 	};
 	const { tabs, class: _class }: Props = $props();
 
-	let currentTab = $state<Tab | null>(null);
-
-	onMount(async function () {
-		await loadTab();
-	});
-
-	$effect(() => {
-		// If tabs change (such as component props changing), update state
-		void loadTab();
-	});
-
-	async function loadTab() {
-		const tab = page.url.searchParams.get('tab');
-		if (!tab) {
-			const defaultTab = tabs[0];
-			await setTabQuery(defaultTab.name);
-		} else {
-			const foundTab = tabs.find((t) => t.name === tab);
-			if (!foundTab) return;
-			currentTab = foundTab;
-		}
-	}
+	// Falls back to the first tab both when there's no `tab` param yet or there is but is an unknown tab.
+	const tabStore = mkParamStore('tab', 'string');
+	const currentTab = $derived(tabs.find((t) => t.name === tabStore.value) ?? tabs[0]);
 
 	async function changeTab(tab: Tab) {
-		currentTab = tab;
-		await setTabQuery(tab.name);
-	}
-
-	async function setTabQuery(tab: string) {
-		page.url.searchParams.set('tab', tab);
-		await goto(`?${page.url.searchParams.toString()}`, {
-			replaceState: true,
-			noScroll: true,
-			keepFocus: true,
-		});
+		tabStore.value = tab.name;
 	}
 </script>
 
