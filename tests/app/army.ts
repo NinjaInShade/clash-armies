@@ -142,7 +142,7 @@ describe('Saving', function () {
 				},
 			});
 			await server.army.saveArmy(req, data);
-			const { armies } = await server.army.getArmies(req);
+			const { armies } = await server.army.getArmies(req, { includeGuideContent: true });
 			assertArmies(armies, [data]);
 		});
 
@@ -162,7 +162,7 @@ describe('Saving', function () {
 				},
 			});
 			await server.army.saveArmy(req, data);
-			const { armies } = await server.army.getArmies(req);
+			const { armies } = await server.army.getArmies(req, { includeGuideContent: true });
 			// Expect one empty tag
 			data.guide.textContent = '<p></p>';
 			assertArmies(armies, [data]);
@@ -350,11 +350,12 @@ describe('Saving', function () {
 				},
 			});
 			await server.army.saveArmy(req, data);
-			const army = (await server.army.getArmies(req)).armies[0];
+			const army = (await server.army.getArmies(req, { includeGuideContent: true })).armies[0];
 			// Remove guide
 			army.guide = null;
+			army.hasGuide = false;
 			await server.army.saveArmy(req, army);
-			const armySaved = (await server.army.getArmies(req)).armies[0];
+			const armySaved = (await server.army.getArmies(req, { includeGuideContent: true })).armies[0];
 			assertArmies([armySaved], [army]);
 		});
 	});
@@ -681,7 +682,7 @@ describe('Fetching', function () {
 		await server.army.saveArmy(req, dataWithGuide);
 		await server.army.saveArmy(req, dataWithoutGuide);
 
-		const { armies } = await server.army.getArmies(req, { hasGuide: true });
+		const { armies } = await server.army.getArmies(req, { hasGuide: true, includeGuideContent: true });
 		assertArmies(armies, [dataWithGuide]);
 	});
 

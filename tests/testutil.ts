@@ -92,6 +92,7 @@ export function assertArmies(actual: Army[], expected: Record<string, unknown>[]
 		assert.isNumber(army.votes);
 		assert.isNumber(army.userVote);
 		assert.isBoolean(army.userBookmarked);
+		assert.isBoolean(army.hasGuide);
 	}
 }
 
