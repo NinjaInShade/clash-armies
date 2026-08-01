@@ -14,6 +14,15 @@ export type Army = {
 	copyLinkClicks: number;
 	name: string;
 	townHall: number;
+	/**
+	 * Whether this army has a guide.
+	 * Always present, regardless of whether full guide content was fetched.
+	 */
+	hasGuide: boolean;
+	/**
+	 * Full guide content - typically only populated when explicitly requested (e.g. `includeGuideContent` in `getArmy`).
+	 * Consider using the always-present `hasGuide` if you need to only check if an army has a guide.
+	 */
 	guide: ArmyGuide | null;
 	units: ArmyUnit[];
 	pets: ArmyPet[];
@@ -89,6 +98,7 @@ export class ArmyModel {
 	public pets = $state<PetModel[]>([]);
 	public equipment = $state<EquipmentModel[]>([]);
 	public guide = $state<GuideModel | null>(null);
+	public hasGuide = $state(false);
 	public tags = $state<string[]>([]);
 	public banner = $state(BANNERS[Math.floor(Math.random() * BANNERS.length)]);
 	public comments = $state<CommentModel[]>([]);
@@ -144,6 +154,7 @@ export class ArmyModel {
 		if (data?.guide) {
 			this.guide = new GuideModel(this.gameData, data?.guide ?? undefined);
 		}
+		this.hasGuide = Boolean(data?.hasGuide);
 		if (data?.tags) {
 			this.tags = data?.tags;
 		}
@@ -236,6 +247,7 @@ export class ArmyModel {
 
 	public addGuide() {
 		this.guide = new GuideModel(this.gameData);
+		this.hasGuide = true;
 		return this.guide;
 	}
 
@@ -287,6 +299,7 @@ export class ArmyModel {
 
 	public removeGuide() {
 		this.guide = null;
+		this.hasGuide = false;
 	}
 
 	public hasHero(hero: string) {
@@ -305,7 +318,7 @@ export class ArmyModel {
 			type: this.getArmyType(),
 			hasClanCastle: this.ccUnits.length > 0,
 			hasHeroes: validHeroes.some((hero) => this.hasHero(hero)),
-			hasGuide: this.guide !== null,
+			hasGuide: this.hasGuide,
 		};
 	}
 

@@ -48,8 +48,20 @@ type GetArmiesOptions = {
 	 * NOTE: the ratio is calculated based on both army camp + clan castle units.
 	 */
 	attackType?: 'Ground' | 'Air' | 'Hybrid';
-	/** Only fetch armies which have a guide */
+	/**
+	 * Only fetch armies which have a guide.
+	 *
+	 * Will function correctly regardless of the `includeGuideContent` option.
+	 */
 	hasGuide?: true;
+	/**
+	 * Whether to include each army's full guide content.
+	 *
+	 * When false, `guide` will always be null - use `hasGuide` instead to check for presence.
+	 *
+	 * @default false
+	 */
+	includeGuideContent?: boolean;
 	/** Only fetch armies which do *not* contain any super troops */
 	noSuperTroops?: true;
 	/** Only fetch armies which do *not* contain any epic equipment */
@@ -191,6 +203,7 @@ export class ArmyAPI {
 			search,
 			attackType,
 			hasGuide,
+			includeGuideContent = false,
 			noSuperTroops,
 			noEpicEquipment,
 			hasClanCastle,
@@ -494,11 +507,15 @@ export class ArmyAPI {
 				'ap.pets',
 				'ac.comments',
 				'art.tags',
-				sql<Army['guide']>`IF(ag.id, JSON_OBJECT(
-					'id', ag.id,
-					'textContent', ag.textContent,
-					'youtubeUrl', ag.youtubeUrl
-				), NULL)`.as('guide'),
+				sql<boolean>`(ag.id IS NOT NULL)`.as('hasGuide'),
+				(includeGuideContent
+					? sql<Army['guide']>`IF(ag.id, JSON_OBJECT(
+						'id', ag.id,
+						'textContent', ag.textContent,
+						'youtubeUrl', ag.youtubeUrl
+					), NULL)`
+					: sql<Army['guide']>`NULL`
+				).as('guide'),
 				sql<boolean>`(sa.id IS NOT NULL)`.as('userBookmarked'),
 				eb.fn.coalesce('uv.vote', sql.lit(0)).as('userVote'),
 				// Total rows matching the filters *before* the LIMIT/OFFSET are applied above.
@@ -536,6 +553,8 @@ export class ArmyAPI {
 
 			// @ts-expect-error data is 0/1 number when it's queried from the database // TODO: I think TINYINT(1) should just be returning a boolean?
 			army.userBookmarked = army.userBookmarked === 1;
+			// @ts-expect-error data is 0/1 number when it's queried from the database // TODO: I think TINYINT(1) should just be returning a boolean?
+			army.hasGuide = army.hasGuide === 1;
 		}
 
 		return { armies, total };
@@ -558,8 +577,8 @@ export class ArmyAPI {
 		return this.getArmies(req, { ids: savedArmyIdsArr, page, limit });
 	}
 
-	public async getArmy(req: RequestEvent, id: number) {
-		const { armies } = await this.getArmies(req, { ids: [id] });
+	public async getArmy(req: RequestEvent, id: number, options: Pick<GetArmiesOptions, 'includeGuideContent'> = {}) {
+		const { armies } = await this.getArmies(req, { ids: [id], includeGuideContent: options.includeGuideContent });
 		if (!armies.length) {
 			return null;
 		}
