@@ -15,7 +15,7 @@
 		name="description"
 		content="Browse top performing Town Hall {townHall} armies. Perfect your TH{townHall} attacks for war, farming, and CWL with tested strategies."
 	/>
-	<link rel="canonical" href="https://clasharmies.com/town-hall-{townHall}" />
+	<link rel="canonical" href="https://clasharmies.com/armies/town-hall-{townHall}" />
 </svelte:head>
 
 <section class="armies">
