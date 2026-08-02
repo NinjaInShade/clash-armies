@@ -1,3 +1,12 @@
+## [0.12.0] - 2026-08-02
+
+- Overhaul filtering UI
+- Overhaul pagination UI
+- Improve army list pages load times and on-page performance
+- Reduce data sent over the network on army list pages
+- Fix invalid canonical URL for `/armies/town-hall-{level}` page
+- Update various dependencies
+
 ## [0.11.3] - 2026-07-26
 
 - Fix bug with space to enter newline erroring in the guide editor
