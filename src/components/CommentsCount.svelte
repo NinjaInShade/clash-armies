@@ -15,5 +15,5 @@
 			fill="currentColor"
 		/>
 	</svg>
-	{model.comments.length}
+	{model.commentsCount}
 </a>

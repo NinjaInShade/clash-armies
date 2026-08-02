@@ -35,7 +35,7 @@
 		if (replyTo !== undefined) {
 			return "What's your take?";
 		}
-		if (!model.comments.length) {
+		if (!model.commentsCount) {
 			return 'Tried this army? Be the first to share how it went!';
 		}
 		return 'Tried this army? Share how it went!';
@@ -109,7 +109,7 @@
 			<div>
 				<h2>What's your take?</h2>
 				<p class="body">
-					{#if model.comments.length > 0}
+					{#if model.commentsCount > 0}
 						Join the discussion - sign in to comment!
 					{:else}
 						Sign in to be the first to review this army!

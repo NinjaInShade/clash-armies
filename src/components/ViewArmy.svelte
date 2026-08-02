@@ -190,7 +190,7 @@
 	</div>
 </div>
 
-<div class="comments-feed" class:has-comments={model.comments.length > 0} id="comments">
+<div class="comments-feed" class:has-comments={model.commentsCount > 0} id="comments">
 	<CommentsList {model} comments={model.structuredComments} />
 
 	<div class="add-comment">
