@@ -62,6 +62,14 @@ type GetArmiesOptions = {
 	 * @default false
 	 */
 	includeGuideContent?: boolean;
+	/**
+	 * Whether to include each army's full comment thread.
+	 *
+	 * When false, `comments` will always be empty - use `commentsCount` instead to check the count.
+	 *
+	 * @default false
+	 */
+	includeFullComments?: boolean;
 	/** Only fetch armies which do *not* contain any super troops */
 	noSuperTroops?: true;
 	/** Only fetch armies which do *not* contain any epic equipment */
@@ -86,6 +94,8 @@ type GetArmiesOptions = {
 	 */
 	limit?: number;
 };
+
+type GetArmyOptions = Pick<GetArmiesOptions, 'includeGuideContent' | 'includeFullComments'>;
 
 type GetSavedArmiesOptions = Pick<GetArmiesOptions, 'page' | 'limit'> & {
 	/** Returns the armies saved by this username */
@@ -204,6 +214,7 @@ export class ArmyAPI {
 			attackType,
 			hasGuide,
 			includeGuideContent = false,
+			includeFullComments = false,
 			noSuperTroops,
 			noEpicEquipment,
 			hasClanCastle,
@@ -279,20 +290,22 @@ export class ArmyAPI {
 						.selectFrom('army_comments as ac')
 						.leftJoin('users as u', 'u.id', 'ac.createdBy')
 						.groupBy('ac.armyId')
-						.select([
+						.select((eb) => [
 							'ac.armyId',
-							helpers
-								.jsonAggObj({
-									id: 'ac.id',
-									armyId: 'ac.armyId',
-									comment: 'ac.comment',
-									replyTo: 'ac.replyTo',
-									username: 'u.username',
-									createdBy: 'ac.createdBy',
-									createdTime: 'ac.createdTime',
-									updatedTime: 'ac.updatedTime',
-								})
-								.as('comments'),
+							eb.fn.count<number>('ac.id').as('commentsCount'),
+							(includeFullComments
+								? helpers.jsonAggObj({
+										id: 'ac.id',
+										armyId: 'ac.armyId',
+										comment: 'ac.comment',
+										replyTo: 'ac.replyTo',
+										username: 'u.username',
+										createdBy: 'ac.createdBy',
+										createdTime: 'ac.createdTime',
+										updatedTime: 'ac.updatedTime',
+									})
+								: sql<Army['comments']>`NULL`
+							).as('comments'),
 						])
 						.as('ac'),
 				(join) => join.onRef('ac.armyId', '=', 'a.id')
@@ -506,6 +519,7 @@ export class ArmyAPI {
 				'ae.equipment',
 				'ap.pets',
 				'ac.comments',
+				eb.cast(eb.fn.coalesce('ac.commentsCount', sql.lit(0)), 'integer').as('commentsCount'),
 				'art.tags',
 				sql<boolean>`(ag.id IS NOT NULL)`.as('hasGuide'),
 				(includeGuideContent
@@ -577,8 +591,12 @@ export class ArmyAPI {
 		return this.getArmies(req, { ids: savedArmyIdsArr, page, limit });
 	}
 
-	public async getArmy(req: RequestEvent, id: number, options: Pick<GetArmiesOptions, 'includeGuideContent'> = {}) {
-		const { armies } = await this.getArmies(req, { ids: [id], includeGuideContent: options.includeGuideContent });
+	public async getArmy(req: RequestEvent, id: number, options: GetArmyOptions = {}) {
+		const { armies } = await this.getArmies(req, {
+			ids: [id],
+			includeGuideContent: options.includeGuideContent,
+			includeFullComments: options.includeFullComments,
+		});
 		if (!armies.length) {
 			return null;
 		}

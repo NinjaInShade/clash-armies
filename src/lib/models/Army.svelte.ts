@@ -33,6 +33,15 @@ export type Army = {
 	 * These get merged with the auto-generated tags in `getTags`
 	 */
 	tags: string[];
+	/**
+	 * Number of comments on this army.
+	 * Always present, regardless of whether the full comment thread was fetched.
+	 */
+	commentsCount: number;
+	/**
+	 * Full comment thread - typically only populated when explicitly requested (e.g. `includeFullComments` in `getArmy`).
+	 * Consider using the always-present `commentsCount` if you only need the count.
+	 */
 	comments: ArmyComment[];
 	username: string;
 	createdBy: number;
@@ -102,6 +111,7 @@ export class ArmyModel {
 	public tags = $state<string[]>([]);
 	public banner = $state(BANNERS[Math.floor(Math.random() * BANNERS.length)]);
 	public comments = $state<CommentModel[]>([]);
+	public commentsCount = $state(0);
 	public structuredComments = $state<StructuredArmyComment[]>([]);
 	public votes = $state(0);
 	public userVote = $state(0);
@@ -163,6 +173,7 @@ export class ArmyModel {
 			this.comments = comments;
 			this.structuredComments = CommentModel.structureComments(comments);
 		}
+		this.commentsCount = data?.commentsCount ?? 0;
 		if (data?.banner) {
 			this.banner = data.banner;
 		}
