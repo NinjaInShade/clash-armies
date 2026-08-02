@@ -2,7 +2,7 @@ import { env } from '$env/dynamic/private';
 import { building } from '$app/environment';
 import type { DB } from './db-types.d.ts';
 import { createPool } from 'mysql2';
-import { Kysely, MysqlDialect, sql, ParseJSONResultsPlugin, type InsertObject } from 'kysely';
+import { Kysely, MysqlDialect, sql, type InsertObject } from 'kysely';
 import { logger } from './logger';
 
 const { DB_HOST, DB_USER, DB_PASSWORD, DB_PORT } = env;
@@ -40,7 +40,7 @@ const dialect = new MysqlDialect({
 
 export type Database = Kysely<DB>;
 
-export const db = new Kysely<DB>({ dialect, plugins: [new ParseJSONResultsPlugin()] });
+export const db = new Kysely<DB>({ dialect });
 
 export const helpers = {
 	/**
