@@ -34,7 +34,7 @@
 		<picture>
 			<source srcset={ImgLeagueKing} media="(max-width: 400px)" />
 			<source srcset={ImgLeagueKingLarge} media="(max-width: 625px)" />
-			<img class="graphic" src={ImgHeaderBarbLarge} alt="Clash of Clans unit" />
+			<img class="graphic" src={ImgHeaderBarbLarge} alt="Clash of Clans unit" width="803" height="578" fetchpriority="high" />
 		</picture>
 	</div>
 </header>
@@ -121,6 +121,8 @@
 			max-width: 140%;
 			margin-bottom: -40px;
 			right: 30%;
+			/** At this breakpoint a different image for mobile is rendered, with different width/height (see <source>) */
+			aspect-ratio: 700 / 614;
 		}
 
 		header .container {
