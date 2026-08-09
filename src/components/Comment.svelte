@@ -8,7 +8,7 @@
 	import type { AppState } from '$types';
 	import { formatDistanceToNow } from 'date-fns';
 	import SaveComment from './SaveComment.svelte';
-	import type { ArmyModel, ArmyComment } from '$models';
+	import type { ArmyModel, ArmyComment } from '$models/Army.svelte';
 	import CtxMenu from './CommentMenu.svelte';
 
 	type Props = {

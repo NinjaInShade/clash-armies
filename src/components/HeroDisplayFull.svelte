@@ -2,7 +2,7 @@
 	import HeroDisplay from './HeroDisplay.svelte';
 	import EquipmentDisplay from './EquipmentDisplay.svelte';
 	import PetDisplay from './PetDisplay.svelte';
-	import type { ArmyModel } from '$models';
+	import type { ArmyModel } from '$models/Army.svelte';
 
 	type Props = {
 		hero: string;

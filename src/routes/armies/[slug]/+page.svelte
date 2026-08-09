@@ -4,8 +4,8 @@
 	import { onMount, getContext, untrack } from 'svelte';
 	import { PAGE_VIEW_METRIC } from '$shared/utils';
 	import type { AppState } from '$types';
-	import { ArmyModel } from '$models';
-	import C from '$components';
+	import { ArmyModel } from '$models/Army.svelte';
+	import ViewArmy from '$components/ViewArmy.svelte';
 
 	const { data }: { data: PageData } = $props();
 	const { army } = $derived(data);
@@ -52,7 +52,7 @@
 
 <section class="army">
 	<div class="container">
-		<C.ViewArmy {army} />
+		<ViewArmy {army} />
 	</div>
 </section>
 

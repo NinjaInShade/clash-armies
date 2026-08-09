@@ -2,7 +2,7 @@
 	import type { PageData } from './$types';
 	import OverviewTab from './Overview.svelte';
 	import ConfigTab from './Config.svelte';
-	import C from '$components';
+	import TabStrip from '$components/TabStrip.svelte';
 
 	const { data }: { data: PageData } = $props();
 	const { serverStats, appStats, units, townHalls, metricWeights } = $derived(data);
@@ -30,7 +30,7 @@
 
 <main>
 	<div class="container">
-		<C.TabStrip
+		<TabStrip
 			class="admin-tabs"
 			tabs={[
 				{

@@ -7,7 +7,9 @@
 	import { invalidateAll, goto } from '$app/navigation';
 	import type { AppState, ArmyNotification } from '$types';
 	import { page } from '$app/state';
-	import C from '$components';
+	import Nav from '$components/Nav/Nav.svelte';
+	import Footer from '$components/Nav/Footer.svelte';
+	import Toast from '$components/Toast.svelte';
 	import FeedbackBanner from '$components/FeedbackBanner.svelte';
 	import '$assets/css/base.css';
 	import '$assets/css/common.css';
@@ -119,7 +121,7 @@
 	{/if}
 </svelte:head>
 
-<C.Nav />
+<Nav />
 
 <FeedbackBanner />
 
@@ -133,7 +135,7 @@
 
 {@render children()}
 
-<C.Footer />
+<Footer />
 
 {#if appState.modals.length}
 	<div class="modals-container" transition:fade={{ duration: 150, easing: sineInOut }}>
@@ -149,7 +151,7 @@
 
 <div class="toasts-container">
 	{#each appState.notifications as notification (notification.id)}
-		<C.Toast {...notification.opts} dismiss={notification.dismiss} />
+		<Toast {...notification.opts} dismiss={notification.dismiss} />
 	{/each}
 </div>
 

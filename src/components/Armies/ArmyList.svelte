@@ -1,12 +1,12 @@
 <script lang="ts">
-	import type { Army } from '$models';
+	import type { Army } from '$models/Army.svelte';
 	import { getContext, untrack, type Snippet, type ComponentProps } from 'svelte';
 	import { navigating, page } from '$app/state';
 	import type { AppState } from '$types';
 	import Button from '../Button.svelte';
 	import ArmyCard from '../ArmyCard.svelte';
 	import Banner, { type BannerOptions } from './Banner.svelte';
-	import { ArmyModel } from '$models';
+	import { ArmyModel } from '$models/Army.svelte';
 	import Pagination from './Pagination.svelte';
 	import { mkParamStore, mkPageStore } from '$client/params.svelte';
 	import SearchBox from './SearchBox.svelte';

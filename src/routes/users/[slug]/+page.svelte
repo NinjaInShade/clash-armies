@@ -1,9 +1,10 @@
 <script lang="ts">
-	import C from '$components';
 	import { getContext } from 'svelte';
 	import type { AppState } from '$types';
 	import type { PageData } from './$types';
 	import { format } from 'date-fns';
+	import Button from '$components/Button.svelte';
+	import TabStrip from '$components/TabStrip.svelte';
 	import EditUser from './EditUser.svelte';
 	import CreatedArmiesTab from './CreatedArmiesTab.svelte';
 	import SavedArmiesTab from './SavedArmiesTab.svelte';
@@ -49,7 +50,7 @@
 		</div>
 		{#if username === currentUser || app.user?.hasRoles('admin')}
 			<div class="right">
-				<C.Button onClick={editUser}>Edit</C.Button>
+				<Button onClick={editUser}>Edit</Button>
 			</div>
 		{/if}
 	</div>
@@ -57,7 +58,7 @@
 
 <section class="tabs">
 	<div class="container">
-		<C.TabStrip
+		<TabStrip
 			tabs={[
 				{
 					name: 'created',

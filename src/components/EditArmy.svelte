@@ -4,7 +4,7 @@
 	import { GUIDE_TEXT_CHAR_LIMIT, ARMY_TAGS, MAX_ARMY_TAGS } from '$shared/utils';
 	import { HTTPError, type APIErrors } from '$shared/http';
 	import type { AppState, Banner } from '$types';
-	import { ArmyModel, type Army } from '$models';
+	import { ArmyModel, type Army } from '$models/Army.svelte';
 	import { bannerImgURL, heroImgURL } from '$client/assets';
 	import ImportFromLink from './ImportFromLink.svelte';
 	import EditBanner from './EditBanner.svelte';

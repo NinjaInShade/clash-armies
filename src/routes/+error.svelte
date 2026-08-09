@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { page } from '$app/state';
-	import C from '$components';
+	import Button from '$components/Button.svelte';
 
 	let pageRef: HTMLElement | null = $state(null);
 
@@ -37,7 +37,7 @@
 	<div class="container">
 		<h1>{page.status}!</h1>
 		<p class="body">{getMessage(page)}</p>
-		<C.Button asLink href="/">Go to home</C.Button>
+		<Button asLink href="/">Go to home</Button>
 	</div>
 </header>
 

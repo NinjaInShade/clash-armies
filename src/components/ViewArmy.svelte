@@ -2,7 +2,7 @@
 	import { getContext, untrack } from 'svelte';
 	import { YOUTUBE_URL_REGEX } from '$shared/utils';
 	import type { AppState } from '$types';
-	import { ArmyModel, type Army } from '$models';
+	import { ArmyModel, type Army } from '$models/Army.svelte';
 	import { bannerImgURL, thImgURL, heroImgURL } from '$client/assets';
 	import UnitTotals from './UnitTotals.svelte';
 	import Votes from './Votes.svelte';

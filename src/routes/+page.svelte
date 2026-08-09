@@ -1,7 +1,7 @@
 <script lang="ts">
-	import C from '$components';
 	import type { PageData } from './$types';
 	import { ARMY_PAGES } from '$client/pages';
+	import Button from '$components/Button.svelte';
 	import ArmyList from '~/components/Armies/ArmyList.svelte';
 	import ImgLeagueKing from '$assets/ui/league-king.webp';
 	import ImgLeagueKingLarge from '$assets/ui/league-king_large.webp';
@@ -27,8 +27,8 @@
 		<h1>Find the best<br /> armies <span>EVER!</span></h1>
 		<p class="body">The number one tool to find, create, learn and share the best armies in Clash of Clans</p>
 		<div class="buttons">
-			<C.Button asLink href="/armies/popular">Find army</C.Button>
-			<C.Button asLink href="/army-builder">Create army</C.Button>
+			<Button asLink href="/armies/popular">Find army</Button>
+			<Button asLink href="/army-builder">Create army</Button>
 		</div>
 
 		<picture>

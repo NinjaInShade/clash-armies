@@ -4,7 +4,10 @@
 	import { HTTPError, type APIErrors } from '$shared/http';
 	import { invalidateAll } from '$app/navigation';
 	import type { MetricWeights } from '$server/api/ArmyMetricsAPI';
-	import C from '$components';
+	import Fieldset from '$components/Fieldset.svelte';
+	import Input from '$components/Input.svelte';
+	import Errors from '$components/Errors.svelte';
+	import Button from '$components/Button.svelte';
 
 	type Props = {
 		/** Current weights */
@@ -60,30 +63,30 @@
 
 <div class="edit-metric-weights">
 	<div class="fields">
-		<C.Fieldset label="Vote" htmlName="vote">
-			<C.Input type="number" bind:value={draft.vote} disabled={!editing} />
-		</C.Fieldset>
-		<C.Fieldset label="Page view" htmlName="pageView">
-			<C.Input type="number" bind:value={draft.pageView} disabled={!editing} />
-		</C.Fieldset>
-		<C.Fieldset label="Copy link click" htmlName="copyLinkClick">
-			<C.Input type="number" bind:value={draft.copyLinkClick} disabled={!editing} />
-		</C.Fieldset>
-		<C.Fieldset label="Open link click" htmlName="openLinkClick">
-			<C.Input type="number" bind:value={draft.openLinkClick} disabled={!editing} />
-		</C.Fieldset>
+		<Fieldset label="Vote" htmlName="vote">
+			<Input type="number" bind:value={draft.vote} disabled={!editing} />
+		</Fieldset>
+		<Fieldset label="Page view" htmlName="pageView">
+			<Input type="number" bind:value={draft.pageView} disabled={!editing} />
+		</Fieldset>
+		<Fieldset label="Copy link click" htmlName="copyLinkClick">
+			<Input type="number" bind:value={draft.copyLinkClick} disabled={!editing} />
+		</Fieldset>
+		<Fieldset label="Open link click" htmlName="openLinkClick">
+			<Input type="number" bind:value={draft.openLinkClick} disabled={!editing} />
+		</Fieldset>
 	</div>
 
 	<div class="errors-container">
-		<C.Errors {errors} />
+		<Errors {errors} />
 	</div>
 
 	<div class="controls">
 		{#if editing}
-			<C.Button onClick={cancelEdit} disabled={saving}>Cancel</C.Button>
-			<C.Button onClick={save} disabled={saveDisabled} theme="danger">Save</C.Button>
+			<Button onClick={cancelEdit} disabled={saving}>Cancel</Button>
+			<Button onClick={save} disabled={saveDisabled} theme="danger">Save</Button>
 		{:else}
-			<C.Button onClick={startEdit}>Edit</C.Button>
+			<Button onClick={startEdit}>Edit</Button>
 		{/if}
 	</div>
 </div>

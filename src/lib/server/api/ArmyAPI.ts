@@ -16,7 +16,7 @@ import { generateJSON, generateHTML } from '@tiptap/html';
 import { getExtensions } from '$shared/guideEditor';
 import { parseHTML } from 'zeed-dom';
 import { GuideModel } from '$models/Guide.svelte';
-import type { Army, ArmyComment } from '$models';
+import type { Army } from '$models/Army.svelte';
 import { sql } from 'kysely';
 import z from 'zod';
 

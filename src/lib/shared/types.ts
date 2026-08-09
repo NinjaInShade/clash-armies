@@ -15,7 +15,7 @@ export type Modal<C extends AnyComponent = AnyComponent> = {
 	id: number;
 	/**
 	 * The component that is rendered.
-	 * This component should be wrapped in <C.Modal> ... </C.Modal>
+	 * This component should be wrapped in <Modal> ... </Modal>
 	 */
 	component: C;
 	/**

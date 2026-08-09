@@ -1,5 +1,5 @@
 <script lang="ts">
-	import C from '$components';
+	import EditArmy from '~/components/EditArmy.svelte';
 	import GoogleLoginButton from '$components/GoogleLoginButton.svelte';
 	import type { AppState } from '$types';
 	import { getContext } from 'svelte';
@@ -18,7 +18,7 @@
 
 <section class="army" class:loggedIn={Boolean(app.user)}>
 	<div class="container">
-		<C.EditArmy />
+		<EditArmy />
 	</div>
 	{#if !app.user}
 		<div class="requires-login">

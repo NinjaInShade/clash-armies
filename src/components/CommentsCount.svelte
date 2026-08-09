@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { ArmyModel } from '$models';
+	import type { ArmyModel } from '$models/Army.svelte';
 
 	type Props = {
 		model: ArmyModel;

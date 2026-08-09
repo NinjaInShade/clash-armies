@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { getContext } from 'svelte';
 	import type { AppState } from '$types';
-	import type { ArmyComment } from '$models';
+	import type { ArmyComment } from '$models/Army.svelte';
 	import { invalidateAll } from '$app/navigation';
 	import Menu from './Menu.svelte';
 

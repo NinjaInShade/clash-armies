@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { getContext } from 'svelte';
 	import type { AppState } from '$types';
-	import { ArmyModel } from '$models';
+	import { ArmyModel } from '$models/Army.svelte';
 	import { copyLink, getCopyBtnTitle } from '$client/army';
 	import { invalidate, invalidateAll, goto } from '$app/navigation';
 	import Menu from './Menu.svelte';

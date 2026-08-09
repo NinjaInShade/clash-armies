@@ -3,7 +3,11 @@
 	import type { AppState, User } from '$types';
 	import { HTTPError, type APIErrors } from '$shared/http';
 	import { invalidateAll, goto } from '$app/navigation';
-	import C from '$components';
+	import Button from '$components/Button.svelte';
+	import Modal from '$components/Modal.svelte';
+	import Errors from '$components/Errors.svelte';
+	import Fieldset from '$components/Fieldset.svelte';
+	import Input from '$components/Input.svelte';
 
 	type Props = {
 		/** Function that closes the modal */
@@ -46,24 +50,24 @@
 
 {#snippet controls()}
 	<div class="controls">
-		<C.Button onClick={close}>Cancel</C.Button>
-		<C.Button onClick={saveUser}>Save</C.Button>
+		<Button onClick={close}>Cancel</Button>
+		<Button onClick={saveUser}>Save</Button>
 	</div>
 {/snippet}
 
-<C.Modal title="Edit {app.user && app.user.username === user.username ? 'account' : 'user'}" {close} {controls}>
+<Modal title="Edit {app.user && app.user.username === user.username ? 'account' : 'user'}" {close} {controls}>
 	<div class="errors-container">
-		<C.Errors {errors} />
+		<Errors {errors} />
 	</div>
 
-	<C.Fieldset label="Username" htmlName="username" style="margin-bottom: 1em" --input-width="100%">
-		<C.Input bind:value={username} name="username" />
-	</C.Fieldset>
+	<Fieldset label="Username" htmlName="username" style="margin-bottom: 1em" --input-width="100%">
+		<Input bind:value={username} name="username" />
+	</Fieldset>
 
-	<C.Fieldset label="Player tag" htmlName="playerTag" style="margin-bottom: 1em" --input-width="100%">
-		<C.Input bind:value={playerTag} name="playerTag" placeholder="#XXXXXXXX" />
-	</C.Fieldset>
-</C.Modal>
+	<Fieldset label="Player tag" htmlName="playerTag" style="margin-bottom: 1em" --input-width="100%">
+		<Input bind:value={playerTag} name="playerTag" placeholder="#XXXXXXXX" />
+	</Fieldset>
+</Modal>
 
 <style>
 	.errors-container:not(:empty) {

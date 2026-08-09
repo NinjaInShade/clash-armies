@@ -2,7 +2,10 @@ import { describe, it, beforeEach, beforeAll, afterAll, afterEach } from 'vitest
 import { assert, createReq, USER, USER_2, USER_ADMIN, createUsers, makeData, assertArmies } from '../testutil';
 import type { UnitType, StaticGameData } from '$types';
 import type { SessionUser } from '$server/auth/session';
-import { ArmyModel, UnitModel, PetModel, EquipmentModel } from '$models';
+import { ArmyModel } from '$models/Army.svelte';
+import { UnitModel } from '$models/Unit.svelte';
+import { PetModel } from '$models/Pet.svelte';
+import { EquipmentModel } from '$models/Equipment.svelte';
 import { validateArmy, MAX_PAGE } from '$shared/validation';
 import {
 	GUIDE_TEXT_CHAR_LIMIT,

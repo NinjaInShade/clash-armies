@@ -1,7 +1,7 @@
 import type { AppState, Modal, ToastNotification } from '$types';
 import { HTTPApi } from '$shared/http';
 import { goto } from '$app/navigation';
-import C from '$components';
+import Confirm from '$components/Confirm.svelte';
 
 const TOAST_DEFAULT_DURATION = 2500;
 
@@ -118,7 +118,7 @@ export function createAppState(initial: Pick<AppState, 'units' | 'townHalls' | '
 			}, opts.duration ?? TOAST_DEFAULT_DURATION);
 		},
 		async confirm(confirmText: string) {
-			const confirmed = await this.openModalAsync<boolean>(C.Confirm, { confirmText });
+			const confirmed = await this.openModalAsync<boolean>(Confirm, { confirmText });
 			return Boolean(confirmed);
 		},
 		async requireAuth() {

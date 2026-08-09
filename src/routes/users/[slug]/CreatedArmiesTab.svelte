@@ -1,8 +1,9 @@
 <script lang="ts">
-	import C from '$components';
 	import { getContext } from 'svelte';
 	import type { AppState, User } from '$types';
-	import type { Army } from '$models';
+	import type { Army } from '$models/Army.svelte';
+	import Button from '$components/Button.svelte';
+	import ActionButton from '$components/ActionButton.svelte';
 	import ArmyList from '$components/Armies/ArmyList.svelte';
 	import ImgFallingBarb from '$assets/ui/falling-barb.webp';
 
@@ -21,7 +22,7 @@
 <div class="header">
 	<h2>Created armies</h2>
 	{#if currentUser === username && total > 0}
-		<C.ActionButton asLink href="/army-builder" theme="success">Create army</C.ActionButton>
+		<ActionButton asLink href="/army-builder" theme="success">Create army</ActionButton>
 	{/if}
 </div>
 
@@ -38,7 +39,7 @@
 			{/if}
 		</h2>
 		{#if currentUser === username}
-			<C.Button asLink href="/army-builder">Create army</C.Button>
+			<Button asLink href="/army-builder">Create army</Button>
 		{/if}
 	</div>
 {/snippet}

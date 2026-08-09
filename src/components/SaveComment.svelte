@@ -5,7 +5,7 @@
 	import { invalidateAll } from '$app/navigation';
 	import TextArea from './TextArea.svelte';
 	import Button from './Button.svelte';
-	import type { ArmyModel, ArmyComment } from '$models';
+	import type { ArmyModel, ArmyComment } from '$models/Army.svelte';
 	import ImgBarbKing2 from '$assets/ui/barb-king-2.webp';
 
 	type Props = {

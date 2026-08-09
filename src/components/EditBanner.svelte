@@ -3,7 +3,7 @@
 	import type { Banner } from '$types';
 	import { BANNERS } from '$shared/utils';
 	import { bannerImgURL } from '$client/assets';
-	import C from '$components';
+	import Modal from '$components/Modal.svelte';
 
 	type Props = {
 		/** The currently selected banner */
@@ -43,7 +43,7 @@
 	}
 </script>
 
-<C.Modal title="Select banner" {close} --modal-width="1250px">
+<Modal title="Select banner" {close} --modal-width="1250px">
 	<div class="banner-grid" bind:this={grid}>
 		{#each BANNERS as bannerName (bannerName)}
 			<button onclick={() => selectBanner(bannerName)} class:selected={bannerName === banner}>
@@ -51,7 +51,7 @@
 			</button>
 		{/each}
 	</div>
-</C.Modal>
+</Modal>
 
 <style>
 	.banner-grid {

@@ -3,7 +3,7 @@
 	import { HOLD_REMOVE_SPEED } from '$shared/utils';
 	import type { UnitHome } from '$types';
 	import UnitDisplay from './UnitDisplay.svelte';
-	import type { ArmyModel } from '$models';
+	import type { ArmyModel } from '$models/Army.svelte';
 
 	type Props = {
 		model: ArmyModel;

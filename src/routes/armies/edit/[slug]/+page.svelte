@@ -2,7 +2,7 @@
 	import type { PageData } from './$types';
 	import type { AppState } from '$types';
 	import { getContext } from 'svelte';
-	import C from '$components';
+	import EditArmy from '~/components/EditArmy.svelte';
 
 	const { data }: { data: PageData } = $props();
 	const { army } = $derived(data);
@@ -18,7 +18,7 @@
 <section class="army">
 	<div class="container">
 		{#if army.createdBy === app.user?.id || app.user?.hasRoles('admin')}
-			<C.EditArmy {army} />
+			<EditArmy {army} />
 		{:else}
 			<!-- TODO: make this nicer -->
 			<h2 style="text-align: center;">You do not have permission to edit this army</h2>

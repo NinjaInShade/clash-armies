@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { getContext } from 'svelte';
 	import type { AppState } from '$types';
-	import type { ArmyModel } from '$models';
+	import type { ArmyModel } from '$models/Army.svelte';
 	import { COPY_LINK_CLICK_METRIC } from '$shared/utils';
 	import { copy } from '$client/army';
 

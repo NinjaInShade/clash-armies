@@ -1,9 +1,9 @@
 <script lang="ts">
 	import THWidgetDisplay from '$components/THWidgetDisplay.svelte';
 	import UnitTableDisplay from '$components/UnitTableDisplay.svelte';
+	import Table from '$components/Table.svelte';
 	import type { Unit, TownHall } from '$types';
 	import type { ServerStats, AppStats } from './+page.server';
-	import C from '$components';
 
 	type Props = {
 		serverStats: ServerStats;
@@ -147,7 +147,7 @@
 		<div class="actions"></div>
 	</div>
 	<div class="table-container">
-		<C.Table data={appStats.armiesByTownHall} columns={armiesByTHColumns} defaultSortKey="townHall" selectable />
+		<Table data={appStats.armiesByTownHall} columns={armiesByTHColumns} defaultSortKey="townHall" selectable />
 	</div>
 </section>
 
@@ -160,7 +160,7 @@
 		<div class="actions"></div>
 	</div>
 	<div class="table-container">
-		<C.Table data={townHalls} columns={thColumns} bind:selectedKeys={selectedTHs} defaultSortKey="level" selectable />
+		<Table data={townHalls} columns={thColumns} bind:selectedKeys={selectedTHs} defaultSortKey="level" selectable />
 	</div>
 </section>
 
@@ -173,7 +173,7 @@
 		<div class="actions"></div>
 	</div>
 	<div class="table-container">
-		<C.Table data={units} columns={unitColumns} bind:selectedKeys={selectedUnits} defaultSortKey="type" selectable />
+		<Table data={units} columns={unitColumns} bind:selectedKeys={selectedUnits} defaultSortKey="type" selectable />
 	</div>
 </section>
 

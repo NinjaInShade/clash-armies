@@ -6,7 +6,9 @@
 	import EquipmentDisplay from './EquipmentDisplay.svelte';
 	import PetDisplay from './PetDisplay.svelte';
 	import AddHero from './AddHero.svelte';
-	import { EquipmentModel, ArmyModel, PetModel } from '$models';
+	import { EquipmentModel } from '$models/Equipment.svelte';
+	import { ArmyModel } from '$models/Army.svelte';
+	import { PetModel } from '$models/Pet.svelte';
 
 	type Props = {
 		model: ArmyModel;

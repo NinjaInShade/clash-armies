@@ -5,7 +5,7 @@
 <script lang="ts">
 	import CommentCard from './Comment.svelte';
 	import Self from './CommentsList.svelte';
-	import type { ArmyModel, StructuredArmyComment } from '$models';
+	import type { ArmyModel, StructuredArmyComment } from '$models/Army.svelte';
 
 	type Props = {
 		model: ArmyModel;
