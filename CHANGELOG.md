@@ -1,3 +1,12 @@
+## [0.12.1] - 2026-08-09
+
+- Optimise fonts for better delivery and reduced layout shift
+- Optimise home page hero images for reduced layout shift
+- Enable updating army metric weights at runtime via admin panel
+- Cache army metric weights on startup
+- Bin barrel files
+- Update various dependencies
+
 ## [0.12.0] - 2026-08-02
 
 - Overhaul filtering UI
