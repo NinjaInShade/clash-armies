@@ -7,6 +7,7 @@ import { helpers } from '$server/db';
 import { env } from '$env/dynamic/private';
 import { v4 as uuidv4, validate as isUuid } from 'uuid';
 import { sign, unsign } from 'cookie-signature';
+import z from 'zod';
 
 export type MetricWeights = {
 	vote: number;
@@ -44,6 +45,13 @@ type ArmyMetricsAPIOptions = {
 
 const VISITOR_COOKIE_NAME = 'visitor_id';
 
+const metricWeightsSchema = z.object({
+	vote: z.number(),
+	pageView: z.number(),
+	copyLinkClick: z.number(),
+	openLinkClick: z.number(),
+});
+
 export class ArmyMetricsAPI {
 	public log: Logger;
 
@@ -54,6 +62,8 @@ export class ArmyMetricsAPI {
 	 * Current metric weight values.
 	 *
 	 * Populated and cached on server startup.
+	 *
+	 * Only ever updated via {@link updateMetricWeights} (which is currently only accessible to admins).
 	 */
 	private _metricWeights?: MetricWeights;
 
@@ -80,6 +90,31 @@ export class ArmyMetricsAPI {
 			throw new Error('Missing metric weights?');
 		}
 		return this._metricWeights;
+	}
+
+	/**
+	 * Update the metric weights used to rank armies, ensuring the cache is refreshed.
+	 */
+	public async updateMetricWeights(req: RequestEvent, data: unknown) {
+		req.locals.requireRoles('admin');
+
+		const weights = metricWeightsSchema.parse(data);
+		const rows = [
+			['vote', weights.vote],
+			['page-view', weights.pageView],
+			['copy-link-click', weights.copyLinkClick],
+			['open-link-click', weights.openLinkClick],
+		] as const;
+
+		await this.server.db.transaction().execute(async (tx) => {
+			for (const [name, weight] of rows) {
+				await tx.updateTable('metrics').where('name', '=', name).set({ weight }).execute();
+			}
+		});
+
+		this._metricWeights = weights;
+
+		return weights;
 	}
 
 	private async fetchMetricWeights(): Promise<MetricWeights> {

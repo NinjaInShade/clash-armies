@@ -3,6 +3,20 @@ import type { Server } from '$server/api/Server';
 import fsp from 'node:fs/promises';
 import os from 'node:os';
 
+export type ServerStats = {
+	usedDisk: string;
+	totalDisk: string;
+	usedMemory: string;
+	totalMemory: string;
+};
+
+export type AppStats = {
+	totalUsers: number;
+	totalArmies: number;
+	totalComments: number;
+	armiesByTownHall: { townHall: number; count: number }[];
+};
+
 export const load: PageServerLoad = async (req) => {
 	req.locals.requireRoles('admin');
 	req.setHeaders({
@@ -18,6 +32,7 @@ export const load: PageServerLoad = async (req) => {
 		appStats,
 		units: server.gameData.units,
 		townHalls: server.gameData.townHalls,
+		metricWeights: server.army.metrics.metricWeights,
 	};
 };
 

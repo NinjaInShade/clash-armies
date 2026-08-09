@@ -1,12 +1,12 @@
-<script lang="ts">
+<script lang="ts" generics="T extends string | number | null | undefined = string | null | undefined">
 	import type { HTMLInputAttributes } from 'svelte/elements';
 	import { getContext, type Snippet } from 'svelte';
 
 	type Props = {
 		/** Sets the bound value */
-		value: string | number | null | undefined;
+		value: T;
 		/** Sets the onchange handler */
-		onChange?: (value: string | null) => Promise<void> | void;
+		onChange?: (value: T) => Promise<void> | void;
 		/** Sets the disabled state */
 		disabled?: boolean;
 		/** Sets the error message */
@@ -28,7 +28,13 @@
 			return;
 		}
 		const el = e.target as HTMLInputElement;
-		await onChange(el?.value || null);
+		let coerced: unknown;
+		if (el.type === 'number' || el.type === 'range') {
+			coerced = el.value === '' ? null : +el.value;
+		} else {
+			coerced = el.value || null;
+		}
+		await onChange(coerced as T);
 	}
 </script>
 
