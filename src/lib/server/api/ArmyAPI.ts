@@ -138,11 +138,11 @@ export class ArmyAPI {
 	}
 
 	public async init() {
-		//
+		await this.metrics.init();
 	}
 
 	public async dispose() {
-		//
+		await this.metrics.dispose();
 	}
 
 	public get gameData() {
@@ -226,7 +226,7 @@ export class ArmyAPI {
 			limit = 500,
 		} = options;
 		const userId = req.locals.user?.id ?? null;
-		const weights = await this.metrics.getMetricWeights();
+		const weights = this.metrics.metricWeights;
 
 		let query = this.server.db
 			.selectFrom('armies as a')

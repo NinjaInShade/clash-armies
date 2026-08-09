@@ -8,6 +8,13 @@ import { env } from '$env/dynamic/private';
 import { v4 as uuidv4, validate as isUuid } from 'uuid';
 import { sign, unsign } from 'cookie-signature';
 
+export type MetricWeights = {
+	vote: number;
+	pageView: number;
+	copyLinkClick: number;
+	openLinkClick: number;
+};
+
 type Metric = {
 	name: string;
 	weight: number;
@@ -43,6 +50,12 @@ export class ArmyMetricsAPI {
 	private server: Server;
 	private visitorIdSecret: string;
 	private metricsMinAgeMsOverride?: number;
+	/**
+	 * Current metric weight values.
+	 *
+	 * Populated and cached on server startup.
+	 */
+	private _metricWeights?: MetricWeights;
 
 	constructor(server: Server, options: ArmyMetricsAPIOptions = {}) {
 		this.server = server;
@@ -54,7 +67,22 @@ export class ArmyMetricsAPI {
 		}
 	}
 
-	public async getMetricWeights() {
+	public async init() {
+		this._metricWeights = await this.fetchMetricWeights();
+	}
+
+	public async dispose() {
+		//
+	}
+
+	public get metricWeights() {
+		if (!this._metricWeights) {
+			throw new Error('Missing metric weights?');
+		}
+		return this._metricWeights;
+	}
+
+	private async fetchMetricWeights(): Promise<MetricWeights> {
 		const metrics: Metric[] = await this.server.db.selectFrom('metrics').selectAll().execute();
 
 		const requireMetric = (name: string) => {
