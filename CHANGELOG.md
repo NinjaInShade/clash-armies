@@ -1,3 +1,7 @@
+## [0.12.2] - 2026-08-15
+
+- Add new Revenge Deck equipment
+
 ## [0.12.1] - 2026-08-09
 
 - Optimise fonts for better delivery and reduced layout shift
