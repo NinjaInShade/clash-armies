@@ -13,6 +13,7 @@
 
 	// Intentionally not reactive
 	const originalVotes = model.votes;
+	const originalUserVote = model.userVote;
 	const countLabel = $derived(originalVotes ? model.votes : 'Vote');
 
 	const saveVote = debounce(async function () {
@@ -34,7 +35,9 @@
 			return;
 		}
 		model.userVote = userVote;
-		model.votes = originalVotes + userVote;
+		// `originalVotes` already includes the user's existing vote, so it has to come back
+		// out before applying the new one, otherwise the optimistic count double counts it.
+		model.votes = originalVotes - originalUserVote + userVote;
 		await saveVote();
 	}
 
