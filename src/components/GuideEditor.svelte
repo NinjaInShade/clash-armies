@@ -6,18 +6,16 @@
 	import FocusTrap from './FocusTrap.svelte';
 	import Input from './Input.svelte';
 	import Menu from './Menu.svelte';
+	import '$assets/css/guide.css';
 
 	type Props = {
 		text: string | null;
-		mode: 'view' | 'edit';
 		charLimit?: number;
 	};
-	let { text = $bindable(), charLimit, mode = 'edit' }: Props = $props();
+	let { text = $bindable(), charLimit }: Props = $props();
 
 	let editorRef = $state<HTMLDivElement | undefined>();
 	let editor = $state<Editor | undefined>();
-
-	const editable = $derived(mode === 'edit');
 
 	// Have to declare and assign onTransaction as re-assigning editor for reactivity doesn't work like it did in svelte 4
 	let h1Active = $state(false);
@@ -61,7 +59,6 @@
 			element: editorRef,
 			extensions: editorExtensions,
 			content: text,
-			editable,
 			onUpdate({ editor }) {
 				// If raw text isn't checked, you could never "clear" the text back to null
 				// As an empty editor is returned as <p></p> from getHTML() which is not blank/undefined
@@ -163,7 +160,7 @@
 	}
 </script>
 
-{#if editable && editor}
+{#if editor}
 	<div class="controls">
 		<div class="controls-group">
 			<button onclick={toggleBold} class:active={boldActive} class="focus-grey" title="Ctrl+B" aria-label="{boldActive ? 'Disable' : 'Enable'} bold text">
@@ -372,10 +369,10 @@
 	</div>
 {/if}
 
-<div class="editor-container" class:editable>
+<div class="editor-container">
 	<div bind:this={editorRef}></div>
 
-	{#if editable && editor && charLimit !== undefined}
+	{#if editor && charLimit !== undefined}
 		<div class="char-count" class:warn={charsUsed === charLimit}>
 			<svg height="20" width="20" viewBox="0 0 20 20">
 				<circle r="10" cx="10" cy="10" fill="var(--grey-500)" />
@@ -440,18 +437,15 @@
 	.editor-container {
 		position: relative;
 		border-radius: 6px;
-	}
-	.editor-container.editable {
 		background-color: var(--grey-600);
 		padding: 1em;
+
+		& :global(.tiptap) {
+			outline: none;
+			min-height: min(25vh, 400px);
+		}
 	}
-	:global(.tiptap) {
-		outline: none;
-		font-size: var(--fs);
-		line-height: var(--fs-lh);
-		color: var(--grey-100);
-		min-height: var(--editor-min-height, min(25vh, 400px));
-	}
+	/* Shared guide content styling lives in $assets/css/guide.css - only editor-specific rules belong here */
 	:global(.tiptap p.is-editor-empty:first-child::before) {
 		color: var(--grey-400);
 		content: attr(data-placeholder);
@@ -459,35 +453,8 @@
 		height: 0;
 		pointer-events: none;
 	}
-	:global(.tiptap:first-child) {
-		margin-top: 0;
-	}
-	:global(.tiptap h1) {
-		font-size: var(--h2-lg);
-		line-height: var(--h2-lg-lh);
-	}
-	:global(.tiptap hr) {
-		border: none;
-		border-top: 1px solid var(--grey-500);
-		cursor: pointer;
-		margin: 1rem 0;
-	}
 	:global(.tiptap hr.ProseMirror-selectednode) {
 		border-top: 1px solid var(--primary-400);
-	}
-	:global(.tiptap ul),
-	:global(.tiptap ol) {
-		padding: 0 1em;
-	}
-	:global(.tiptap ul li) {
-		list-style: disc;
-	}
-	:global(.tiptap ol li) {
-		list-style: decimal;
-	}
-	:global(.tiptap a) {
-		color: var(--primary-400);
-		text-decoration: underline;
 	}
 	:global(.tiptap img.ProseMirror-selectednode) {
 		outline: 1px solid var(--primary-400);

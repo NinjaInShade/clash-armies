@@ -13,7 +13,7 @@
 	import Button from './Button.svelte';
 	import CommentsCount from './CommentsCount.svelte';
 	import CommentsList from './CommentsList.svelte';
-	import GuideEditor from './GuideEditor.svelte';
+	import GuideView from './GuideView.svelte';
 	import HeroDisplayFull from './HeroDisplayFull.svelte';
 	import OpenInGameButton from './OpenInGameButton.svelte';
 	import AddComment from './SaveComment.svelte';
@@ -134,7 +134,7 @@
 		</header>
 		{#if model.guide.textContent}
 			<div class="guide-editor-container">
-				<GuideEditor text={model.guide.textContent} mode="view" />
+				<GuideView text={model.guide.textContent} />
 			</div>
 		{/if}
 		{#if model.guide.youtubeUrl}
@@ -457,8 +457,6 @@
 	}
 
 	.guide {
-		--editor-min-height: 0;
-
 		& .guide-editor-container {
 			padding-bottom: 24px;
 		}

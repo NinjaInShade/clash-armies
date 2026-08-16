@@ -343,7 +343,7 @@
 				</h2>
 			</div>
 			<div class="guide-edit">
-				<GuideEditor bind:text={model.guide.textContent} charLimit={GUIDE_TEXT_CHAR_LIMIT} mode="edit" />
+				<GuideEditor bind:text={model.guide.textContent} charLimit={GUIDE_TEXT_CHAR_LIMIT} />
 				<Fieldset label="Video guide" htmlName="youtubeUrl" style="margin-top: 1em">
 					<Input bind:value={model.guide.youtubeUrl} placeholder="https://youtube.com/..." />
 				</Fieldset>

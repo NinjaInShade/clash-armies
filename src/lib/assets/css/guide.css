@@ -1,0 +1,39 @@
+.tiptap {
+	font-size: var(--fs);
+	line-height: var(--fs-lh);
+	color: var(--grey-100);
+
+	&:first-child {
+		margin-top: 0;
+	}
+
+	& h1 {
+		font-size: var(--h2-lg);
+		line-height: var(--h2-lg-lh);
+	}
+
+	& hr {
+		border: none;
+		border-top: 1px solid var(--grey-500);
+		cursor: pointer;
+		margin: 1rem 0;
+	}
+
+	& ul,
+	& ol {
+		padding: 0 1em;
+	}
+
+	& ul li {
+		list-style: disc;
+	}
+
+	& ol li {
+		list-style: decimal;
+	}
+
+	& a {
+		color: var(--primary-400);
+		text-decoration: underline;
+	}
+}
