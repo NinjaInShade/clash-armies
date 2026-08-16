@@ -1036,6 +1036,72 @@ describe('Army comments', function () {
 	});
 });
 
+describe('Army votes', function () {
+	let armyId: number;
+	let armyId2: number;
+
+	beforeAll(async function () {
+		// Create test armies for saving votes
+		const data = makeData({
+			name: 'test',
+			townHall: 1,
+			units: [{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Barbarian', gameData).id, amount: 5 }],
+		});
+		const data2 = makeData({
+			name: 'test2',
+			townHall: 1,
+			units: [{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Barbarian', gameData).id, amount: 5 }],
+		});
+		armyId = await server.army.saveArmy(req, data);
+		armyId2 = await server.army.saveArmy(req, data2);
+	});
+
+	afterAll(async function () {
+		await server.db.deleteFrom('army_units').execute();
+		await server.db.deleteFrom('armies').execute();
+	});
+
+	afterEach(async function () {
+		await server.db.deleteFrom('army_votes').execute();
+	});
+
+	it('Should be able to up/down vote an army', async function () {
+		await server.army.saveVote(req, { armyId, vote: 1 });
+		const upvote = await server.db.selectFrom('army_votes').where('armyId', '=', armyId).selectAll().executeTakeFirstOrThrow();
+		assert.include(upvote, { armyId, votedBy: reqUser.id, vote: 1 });
+
+		await server.army.saveVote(req, { armyId, vote: -1 });
+		const downvote = await server.db.selectFrom('army_votes').where('armyId', '=', armyId).selectAll().executeTakeFirstOrThrow();
+		assert.include(downvote, { armyId, votedBy: reqUser.id, vote: -1 });
+	});
+
+	it('Should only clear the vote for the given army', async function () {
+		await server.army.saveVote(req, { armyId, vote: 1 });
+		await server.army.saveVote(req, { armyId: armyId2, vote: 1 });
+
+		await server.army.saveVote(req, { armyId, vote: 0 });
+
+		const votes = await server.db.selectFrom('army_votes').where('votedBy', '=', reqUser.id).selectAll().execute();
+		assert.lengthOf(votes, 1);
+		assert.include(votes[0], { armyId: armyId2, votedBy: reqUser.id, vote: 1 });
+	});
+
+	it("Should not clear other users' votes for the same army", async function () {
+		await server.army.saveVote(req, { armyId, vote: 1 });
+		await server.army.saveVote(req2, { armyId, vote: 1 });
+
+		await server.army.saveVote(req, { armyId, vote: 0 });
+
+		const votes = await server.db.selectFrom('army_votes').where('armyId', '=', armyId).selectAll().execute();
+		assert.lengthOf(votes, 1);
+		assert.include(votes[0], { armyId, votedBy: req2User.id, vote: 1 });
+	});
+
+	it('Should throw for an invalid vote', async function () {
+		await assert.throwsAsync(() => server.army.saveVote(req, { armyId, vote: 2 }), 'Invalid vote');
+	});
+});
+
 describe('Army notifications', function () {
 	let armyId: number;
 

@@ -1,3 +1,8 @@
+## [0.12.3] - 2026-08-16
+
+- Fix optimistic vote count double counting an existing vote
+- Fix clearing a vote deleting all other user's votes
+
 ## [0.12.2] - 2026-08-15
 
 - Add new Revenge Deck equipment
