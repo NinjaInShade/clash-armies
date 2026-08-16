@@ -1,3 +1,9 @@
+## [0.12.4] - 2026-08-16
+
+- Add `/sitemap.xml` endpoint
+- Optimise page bundle sizes
+- Replace prettier with `oxfmt`
+
 ## [0.12.3] - 2026-08-16
 
 - Fix optimistic vote count double counting an existing vote
