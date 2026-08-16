@@ -1,9 +1,9 @@
 <script lang="ts">
-	import type { UnitHome } from '$types';
-	import type { ArmyModel } from '$models/Army.svelte';
-	import ImgTroops from '$assets/ui/troops.webp';
-	import ImgSpells from '$assets/ui/spells.webp';
 	import ImgSieges from '$assets/ui/sieges.webp';
+	import ImgSpells from '$assets/ui/spells.webp';
+	import ImgTroops from '$assets/ui/troops.webp';
+	import type { ArmyModel } from '$models/Army.svelte';
+	import type { UnitHome } from '$types';
 
 	type Props = {
 		model: ArmyModel;

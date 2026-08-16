@@ -354,7 +354,7 @@ export class Logger {
 			const msgChunks: any[] = [];
 
 			let i = 0;
-			for (i; i < msg.length + _availableSpace; ) {
+			for (i; i < msg.length + _availableSpace;) {
 				const addLeftPad = padStart || i !== 0;
 				let chunk = msg.substring(i, i + _availableSpace);
 

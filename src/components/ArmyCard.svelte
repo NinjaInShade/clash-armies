@@ -1,18 +1,18 @@
 <script lang="ts">
 	import { getContext } from 'svelte';
-	import type { AppState } from '$types';
-	import { ArmyModel } from '$models/Army.svelte';
-	import { thImgURL } from '$client/assets';
-	import HeroDisplay from './HeroDisplay.svelte';
-	import UnitTotals from './UnitTotals.svelte';
-	import UnitsList from './UnitsList.svelte';
-	import ArmyTags from './ArmyTags.svelte';
-	import Votes from './Votes.svelte';
-	import OpenInGameButton from './OpenInGameButton.svelte';
-	import CommentsCount from './CommentsCount.svelte';
-	import ShareButton from './ShareButton.svelte';
-	import CtxMenu from './ArmyActionsMenu.svelte';
 	import ImgClanCastle from '$assets/ui/clan-castle.webp';
+	import { thImgURL } from '$client/assets';
+	import { ArmyModel } from '$models/Army.svelte';
+	import type { AppState } from '$types';
+	import CtxMenu from './ArmyActionsMenu.svelte';
+	import ArmyTags from './ArmyTags.svelte';
+	import CommentsCount from './CommentsCount.svelte';
+	import HeroDisplay from './HeroDisplay.svelte';
+	import OpenInGameButton from './OpenInGameButton.svelte';
+	import ShareButton from './ShareButton.svelte';
+	import UnitsList from './UnitsList.svelte';
+	import UnitTotals from './UnitTotals.svelte';
+	import Votes from './Votes.svelte';
 
 	type Props = {
 		model: ArmyModel;

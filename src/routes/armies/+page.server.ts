@@ -1,5 +1,5 @@
-import type { PageServerLoad } from './$types';
 import { ARMIES_PAGE_SIZE } from '$shared/utils';
+import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async (req) => {
 	const server = req.locals.server;

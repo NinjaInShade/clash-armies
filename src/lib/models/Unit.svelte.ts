@@ -1,6 +1,6 @@
+import { SUPER_TO_REGULAR } from '$shared/utils';
 import type { UnitHome, Unit, Optional, StaticGameData } from '$types';
 import { ArmyModel, type ArmyUnit } from './Army.svelte';
-import { SUPER_TO_REGULAR } from '$shared/utils';
 
 export class UnitModel {
 	public gameData: StaticGameData;

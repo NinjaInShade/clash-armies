@@ -1,11 +1,11 @@
 <script lang="ts">
-	import type { AppState, ArmyNotification } from '$types';
-	import { getContext } from 'svelte';
-	import { formatDistanceToNow } from 'date-fns';
 	import { invalidateAll } from '$app/navigation';
-	import Menu from '../Menu.svelte';
-	import FocusTrap from '../FocusTrap.svelte';
+	import { formatDistanceToNow } from 'date-fns';
+	import { getContext } from 'svelte';
 	import ImgBarb from '$assets/ui/barbarian.webp';
+	import type { AppState, ArmyNotification } from '$types';
+	import FocusTrap from '../FocusTrap.svelte';
+	import Menu from '../Menu.svelte';
 
 	type Props = {
 		open: boolean;

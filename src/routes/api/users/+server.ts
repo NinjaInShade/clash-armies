@@ -1,6 +1,6 @@
 import { json } from '@sveltejs/kit';
-import type { RequestHandler } from './$types';
 import { endpoint } from '$server/utils';
+import type { RequestHandler } from './$types';
 
 export const POST: RequestHandler = endpoint(async (req) => {
 	const server = req.locals.server;

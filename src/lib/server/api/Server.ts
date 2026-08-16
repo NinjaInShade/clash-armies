@@ -1,14 +1,14 @@
 import type { RequestEvent } from '@sveltejs/kit';
-import { logger, type Logger } from '$server/logger';
-import { waitForDatabase, type Database } from '$server/db';
-import { migrate } from '$server/migration/migrator';
-import { migration } from '$server/migration';
-import { GameData, type GameDataSettings } from '$server/game-data/GameData';
-import { ArmyAPI } from '$server/api/ArmyAPI';
-import { UserAPI } from '$server/api/UserAPI';
-import { NotificationAPI } from '$server/api/NotificationAPI';
-import { deleteExpiredSessions } from '$server/auth/session';
 import { CronJob } from 'cron';
+import { ArmyAPI } from '$server/api/ArmyAPI';
+import { NotificationAPI } from '$server/api/NotificationAPI';
+import { UserAPI } from '$server/api/UserAPI';
+import { deleteExpiredSessions } from '$server/auth/session';
+import { waitForDatabase, type Database } from '$server/db';
+import { GameData, type GameDataSettings } from '$server/game-data/GameData';
+import { logger, type Logger } from '$server/logger';
+import { migration } from '$server/migration';
+import { migrate } from '$server/migration/migrator';
 
 /**
  * Settings to configure the server.

@@ -1,6 +1,6 @@
-import { Google } from 'arctic';
 import { dev, building } from '$app/environment';
 import { env } from '$env/dynamic/private';
+import { Google } from 'arctic';
 
 const { GOOGLE_AUTH_CLIENT_ID, GOOGLE_AUTH_SECRET, ORIGIN } = env;
 

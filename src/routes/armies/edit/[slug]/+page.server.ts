@@ -1,6 +1,6 @@
 import { error } from '@sveltejs/kit';
-import type { PageServerLoad } from './$types';
 import z from 'zod';
+import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async (req) => {
 	const id = z.number().parse(+req.params.slug);

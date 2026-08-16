@@ -1,8 +1,8 @@
+import { dev } from '$app/environment';
 import type { RequestEvent } from '@sveltejs/kit';
 import { redirect } from '@sveltejs/kit';
 import { generateState, generateCodeVerifier } from 'arctic';
 import { google } from '$server/auth/oauth';
-import { dev } from '$app/environment';
 
 export async function GET(req: RequestEvent): Promise<Response> {
 	const redirectTo = req.locals.server.getSafeRedirect(req, {

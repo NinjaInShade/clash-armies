@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { getContext } from 'svelte';
-	import type { AppState } from '$types';
 	import { ARMY_PAGES } from '$client/pages';
-	import Banner from '~/components/Armies/Banner.svelte';
+	import Banner from '$components/Armies/Banner.svelte';
+	import type { AppState } from '$types';
 
 	const app = getContext<AppState>('app');
 	const pageMeta = ARMY_PAGES.browse;

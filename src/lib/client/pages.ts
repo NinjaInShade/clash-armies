@@ -1,7 +1,7 @@
-import { encodeUnitName } from '$shared/utils';
-import { thImgURL, unitImgURL, heroImgURL, equipmentImgURL, petImgURL } from '$client/assets';
 import ImgGem from '$assets/ui/gem.webp';
 import ImgLeafBadge from '$assets/ui/leaf-badge.webp';
+import { thImgURL, unitImgURL, heroImgURL, equipmentImgURL, petImgURL } from '$client/assets';
+import { encodeUnitName } from '$shared/utils';
 
 export const ARMY_PAGES = {
 	popular: {

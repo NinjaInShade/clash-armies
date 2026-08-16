@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { getContext } from 'svelte';
-	import type { AppState, User } from '$types';
-	import type { Army } from '$models/Army.svelte';
-	import ArmyList from '$components/Armies/ArmyList.svelte';
 	import ImgFallingBarb from '$assets/ui/falling-barb.webp';
+	import ArmyList from '$components/Armies/ArmyList.svelte';
+	import type { Army } from '$models/Army.svelte';
+	import type { AppState, User } from '$types';
 
 	type Props = {
 		savedArmies: Army[];

@@ -1,5 +1,5 @@
-import type { LayoutServerLoad } from './$types';
 import type { User, ArmyNotification } from '$types';
+import type { LayoutServerLoad } from './$types';
 
 export const load: LayoutServerLoad = async (req) => {
 	const { server } = req.locals;

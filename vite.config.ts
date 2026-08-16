@@ -1,13 +1,13 @@
 /// <reference types="vitest" />
 
-import { sveltekit } from '@sveltejs/kit/vite';
-import adapter from '@sveltejs/adapter-node';
-import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
-import { defineConfig, type PluginOption } from 'vite';
-import { coverageConfigDefaults } from 'vitest/config';
-import basicSsl from '@vitejs/plugin-basic-ssl';
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
+import adapter from '@sveltejs/adapter-node';
+import { sveltekit } from '@sveltejs/kit/vite';
+import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
+import basicSsl from '@vitejs/plugin-basic-ssl';
+import { defineConfig, type PluginOption } from 'vite';
+import { coverageConfigDefaults } from 'vitest/config';
 
 const path = fileURLToPath(new URL('package.json', import.meta.url));
 const pkg = JSON.parse(readFileSync(path, 'utf8'));

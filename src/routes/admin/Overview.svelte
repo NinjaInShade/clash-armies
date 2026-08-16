@@ -1,7 +1,7 @@
 <script lang="ts">
+	import Table from '$components/Table.svelte';
 	import THWidgetDisplay from '$components/THWidgetDisplay.svelte';
 	import UnitTableDisplay from '$components/UnitTableDisplay.svelte';
-	import Table from '$components/Table.svelte';
 	import type { Unit, TownHall } from '$types';
 	import type { ServerStats, AppStats } from './+page.server';
 

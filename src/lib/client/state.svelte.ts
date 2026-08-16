@@ -1,7 +1,7 @@
-import type { AppState, Modal, ToastNotification } from '$types';
-import { HTTPApi } from '$shared/http';
 import { goto } from '$app/navigation';
 import Confirm from '$components/Confirm.svelte';
+import { HTTPApi } from '$shared/http';
+import type { AppState, Modal, ToastNotification } from '$types';
 
 const TOAST_DEFAULT_DURATION = 2500;
 

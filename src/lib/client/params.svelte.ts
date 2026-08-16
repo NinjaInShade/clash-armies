@@ -1,5 +1,5 @@
-import { page } from '$app/state';
 import { goto } from '$app/navigation';
+import { page } from '$app/state';
 
 type Serializers<T> = {
 	serialize(value: T): string;

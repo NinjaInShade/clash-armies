@@ -1,6 +1,6 @@
+import type { VDocumentFragment, VHTMLDocument } from 'zeed-dom';
 import type { StaticGameData } from '$types';
 import type { ArmyGuide } from './Army.svelte';
-import type { VDocumentFragment, VHTMLDocument } from 'zeed-dom';
 
 export class GuideModel {
 	public gameData: StaticGameData;

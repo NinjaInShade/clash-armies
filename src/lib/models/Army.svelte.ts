@@ -1,10 +1,10 @@
-import type { Unit, UnitHome, Banner, StaticGameData, Pet, Equipment } from '$types';
 import { BANNERS } from '$shared/utils';
-import { UnitModel } from './Unit.svelte';
-import { PetModel } from './Pet.svelte';
+import type { Unit, UnitHome, Banner, StaticGameData, Pet, Equipment } from '$types';
+import { CommentModel } from './Comment.svelte';
 import { EquipmentModel } from './Equipment.svelte';
 import { GuideModel } from './Guide.svelte';
-import { CommentModel } from './Comment.svelte';
+import { PetModel } from './Pet.svelte';
+import { UnitModel } from './Unit.svelte';
 
 export type Army = {
 	id: number;

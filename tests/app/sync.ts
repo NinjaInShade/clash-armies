@@ -1,12 +1,12 @@
-import { describe, it, beforeEach, beforeAll, afterAll } from 'vitest';
-import { assert } from '../testutil';
 import fsp from 'node:fs/promises';
 import path from 'node:path';
 import JSON5 from 'json5';
-import { db } from '$server/db';
+import { describe, it, beforeEach, beforeAll, afterAll } from 'vitest';
 import { Server } from '$server/api/Server';
-import type { GameData, GameDataEquipment, GameDataHero, GameDataPet, GameDataTownHall, GameDataUnit } from '~/lib/server/game-data/schema';
-import type { UnitType } from '~/lib/shared/types';
+import { db } from '$server/db';
+import type { GameData, GameDataEquipment, GameDataHero, GameDataPet, GameDataTownHall, GameDataUnit } from '$server/game-data/schema';
+import type { UnitType } from '$shared/types';
+import { assert } from '../testutil';
 
 // TODO: better sync update tests, such as asserting renaming failing if armies use it, etc...
 

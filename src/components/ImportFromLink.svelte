@@ -1,13 +1,13 @@
 <script lang="ts">
 	import { getContext } from 'svelte';
-	import type { AppState } from '$types';
-	import { ArmyModel } from '$models/Army.svelte';
 	import { parseLink } from '$client/army';
+	import { ArmyModel } from '$models/Army.svelte';
+	import type { AppState } from '$types';
 	import Button from './Button.svelte';
-	import Modal from './Modal.svelte';
 	import Errors from './Errors.svelte';
 	import Fieldset from './Fieldset.svelte';
 	import Input from './Input.svelte';
+	import Modal from './Modal.svelte';
 
 	type Props = {
 		/** Function that closes the modal */

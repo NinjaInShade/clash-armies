@@ -1,8 +1,8 @@
 <script lang="ts">
-	import HeroDisplay from './HeroDisplay.svelte';
-	import EquipmentDisplay from './EquipmentDisplay.svelte';
-	import PetDisplay from './PetDisplay.svelte';
 	import type { ArmyModel } from '$models/Army.svelte';
+	import EquipmentDisplay from './EquipmentDisplay.svelte';
+	import HeroDisplay from './HeroDisplay.svelte';
+	import PetDisplay from './PetDisplay.svelte';
 
 	type Props = {
 		hero: string;

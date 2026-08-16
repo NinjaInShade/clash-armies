@@ -1,16 +1,16 @@
 <script lang="ts">
-	import { getContext } from 'svelte';
-	import type { AppState } from '$types';
 	import { requireHTML } from '$lib/client/state.svelte';
+	import { getContext } from 'svelte';
+	import type { FiltersState, PickUnit, Filters } from '$client/filtersState.svelte';
 	import ActionButton from '$components/ActionButton.svelte';
-	import Checkbox from '$components/Checkbox.svelte';
-	import RadioButton, { type RadioOption } from '$components/RadioButton.svelte';
 	import THFilterButton from '$components/Armies/THFilterButton.svelte';
-	import UnitDisplay from '$components/UnitDisplay.svelte';
+	import Checkbox from '$components/Checkbox.svelte';
 	import EquipmentDisplay from '$components/EquipmentDisplay.svelte';
 	import PetDisplay from '$components/PetDisplay.svelte';
+	import RadioButton, { type RadioOption } from '$components/RadioButton.svelte';
+	import UnitDisplay from '$components/UnitDisplay.svelte';
 	import { ARMY_TAGS, MAX_FILTER_UNITS, MAX_FILTER_EQUIPMENTS, MAX_FILTER_PETS } from '$shared/utils';
-	import type { FiltersState, PickUnit, Filters } from '$client/filtersState.svelte';
+	import type { AppState } from '$types';
 
 	const YES_NO_OPTIONS: RadioOption<boolean | undefined>[] = [
 		{ value: true, label: 'Yes' },

@@ -1,6 +1,6 @@
 import type { MigrationFn } from '$server/migration/migrator';
 
-// prettier-ignore
+// oxfmt-ignore
 export default function migration(runStep: MigrationFn) {
     runStep(61, async () => { /* Historical artifact - see 768be65 */ });
     runStep(62, async () => { /* Historical artifact - see 768be65 */ });

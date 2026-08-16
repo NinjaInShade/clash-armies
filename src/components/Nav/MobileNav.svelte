@@ -1,12 +1,12 @@
 <script lang="ts">
 	import { getContext } from 'svelte';
+	import ImgAdmin from '$assets/ui/admin.webp';
+	import ImgClashProfile from '$assets/ui/clash-profile.webp';
+	import ImgHammerAndSaw from '$assets/ui/hammer-and-saw.webp';
+	import ImgSignpost from '$assets/ui/signpost.webp';
+	import { ARMY_PAGES } from '$client/pages';
 	import type { AppState } from '$types';
 	import LinkCard from './LinkCard.svelte';
-	import { ARMY_PAGES } from '$client/pages';
-	import ImgSignpost from '$assets/ui/signpost.webp';
-	import ImgHammerAndSaw from '$assets/ui/hammer-and-saw.webp';
-	import ImgClashProfile from '$assets/ui/clash-profile.webp';
-	import ImgAdmin from '$assets/ui/admin.webp';
 
 	type Props = {
 		open: boolean;
@@ -32,7 +32,7 @@
 		},
 	]);
 	const armyLinks = [ARMY_PAGES.popular, ARMY_PAGES.latest, ARMY_PAGES.townHalls, ARMY_PAGES.browse];
-	// prettier-ignore
+	// oxfmt-ignore
 	const accountLinks = $derived([
 		...(app.user ? [
 				{

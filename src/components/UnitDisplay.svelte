@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { getContext } from 'svelte';
-	import type { AppState, Unit } from '$types';
 	import { unitImgURL } from '$client/assets';
+	import type { AppState, Unit } from '$types';
 
 	type Props = {
 		unit: Unit;

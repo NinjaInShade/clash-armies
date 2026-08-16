@@ -1,8 +1,8 @@
 <script lang="ts">
-	import type { PageData } from './$types';
-	import OverviewTab from './Overview.svelte';
-	import ConfigTab from './Config.svelte';
 	import TabStrip from '$components/TabStrip.svelte';
+	import type { PageData } from './$types';
+	import ConfigTab from './Config.svelte';
+	import OverviewTab from './Overview.svelte';
 
 	const { data }: { data: PageData } = $props();
 	const { serverStats, appStats, units, townHalls, metricWeights } = $derived(data);

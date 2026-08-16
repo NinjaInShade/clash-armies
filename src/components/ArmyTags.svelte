@@ -1,6 +1,6 @@
 <script lang="ts">
-	import type { ArmyModel } from '$models/Army.svelte';
 	import { getTags } from '$lib/client/army';
+	import type { ArmyModel } from '$models/Army.svelte';
 
 	type Props = {
 		model: ArmyModel;

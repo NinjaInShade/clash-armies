@@ -1,8 +1,8 @@
-import type { MigrationFn } from '$server/migration/migrator';
-import type { Database } from '$server/db';
 import { sql } from 'kysely';
+import type { Database } from '$server/db';
+import type { MigrationFn } from '$server/migration/migrator';
 
-// prettier-ignore
+// oxfmt-ignore
 export default function migration(runStep: MigrationFn) {
     runStep(73, async (db: Database) => {
         // As part of the move away from using lucia as an npm package and moving to

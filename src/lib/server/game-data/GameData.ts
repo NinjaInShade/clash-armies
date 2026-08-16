@@ -1,13 +1,13 @@
-import { logger, type Logger } from '$server/logger';
+import { createHash } from 'node:crypto';
+import fsp from 'node:fs/promises';
+import path from 'node:path';
+import JSON5 from 'json5';
 import type { Server } from '$server/api/Server';
+import { helpers, type Database } from '$server/db';
+import { logger, type Logger } from '$server/logger';
+import { encodeUnitName } from '$shared/utils';
 import type { Unit, Equipment, Pet, TownHall, StaticGameData, Hero, UnitType } from '$types';
 import { GameDataSchema, type GameData as GameDataType, type GameDataUnit } from './schema';
-import { encodeUnitName } from '$shared/utils';
-import JSON5 from 'json5';
-import path from 'node:path';
-import fsp from 'node:fs/promises';
-import { createHash } from 'node:crypto';
-import { helpers, type Database } from '$server/db';
 
 export type GameDataSettings = {
 	/**

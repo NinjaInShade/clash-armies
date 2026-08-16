@@ -1,5 +1,5 @@
-import type { Database } from '$server/db';
 import { sql } from 'kysely';
+import type { Database } from '$server/db';
 import { logger } from '$server/logger';
 
 export type MigrationFn = (step: number, query: string | ((db: Database) => Promise<void>)) => void;

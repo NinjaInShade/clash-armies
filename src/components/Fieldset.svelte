@@ -1,6 +1,6 @@
 <script lang="ts">
-	import type { HTMLFieldsetAttributes } from 'svelte/elements';
 	import { setContext, type Snippet } from 'svelte';
+	import type { HTMLFieldsetAttributes } from 'svelte/elements';
 
 	type Props = {
 		/** Sets the label */

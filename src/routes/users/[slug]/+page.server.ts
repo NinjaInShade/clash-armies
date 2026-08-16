@@ -1,8 +1,8 @@
-import type { PageServerLoad } from './$types';
 import { error } from '@sveltejs/kit';
 import z from 'zod';
 import { ARMIES_PAGE_SIZE } from '$shared/utils';
 import { parsePageParam } from '$shared/validation';
+import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async (req) => {
 	req.depends('ca:savedArmies');

@@ -1,12 +1,12 @@
-import type { StaticGameData } from '$types';
-import { BANNERS, VALID_UNIT_HOME, GUIDE_TEXT_CHAR_LIMIT, YOUTUBE_URL_REGEX, MAX_COMMENT_LENGTH, MAX_ARMY_TAGS, ARMY_TAGS } from './utils';
-import { ArmyModel } from '$models/Army.svelte';
-import { UnitModel } from '$models/Unit.svelte';
-import { PetModel } from '$models/Pet.svelte';
-import { EquipmentModel } from '$models/Equipment.svelte';
-import { GuideModel } from '$models/Guide.svelte';
 import { parseHTML } from 'zeed-dom';
 import z from 'zod';
+import { ArmyModel } from '$models/Army.svelte';
+import { EquipmentModel } from '$models/Equipment.svelte';
+import { GuideModel } from '$models/Guide.svelte';
+import { PetModel } from '$models/Pet.svelte';
+import { UnitModel } from '$models/Unit.svelte';
+import type { StaticGameData } from '$types';
+import { BANNERS, VALID_UNIT_HOME, GUIDE_TEXT_CHAR_LIMIT, YOUTUBE_URL_REGEX, MAX_COMMENT_LENGTH, MAX_ARMY_TAGS, ARMY_TAGS } from './utils';
 
 export const numberSchema = z.number().int().positive();
 export const unitSchema = z.object({

@@ -1,6 +1,6 @@
 import type { MigrationFn } from '$server/migration/migrator';
 
-// prettier-ignore
+// oxfmt-ignore
 export default function migration(runStep: MigrationFn) {
     runStep(1, `
         CREATE TABLE users (

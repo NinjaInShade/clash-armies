@@ -1,16 +1,16 @@
 <script lang="ts">
-	import { fade } from 'svelte/transition';
-	import { sineInOut } from 'svelte/easing';
-	import { onMount, setContext, tick, type Snippet } from 'svelte';
-	import type { LayoutData } from './$types';
-	import { createAppState } from '$client/state.svelte';
 	import { invalidateAll, goto } from '$app/navigation';
-	import type { AppState, ArmyNotification } from '$types';
 	import { page } from '$app/state';
-	import Nav from '$components/Nav/Nav.svelte';
-	import Footer from '$components/Nav/Footer.svelte';
-	import Toast from '$components/Toast.svelte';
+	import { onMount, setContext, tick, type Snippet } from 'svelte';
+	import { sineInOut } from 'svelte/easing';
+	import { fade } from 'svelte/transition';
+	import { createAppState } from '$client/state.svelte';
 	import FeedbackBanner from '$components/FeedbackBanner.svelte';
+	import Footer from '$components/Nav/Footer.svelte';
+	import Nav from '$components/Nav/Nav.svelte';
+	import Toast from '$components/Toast.svelte';
+	import type { AppState, ArmyNotification } from '$types';
+	import type { LayoutData } from './$types';
 	import '$assets/css/base.css';
 	import '$assets/css/common.css';
 

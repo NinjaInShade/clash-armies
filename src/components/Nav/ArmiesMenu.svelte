@@ -1,12 +1,12 @@
 <script lang="ts">
 	import { getContext } from 'svelte';
-	import type { AppState } from '$types';
-	import Menu from '../Menu.svelte';
-	import LinkCard from './LinkCard.svelte';
-	import ResponsiveGridSlice from '../ResponsiveGridSlice.svelte';
-	import { ARMY_PAGES } from '$client/pages';
-	import type { TownHall } from '$types';
 	import { fade } from 'svelte/transition';
+	import { ARMY_PAGES } from '$client/pages';
+	import type { AppState } from '$types';
+	import type { TownHall } from '$types';
+	import Menu from '../Menu.svelte';
+	import ResponsiveGridSlice from '../ResponsiveGridSlice.svelte';
+	import LinkCard from './LinkCard.svelte';
 
 	type Props = {
 		open: boolean;

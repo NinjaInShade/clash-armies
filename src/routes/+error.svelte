@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
 	import { page } from '$app/state';
+	import { onMount } from 'svelte';
 	import Button from '$components/Button.svelte';
 
 	let pageRef: HTMLElement | null = $state(null);

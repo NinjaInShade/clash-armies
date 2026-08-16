@@ -1,8 +1,8 @@
 <script lang="ts">
 	import type { Snippet, Component } from 'svelte';
-	import FocusTrap from './FocusTrap.svelte';
-	import Button from './Button.svelte';
 	import ImgClose from '$assets/ui/close.webp';
+	import Button from './Button.svelte';
+	import FocusTrap from './FocusTrap.svelte';
 
 	type ComponentRendering = {
 		/** Sets the component the modal renders. Uses children as fallback */

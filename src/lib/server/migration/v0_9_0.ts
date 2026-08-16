@@ -1,7 +1,7 @@
-import type { MigrationFn } from '$server/migration/migrator';
-import type { Database } from '$server/db';
-import type { Unit, Equipment } from '$types';
 import { sql } from 'kysely';
+import type { Database } from '$server/db';
+import type { MigrationFn } from '$server/migration/migrator';
+import type { Unit, Equipment } from '$types';
 
 // Mapping from old `town_halls` hero columns -> hero name.
 // Used to flatten denormalized columns into `town_hall_heroes_max`.
@@ -14,7 +14,7 @@ const TH_HERO_COLUMNS = [
 	{ column: 'maxDragonDuke', name: 'Dragon Duke' },
 ];
 
-// prettier-ignore
+// oxfmt-ignore
 export default function migration(runStep: MigrationFn) {
     // 0) Fix existing bad data in prepartion for UNIQUE constraints in migration 71.
     // NOTE: some of the queries below got guards added due to purging historical migrations.

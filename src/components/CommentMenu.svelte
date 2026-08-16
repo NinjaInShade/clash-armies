@@ -1,8 +1,8 @@
 <script lang="ts">
-	import { getContext } from 'svelte';
-	import type { AppState } from '$types';
-	import type { ArmyComment } from '$models/Army.svelte';
 	import { invalidateAll } from '$app/navigation';
+	import { getContext } from 'svelte';
+	import type { ArmyComment } from '$models/Army.svelte';
+	import type { AppState } from '$types';
 	import Menu from './Menu.svelte';
 
 	type Props = {

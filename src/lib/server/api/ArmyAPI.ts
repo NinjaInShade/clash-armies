@@ -1,7 +1,14 @@
-import type { Server } from '$server/api/Server';
-import { ArmyMetricsAPI } from '$server/api/ArmyMetricsAPI';
-import { helpers } from '$server/db';
 import type { RequestEvent } from '@sveltejs/kit';
+import { generateJSON, generateHTML } from '@tiptap/html';
+import { sql } from 'kysely';
+import { parseHTML } from 'zeed-dom';
+import z from 'zod';
+import type { Army } from '$models/Army.svelte';
+import { GuideModel } from '$models/Guide.svelte';
+import { ArmyMetricsAPI } from '$server/api/ArmyMetricsAPI';
+import type { Server } from '$server/api/Server';
+import { helpers } from '$server/db';
+import { getExtensions } from '$shared/guideEditor';
 import {
 	USER_MAX_ARMIES,
 	ARMY_TAGS,
@@ -12,13 +19,6 @@ import {
 	MAX_FILTER_PETS,
 } from '$shared/utils';
 import { validateArmy, numberSchema, commentSchema, parsePageParam, parseField, coerceBoolean, coerceNumber } from '$shared/validation';
-import { generateJSON, generateHTML } from '@tiptap/html';
-import { getExtensions } from '$shared/guideEditor';
-import { parseHTML } from 'zeed-dom';
-import { GuideModel } from '$models/Guide.svelte';
-import type { Army } from '$models/Army.svelte';
-import { sql } from 'kysely';
-import z from 'zod';
 
 type GetArmiesOptions = {
 	/** Returns the armies with these ID's */

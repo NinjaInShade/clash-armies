@@ -1,6 +1,6 @@
 <script lang="ts">
-	import GoogleLoginButton from '$components/GoogleLoginButton.svelte';
 	import ImgSwords from '$assets/ui/swords.webp';
+	import GoogleLoginButton from '$components/GoogleLoginButton.svelte';
 </script>
 
 <svelte:head>

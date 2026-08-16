@@ -1,8 +1,8 @@
-import type { Server } from '$server/api/Server';
 import type { RequestEvent } from '@sveltejs/kit';
-import type { User } from '$types';
-import { helpers } from '$server/db';
 import z from 'zod';
+import type { Server } from '$server/api/Server';
+import { helpers } from '$server/db';
+import type { User } from '$types';
 
 type GetUsersOptions = {
 	/**

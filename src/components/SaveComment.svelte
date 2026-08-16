@@ -1,12 +1,12 @@
 <script lang="ts">
-	import { getContext } from 'svelte';
-	import type { AppState } from '$types';
-	import { MAX_COMMENT_LENGTH } from '$shared/utils';
 	import { invalidateAll } from '$app/navigation';
-	import TextArea from './TextArea.svelte';
-	import Button from './Button.svelte';
-	import type { ArmyModel, ArmyComment } from '$models/Army.svelte';
+	import { getContext } from 'svelte';
 	import ImgBarbKing2 from '$assets/ui/barb-king-2.webp';
+	import type { ArmyModel, ArmyComment } from '$models/Army.svelte';
+	import { MAX_COMMENT_LENGTH } from '$shared/utils';
+	import type { AppState } from '$types';
+	import Button from './Button.svelte';
+	import TextArea from './TextArea.svelte';
 
 	type Props = {
 		model: ArmyModel;

@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { mkParamStore } from '~/lib/client/params.svelte';
 	import type { Component } from 'svelte';
+	import { mkParamStore } from '$client/params.svelte';
 
 	type Tab = {
 		name: string;

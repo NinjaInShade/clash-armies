@@ -1,8 +1,8 @@
-import type { MigrationFn } from '$server/migration/migrator';
-import type { Database } from '$server/db';
 import { sql } from 'kysely';
+import type { Database } from '$server/db';
+import type { MigrationFn } from '$server/migration/migrator';
 
-// prettier-ignore
+// oxfmt-ignore
 export default function migration(runStep: MigrationFn) {
     runStep(29, async () => { /* Historical artifact - see 768be65 */ });
     runStep(30, async () => { /* Historical artifact - see 768be65 */ });

@@ -3,9 +3,9 @@
 </script>
 
 <script lang="ts">
+	import type { ArmyModel, StructuredArmyComment } from '$models/Army.svelte';
 	import CommentCard from './Comment.svelte';
 	import Self from './CommentsList.svelte';
-	import type { ArmyModel, StructuredArmyComment } from '$models/Army.svelte';
 
 	type Props = {
 		model: ArmyModel;

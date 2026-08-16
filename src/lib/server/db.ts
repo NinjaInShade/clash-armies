@@ -1,8 +1,8 @@
-import { env } from '$env/dynamic/private';
 import { building } from '$app/environment';
-import type { DB } from './db-types.d.ts';
-import { createPool } from 'mysql2';
+import { env } from '$env/dynamic/private';
 import { Kysely, MysqlDialect, sql, type InsertObject } from 'kysely';
+import { createPool } from 'mysql2';
+import type { DB } from './db-types.d.ts';
 import { logger } from './logger';
 
 const { DB_HOST, DB_USER, DB_PASSWORD, DB_PORT } = env;

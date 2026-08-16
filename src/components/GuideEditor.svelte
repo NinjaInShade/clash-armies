@@ -1,11 +1,11 @@
 <script lang="ts">
-	import { onDestroy } from 'svelte';
 	import { Editor } from '@tiptap/core';
+	import { onDestroy } from 'svelte';
 	import { getExtensions } from '$shared/guideEditor';
-	import Menu from './Menu.svelte';
+	import ActionButton from './ActionButton.svelte';
 	import FocusTrap from './FocusTrap.svelte';
 	import Input from './Input.svelte';
-	import ActionButton from './ActionButton.svelte';
+	import Menu from './Menu.svelte';
 
 	type Props = {
 		text: string | null;

@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { getContext } from 'svelte';
-	import type { AppState } from '$types';
-	import type { ArmyModel } from '$models/Army.svelte';
 	import { openInGame, getOpenBtnTitle } from '$client/army';
+	import type { ArmyModel } from '$models/Army.svelte';
+	import type { AppState } from '$types';
 
 	type Props = {
 		model: ArmyModel;

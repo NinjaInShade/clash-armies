@@ -1,13 +1,13 @@
 <script lang="ts">
 	import { getContext } from 'svelte';
-	import type { AppState } from '$types';
-	import Logo from '../Logo.svelte';
-	import NotificationsMenu from './NotificationsMenu.svelte';
-	import AccountMenu from './AccountMenu.svelte';
-	import Button from '../Button.svelte';
-	import MobileNav from './MobileNav.svelte';
-	import ArmiesMenu from './ArmiesMenu.svelte';
 	import { fade, slide } from 'svelte/transition';
+	import type { AppState } from '$types';
+	import Button from '../Button.svelte';
+	import Logo from '../Logo.svelte';
+	import AccountMenu from './AccountMenu.svelte';
+	import ArmiesMenu from './ArmiesMenu.svelte';
+	import MobileNav from './MobileNav.svelte';
+	import NotificationsMenu from './NotificationsMenu.svelte';
 
 	const app = getContext<AppState>('app');
 

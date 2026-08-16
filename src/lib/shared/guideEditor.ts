@@ -1,16 +1,16 @@
-import { GUIDE_TEXT_CHAR_LIMIT } from './utils';
-import Document from '@tiptap/extension-document';
-import Paragraph from '@tiptap/extension-paragraph';
-import Text from '@tiptap/extension-text';
-import Heading from '@tiptap/extension-heading';
-import TextAlign from '@tiptap/extension-text-align';
 import Bold from '@tiptap/extension-bold';
-import Italic from '@tiptap/extension-italic';
+import Document from '@tiptap/extension-document';
+import Heading from '@tiptap/extension-heading';
 import HorizontalRule from '@tiptap/extension-horizontal-rule';
-import Strike from '@tiptap/extension-strike';
+import Italic from '@tiptap/extension-italic';
 import Link from '@tiptap/extension-link';
 import { BulletList, OrderedList, ListItem, ListKeymap } from '@tiptap/extension-list';
+import Paragraph from '@tiptap/extension-paragraph';
+import Strike from '@tiptap/extension-strike';
+import Text from '@tiptap/extension-text';
+import TextAlign from '@tiptap/extension-text-align';
 import { Placeholder, UndoRedo, Dropcursor, Gapcursor, CharacterCount } from '@tiptap/extensions';
+import { GUIDE_TEXT_CHAR_LIMIT } from './utils';
 
 type GetExtensionsOpts = {
 	addLinkCb?: () => boolean;

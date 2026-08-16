@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { type Snippet, onDestroy } from 'svelte';
 	import { computePosition, autoUpdate, flip, shift, offset, type Placement } from '@floating-ui/dom';
+	import { type Snippet, onDestroy } from 'svelte';
 
 	type Props = {
 		open: boolean;

@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { getContext, untrack } from 'svelte';
-	import { HOLD_ADD_SPEED } from '$shared/utils';
-	import type { AppState, Unit, UnitType, UnitHome } from '$types';
 	import { ArmyModel } from '$models/Army.svelte';
 	import { UnitModel } from '$models/Unit.svelte';
+	import { HOLD_ADD_SPEED } from '$shared/utils';
+	import type { AppState, Unit, UnitType, UnitHome } from '$types';
 	import UnitDisplay from './UnitDisplay.svelte';
 
 	type TitleOptions = {

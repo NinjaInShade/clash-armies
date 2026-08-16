@@ -1,20 +1,20 @@
 <script lang="ts">
-	import type { Army } from '$models/Army.svelte';
-	import { getContext, untrack, type Snippet, type ComponentProps } from 'svelte';
 	import { navigating, page } from '$app/state';
-	import type { AppState } from '$types';
-	import Button from '../Button.svelte';
-	import ArmyCard from '../ArmyCard.svelte';
-	import Banner, { type BannerOptions } from './Banner.svelte';
-	import { ArmyModel } from '$models/Army.svelte';
-	import Pagination from './Pagination.svelte';
+	import { getContext, untrack, type Snippet, type ComponentProps } from 'svelte';
+	import ImgPekka from '$assets/ui/pekka.webp';
+	import { createFiltersState } from '$client/filtersState.svelte';
 	import { mkParamStore, mkPageStore } from '$client/params.svelte';
-	import SearchBox from './SearchBox.svelte';
-	import { debounce, ARMIES_PAGE_SIZE } from '$shared/utils';
 	import FiltersDrawer from '$components/Armies/FiltersDrawer.svelte';
 	import THFilterButton from '$components/Armies/THFilterButton.svelte';
-	import { createFiltersState } from '$client/filtersState.svelte';
-	import ImgPekka from '$assets/ui/pekka.webp';
+	import type { Army } from '$models/Army.svelte';
+	import { ArmyModel } from '$models/Army.svelte';
+	import { debounce, ARMIES_PAGE_SIZE } from '$shared/utils';
+	import type { AppState } from '$types';
+	import ArmyCard from '../ArmyCard.svelte';
+	import Button from '../Button.svelte';
+	import Banner, { type BannerOptions } from './Banner.svelte';
+	import Pagination from './Pagination.svelte';
+	import SearchBox from './SearchBox.svelte';
 
 	type FiltersDrawerProps = ComponentProps<typeof FiltersDrawer>;
 

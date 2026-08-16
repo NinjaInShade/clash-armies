@@ -1,7 +1,7 @@
 import { error } from '@sveltejs/kit';
-import type { PageServerLoad } from './$types';
 import z from 'zod';
 import { ARMIES_PAGE_SIZE } from '$shared/utils';
+import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async (req) => {
 	const townHall = z.number().parse(+req.params.slug);

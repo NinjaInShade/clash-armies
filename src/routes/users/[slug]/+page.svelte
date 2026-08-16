@@ -1,15 +1,15 @@
 <script lang="ts">
-	import { getContext } from 'svelte';
-	import type { AppState } from '$types';
-	import type { PageData } from './$types';
 	import { format } from 'date-fns';
-	import Button from '$components/Button.svelte';
-	import TabStrip from '$components/TabStrip.svelte';
-	import EditUser from './EditUser.svelte';
-	import CreatedArmiesTab from './CreatedArmiesTab.svelte';
-	import SavedArmiesTab from './SavedArmiesTab.svelte';
+	import { getContext } from 'svelte';
 	import ImgBarbKing from '$assets/ui/barb-king.webp';
 	import ImgExperience from '$assets/ui/experience.webp';
+	import Button from '$components/Button.svelte';
+	import TabStrip from '$components/TabStrip.svelte';
+	import type { AppState } from '$types';
+	import type { PageData } from './$types';
+	import CreatedArmiesTab from './CreatedArmiesTab.svelte';
+	import EditUser from './EditUser.svelte';
+	import SavedArmiesTab from './SavedArmiesTab.svelte';
 
 	const { data }: { data: PageData } = $props();
 	const { user } = $derived(data);

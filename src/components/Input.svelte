@@ -1,6 +1,6 @@
 <script lang="ts" generics="T extends string | number | null | undefined = string | null | undefined">
-	import type { HTMLInputAttributes } from 'svelte/elements';
 	import { getContext, type Snippet } from 'svelte';
+	import type { HTMLInputAttributes } from 'svelte/elements';
 
 	type Props = {
 		/** Sets the bound value */

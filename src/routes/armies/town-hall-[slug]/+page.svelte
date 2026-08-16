@@ -1,9 +1,9 @@
 <script lang="ts">
-	import type { PageData } from './$types';
 	import { page } from '$app/state';
 	import { ARMY_PAGES } from '$client/pages';
-	import ArmyList from '~/components/Armies/ArmyList.svelte';
-	import PaginatedCanonical from '~/components/Armies/PaginatedCanonical.svelte';
+	import ArmyList from '$components/Armies/ArmyList.svelte';
+	import PaginatedCanonical from '$components/Armies/PaginatedCanonical.svelte';
+	import type { PageData } from './$types';
 
 	const { data }: { data: PageData } = $props();
 	const townHall = $derived(+page.params.slug!);

@@ -1,7 +1,7 @@
 <script lang="ts">
+	import { add, isAfter, type Duration } from 'date-fns';
 	import { onMount } from 'svelte';
 	import { fade } from 'svelte/transition';
-	import { add, isAfter, type Duration } from 'date-fns';
 
 	const STORAGE_KEY = 'ca:feedback-banner-dismissed';
 	const SHOW_AGAIN_AFTER: Duration = { months: 2 };

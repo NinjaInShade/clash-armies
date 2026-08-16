@@ -4,12 +4,12 @@
 </script>
 
 <script lang="ts">
-	import { getContext } from 'svelte';
-	import type { AppState } from '$types';
 	import { formatDistanceToNow } from 'date-fns';
-	import SaveComment from './SaveComment.svelte';
+	import { getContext } from 'svelte';
 	import type { ArmyModel, ArmyComment } from '$models/Army.svelte';
+	import type { AppState } from '$types';
 	import CtxMenu from './CommentMenu.svelte';
+	import SaveComment from './SaveComment.svelte';
 
 	type Props = {
 		model: ArmyModel;

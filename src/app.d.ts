@@ -1,6 +1,6 @@
-import type { Session } from '$types';
-import type { SessionUser } from '$server/auth/session';
 import type { Server } from '$server/api/Server';
+import type { SessionUser } from '$server/auth/session';
+import type { Session } from '$types';
 
 // See https://kit.svelte.dev/docs/types#app
 // for information about these interfaces
@@ -13,7 +13,7 @@ declare global {
 		// interface Platform {}
 	}
 
-	declare const __CHANGELOG__: string;
+	const __CHANGELOG__: string;
 }
 
 export interface Request {

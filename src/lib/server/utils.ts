@@ -1,8 +1,9 @@
-import type { APIErrors } from '$shared/http';
-import z from 'zod';
-import { v4 as uuidv4 } from 'uuid';
+import { dev } from '$app/environment';
 import { json } from '@sveltejs/kit';
-import { hasAuth, requireAuth, hasRoles, requireRoles } from '$server/auth/utils';
+import type { RequestEvent, Handle } from '@sveltejs/kit';
+import { v4 as uuidv4 } from 'uuid';
+import z from 'zod';
+import type { Server } from '$server/api/Server';
 import {
 	SESSION_COOKIE_NAME,
 	validateSessionToken,
@@ -11,9 +12,8 @@ import {
 	getSessionCookieAttributes,
 	getBlankSessionCookieAttributes,
 } from '$server/auth/session';
-import type { RequestEvent, Handle } from '@sveltejs/kit';
-import type { Server } from '$server/api/Server';
-import { dev } from '$app/environment';
+import { hasAuth, requireAuth, hasRoles, requireRoles } from '$server/auth/utils';
+import type { APIErrors } from '$shared/http';
 
 export type SvelteKitHandleResolve = Parameters<Handle>[0]['resolve'];
 

@@ -1,7 +1,7 @@
 <script lang="ts">
-	import type { AppState } from '$types';
-	import { thImgURL } from '$client/assets';
 	import { getContext } from 'svelte';
+	import { thImgURL } from '$client/assets';
+	import type { AppState } from '$types';
 	import Menu from '../Menu.svelte';
 
 	type Props = {

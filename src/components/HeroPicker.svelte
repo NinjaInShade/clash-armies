@@ -1,14 +1,14 @@
 <script lang="ts">
 	import { getContext } from 'svelte';
-	import type { AppState, Pet } from '$types';
-	import HeroDisplay from './HeroDisplay.svelte';
-	import ActionButton from './ActionButton.svelte';
-	import EquipmentDisplay from './EquipmentDisplay.svelte';
-	import PetDisplay from './PetDisplay.svelte';
-	import AddHero from './AddHero.svelte';
-	import { EquipmentModel } from '$models/Equipment.svelte';
 	import { ArmyModel } from '$models/Army.svelte';
+	import { EquipmentModel } from '$models/Equipment.svelte';
 	import { PetModel } from '$models/Pet.svelte';
+	import type { AppState, Pet } from '$types';
+	import ActionButton from './ActionButton.svelte';
+	import AddHero from './AddHero.svelte';
+	import EquipmentDisplay from './EquipmentDisplay.svelte';
+	import HeroDisplay from './HeroDisplay.svelte';
+	import PetDisplay from './PetDisplay.svelte';
 
 	type Props = {
 		model: ArmyModel;

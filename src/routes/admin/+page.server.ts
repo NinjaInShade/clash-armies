@@ -1,7 +1,7 @@
-import type { PageServerLoad } from './$types';
-import type { Server } from '$server/api/Server';
 import fsp from 'node:fs/promises';
 import os from 'node:os';
+import type { Server } from '$server/api/Server';
+import type { PageServerLoad } from './$types';
 
 export type ServerStats = {
 	usedDisk: string;

@@ -1,6 +1,6 @@
 <script lang="ts">
-	import type { HTMLTextareaAttributes } from 'svelte/elements';
 	import { getContext, type Snippet } from 'svelte';
+	import type { HTMLTextareaAttributes } from 'svelte/elements';
 
 	type Props = {
 		/** Sets the bound value */

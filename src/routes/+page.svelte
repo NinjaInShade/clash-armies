@@ -1,12 +1,12 @@
 <script lang="ts">
-	import type { PageData } from './$types';
-	import { ARMY_PAGES } from '$client/pages';
-	import Button from '$components/Button.svelte';
-	import ArmyList from '~/components/Armies/ArmyList.svelte';
+	import ImgHeaderBarbLarge from '$assets/ui/header-barbarian_large.webp';
 	import ImgLeagueKing from '$assets/ui/league-king.webp';
 	import ImgLeagueKingLarge from '$assets/ui/league-king_large.webp';
-	import ImgHeaderBarbLarge from '$assets/ui/header-barbarian_large.webp';
-	import PaginatedCanonical from '~/components/Armies/PaginatedCanonical.svelte';
+	import { ARMY_PAGES } from '$client/pages';
+	import ArmyList from '$components/Armies/ArmyList.svelte';
+	import PaginatedCanonical from '$components/Armies/PaginatedCanonical.svelte';
+	import Button from '$components/Button.svelte';
+	import type { PageData } from './$types';
 
 	const { data }: { data: PageData } = $props();
 	const latestArmiesMeta = ARMY_PAGES.latest;

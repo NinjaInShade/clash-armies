@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import type { Banner } from '$types';
-	import { BANNERS } from '$shared/utils';
 	import { bannerImgURL } from '$client/assets';
 	import Modal from '$components/Modal.svelte';
+	import { BANNERS } from '$shared/utils';
+	import type { Banner } from '$types';
 
 	type Props = {
 		/** The currently selected banner */

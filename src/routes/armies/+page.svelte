@@ -1,8 +1,8 @@
 <script lang="ts">
-	import type { PageData } from './$types';
 	import { ARMY_PAGES } from '$client/pages';
-	import ArmyList from '~/components/Armies/ArmyList.svelte';
-	import PaginatedCanonical from '~/components/Armies/PaginatedCanonical.svelte';
+	import ArmyList from '$components/Armies/ArmyList.svelte';
+	import PaginatedCanonical from '$components/Armies/PaginatedCanonical.svelte';
+	import type { PageData } from './$types';
 
 	const { data }: { data: PageData } = $props();
 	const pageMeta = ARMY_PAGES.latest;
