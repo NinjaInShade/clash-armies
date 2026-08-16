@@ -2,6 +2,7 @@ import type { RequestEvent } from '@sveltejs/kit';
 import { CronJob } from 'cron';
 import { ArmyAPI } from '$server/api/ArmyAPI';
 import { NotificationAPI } from '$server/api/NotificationAPI';
+import { SitemapAPI } from '$server/api/SitemapAPI';
 import { UserAPI } from '$server/api/UserAPI';
 import { deleteExpiredSessions } from '$server/auth/session';
 import { waitForDatabase, type Database } from '$server/db';
@@ -34,6 +35,7 @@ export class Server {
 	public army: ArmyAPI;
 	public user: UserAPI;
 	public notification: NotificationAPI;
+	public sitemap: SitemapAPI;
 	public gameData: GameData;
 
 	private hourlyTaskJob: CronJob;
@@ -48,6 +50,7 @@ export class Server {
 		this.army = new ArmyAPI(this);
 		this.user = new UserAPI(this);
 		this.notification = new NotificationAPI(this);
+		this.sitemap = new SitemapAPI(this);
 
 		this.gameData = new GameData(this, this.settings.gameData);
 
@@ -69,6 +72,8 @@ export class Server {
 		await this.army.init();
 		await this.user.init();
 		await this.notification.init();
+
+		await this.sitemap.init();
 	}
 
 	public async dispose(reason?: string) {

@@ -56,11 +56,13 @@ export async function createUsers(server: Server) {
 	const users = [USER, USER_2, USER_ADMIN];
 	await server.db
 		.insertInto('users')
-		.values(users.map((user) => ({ username: user.username, googleId: '123' })))
+		.values(users.map((user) => ({ id: user.id, username: user.username, googleId: '123' })))
+		.ignore()
 		.execute();
 	await server.db
 		.insertInto('user_roles')
 		.values(users.flatMap((user) => user.roles.map((role) => ({ userId: user.id, role }))))
+		.ignore()
 		.execute();
 }
 
