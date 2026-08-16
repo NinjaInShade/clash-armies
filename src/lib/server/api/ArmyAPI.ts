@@ -879,7 +879,7 @@ export class ArmyAPI {
 		}
 
 		if (vote === 0) {
-			await this.server.db.deleteFrom('army_votes').where('votedBy', '=', user.id).execute();
+			await this.server.db.deleteFrom('army_votes').where('armyId', '=', armyId).where('votedBy', '=', user.id).execute();
 		} else {
 			await helpers.upsert(this.server.db, 'army_votes', { armyId, votedBy: user.id, vote });
 		}
