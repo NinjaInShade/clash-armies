@@ -16,7 +16,9 @@
 		"test:coverage": "pnpm run test:before && vitest run --coverage",
 		"test:ui": "pnpm run test:before && vitest --ui --coverage.enabled=true",
 		"test": "pnpm run test:before && vitest run",
-		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json src"
+		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json src",
+		"fmt": "oxfmt",
+		"fmt:check": "oxfmt --check"
 	},
 	"engines": {
 		"node": ">=26.3.0"
@@ -38,9 +40,8 @@
 		"eslint-config-prettier": "^10.1.8",
 		"eslint-plugin-svelte": "^3.22.0",
 		"globals": "^17.9.0",
-		"prettier": "^3.9.6",
-		"prettier-plugin-svelte": "^4.1.1",
 		"@vitejs/plugin-basic-ssl": "2.3.0",
+		"oxfmt": "^0.63.0",
 		"svelte": "^5.56.8",
 		"svelte-check": "^4.7.5",
 		"svelte-eslint-parser": "^1.8.0",

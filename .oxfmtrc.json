@@ -1,0 +1,16 @@
+{
+	"$schema": "./node_modules/oxfmt/configuration_schema.json",
+	"useTabs": true,
+	"singleQuote": true,
+	"trailingComma": "es5",
+	"bracketSpacing": true,
+	"printWidth": 160,
+	"sortPackageJson": true,
+	"svelte": {},
+	"sortImports": {
+		// Should match the sveltekit `alias` keys in `vite.config.ts`
+		"internalPattern": ["~/", "$types", "$components", "$assets", "$models", "$client", "$server", "$shared"],
+		"newlinesBetween": false
+	},
+	"ignorePatterns": ["pnpm-lock.yaml", "src/lib/server/db-types.d.ts", "tests/fixtures/game-data.json5"]
+}
