@@ -4926,6 +4926,26 @@
 					level: 10,
 					petHouseLevel: 6,
 				},
+				{
+					level: 11,
+					petHouseLevel: 12,
+				},
+				{
+					level: 12,
+					petHouseLevel: 12,
+				},
+				{
+					level: 13,
+					petHouseLevel: 12,
+				},
+				{
+					level: 14,
+					petHouseLevel: 12,
+				},
+				{
+					level: 15,
+					petHouseLevel: 12,
+				},
 			],
 		},
 		{
