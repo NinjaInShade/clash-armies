@@ -1,3 +1,7 @@
+## [0.12.5] - 2026-09-05
+
+- Add new Diggy levels
+
 ## [0.12.4] - 2026-08-16
 
 - Add `/sitemap.xml` endpoint
