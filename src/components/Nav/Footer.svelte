@@ -93,6 +93,9 @@
 							<a href="/users/{app.user.username}">Account</a>
 						</li>
 					{/if}
+					<li>
+						<a href="/privacy-policy">Privacy policy</a>
+					</li>
 				</ul>
 			</div>
 			<div class="col">
