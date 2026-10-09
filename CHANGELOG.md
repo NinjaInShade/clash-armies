@@ -1,3 +1,8 @@
+## [0.12.6] - 2026-10-09
+
+- Add new Portal Pendant equipment
+- Add privacy policy
+
 ## [0.12.5] - 2026-09-05
 
 - Add new Diggy levels
