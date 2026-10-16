@@ -46,7 +46,6 @@
 		"@tiptap/extensions": "^3.32.0",
 		"@tiptap/html": "^3.32.0",
 		"@tiptap/pm": "^3.32.0",
-		"arctic": "3.7.0",
 		"cookie-signature": "1.2.2",
 		"cron": "4.4.0",
 		"date-fns": "4.4.0",

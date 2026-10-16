@@ -1,8 +1,7 @@
 import { dev } from '$app/env';
 import type { RequestEvent } from '@sveltejs/kit';
 import { redirect } from '@sveltejs/kit';
-import { generateState, generateCodeVerifier } from 'arctic';
-import { google } from '#server/auth/oauth.ts';
+import { generateState, generateCodeVerifier, createGoogleAuthorizationURL } from '#server/auth/oauth.ts';
 
 export async function GET(req: RequestEvent): Promise<Response> {
 	const redirectTo = req.locals.server.getSafeRedirect(req, {
@@ -17,7 +16,7 @@ export async function GET(req: RequestEvent): Promise<Response> {
 
 	const state = JSON.stringify({ s: generateState(), r: redirectTo });
 	const codeVerifier = generateCodeVerifier();
-	const url = google.createAuthorizationURL(state, codeVerifier, ['openid', 'email']);
+	const url = await createGoogleAuthorizationURL(state, codeVerifier, ['openid', 'email']);
 
 	req.cookies.set('google_oauth_state', state, {
 		path: '/',

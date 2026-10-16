@@ -1,16 +1,17 @@
 import type { RequestEvent } from '@sveltejs/kit';
-import { OAuth2RequestError } from 'arctic';
-import { google } from '#server/auth/oauth.ts';
+import z from 'zod';
+import { OAuth2RequestError, validateGoogleAuthorizationCode } from '#server/auth/oauth.ts';
 import { createSession, SESSION_COOKIE_NAME, getSessionCookieAttributes } from '#server/auth/session.ts';
 import { log } from '#server/auth/utils.ts';
 import { db } from '#server/db.ts';
 
-type GoogleUser = {
-	sub: string;
-	picture: string;
-	email?: string;
-	email_verified?: string;
-};
+/** See https://developers.google.com/identity/openid-connect/openid-connect#obtainuserinfo */
+const googleUserSchema = z.object({
+	sub: z.string().min(1),
+	picture: z.string().optional(),
+	email: z.string().optional(),
+	email_verified: z.boolean().optional(),
+});
 
 function isObject(obj: unknown): obj is Record<string, unknown> {
 	return typeof obj === 'object' && !Array.isArray(obj) && obj !== null;
@@ -43,14 +44,17 @@ export async function GET(req: RequestEvent): Promise<Response> {
 	}
 
 	try {
-		const tokens = await google.validateAuthorizationCode(code, storedCodeVerifier);
-		const accessToken = tokens.accessToken();
+		const { accessToken } = await validateGoogleAuthorizationCode(code, storedCodeVerifier);
 		const response = await fetch('https://openidconnect.googleapis.com/v1/userinfo', {
 			headers: {
 				Authorization: `Bearer ${accessToken}`,
 			},
 		});
-		const googleUser: GoogleUser = await response.json();
+		if (!response.ok) {
+			throw new Error(`Unexpected userinfo response status: ${response.status}`);
+		}
+
+		const googleUser = googleUserSchema.parse(await response.json());
 		const googleId = googleUser.sub;
 		const googleEmail = googleUser.email ?? null;
 
