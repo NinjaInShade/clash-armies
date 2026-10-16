@@ -1,7 +1,6 @@
 import { dev } from '$app/env';
 import type { RequestEvent } from '@sveltejs/kit';
 import type { Handle } from '@sveltejs/kit/hooks';
-import { v4 as uuidv4 } from 'uuid';
 import z from 'zod';
 import type { Server } from '#server/api/Server.ts';
 import {
@@ -90,7 +89,7 @@ export function endpoint(action: (req: RequestEvent) => Promise<Response>) {
 }
 
 export function initRequest(req: RequestEvent, server: Server) {
-	req.locals.uuid = uuidv4();
+	req.locals.uuid = crypto.randomUUID();
 	req.locals.server = server;
 	req.locals.hasAuth = () => hasAuth(req);
 	req.locals.requireAuth = () => requireAuth(req);

@@ -1,5 +1,4 @@
 import type { RequestEvent } from '@sveltejs/kit';
-import { v4 as uuidv4 } from 'uuid';
 import * as vitest from 'vitest';
 import type { Army } from '#models/Army.svelte.ts';
 import type { Server } from '#server/api/Server.ts';
@@ -30,7 +29,7 @@ export const USER_ADMIN: SessionUser = {
  * Sveltekit request object shim
  */
 export function createReq(user: SessionUser, server: Server) {
-	const uuid = uuidv4();
+	const uuid = crypto.randomUUID();
 	const req = {
 		locals: {
 			uuid,

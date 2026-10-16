@@ -1,7 +1,6 @@
 import { VISITOR_ID_SECRET } from '$app/env/private';
 import type { RequestEvent } from '@sveltejs/kit';
 import { sign, unsign } from 'cookie-signature';
-import { v4 as uuidv4, validate as isUuid } from 'uuid';
 import z from 'zod';
 import type { Server } from '#server/api/Server.ts';
 import { helpers } from '#server/db.ts';
@@ -161,7 +160,7 @@ export class ArmyMetricsAPI {
 			return;
 		}
 
-		const visitorId = uuidv4();
+		const visitorId = crypto.randomUUID();
 		this.setVisitorId(req, visitorId);
 	}
 
@@ -293,7 +292,7 @@ export class ArmyMetricsAPI {
 			return undefined;
 		}
 
-		if (!isUuid(unsigned)) {
+		if (!z.uuid().safeParse(unsigned).success) {
 			return undefined;
 		}
 
