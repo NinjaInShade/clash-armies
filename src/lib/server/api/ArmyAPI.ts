@@ -238,12 +238,15 @@ export class ArmyAPI {
 						.select([
 							'au.armyId',
 							helpers
-								.jsonAggObj({
-									id: 'au.id',
-									home: 'au.home',
-									unitId: 'au.unitId',
-									amount: 'au.amount',
-								})
+								.jsonAggObj(
+									{
+										id: 'au.id',
+										home: 'au.home',
+										unitId: 'au.unitId',
+										amount: 'au.amount',
+									},
+									{ order: 'au.id' }
+								)
 								.as('units'),
 						])
 						.as('au'),
@@ -257,10 +260,13 @@ export class ArmyAPI {
 						.select([
 							'ae.armyId',
 							helpers
-								.jsonAggObj({
-									id: 'ae.id',
-									equipmentId: 'ae.equipmentId',
-								})
+								.jsonAggObj(
+									{
+										id: 'ae.id',
+										equipmentId: 'ae.equipmentId',
+									},
+									{ order: 'ae.id' }
+								)
 								.as('equipment'),
 						])
 						.as('ae'),
@@ -274,11 +280,14 @@ export class ArmyAPI {
 						.select([
 							'ap.armyId',
 							helpers
-								.jsonAggObj({
-									id: 'ap.id',
-									hero: 'ap.hero',
-									petId: 'ap.petId',
-								})
+								.jsonAggObj(
+									{
+										id: 'ap.id',
+										hero: 'ap.hero',
+										petId: 'ap.petId',
+									},
+									{ order: 'ap.id' }
+								)
 								.as('pets'),
 						])
 						.as('ap'),
@@ -294,16 +303,19 @@ export class ArmyAPI {
 							'ac.armyId',
 							eb.fn.count<number>('ac.id').as('commentsCount'),
 							(includeFullComments
-								? helpers.jsonAggObj({
-										id: 'ac.id',
-										armyId: 'ac.armyId',
-										comment: 'ac.comment',
-										replyTo: 'ac.replyTo',
-										username: 'u.username',
-										createdBy: 'ac.createdBy',
-										createdTime: 'ac.createdTime',
-										updatedTime: 'ac.updatedTime',
-									})
+								? helpers.jsonAggObj(
+										{
+											id: 'ac.id',
+											armyId: 'ac.armyId',
+											comment: 'ac.comment',
+											replyTo: 'ac.replyTo',
+											username: 'u.username',
+											createdBy: 'ac.createdBy',
+											createdTime: 'ac.createdTime',
+											updatedTime: 'ac.updatedTime',
+										},
+										{ order: 'ac.id' }
+									)
 								: sql<Army['comments']>`NULL`
 							).as('comments'),
 						])
@@ -315,7 +327,7 @@ export class ArmyAPI {
 					eb
 						.selectFrom('army_tags as art')
 						.groupBy('art.armyId')
-						.select(['art.armyId', helpers.jsonAgg('art.tag').as('tags')])
+						.select(['art.armyId', helpers.jsonAgg('art.tag', { order: 'art.tag' }).as('tags')])
 						.as('art'),
 				(join) => join.onRef('art.armyId', '=', 'a.id')
 			)
@@ -494,6 +506,7 @@ export class ArmyAPI {
 		} else {
 			query = query.orderBy('createdTime', 'desc');
 		}
+		query = query.orderBy('a.id', 'asc');
 
 		if (limit) {
 			query = query.limit(limit).offset(((page ?? 1) - 1) * limit);
