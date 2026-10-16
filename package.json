@@ -76,7 +76,7 @@
 		"eslint-plugin-svelte": "^3.23.1",
 		"globals": "^17.9.0",
 		"kysely-codegen": "^0.20.0",
-		"oxfmt": "^0.63.0",
+		"oxfmt": "^0.73.0",
 		"svelte": "^5.57.2",
 		"svelte-check": "^4.7.6",
 		"svelte-eslint-parser": "^1.9.0",
