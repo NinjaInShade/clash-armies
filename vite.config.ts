@@ -19,6 +19,14 @@ export default defineConfig((env) => {
 	const plugins: PluginOption[] = [
 		sveltekit({
 			preprocess: vitePreprocess(),
+			compilerOptions: {
+				warningFilter: (warning) => {
+					// Seeding state with an initial value is very common, so this warning is just annoying.
+					// I'd rather not put `untrack(() => INITIAL)` everywhere at the moment, but
+					// this filtering does not make IDE warnings go away, so maybe I will one day...
+					return warning.code !== 'state_referenced_locally';
+				},
+			},
 			adapter: adapter({
 				// Where the final node build that uses the vite build goes.
 				// This is the code that gets deployed to prod.
