@@ -20,7 +20,7 @@
 	const { model }: Props = $props();
 
 	const app = getContext<AppState>('app');
-	const downloads = $derived(model.openLinkClicks + model.copyLinkClicks);
+	const downloads = $derived((model.openLinkClicks + model.copyLinkClicks).toLocaleString('en-GB'));
 
 	let menuBtn = $state<HTMLButtonElement>();
 	let menuOpen = $state(false);
