@@ -1,7 +1,7 @@
-import { mkParamStore } from '$client/params.svelte';
-import type { Unit, Equipment, Pet } from '$shared/gameData';
-import { ARMY_TAG_CODES, ARMY_TAGS_BY_CODE, type ArmyTag } from '$shared/utils';
-import type { AppState } from '$types';
+import { mkParamStore } from '#client/params.svelte.ts';
+import type { Unit, Equipment, Pet } from '#shared/gameData.ts';
+import { ARMY_TAG_CODES, ARMY_TAGS_BY_CODE, type ArmyTag } from '#shared/utils.ts';
+import type { AppState } from '#types';
 
 export type PickUnit = (Unit & { pickType: 'unit' }) | (Equipment & { pickType: 'equipment' }) | (Pet & { pickType: 'pet' });
 

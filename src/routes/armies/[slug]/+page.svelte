@@ -1,10 +1,10 @@
 <script lang="ts">
 	import { page } from '$app/state';
 	import { onMount, getContext, untrack } from 'svelte';
-	import ViewArmy from '$components/ViewArmy.svelte';
-	import { ArmyModel } from '$models/Army.svelte';
-	import { PAGE_VIEW_METRIC } from '$shared/utils';
-	import type { AppState } from '$types';
+	import ViewArmy from '#components/ViewArmy.svelte';
+	import { ArmyModel } from '#models/Army.svelte.ts';
+	import { PAGE_VIEW_METRIC } from '#shared/utils.ts';
+	import type { AppState } from '#types';
 	import type { PageData } from './$types';
 
 	const { data }: { data: PageData } = $props();

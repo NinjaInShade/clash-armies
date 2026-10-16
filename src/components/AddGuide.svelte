@@ -1,5 +1,5 @@
 <script lang="ts">
-	import ImgBBDuel from '$assets/ui/bb-duel.webp';
+	import ImgBBDuel from '#assets/ui/bb-duel.webp';
 
 	type Props = {
 		onClick: () => void;

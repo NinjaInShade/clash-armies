@@ -1,7 +1,7 @@
 import crypto from 'node:crypto';
 import { dev } from '$app/env';
-import { db, helpers } from '$server/db';
-import type { Session, User } from '$types';
+import { db } from '#server/db.ts';
+import type { Session, User } from '#types';
 
 // Various implementation functions for session based authentication, following lucia guide(s):
 // - https://lucia-auth.com/sessions/basic

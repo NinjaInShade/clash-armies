@@ -1,5 +1,5 @@
 <script lang="ts">
-	import TabStrip from '$components/TabStrip.svelte';
+	import TabStrip from '#components/TabStrip.svelte';
 	import type { PageData } from './$types';
 	import ConfigTab from './Config.svelte';
 	import OverviewTab from './Overview.svelte';

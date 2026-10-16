@@ -1,7 +1,7 @@
 import type { Component, ComponentProps } from 'svelte';
-import type { RawGameData, StaticGameData } from '$shared/gameData';
-import type { HTTPApi } from '$shared/http';
-import { BANNERS, VALID_UNIT_HOME } from '$shared/utils';
+import type { RawGameData, StaticGameData } from '#shared/gameData.ts';
+import type { HTTPApi } from '#shared/http.ts';
+import { BANNERS, VALID_UNIT_HOME } from '#shared/utils.ts';
 
 // eslint-disable-next-line
 type AnyComponent = Component<any>;

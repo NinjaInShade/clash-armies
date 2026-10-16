@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { getContext } from 'svelte';
-	import type { AppState } from '$types';
+	import type { AppState } from '#types';
 	import Logo from '../Logo.svelte';
 
 	const app = getContext<AppState>('app');

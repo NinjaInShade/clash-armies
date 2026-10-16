@@ -1,5 +1,5 @@
 <script lang="ts">
-	import IconGoogleLogo from '$assets/icons/google-logo.svg';
+	import IconGoogleLogo from '#assets/icons/google-logo.svg';
 </script>
 
 <a href="/api/login/google" class="login-btn">

@@ -1,13 +1,13 @@
 <script lang="ts">
 	import { refreshAll, goto } from '$app/navigation';
 	import { getContext } from 'svelte';
-	import Button from '$components/Button.svelte';
-	import Errors from '$components/Errors.svelte';
-	import Fieldset from '$components/Fieldset.svelte';
-	import Input from '$components/Input.svelte';
-	import Modal from '$components/Modal.svelte';
-	import { HTTPError, type APIErrors } from '$shared/http';
-	import type { AppState, User } from '$types';
+	import Button from '#components/Button.svelte';
+	import Errors from '#components/Errors.svelte';
+	import Fieldset from '#components/Fieldset.svelte';
+	import Input from '#components/Input.svelte';
+	import Modal from '#components/Modal.svelte';
+	import { HTTPError, type APIErrors } from '#shared/http.ts';
+	import type { AppState, User } from '#types';
 
 	type Props = {
 		/** Function that closes the modal */

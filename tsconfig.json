@@ -12,7 +12,6 @@
 		"moduleResolution": "bundler",
 		"verbatimModuleSyntax": true
 	},
-	// Path aliases are handled by https://svelte.dev/docs/kit/@sveltejs-kit-vite#alias
 	"include": ["src", "tests", "vite.config.ts"],
 	"exclude": ["node_modules"]
 }

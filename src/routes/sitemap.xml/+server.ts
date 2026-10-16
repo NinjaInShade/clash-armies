@@ -1,4 +1,4 @@
-import { SITEMAP_MAX_AGE_SECONDS } from '$server/api/SitemapAPI';
+import { SITEMAP_MAX_AGE_SECONDS } from '#server/api/SitemapAPI.ts';
 import type { RequestHandler } from './$types';
 
 export const GET: RequestHandler = async (req) => {

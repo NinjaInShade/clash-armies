@@ -1,13 +1,13 @@
 <script lang="ts">
 	import { refreshAll } from '$app/navigation';
 	import { getContext } from 'svelte';
-	import Button from '$components/Button.svelte';
-	import Errors from '$components/Errors.svelte';
-	import Fieldset from '$components/Fieldset.svelte';
-	import Input from '$components/Input.svelte';
-	import type { MetricWeights } from '$server/api/ArmyMetricsAPI';
-	import { HTTPError, type APIErrors } from '$shared/http';
-	import type { AppState } from '$types';
+	import Button from '#components/Button.svelte';
+	import Errors from '#components/Errors.svelte';
+	import Fieldset from '#components/Fieldset.svelte';
+	import Input from '#components/Input.svelte';
+	import type { MetricWeights } from '#server/api/ArmyMetricsAPI.ts';
+	import { HTTPError, type APIErrors } from '#shared/http.ts';
+	import type { AppState } from '#types';
 
 	type Props = {
 		/** Current weights */

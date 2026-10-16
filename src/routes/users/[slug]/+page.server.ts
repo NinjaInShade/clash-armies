@@ -1,7 +1,7 @@
 import { error } from '@sveltejs/kit';
 import z from 'zod';
-import { ARMIES_PAGE_SIZE } from '$shared/utils';
-import { parsePageParam } from '$shared/validation';
+import { ARMIES_PAGE_SIZE } from '#shared/utils.ts';
+import { parsePageParam } from '#shared/validation.ts';
 import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async (req) => {

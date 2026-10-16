@@ -1,11 +1,11 @@
 <script lang="ts">
-	import ImgHeaderBarbLarge from '$assets/ui/header-barbarian_large.webp';
-	import ImgLeagueKing from '$assets/ui/league-king.webp';
-	import ImgLeagueKingLarge from '$assets/ui/league-king_large.webp';
-	import { ARMY_PAGES } from '$client/pages';
-	import ArmyList from '$components/Armies/ArmyList.svelte';
-	import PaginatedCanonical from '$components/Armies/PaginatedCanonical.svelte';
-	import Button from '$components/Button.svelte';
+	import ImgHeaderBarbLarge from '#assets/ui/header-barbarian_large.webp';
+	import ImgLeagueKing from '#assets/ui/league-king.webp';
+	import ImgLeagueKingLarge from '#assets/ui/league-king_large.webp';
+	import { ARMY_PAGES } from '#client/pages.ts';
+	import ArmyList from '#components/Armies/ArmyList.svelte';
+	import PaginatedCanonical from '#components/Armies/PaginatedCanonical.svelte';
+	import Button from '#components/Button.svelte';
 	import type { PageData } from './$types';
 
 	const { data }: { data: PageData } = $props();
@@ -47,7 +47,7 @@
 
 <style>
 	header {
-		background: repeat-x 0 25% url('$assets/ui/stones-background.webp');
+		background: repeat-x 0 25% url('../lib/assets/ui/stones-background.webp');
 		padding: 0 var(--side-padding);
 		overflow: hidden;
 	}
@@ -88,7 +88,7 @@
 
 	@media (max-width: 1000px) {
 		header {
-			background: repeat-x 0 15% url('$assets/ui/stones-background.webp');
+			background: repeat-x 0 15% url('../lib/assets/ui/stones-background.webp');
 		}
 
 		header .container {
@@ -109,7 +109,7 @@
 
 	@media (max-width: 625px) {
 		header {
-			background: repeat-x 0 7% url('$assets/ui/stones-background.webp');
+			background: repeat-x 0 7% url('../lib/assets/ui/stones-background.webp');
 		}
 
 		.graphic {

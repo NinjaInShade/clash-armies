@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { getContext } from 'svelte';
-	import EditArmy from '$components/EditArmy.svelte';
-	import GoogleLoginButton from '$components/GoogleLoginButton.svelte';
-	import type { AppState } from '$types';
+	import EditArmy from '#components/EditArmy.svelte';
+	import GoogleLoginButton from '#components/GoogleLoginButton.svelte';
+	import type { AppState } from '#types';
 
 	const app = getContext<AppState>('app');
 </script>

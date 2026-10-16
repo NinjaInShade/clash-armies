@@ -1,10 +1,10 @@
 <script lang="ts">
 	import { refreshAll } from '$app/navigation';
 	import { getContext } from 'svelte';
-	import ImgBarbKing2 from '$assets/ui/barb-king-2.webp';
-	import type { ArmyModel, ArmyComment } from '$models/Army.svelte';
-	import { MAX_COMMENT_LENGTH } from '$shared/utils';
-	import type { AppState } from '$types';
+	import ImgBarbKing2 from '#assets/ui/barb-king-2.webp';
+	import type { ArmyModel, ArmyComment } from '#models/Army.svelte.ts';
+	import { MAX_COMMENT_LENGTH } from '#shared/utils.ts';
+	import type { AppState } from '#types';
 	import Button from './Button.svelte';
 	import TextArea from './TextArea.svelte';
 

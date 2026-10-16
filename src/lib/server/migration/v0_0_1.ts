@@ -1,4 +1,4 @@
-import type { MigrationFn } from '$server/migration/migrator';
+import type { MigrationFn } from '#server/migration/migrator.ts';
 
 // oxfmt-ignore
 export default function migration(runStep: MigrationFn) {

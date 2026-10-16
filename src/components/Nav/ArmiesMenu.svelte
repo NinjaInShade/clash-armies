@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { getContext } from 'svelte';
 	import { fade } from 'svelte/transition';
-	import { ARMY_PAGES } from '$client/pages';
-	import type { TownHall } from '$shared/gameData';
-	import type { AppState } from '$types';
+	import { ARMY_PAGES } from '#client/pages.ts';
+	import type { TownHall } from '#shared/gameData.ts';
+	import type { AppState } from '#types';
 	import Menu from '../Menu.svelte';
 	import ResponsiveGridSlice from '../ResponsiveGridSlice.svelte';
 	import LinkCard from './LinkCard.svelte';

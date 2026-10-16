@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { invalidate, refreshAll, goto } from '$app/navigation';
 	import { getContext } from 'svelte';
-	import { copyLink, getCopyBtnTitle } from '$client/army';
-	import { ArmyModel } from '$models/Army.svelte';
-	import type { AppState } from '$types';
+	import { copyLink, getCopyBtnTitle } from '#client/army.ts';
+	import { ArmyModel } from '#models/Army.svelte.ts';
+	import type { AppState } from '#types';
 	import Menu from './Menu.svelte';
 
 	type Props = {

@@ -2,10 +2,10 @@ import fsp from 'node:fs/promises';
 import path from 'node:path';
 import JSON5 from 'json5';
 import { describe, it, beforeEach, beforeAll, afterAll } from 'vitest';
-import { Server } from '$server/api/Server';
-import { db } from '$server/db';
-import type { GameData, GameDataEquipment, GameDataHero, GameDataPet, GameDataTownHall, GameDataUnit } from '$server/game-data/schema';
-import type { UnitType } from '$shared/gameData';
+import { Server } from '#server/api/Server.ts';
+import { db } from '#server/db.ts';
+import type { GameData, GameDataEquipment, GameDataHero, GameDataPet, GameDataTownHall, GameDataUnit } from '#server/game-data/schema.ts';
+import type { UnitType } from '#shared/gameData.ts';
 import { assert } from '../testutil';
 
 // TODO: better sync update tests, such as asserting renaming failing if armies use it, etc...

@@ -1,10 +1,10 @@
 import type { Component } from 'svelte';
-import { ArmyModel } from '$models/Army.svelte';
-import { EquipmentModel } from '$models/Equipment.svelte';
-import { PetModel } from '$models/Pet.svelte';
-import { UnitModel } from '$models/Unit.svelte';
-import { COPY_LINK_CLICK_METRIC, OPEN_LINK_CLICK_METRIC } from '$shared/utils';
-import type { AppState } from '$types';
+import { ArmyModel } from '#models/Army.svelte.ts';
+import { EquipmentModel } from '#models/Equipment.svelte.ts';
+import { PetModel } from '#models/Pet.svelte.ts';
+import { UnitModel } from '#models/Unit.svelte.ts';
+import { COPY_LINK_CLICK_METRIC, OPEN_LINK_CLICK_METRIC } from '#shared/utils.ts';
+import type { AppState } from '#types';
 
 /**
  * Generates URL link to copy army into clash of clans.

@@ -1,15 +1,15 @@
 import type { RequestEvent } from '@sveltejs/kit';
 import { CronJob } from 'cron';
-import { ArmyAPI } from '$server/api/ArmyAPI';
-import { NotificationAPI } from '$server/api/NotificationAPI';
-import { SitemapAPI } from '$server/api/SitemapAPI';
-import { UserAPI } from '$server/api/UserAPI';
-import { deleteExpiredSessions } from '$server/auth/session';
-import { waitForDatabase, type Database } from '$server/db';
-import { GameData, type GameDataSettings } from '$server/game-data/GameData';
-import { logger, type Logger } from '$server/logger';
-import { migration } from '$server/migration';
-import { migrate } from '$server/migration/migrator';
+import { ArmyAPI } from '#server/api/ArmyAPI.ts';
+import { NotificationAPI } from '#server/api/NotificationAPI.ts';
+import { SitemapAPI } from '#server/api/SitemapAPI.ts';
+import { UserAPI } from '#server/api/UserAPI.ts';
+import { deleteExpiredSessions } from '#server/auth/session.ts';
+import { waitForDatabase, type Database } from '#server/db.ts';
+import { GameData, type GameDataSettings } from '#server/game-data/GameData.ts';
+import { logger, type Logger } from '#server/logger.ts';
+import { migration } from '#server/migration/index.ts';
+import { migrate } from '#server/migration/migrator.ts';
 
 /**
  * Settings to configure the server.

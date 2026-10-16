@@ -1,8 +1,8 @@
 <script lang="ts">
-	import Table from '$components/Table.svelte';
-	import THWidgetDisplay from '$components/THWidgetDisplay.svelte';
-	import UnitTableDisplay from '$components/UnitTableDisplay.svelte';
-	import type { Unit, TownHall } from '$shared/gameData';
+	import Table from '#components/Table.svelte';
+	import THWidgetDisplay from '#components/THWidgetDisplay.svelte';
+	import UnitTableDisplay from '#components/UnitTableDisplay.svelte';
+	import type { Unit, TownHall } from '#shared/gameData.ts';
 	import type { ServerStats, AppStats } from './+page.server';
 
 	type Props = {

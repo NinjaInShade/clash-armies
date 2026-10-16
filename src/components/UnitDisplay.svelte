@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { getContext } from 'svelte';
-	import { unitImgURL } from '$client/assets';
-	import type { Unit } from '$shared/gameData';
-	import type { AppState } from '$types';
+	import { unitImgURL } from '#client/assets.ts';
+	import type { Unit } from '#shared/gameData.ts';
+	import type { AppState } from '#types';
 
 	type Props = {
 		unit: Unit;

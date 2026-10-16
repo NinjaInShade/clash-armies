@@ -3,12 +3,12 @@ import { generateJSON, generateHTML } from '@tiptap/html';
 import { sql } from 'kysely';
 import { parseHTML } from 'zeed-dom';
 import z from 'zod';
-import type { Army } from '$models/Army.svelte';
-import { GuideModel } from '$models/Guide.svelte';
-import { ArmyMetricsAPI } from '$server/api/ArmyMetricsAPI';
-import type { Server } from '$server/api/Server';
-import { helpers } from '$server/db';
-import { getExtensions } from '$shared/guideEditor';
+import type { Army } from '#models/Army.svelte.ts';
+import { GuideModel } from '#models/Guide.svelte.ts';
+import { ArmyMetricsAPI } from '#server/api/ArmyMetricsAPI.ts';
+import type { Server } from '#server/api/Server.ts';
+import { helpers } from '#server/db.ts';
+import { getExtensions } from '#shared/guideEditor.ts';
 import {
 	USER_MAX_ARMIES,
 	ARMY_TAGS,
@@ -17,8 +17,8 @@ import {
 	MAX_FILTER_UNITS,
 	MAX_FILTER_EQUIPMENTS,
 	MAX_FILTER_PETS,
-} from '$shared/utils';
-import { validateArmy, numberSchema, commentSchema, parsePageParam, parseField, coerceBoolean, coerceNumber } from '$shared/validation';
+} from '#shared/utils.ts';
+import { validateArmy, numberSchema, commentSchema, parsePageParam, parseField, coerceBoolean, coerceNumber } from '#shared/validation.ts';
 
 type GetArmiesOptions = {
 	/** Returns the armies with these ID's */

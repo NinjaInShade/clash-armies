@@ -1,11 +1,11 @@
 <script lang="ts">
 	import { format } from 'date-fns';
 	import { getContext } from 'svelte';
-	import ImgBarbKing from '$assets/ui/barb-king.webp';
-	import ImgExperience from '$assets/ui/experience.webp';
-	import Button from '$components/Button.svelte';
-	import TabStrip from '$components/TabStrip.svelte';
-	import type { AppState } from '$types';
+	import ImgBarbKing from '#assets/ui/barb-king.webp';
+	import ImgExperience from '#assets/ui/experience.webp';
+	import Button from '#components/Button.svelte';
+	import TabStrip from '#components/TabStrip.svelte';
+	import type { AppState } from '#types';
 	import type { PageData } from './$types';
 	import CreatedArmiesTab from './CreatedArmiesTab.svelte';
 	import EditUser from './EditUser.svelte';

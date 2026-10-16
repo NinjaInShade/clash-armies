@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { heroImgURL } from '$client/assets';
+	import { heroImgURL } from '#client/assets.ts';
 
 	type Props = {
 		hero: string;

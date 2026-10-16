@@ -1,6 +1,6 @@
 import z from 'zod';
-import { endpoint } from '$server/utils';
-import { PAGE_VIEW_METRIC, COPY_LINK_CLICK_METRIC, OPEN_LINK_CLICK_METRIC } from '$shared/utils';
+import { endpoint } from '#server/utils.ts';
+import { PAGE_VIEW_METRIC, COPY_LINK_CLICK_METRIC, OPEN_LINK_CLICK_METRIC } from '#shared/utils.ts';
 import type { RequestHandler } from './$types';
 
 export const POST: RequestHandler = endpoint(async (req) => {

@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { getContext } from 'svelte';
-	import { parseLink } from '$client/importArmy';
-	import { ArmyModel } from '$models/Army.svelte';
-	import type { AppState } from '$types';
+	import { parseLink } from '#client/importArmy.ts';
+	import { ArmyModel } from '#models/Army.svelte.ts';
+	import type { AppState } from '#types';
 	import Button from './Button.svelte';
 	import Errors from './Errors.svelte';
 	import Fieldset from './Fieldset.svelte';

@@ -1,6 +1,6 @@
 import fsp from 'node:fs/promises';
 import os from 'node:os';
-import type { Server } from '$server/api/Server';
+import type { Server } from '#server/api/Server.ts';
 import type { PageServerLoad } from './$types';
 
 export type ServerStats = {

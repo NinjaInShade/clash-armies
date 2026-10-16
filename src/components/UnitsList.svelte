@@ -1,8 +1,8 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
-	import type { ArmyModel } from '$models/Army.svelte';
-	import { HOLD_REMOVE_SPEED } from '$shared/utils';
-	import type { UnitHome } from '$types';
+	import type { ArmyModel } from '#models/Army.svelte.ts';
+	import { HOLD_REMOVE_SPEED } from '#shared/utils.ts';
+	import type { UnitHome } from '#types';
 	import UnitDisplay from './UnitDisplay.svelte';
 
 	type Props = {

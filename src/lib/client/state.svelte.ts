@@ -1,7 +1,7 @@
-import Confirm from '$components/Confirm.svelte';
-import { createStaticGameData, type RawGameData } from '$shared/gameData';
-import { HTTPApi } from '$shared/http';
-import type { AppState, Modal, ToastNotification } from '$types';
+import Confirm from '#components/Confirm.svelte';
+import { createStaticGameData, type RawGameData } from '#shared/gameData.ts';
+import { HTTPApi } from '#shared/http.ts';
+import type { AppState, Modal, ToastNotification } from '#types';
 
 type InitialAppState = { gameData: RawGameData; user: AppState['user'] };
 

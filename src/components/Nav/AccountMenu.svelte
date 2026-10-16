@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { getContext } from 'svelte';
-	import type { AppState } from '$types';
+	import type { AppState } from '#types';
 	import Menu from '../Menu.svelte';
 
 	type Props = {

@@ -1,15 +1,15 @@
-import { ArmyModel } from '$models/Army.svelte';
-import { EquipmentModel } from '$models/Equipment.svelte';
-import { PetModel } from '$models/Pet.svelte';
-import { UnitModel } from '$models/Unit.svelte';
-import type { StaticGameData } from '$shared/gameData';
-import { validateArmy } from '$shared/validation';
-import type { UnitHome } from '$types';
+import { ArmyModel } from '#models/Army.svelte.ts';
+import { EquipmentModel } from '#models/Equipment.svelte.ts';
+import { PetModel } from '#models/Pet.svelte.ts';
+import { UnitModel } from '#models/Unit.svelte.ts';
+import type { StaticGameData } from '#shared/gameData.ts';
+import { validateArmy } from '#shared/validation.ts';
+import type { UnitHome } from '#types';
 
 /*
- * Kept separate from `$client/army` on purpose:
+ * Kept separate from `#client/army.ts` on purpose:
  *
- * `validateArmy` pulls in zod (~100KB gzipped), and `$client/army` is imported by many places, notably
+ * `validateArmy` pulls in zod (~100KB gzipped), and `#client/army.ts` is imported by many places, notably
  * `ArmyCard`, so bundling the two together ships extra cost to every page listing armies for example.
  *
  * Importing from a link only happens when creating/editing an army, so this is a separate module scoped

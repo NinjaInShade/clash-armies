@@ -1,4 +1,4 @@
-import { encodeUnitName } from '$shared/utils';
+import { encodeUnitName } from '#shared/utils.ts';
 
 export type TownHall = {
 	level: number;

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { APIErrors } from '$shared/http';
+	import type { APIErrors } from '#shared/http.ts';
 
 	type Props = {
 		errors: APIErrors | null;

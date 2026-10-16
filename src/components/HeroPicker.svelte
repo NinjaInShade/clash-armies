@@ -1,10 +1,10 @@
 <script lang="ts">
 	import { getContext } from 'svelte';
-	import { ArmyModel } from '$models/Army.svelte';
-	import { EquipmentModel } from '$models/Equipment.svelte';
-	import { PetModel } from '$models/Pet.svelte';
-	import type { Pet } from '$shared/gameData';
-	import type { AppState } from '$types';
+	import { ArmyModel } from '#models/Army.svelte.ts';
+	import { EquipmentModel } from '#models/Equipment.svelte.ts';
+	import { PetModel } from '#models/Pet.svelte.ts';
+	import type { Pet } from '#shared/gameData.ts';
+	import type { AppState } from '#types';
 	import ActionButton from './ActionButton.svelte';
 	import AddHero from './AddHero.svelte';
 	import EquipmentDisplay from './EquipmentDisplay.svelte';

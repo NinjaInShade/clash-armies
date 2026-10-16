@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { MAX_FILTER_SEARCH_LENGTH } from '$shared/utils';
+	import { MAX_FILTER_SEARCH_LENGTH } from '#shared/utils.ts';
 	import Input from '../Input.svelte';
 
 	type Props = {

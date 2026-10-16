@@ -1,6 +1,6 @@
-import type { Unit, StaticGameData, Pet, Equipment } from '$shared/gameData';
-import { BANNERS } from '$shared/utils';
-import type { UnitHome, Banner } from '$types';
+import type { Unit, StaticGameData, Pet, Equipment } from '#shared/gameData.ts';
+import { BANNERS } from '#shared/utils.ts';
+import type { UnitHome, Banner } from '#types';
 import { CommentModel } from './Comment.svelte';
 import { EquipmentModel } from './Equipment.svelte';
 import { GuideModel } from './Guide.svelte';

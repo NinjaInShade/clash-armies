@@ -1,9 +1,9 @@
 import { dev } from '$app/env';
 import type { Handle, HandleServerError, ServerInit } from '@sveltejs/kit/hooks';
-import { Server } from '$server/api/Server';
-import { db } from '$server/db';
-import { Logger } from '$server/logger';
-import { initRequest, resolveRequest, handleUnexpectedError, authMiddleware } from '$server/utils';
+import { Server } from '#server/api/Server.ts';
+import { db } from '#server/db.ts';
+import { Logger } from '#server/logger.ts';
+import { initRequest, resolveRequest, handleUnexpectedError, authMiddleware } from '#server/utils.ts';
 
 Logger.showTimestamp = true;
 Logger.showDate = !dev;

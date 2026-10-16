@@ -1,13 +1,13 @@
 import type { RequestEvent } from '@sveltejs/kit';
 import { describe, it, beforeEach, beforeAll, afterAll, afterEach } from 'vitest';
-import { ArmyModel } from '$models/Army.svelte';
-import { EquipmentModel } from '$models/Equipment.svelte';
-import { PetModel } from '$models/Pet.svelte';
-import { UnitModel } from '$models/Unit.svelte';
-import { Server } from '$server/api/Server';
-import type { SessionUser } from '$server/auth/session';
-import { db } from '$server/db';
-import type { UnitType, StaticGameData } from '$shared/gameData';
+import { ArmyModel } from '#models/Army.svelte.ts';
+import { EquipmentModel } from '#models/Equipment.svelte.ts';
+import { PetModel } from '#models/Pet.svelte.ts';
+import { UnitModel } from '#models/Unit.svelte.ts';
+import { Server } from '#server/api/Server.ts';
+import type { SessionUser } from '#server/auth/session.ts';
+import { db } from '#server/db.ts';
+import type { UnitType, StaticGameData } from '#shared/gameData.ts';
 import {
 	GUIDE_TEXT_CHAR_LIMIT,
 	ARMY_TAGS,
@@ -16,8 +16,8 @@ import {
 	MAX_FILTER_UNITS,
 	MAX_FILTER_EQUIPMENTS,
 	MAX_FILTER_PETS,
-} from '$shared/utils';
-import { validateArmy, MAX_PAGE } from '$shared/validation';
+} from '#shared/utils.ts';
+import { validateArmy, MAX_PAGE } from '#shared/validation.ts';
 import { assert, createReq, USER, USER_2, USER_ADMIN, createUsers, makeData, assertArmies } from '../testutil';
 
 let gameData: StaticGameData;

@@ -1,6 +1,6 @@
 import type { RequestEvent } from '@sveltejs/kit';
 import { redirect } from '@sveltejs/kit';
-import { invalidateSession, SESSION_COOKIE_NAME, getBlankSessionCookieAttributes } from '$server/auth/session';
+import { invalidateSession, SESSION_COOKIE_NAME, getBlankSessionCookieAttributes } from '#server/auth/session.ts';
 
 export async function GET(req: RequestEvent): Promise<Response> {
 	const redirectTo = req.locals.server.getSafeRedirect(req, {

@@ -1,16 +1,16 @@
 <script lang="ts">
 	import { getContext } from 'svelte';
-	import type { FiltersState, PickUnit, Filters } from '$client/filtersState.svelte';
-	import { requireHTML } from '$client/state.svelte';
-	import ActionButton from '$components/ActionButton.svelte';
-	import THFilterButton from '$components/Armies/THFilterButton.svelte';
-	import Checkbox from '$components/Checkbox.svelte';
-	import EquipmentDisplay from '$components/EquipmentDisplay.svelte';
-	import PetDisplay from '$components/PetDisplay.svelte';
-	import RadioButton, { type RadioOption } from '$components/RadioButton.svelte';
-	import UnitDisplay from '$components/UnitDisplay.svelte';
-	import { ARMY_TAGS, MAX_FILTER_UNITS, MAX_FILTER_EQUIPMENTS, MAX_FILTER_PETS } from '$shared/utils';
-	import type { AppState } from '$types';
+	import type { FiltersState, PickUnit, Filters } from '#client/filtersState.svelte.ts';
+	import { requireHTML } from '#client/state.svelte.ts';
+	import ActionButton from '#components/ActionButton.svelte';
+	import THFilterButton from '#components/Armies/THFilterButton.svelte';
+	import Checkbox from '#components/Checkbox.svelte';
+	import EquipmentDisplay from '#components/EquipmentDisplay.svelte';
+	import PetDisplay from '#components/PetDisplay.svelte';
+	import RadioButton, { type RadioOption } from '#components/RadioButton.svelte';
+	import UnitDisplay from '#components/UnitDisplay.svelte';
+	import { ARMY_TAGS, MAX_FILTER_UNITS, MAX_FILTER_EQUIPMENTS, MAX_FILTER_PETS } from '#shared/utils.ts';
+	import type { AppState } from '#types';
 
 	const YES_NO_OPTIONS: RadioOption<boolean | undefined>[] = [
 		{ value: true, label: 'Yes' },

@@ -3,7 +3,7 @@ import type { RequestEvent } from '@sveltejs/kit';
 import type { Handle } from '@sveltejs/kit/hooks';
 import { v4 as uuidv4 } from 'uuid';
 import z from 'zod';
-import type { Server } from '$server/api/Server';
+import type { Server } from '#server/api/Server.ts';
 import {
 	SESSION_COOKIE_NAME,
 	validateSessionToken,
@@ -11,9 +11,9 @@ import {
 	invalidateSession,
 	getSessionCookieAttributes,
 	getBlankSessionCookieAttributes,
-} from '$server/auth/session';
-import { hasAuth, requireAuth, hasRoles, requireRoles } from '$server/auth/utils';
-import type { APIErrors } from '$shared/http';
+} from '#server/auth/session.ts';
+import { hasAuth, requireAuth, hasRoles, requireRoles } from '#server/auth/utils.ts';
+import type { APIErrors } from '#shared/http.ts';
 
 export type SvelteKitHandleResolve = Parameters<Handle>[0]['resolve'];
 

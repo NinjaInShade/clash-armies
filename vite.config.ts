@@ -24,16 +24,6 @@ export default defineConfig((env) => {
 				// This is the code that gets deployed to prod.
 				out: 'dist',
 			}),
-			alias: {
-				'~': 'src',
-				$types: 'src/lib/shared/types',
-				$components: 'src/components',
-				$assets: 'src/lib/assets',
-				$models: 'src/lib/models',
-				$client: 'src/lib/client',
-				$server: 'src/lib/server',
-				$shared: 'src/lib/shared',
-			},
 			files: {
 				hooks: {
 					server: 'src/lib/server/hooks.server.ts',

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import ImgBarbGold from '$assets/ui/barb-gold.webp';
+	import ImgBarbGold from '#assets/ui/barb-gold.webp';
 </script>
 
 <svelte:head>

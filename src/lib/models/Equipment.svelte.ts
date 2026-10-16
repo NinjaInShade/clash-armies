@@ -1,5 +1,5 @@
-import type { Equipment, StaticGameData } from '$shared/gameData';
-import type { Optional } from '$types';
+import type { Equipment, StaticGameData } from '#shared/gameData.ts';
+import type { Optional } from '#types';
 import { ArmyModel, type ArmyEquipment } from './Army.svelte';
 
 export class EquipmentModel {

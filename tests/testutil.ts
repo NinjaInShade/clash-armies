@@ -1,11 +1,11 @@
 import type { RequestEvent } from '@sveltejs/kit';
 import { v4 as uuidv4 } from 'uuid';
 import * as vitest from 'vitest';
-import type { Army } from '$models/Army.svelte';
-import type { Server } from '$server/api/Server';
-import type { SessionUser } from '$server/auth/session';
-import { hasAuth, requireAuth, hasRoles, requireRoles } from '$server/auth/utils';
-import { BANNERS } from '$shared/utils';
+import type { Army } from '#models/Army.svelte.ts';
+import type { Server } from '#server/api/Server.ts';
+import type { SessionUser } from '#server/auth/session.ts';
+import { hasAuth, requireAuth, hasRoles, requireRoles } from '#server/auth/utils.ts';
+import { BANNERS } from '#shared/utils.ts';
 
 export const USER: SessionUser = {
 	id: 1,

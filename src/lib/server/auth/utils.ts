@@ -1,5 +1,5 @@
 import { type RequestEvent, redirect, error } from '@sveltejs/kit';
-import { logger } from '$server/logger';
+import { logger } from '#server/logger.ts';
 
 export const log = logger('clash-armies:auth');
 

@@ -1,8 +1,8 @@
 import type { RequestEvent } from '@sveltejs/kit';
-import type { Server } from '$server/api/Server';
-import { helpers } from '$server/db';
-import { logger, type Logger } from '$server/logger';
-import { pluralize } from '$shared/utils';
+import type { Server } from '#server/api/Server.ts';
+import { helpers } from '#server/db.ts';
+import { logger, type Logger } from '#server/logger.ts';
+import { pluralize } from '#shared/utils.ts';
 
 type GetNotificationsOptions = {
 	/** Returns notifications for this user */

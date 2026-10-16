@@ -1,11 +1,11 @@
 import { parseHTML } from 'zeed-dom';
 import z from 'zod';
-import { ArmyModel } from '$models/Army.svelte';
-import { EquipmentModel } from '$models/Equipment.svelte';
-import { GuideModel } from '$models/Guide.svelte';
-import { PetModel } from '$models/Pet.svelte';
-import { UnitModel } from '$models/Unit.svelte';
-import type { StaticGameData } from '$shared/gameData';
+import { ArmyModel } from '#models/Army.svelte.ts';
+import { EquipmentModel } from '#models/Equipment.svelte.ts';
+import { GuideModel } from '#models/Guide.svelte.ts';
+import { PetModel } from '#models/Pet.svelte.ts';
+import { UnitModel } from '#models/Unit.svelte.ts';
+import type { StaticGameData } from '#shared/gameData.ts';
 import { BANNERS, VALID_UNIT_HOME, GUIDE_TEXT_CHAR_LIMIT, YOUTUBE_URL_REGEX, MAX_COMMENT_LENGTH, MAX_ARMY_TAGS, ARMY_TAGS } from './utils';
 
 export const numberSchema = z.number().int().positive();

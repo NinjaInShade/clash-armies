@@ -6,8 +6,8 @@
 <script lang="ts">
 	import { formatDistanceToNow } from 'date-fns';
 	import { getContext } from 'svelte';
-	import type { ArmyModel, ArmyComment } from '$models/Army.svelte';
-	import type { AppState } from '$types';
+	import type { ArmyModel, ArmyComment } from '#models/Army.svelte.ts';
+	import type { AppState } from '#types';
 	import CtxMenu from './CommentMenu.svelte';
 	import SaveComment from './SaveComment.svelte';
 

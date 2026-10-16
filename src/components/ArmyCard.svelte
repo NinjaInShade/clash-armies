@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { getContext } from 'svelte';
-	import ImgClanCastle from '$assets/ui/clan-castle.webp';
-	import { thImgURL } from '$client/assets';
-	import { ArmyModel } from '$models/Army.svelte';
-	import type { AppState } from '$types';
+	import ImgClanCastle from '#assets/ui/clan-castle.webp';
+	import { thImgURL } from '#client/assets.ts';
+	import { ArmyModel } from '#models/Army.svelte.ts';
+	import type { AppState } from '#types';
 	import CtxMenu from './ArmyActionsMenu.svelte';
 	import ArmyTags from './ArmyTags.svelte';
 	import CommentsCount from './CommentsCount.svelte';

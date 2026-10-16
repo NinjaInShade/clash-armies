@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { Snippet, Component } from 'svelte';
-	import ImgClose from '$assets/ui/close.webp';
+	import ImgClose from '#assets/ui/close.webp';
 	import Button from './Button.svelte';
 	import FocusTrap from './FocusTrap.svelte';
 

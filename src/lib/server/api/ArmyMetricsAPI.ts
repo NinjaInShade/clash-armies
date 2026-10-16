@@ -3,11 +3,11 @@ import type { RequestEvent } from '@sveltejs/kit';
 import { sign, unsign } from 'cookie-signature';
 import { v4 as uuidv4, validate as isUuid } from 'uuid';
 import z from 'zod';
-import type { Server } from '$server/api/Server';
-import { helpers } from '$server/db';
-import { logger, type Logger } from '$server/logger';
-import { KNOWN_BOT_UAS } from '$server/utils';
-import { pluralize, HOUR, DAY, PAGE_VIEW_METRIC, COPY_LINK_CLICK_METRIC, OPEN_LINK_CLICK_METRIC } from '$shared/utils';
+import type { Server } from '#server/api/Server.ts';
+import { helpers } from '#server/db.ts';
+import { logger, type Logger } from '#server/logger.ts';
+import { KNOWN_BOT_UAS } from '#server/utils.ts';
+import { pluralize, HOUR, DAY, PAGE_VIEW_METRIC, COPY_LINK_CLICK_METRIC, OPEN_LINK_CLICK_METRIC } from '#shared/utils.ts';
 
 export type MetricWeights = {
 	vote: number;

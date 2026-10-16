@@ -1,6 +1,6 @@
-import type { Server } from '$server/api/Server';
-import type { SessionUser } from '$server/auth/session';
-import type { Session } from '$types';
+import type { Server } from '#server/api/Server.ts';
+import type { SessionUser } from '#server/auth/session.ts';
+import type { Session } from '#types';
 
 // See https://kit.svelte.dev/docs/types#app
 // for information about these interfaces

@@ -3,6 +3,15 @@
 	"version": "0.12.6",
 	"private": true,
 	"type": "module",
+	"imports": {
+		"#types": "./src/lib/shared/types.ts",
+		"#components/*": "./src/components/*",
+		"#assets/*": "./src/lib/assets/*",
+		"#models/*": "./src/lib/models/*",
+		"#client/*": "./src/lib/client/*",
+		"#server/*": "./src/lib/server/*",
+		"#shared/*": "./src/lib/shared/*"
+	},
 	"scripts": {
 		"start:before": "docker compose up -d",
 		"start": "pnpm run start:before && vite dev",

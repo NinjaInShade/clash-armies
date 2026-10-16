@@ -1,6 +1,6 @@
 import { sql } from 'kysely';
-import type { Database } from '$server/db';
-import { logger } from '$server/logger';
+import type { Database } from '#server/db.ts';
+import { logger } from '#server/logger.ts';
 
 export type MigrationFn = (step: number, query: string | ((db: Database) => Promise<void>)) => void;
 export type Migration = (runStep: MigrationFn) => void;

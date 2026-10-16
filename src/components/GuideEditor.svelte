@@ -1,12 +1,12 @@
 <script lang="ts">
 	import { Editor } from '@tiptap/core';
 	import { onDestroy } from 'svelte';
-	import { getExtensions } from '$shared/guideEditor';
+	import { getExtensions } from '#shared/guideEditor.ts';
 	import ActionButton from './ActionButton.svelte';
 	import FocusTrap from './FocusTrap.svelte';
 	import Input from './Input.svelte';
 	import Menu from './Menu.svelte';
-	import '$assets/css/guide.css';
+	import '#assets/css/guide.css';
 
 	type Props = {
 		text: string | null;
@@ -445,7 +445,7 @@
 			min-height: min(25vh, 400px);
 		}
 	}
-	/* Shared guide content styling lives in $assets/css/guide.css - only editor-specific rules belong here */
+	/* Shared guide content styling lives in #assets/css/guide.css - only editor-specific rules belong here */
 	:global(.tiptap p.is-editor-empty:first-child::before) {
 		color: var(--grey-400);
 		content: attr(data-placeholder);

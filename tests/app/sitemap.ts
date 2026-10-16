@@ -1,9 +1,9 @@
 import type { RequestEvent } from '@sveltejs/kit';
 import { describe, it, beforeAll, afterAll, vi } from 'vitest';
-import { UnitModel } from '$models/Unit.svelte';
-import { Server } from '$server/api/Server';
-import { db } from '$server/db';
-import type { StaticGameData } from '$shared/gameData';
+import { UnitModel } from '#models/Unit.svelte.ts';
+import { Server } from '#server/api/Server.ts';
+import { db } from '#server/db.ts';
+import type { StaticGameData } from '#shared/gameData.ts';
 import { assert, createReq, createUsers, makeData, USER, USER_2 } from '../testutil';
 
 describe('Sitemap', function () {

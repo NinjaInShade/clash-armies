@@ -1,5 +1,5 @@
 <script lang="ts">
-	import '$assets/css/guide.css';
+	import '#assets/css/guide.css';
 
 	type Props = {
 		text: string;

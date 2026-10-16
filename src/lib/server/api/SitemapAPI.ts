@@ -1,6 +1,6 @@
-import type { Server } from '$server/api/Server';
-import { logger, type Logger } from '$server/logger';
-import { HOUR } from '$shared/utils';
+import type { Server } from '#server/api/Server.ts';
+import { logger, type Logger } from '#server/logger.ts';
+import { HOUR } from '#shared/utils.ts';
 
 /**
  * How long a generated and cached sitemap is served before the next request rebuilds it.

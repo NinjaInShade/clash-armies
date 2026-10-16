@@ -32,7 +32,7 @@
 		display: flex;
 		justify-content: flex-start;
 		align-items: center;
-		background-image: url('$assets/ui/cloud-overlay.webp');
+		background-image: url('../../lib/assets/ui/cloud-overlay.webp');
 		background-size: cover;
 		background-blend-mode: color-burn;
 		background-color: var(--grey-850);

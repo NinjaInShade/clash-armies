@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { getContext } from 'svelte';
-	import { heroImgURL } from '$client/assets';
-	import { ArmyModel } from '$models/Army.svelte';
-	import type { AppState } from '$types';
+	import { heroImgURL } from '#client/assets.ts';
+	import { ArmyModel } from '#models/Army.svelte.ts';
+	import type { AppState } from '#types';
 
 	type Props = {
 		model: ArmyModel;

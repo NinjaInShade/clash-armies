@@ -1,4 +1,4 @@
-import { endpoint } from '$server/utils';
+import { endpoint } from '#server/utils.ts';
 import type { RequestHandler } from './$types';
 
 export const POST: RequestHandler = endpoint(async (req) => {

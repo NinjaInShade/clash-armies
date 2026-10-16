@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { page as pageState } from '$app/state';
-	import { mkPageStore, currentSearchParams } from '$client/params.svelte';
-	import ActionButton from '$components/ActionButton.svelte';
+	import { mkPageStore, currentSearchParams } from '#client/params.svelte.ts';
+	import ActionButton from '#components/ActionButton.svelte';
 
 	type Props = {
 		totalPages: number;

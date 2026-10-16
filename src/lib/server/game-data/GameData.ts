@@ -2,10 +2,10 @@ import { createHash } from 'node:crypto';
 import fsp from 'node:fs/promises';
 import path from 'node:path';
 import JSON5 from 'json5';
-import type { Server } from '$server/api/Server';
-import { helpers, type Database } from '$server/db';
-import { logger, type Logger } from '$server/logger';
-import { createStaticGameData, type Unit, type Equipment, type Pet, type TownHall, type StaticGameData, type Hero, type UnitType } from '$shared/gameData';
+import type { Server } from '#server/api/Server.ts';
+import { helpers, type Database } from '#server/db.ts';
+import { logger, type Logger } from '#server/logger.ts';
+import { createStaticGameData, type Unit, type Equipment, type Pet, type TownHall, type StaticGameData, type Hero, type UnitType } from '#shared/gameData.ts';
 import { GameDataSchema, type GameData as GameDataType, type GameDataUnit } from './schema';
 
 export type GameDataSettings = {

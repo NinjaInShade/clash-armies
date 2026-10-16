@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { getContext } from 'svelte';
-	import { copy } from '$client/army';
-	import type { ArmyModel } from '$models/Army.svelte';
-	import { COPY_LINK_CLICK_METRIC } from '$shared/utils';
-	import type { AppState } from '$types';
+	import { copy } from '#client/army.ts';
+	import type { ArmyModel } from '#models/Army.svelte.ts';
+	import { COPY_LINK_CLICK_METRIC } from '#shared/utils.ts';
+	import type { AppState } from '#types';
 
 	type CAShareData = Required<Omit<ShareData, 'files'>>;
 

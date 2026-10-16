@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { getContext } from 'svelte';
 	import { fade, slide } from 'svelte/transition';
-	import type { AppState } from '$types';
+	import type { AppState } from '#types';
 	import Button from '../Button.svelte';
 	import Logo from '../Logo.svelte';
 	import AccountMenu from './AccountMenu.svelte';

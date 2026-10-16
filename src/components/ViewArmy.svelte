@@ -1,13 +1,13 @@
 <script lang="ts">
 	import { getContext, untrack } from 'svelte';
-	import IconYoutube from '$assets/icons/youtube-coloured.png';
-	import ImgArmyCamp from '$assets/ui/army-camp.webp';
-	import ImgBBDuel from '$assets/ui/bb-duel.webp';
-	import ImgClanCastle from '$assets/ui/clan-castle.webp';
-	import { bannerImgURL, thImgURL, heroImgURL } from '$client/assets';
-	import { ArmyModel, type Army } from '$models/Army.svelte';
-	import { YOUTUBE_URL_REGEX } from '$shared/utils';
-	import type { AppState } from '$types';
+	import IconYoutube from '#assets/icons/youtube-coloured.png';
+	import ImgArmyCamp from '#assets/ui/army-camp.webp';
+	import ImgBBDuel from '#assets/ui/bb-duel.webp';
+	import ImgClanCastle from '#assets/ui/clan-castle.webp';
+	import { bannerImgURL, thImgURL, heroImgURL } from '#client/assets.ts';
+	import { ArmyModel, type Army } from '#models/Army.svelte.ts';
+	import { YOUTUBE_URL_REGEX } from '#shared/utils.ts';
+	import type { AppState } from '#types';
 	import CtxMenu from './ArmyActionsMenu.svelte';
 	import ArmyTags from './ArmyTags.svelte';
 	import Button from './Button.svelte';

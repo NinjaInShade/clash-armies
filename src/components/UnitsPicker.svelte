@@ -1,10 +1,10 @@
 <script lang="ts">
 	import { getContext, untrack } from 'svelte';
-	import { ArmyModel } from '$models/Army.svelte';
-	import { UnitModel } from '$models/Unit.svelte';
-	import type { Unit, UnitType } from '$shared/gameData';
-	import { HOLD_ADD_SPEED } from '$shared/utils';
-	import type { AppState, UnitHome } from '$types';
+	import { ArmyModel } from '#models/Army.svelte.ts';
+	import { UnitModel } from '#models/Unit.svelte.ts';
+	import type { Unit, UnitType } from '#shared/gameData.ts';
+	import { HOLD_ADD_SPEED } from '#shared/utils.ts';
+	import type { AppState, UnitHome } from '#types';
 	import UnitDisplay from './UnitDisplay.svelte';
 
 	type TitleOptions = {

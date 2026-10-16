@@ -3,7 +3,7 @@
 </script>
 
 <script lang="ts">
-	import type { ArmyModel, StructuredArmyComment } from '$models/Army.svelte';
+	import type { ArmyModel, StructuredArmyComment } from '#models/Army.svelte.ts';
 	import CommentCard from './Comment.svelte';
 	import Self from './CommentsList.svelte';
 

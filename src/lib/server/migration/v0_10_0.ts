@@ -1,6 +1,6 @@
 import { sql } from 'kysely';
-import type { Database } from '$server/db';
-import type { MigrationFn } from '$server/migration/migrator';
+import type { Database } from '#server/db.ts';
+import type { MigrationFn } from '#server/migration/migrator.ts';
 
 // oxfmt-ignore
 export default function migration(runStep: MigrationFn) {

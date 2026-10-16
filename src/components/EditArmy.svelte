@@ -1,15 +1,15 @@
 <script lang="ts">
 	import { refreshAll, goto } from '$app/navigation';
 	import { getContext } from 'svelte';
-	import ImgArmyCamp from '$assets/ui/army-camp.webp';
-	import ImgBBDuel from '$assets/ui/bb-duel.webp';
-	import ImgClanCastle from '$assets/ui/clan-castle.webp';
-	import ImgHammerAndSaw from '$assets/ui/hammer-and-saw.webp';
-	import { bannerImgURL, heroImgURL } from '$client/assets';
-	import { ArmyModel, type Army } from '$models/Army.svelte';
-	import { HTTPError, type APIErrors } from '$shared/http';
-	import { GUIDE_TEXT_CHAR_LIMIT, ARMY_TAGS, MAX_ARMY_TAGS } from '$shared/utils';
-	import type { AppState, Banner } from '$types';
+	import ImgArmyCamp from '#assets/ui/army-camp.webp';
+	import ImgBBDuel from '#assets/ui/bb-duel.webp';
+	import ImgClanCastle from '#assets/ui/clan-castle.webp';
+	import ImgHammerAndSaw from '#assets/ui/hammer-and-saw.webp';
+	import { bannerImgURL, heroImgURL } from '#client/assets.ts';
+	import { ArmyModel, type Army } from '#models/Army.svelte.ts';
+	import { HTTPError, type APIErrors } from '#shared/http.ts';
+	import { GUIDE_TEXT_CHAR_LIMIT, ARMY_TAGS, MAX_ARMY_TAGS } from '#shared/utils.ts';
+	import type { AppState, Banner } from '#types';
 	import ActionButton from './ActionButton.svelte';
 	import OfferClanCastle from './AddClanCastle.svelte';
 	import OfferGuide from './AddGuide.svelte';

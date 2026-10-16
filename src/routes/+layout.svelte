@@ -4,15 +4,15 @@
 	import { onMount, setContext, tick, type Snippet } from 'svelte';
 	import { sineInOut } from 'svelte/easing';
 	import { fade } from 'svelte/transition';
-	import { createAppState } from '$client/state.svelte';
-	import FeedbackBanner from '$components/FeedbackBanner.svelte';
-	import Footer from '$components/Nav/Footer.svelte';
-	import Nav from '$components/Nav/Nav.svelte';
-	import Toast from '$components/Toast.svelte';
-	import type { AppState, ArmyNotification } from '$types';
+	import { createAppState } from '#client/state.svelte.ts';
+	import FeedbackBanner from '#components/FeedbackBanner.svelte';
+	import Footer from '#components/Nav/Footer.svelte';
+	import Nav from '#components/Nav/Nav.svelte';
+	import Toast from '#components/Toast.svelte';
+	import type { AppState, ArmyNotification } from '#types';
 	import type { LayoutData } from './$types';
-	import '$assets/css/base.css';
-	import '$assets/css/common.css';
+	import '#assets/css/base.css';
+	import '#assets/css/common.css';
 
 	type Props = {
 		data: LayoutData;

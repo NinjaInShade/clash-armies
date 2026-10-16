@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { unitImgURL } from '$client/assets';
+	import { unitImgURL } from '#client/assets.ts';
 
 	type Props = {
 		name: string;

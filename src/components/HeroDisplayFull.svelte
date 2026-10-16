@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { ArmyModel } from '$models/Army.svelte';
+	import type { ArmyModel } from '#models/Army.svelte.ts';
 	import EquipmentDisplay from './EquipmentDisplay.svelte';
 	import HeroDisplay from './HeroDisplay.svelte';
 	import PetDisplay from './PetDisplay.svelte';

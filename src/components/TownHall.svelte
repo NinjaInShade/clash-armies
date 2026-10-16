@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { thImgURL } from '$client/assets';
+	import { thImgURL } from '#client/assets.ts';
 
 	type Props = {
 		/** Town hall level */

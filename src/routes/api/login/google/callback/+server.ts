@@ -1,9 +1,9 @@
 import type { RequestEvent } from '@sveltejs/kit';
 import { OAuth2RequestError } from 'arctic';
-import { google } from '$server/auth/oauth';
-import { createSession, SESSION_COOKIE_NAME, getSessionCookieAttributes } from '$server/auth/session';
-import { log } from '$server/auth/utils';
-import { db } from '$server/db';
+import { google } from '#server/auth/oauth.ts';
+import { createSession, SESSION_COOKIE_NAME, getSessionCookieAttributes } from '#server/auth/session.ts';
+import { log } from '#server/auth/utils.ts';
+import { db } from '#server/db.ts';
 
 type GoogleUser = {
 	sub: string;

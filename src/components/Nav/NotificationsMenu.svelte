@@ -2,8 +2,8 @@
 	import { refreshAll } from '$app/navigation';
 	import { formatDistanceToNow } from 'date-fns';
 	import { getContext } from 'svelte';
-	import ImgBarb from '$assets/ui/barbarian.webp';
-	import type { AppState, ArmyNotification } from '$types';
+	import ImgBarb from '#assets/ui/barbarian.webp';
+	import type { AppState, ArmyNotification } from '#types';
 	import FocusTrap from '../FocusTrap.svelte';
 	import Menu from '../Menu.svelte';
 

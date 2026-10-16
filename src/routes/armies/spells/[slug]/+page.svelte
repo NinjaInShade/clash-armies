@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { page } from '$app/state';
-	import { ARMY_PAGES } from '$client/pages';
-	import ArmyList from '$components/Armies/ArmyList.svelte';
-	import PaginatedCanonical from '$components/Armies/PaginatedCanonical.svelte';
+	import { ARMY_PAGES } from '#client/pages.ts';
+	import ArmyList from '#components/Armies/ArmyList.svelte';
+	import PaginatedCanonical from '#components/Armies/PaginatedCanonical.svelte';
 	import type { PageData } from './$types';
 
 	const { data }: { data: PageData } = $props();
