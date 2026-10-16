@@ -1,7 +1,7 @@
 # Build: builds distribution code.
 FROM node:26.12.0-alpine AS build
 WORKDIR /app
-RUN npm install -g pnpm@11.0.3
+RUN npm install -g pnpm@12.14.0
 # Copy lockfile first so this layer caches when only source changes
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 RUN pnpm install --frozen-lockfile
@@ -14,7 +14,7 @@ RUN pnpm run build
 # Done in its own stage so dev deps never reach the final image.
 FROM node:26.12.0-alpine AS prod-deps
 WORKDIR /app
-RUN npm install -g pnpm@11.0.3
+RUN npm install -g pnpm@12.14.0
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 RUN pnpm install --frozen-lockfile --prod
 
