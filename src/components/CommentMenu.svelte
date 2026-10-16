@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { invalidateAll } from '$app/navigation';
+	import { refreshAll } from '$app/navigation';
 	import { getContext } from 'svelte';
 	import type { ArmyComment } from '$models/Army.svelte';
 	import type { AppState } from '$types';
@@ -32,7 +32,7 @@
 			menuOpen = false;
 		}
 
-		await invalidateAll();
+		await refreshAll();
 	}
 
 	async function setEditingMode() {

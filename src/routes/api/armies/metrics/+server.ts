@@ -1,4 +1,3 @@
-import { json } from '@sveltejs/kit';
 import z from 'zod';
 import { endpoint } from '$server/utils';
 import { PAGE_VIEW_METRIC, COPY_LINK_CLICK_METRIC, OPEN_LINK_CLICK_METRIC } from '$shared/utils';
@@ -22,5 +21,5 @@ export const POST: RequestHandler = endpoint(async (req) => {
 		throw invalidMetricErr;
 	}
 
-	return json({}, { status: 200 });
+	return Response.json({}, { status: 200 });
 });

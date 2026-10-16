@@ -1,5 +1,5 @@
 import { goto } from '$app/navigation';
-import { page } from '$app/state';
+import { page, type ReadonlyURLSearchParams } from '$app/state';
 
 type Serializers<T> = {
 	serialize(value: T): string;
@@ -49,7 +49,7 @@ let pendingPush = false;
  * Each call still builds its own mutation/resetKeys based on previous call(s).
  */
 async function updateSearchParams(mutate: (params: URLSearchParams) => void, options: ParamStoreOptions = {}): Promise<void> {
-	const params = new URLSearchParams(currentSearchParams());
+	const params = new URLSearchParams(currentSearchParams().toString());
 	mutate(params);
 	for (const key of options.resetKeys ?? []) {
 		params.delete(key);
@@ -78,9 +78,8 @@ async function applyPendingParams() {
 
 		try {
 			await goto(`?${params.toString()}`, {
-				keepFocus: true,
-				replaceState: !push,
-				noScroll: true,
+				replace: !push,
+				reset: false,
 			});
 		} catch (err) {
 			console.error('Failed to navigate to pending parameters:', err);
@@ -94,7 +93,7 @@ async function applyPendingParams() {
 }
 
 /** The current params, preferring any not-yet-applied params over the real (stale) `page.url`. */
-export function currentSearchParams(): URLSearchParams {
+export function currentSearchParams(): ReadonlyURLSearchParams {
 	return pendingParams ?? page.url.searchParams;
 }
 

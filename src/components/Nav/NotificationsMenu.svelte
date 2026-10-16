@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { invalidateAll } from '$app/navigation';
+	import { refreshAll } from '$app/navigation';
 	import { formatDistanceToNow } from 'date-fns';
 	import { getContext } from 'svelte';
 	import ImgBarb from '$assets/ui/barbarian.webp';
@@ -28,7 +28,7 @@
 			return;
 		}
 
-		await invalidateAll();
+		await refreshAll();
 	}
 
 	function markAllAsRead() {

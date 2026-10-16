@@ -1,4 +1,4 @@
-import { dev } from '$app/environment';
+import { dev } from '$app/env';
 import type { RequestEvent } from '@sveltejs/kit';
 import { redirect } from '@sveltejs/kit';
 import { generateState, generateCodeVerifier } from 'arctic';
@@ -35,5 +35,5 @@ export async function GET(req: RequestEvent): Promise<Response> {
 		sameSite: 'lax',
 	});
 
-	return redirect(302, url.toString());
+	return redirect(302, url.toString(), { external: [url.origin] });
 }

@@ -1,4 +1,3 @@
-import { json } from '@sveltejs/kit';
 import z from 'zod';
 import { endpoint } from '$server/utils';
 import type { RequestHandler } from './$types';
@@ -9,7 +8,7 @@ export const POST: RequestHandler = endpoint(async (req) => {
 
 	const armyId = await server.army.saveArmy(req, army);
 
-	return json(armyId, { status: 200 });
+	return Response.json(armyId, { status: 200 });
 });
 
 export const DELETE: RequestHandler = endpoint(async (req) => {
@@ -19,5 +18,5 @@ export const DELETE: RequestHandler = endpoint(async (req) => {
 	const armyId = z.number().parse(data);
 	await server.army.deleteArmy(req, armyId);
 
-	return json({}, { status: 200 });
+	return Response.json({}, { status: 200 });
 });

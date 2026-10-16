@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { invalidateAll, goto } from '$app/navigation';
+	import { refreshAll, goto } from '$app/navigation';
 	import { page } from '$app/state';
 	import { onMount, setContext, tick, type Snippet } from 'svelte';
 	import { sineInOut } from 'svelte/easing';
@@ -30,8 +30,9 @@
 				await tick();
 				window.scrollTo({ left: 0, top: +scrollTop, behavior: 'instant' });
 			}
-			page.url.searchParams.delete('scrollTop');
-			await goto(`?${page.url.searchParams.toString()}`, { replaceState: true, noScroll: true });
+			const url = new URL(page.url.href);
+			url.searchParams.delete('scrollTop');
+			await goto(`?${url.searchParams.toString()}`, { replace: true, reset: false });
 		}
 
 		if (adScriptTag) {
@@ -54,7 +55,7 @@
 			return;
 		}
 
-		await invalidateAll();
+		await refreshAll();
 	}
 
 	/** Extends user to include properties AppState needs */

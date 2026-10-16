@@ -1,6 +1,6 @@
-import { dev } from '$app/environment';
-import { json } from '@sveltejs/kit';
-import type { RequestEvent, Handle } from '@sveltejs/kit';
+import { dev } from '$app/env';
+import type { RequestEvent } from '@sveltejs/kit';
+import type { Handle } from '@sveltejs/kit/hooks';
 import { v4 as uuidv4 } from 'uuid';
 import z from 'zod';
 import type { Server } from '$server/api/Server';
@@ -84,7 +84,7 @@ export function endpoint(action: (req: RequestEvent) => Promise<Response>) {
 				error: err,
 			});
 
-			return json({ errors }, { status: 400 });
+			return Response.json({ errors }, { status: 400 });
 		}
 	};
 }
@@ -114,7 +114,7 @@ export async function resolveRequest(req: RequestEvent, resolve: SvelteKitHandle
 	return response;
 }
 
-export function handleUnexpectedError(req: RequestEvent, error: unknown, _status: number, _message: string) {
+export function handleUnexpectedError(req: RequestEvent, error: unknown) {
 	const server = req.locals.server;
 	server.log.error('SvelteKit error:', {
 		requestId: req.locals.uuid,

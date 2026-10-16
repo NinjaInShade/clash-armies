@@ -1,4 +1,4 @@
-import { env } from '$env/dynamic/private';
+import { VISITOR_ID_SECRET } from '$app/env/private';
 import type { RequestEvent } from '@sveltejs/kit';
 import { sign, unsign } from 'cookie-signature';
 import { v4 as uuidv4, validate as isUuid } from 'uuid';
@@ -69,7 +69,7 @@ export class ArmyMetricsAPI {
 
 	constructor(server: Server, options: ArmyMetricsAPIOptions = {}) {
 		this.server = server;
-		this.visitorIdSecret = requireVisitorIdSecret();
+		this.visitorIdSecret = VISITOR_ID_SECRET;
 		this.log = logger('clash-armies:metrics');
 
 		if (typeof options.metricsMinAgeMs === 'number') {
@@ -331,12 +331,4 @@ export class ArmyMetricsAPI {
 		}
 		return true;
 	}
-}
-
-function requireVisitorIdSecret() {
-	const { VISITOR_ID_SECRET } = env;
-	if (!VISITOR_ID_SECRET) {
-		throw new Error('Expected visitor id secret to be defined');
-	}
-	return VISITOR_ID_SECRET;
 }

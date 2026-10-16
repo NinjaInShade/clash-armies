@@ -48,7 +48,7 @@
 	 * discover and index results, preserving any other active query parameters.
 	 */
 	function hrefForPage(p: number) {
-		const params = new URLSearchParams(searchParams);
+		const params = new URLSearchParams(searchParams.toString());
 		if (p === 1) {
 			params.delete(pageParam);
 		} else {
@@ -66,7 +66,7 @@
 				{@render chevron('prev')}
 			</ActionButton>
 		{:else}
-			<ActionButton asLink href={hrefForPage(page - 1)} theme="grey" aria-label="Previous page" data-sveltekit-noscroll data-sveltekit-keepfocus>
+			<ActionButton asLink href={hrefForPage(page - 1)} theme="grey" aria-label="Previous page" data-sveltekit-reset={false}>
 				{@render chevron('prev')}
 			</ActionButton>
 		{/if}
@@ -86,8 +86,7 @@
 						theme={p === page ? 'primary-dark' : 'grey'}
 						class={p === page ? 'focus-primary page-active' : isAdjacent(p) ? 'focus-grey page-adjacent' : 'focus-grey'}
 						aria-current={p === page ? 'page' : undefined}
-						data-sveltekit-noscroll
-						data-sveltekit-keepfocus
+						data-sveltekit-reset={false}
 					>
 						{p}
 					</ActionButton>
@@ -102,7 +101,7 @@
 				{@render chevron('next')}
 			</ActionButton>
 		{:else}
-			<ActionButton asLink href={hrefForPage(page + 1)} theme="grey" aria-label="Next page" data-sveltekit-noscroll data-sveltekit-keepfocus>
+			<ActionButton asLink href={hrefForPage(page + 1)} theme="grey" aria-label="Next page" data-sveltekit-reset={false}>
 				{@render chevron('next')}
 			</ActionButton>
 		{/if}

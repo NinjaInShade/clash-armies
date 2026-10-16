@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { version } from '$app/environment';
+	import { version } from '$app/env';
 	import ImgSwords from '$assets/ui/swords.webp';
 
 	type Props = {

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { invalidate, invalidateAll, goto } from '$app/navigation';
+	import { invalidate, refreshAll, goto } from '$app/navigation';
 	import { getContext } from 'svelte';
 	import { copyLink, getCopyBtnTitle } from '$client/army';
 	import { ArmyModel } from '$models/Army.svelte';
@@ -70,7 +70,7 @@
 		}
 
 		await goto(`/armies`);
-		await invalidateAll();
+		await refreshAll();
 	}
 </script>
 

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { getTags } from '$lib/client/army';
+	import { getTags } from '$client/army';
 	import type { ArmyModel } from '$models/Army.svelte';
 
 	type Props = {

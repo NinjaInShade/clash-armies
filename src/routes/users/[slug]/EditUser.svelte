@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { invalidateAll, goto } from '$app/navigation';
+	import { refreshAll, goto } from '$app/navigation';
 	import { getContext } from 'svelte';
 	import Button from '$components/Button.svelte';
 	import Errors from '$components/Errors.svelte';
@@ -42,7 +42,7 @@
 		}
 
 		// Navigate in case username has changed
-		await invalidateAll();
+		await refreshAll();
 		await goto(`/users/${trimmedUsername}`);
 		close();
 	}

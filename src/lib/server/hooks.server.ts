@@ -1,5 +1,5 @@
-import { dev } from '$app/environment';
-import type { Handle, HandleServerError, ServerInit } from '@sveltejs/kit';
+import { dev } from '$app/env';
+import type { Handle, HandleServerError, ServerInit } from '@sveltejs/kit/hooks';
 import { Server } from '$server/api/Server';
 import { db } from '$server/db';
 import { Logger } from '$server/logger';
@@ -27,8 +27,10 @@ export const handle: Handle = async ({ event: req, resolve }) => {
 	return resolveRequest(req, resolve);
 };
 
-export const handleError: HandleServerError = async ({ event: req, error, status, message }) => {
-	handleUnexpectedError(req, error, status, message);
+export const handleError: HandleServerError = async ({ event: req, kind, error }) => {
+	if (kind === 'unknown') {
+		handleUnexpectedError(req, error);
+	}
 };
 
 process.on('sveltekit:shutdown', async (reason: 'SIGINT' | 'SIGTERM' | 'IDLE') => {

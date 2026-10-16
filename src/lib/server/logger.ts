@@ -1,4 +1,4 @@
-import { dev } from '$app/environment';
+import { dev } from '$app/env';
 
 /**
  * ANSI escape codes for misc things (reset, bold, hidden etc...)

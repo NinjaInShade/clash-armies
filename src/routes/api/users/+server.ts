@@ -1,4 +1,3 @@
-import { json } from '@sveltejs/kit';
 import { endpoint } from '$server/utils';
 import type { RequestHandler } from './$types';
 
@@ -8,5 +7,5 @@ export const POST: RequestHandler = endpoint(async (req) => {
 
 	await server.user.saveUser(req, user);
 
-	return json({}, { status: 200 });
+	return Response.json({}, { status: 200 });
 });

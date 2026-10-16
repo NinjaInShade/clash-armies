@@ -1,32 +1,17 @@
-import { building } from '$app/environment';
-import { env } from '$env/dynamic/private';
+import { DB_HOST, DB_USER, DB_PASSWORD, DB_PORT } from '$app/env/private';
 import { Kysely, MysqlDialect, sql, type InsertObject } from 'kysely';
 import { createPool } from 'mysql2';
 import type { DB } from './db-types.d.ts';
 import { logger } from './logger';
 
-const { DB_HOST, DB_USER, DB_PASSWORD, DB_PORT } = env;
-
 const log = logger('clash-armies:db');
-
-if (!building) {
-	if (typeof DB_USER !== 'string') {
-		throw new Error('Expected database user to be defined');
-	}
-	if (typeof DB_PASSWORD !== 'string') {
-		throw new Error('Expected database password to be defined');
-	}
-	if (DB_PORT && Number.isNaN(+DB_PORT)) {
-		throw new Error('Expected database port to be a valid number');
-	}
-}
 
 const dialect = new MysqlDialect({
 	pool: createPool({
 		user: DB_USER,
 		password: DB_PASSWORD,
 		host: DB_HOST ?? 'localhost',
-		port: DB_PORT ? +DB_PORT : 3306,
+		port: DB_PORT ?? 3306,
 		database: 'clash-armies',
 		timezone: 'Z',
 		typeCast(field, next) {

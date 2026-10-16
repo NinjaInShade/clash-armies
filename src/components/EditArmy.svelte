@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { invalidateAll, goto } from '$app/navigation';
+	import { refreshAll, goto } from '$app/navigation';
 	import { getContext } from 'svelte';
 	import ImgArmyCamp from '$assets/ui/army-camp.webp';
 	import ImgBBDuel from '$assets/ui/bb-duel.webp';
@@ -179,7 +179,7 @@
 			await goto(`/armies/${id}`);
 		} else {
 			// Back out of editing mode
-			await invalidateAll();
+			await refreshAll();
 			await goto(`/armies/${model.id}`);
 		}
 	}

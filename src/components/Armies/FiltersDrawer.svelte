@@ -1,7 +1,7 @@
 <script lang="ts">
-	import { requireHTML } from '$lib/client/state.svelte';
 	import { getContext } from 'svelte';
 	import type { FiltersState, PickUnit, Filters } from '$client/filtersState.svelte';
+	import { requireHTML } from '$client/state.svelte';
 	import ActionButton from '$components/ActionButton.svelte';
 	import THFilterButton from '$components/Armies/THFilterButton.svelte';
 	import Checkbox from '$components/Checkbox.svelte';

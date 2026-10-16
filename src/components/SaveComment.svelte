@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { invalidateAll } from '$app/navigation';
+	import { refreshAll } from '$app/navigation';
 	import { getContext } from 'svelte';
 	import ImgBarbKing2 from '$assets/ui/barb-king-2.webp';
 	import type { ArmyModel, ArmyComment } from '$models/Army.svelte';
@@ -60,7 +60,7 @@
 			return;
 		}
 
-		await invalidateAll();
+		await refreshAll();
 		commentText = null;
 		onSave();
 	}

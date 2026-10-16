@@ -1,4 +1,3 @@
-import { goto } from '$app/navigation';
 import Confirm from '$components/Confirm.svelte';
 import { createStaticGameData, type RawGameData } from '$shared/gameData';
 import { HTTPApi } from '$shared/http';
@@ -109,7 +108,7 @@ export function createAppState(initial: InitialAppState) {
 
 			const encodedRedirect = encodeURIComponent(`${redirectURL.pathname}${redirectURL.search}`);
 			const authURL = new URL(`/api/login/google?r=${encodedRedirect}`, loc.origin);
-			await goto(authURL);
+			window.location.href = authURL.href;
 		},
 	};
 }

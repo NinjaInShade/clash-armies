@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { invalidateAll } from '$app/navigation';
+	import { refreshAll } from '$app/navigation';
 	import { getContext } from 'svelte';
 	import Button from '$components/Button.svelte';
 	import Errors from '$components/Errors.svelte';
@@ -57,7 +57,7 @@
 		}
 
 		editing = false;
-		await invalidateAll();
+		await refreshAll();
 	}
 </script>
 

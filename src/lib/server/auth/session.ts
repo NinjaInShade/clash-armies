@@ -1,5 +1,5 @@
 import crypto from 'node:crypto';
-import { dev } from '$app/environment';
+import { dev } from '$app/env';
 import { db, helpers } from '$server/db';
 import type { Session, User } from '$types';
 
