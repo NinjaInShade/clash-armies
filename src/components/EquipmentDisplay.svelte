@@ -15,7 +15,7 @@
 	};
 	const { name, amount, level, title }: Props = $props();
 	const app = getContext<AppState>('app');
-	const appEq = $derived(app.equipment.find((eq) => eq.name === name));
+	const appEq = $derived(app.gameData.index.equipment.byName(name));
 	const epic = $derived(appEq?.epic ?? false);
 	const levels = $derived(appEq?.levels ?? []);
 	const isMaxLevel = $derived(level === Math.max(...levels.map((x) => x.level)));

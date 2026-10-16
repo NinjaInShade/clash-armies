@@ -1,4 +1,5 @@
-import type { StaticGameData, Optional } from '$types';
+import type { StaticGameData } from '$shared/gameData';
+import type { Optional } from '$types';
 import type { ArmyComment, StructuredArmyComment } from './Army.svelte';
 
 export class CommentModel {

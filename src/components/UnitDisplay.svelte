@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { getContext } from 'svelte';
 	import { unitImgURL } from '$client/assets';
-	import type { AppState, Unit } from '$types';
+	import type { Unit } from '$shared/gameData';
+	import type { AppState } from '$types';
 
 	type Props = {
 		unit: Unit;
@@ -21,7 +22,7 @@
 	const { unit, display, level, amount, title }: Props = $props();
 	const app = getContext<AppState>('app');
 	const { name, type, isSuper } = $derived(unit);
-	const levels = $derived(app.units.find((u) => u.name === name)?.levels ?? []);
+	const levels = $derived(app.gameData.index.units.byName(name)?.levels ?? []);
 	const isMaxLevel = $derived(level === Math.max(...levels.map((x) => x.level)));
 </script>
 

@@ -6,7 +6,7 @@ import type { PageServerLoad } from './$types';
 export const load: PageServerLoad = async (req) => {
 	const townHall = z.number().parse(+req.params.slug);
 	const server = req.locals.server;
-	if (!server.gameData.validTownHalls.has(townHall)) {
+	if (!server.gameData.index.townHalls.byLevel(townHall)) {
 		return error(404);
 	}
 	const query = server.army.parseArmyListQuery(req.url.searchParams);

@@ -3,7 +3,7 @@ import { describe, it, beforeAll, afterAll, vi } from 'vitest';
 import { UnitModel } from '$models/Unit.svelte';
 import { Server } from '$server/api/Server';
 import { db } from '$server/db';
-import type { StaticGameData } from '$types';
+import type { StaticGameData } from '$shared/gameData';
 import { assert, createReq, createUsers, makeData, USER, USER_2 } from '../testutil';
 
 describe('Sitemap', function () {
@@ -27,7 +27,7 @@ describe('Sitemap', function () {
 	beforeAll(async function () {
 		server = new Server(db);
 		await server.init();
-		gameData = server.gameData.data;
+		gameData = server.gameData;
 
 		await createUsers(server);
 		req = createReq(USER, server);
@@ -94,24 +94,26 @@ describe('Sitemap', function () {
 	});
 
 	it('Should include a page per town hall and unit', async function () {
+		const { index } = server.gameData;
+
 		const xml = await server.sitemap.getSitemap();
 		const sitemapPaths = paths(xml);
 
-		for (const level of server.gameData.validTownHalls) {
+		for (const level of index.townHalls.levels) {
 			assert.include(sitemapPaths, `/armies/town-hall-${level}`);
 		}
 
 		const slugPages = [
-			[server.gameData.troopSlugs, 'troops'],
-			[server.gameData.spellSlugs, 'spells'],
-			[server.gameData.siegeSlugs, 'sieges'],
-			[server.gameData.heroSlugs, 'heroes'],
-			[server.gameData.petSlugs, 'pets'],
-			[server.gameData.equipmentSlugs, 'equipment'],
+			[index.troops.slugs, 'troops'],
+			[index.spells.slugs, 'spells'],
+			[index.sieges.slugs, 'sieges'],
+			[index.heroes.slugs, 'heroes'],
+			[index.pets.slugs, 'pets'],
+			[index.equipment.slugs, 'equipment'],
 		] as const;
 		for (const [slugs, segment] of slugPages) {
-			assert.isNotEmpty(Array.from(slugs.keys()));
-			for (const slug of slugs.keys()) {
+			assert.isNotEmpty(slugs);
+			for (const slug of slugs) {
 				assert.include(sitemapPaths, `/armies/${segment}/${slug}`);
 			}
 		}

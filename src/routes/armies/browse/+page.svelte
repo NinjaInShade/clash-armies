@@ -7,9 +7,7 @@
 	const app = getContext<AppState>('app');
 	const pageMeta = ARMY_PAGES.browse;
 
-	const troops = $derived(app.units.filter((u) => u.type === 'Troop'));
-	const spells = $derived(app.units.filter((u) => u.type === 'Spell'));
-	const sieges = $derived(app.units.filter((u) => u.type === 'Siege'));
+	const { Troop: troops, Spell: spells, Siege: sieges } = $derived(app.gameData.unitsByType);
 </script>
 
 <svelte:head>
@@ -26,7 +24,7 @@
 			<section>
 				<h3>Heroes</h3>
 				<ul class="links">
-					{#each app.heroNames as hero (hero)}
+					{#each app.gameData.index.heroes.names as hero (hero)}
 						{@render linkCard(ARMY_PAGES.hero(hero).navOptions)}
 					{/each}
 				</ul>
@@ -62,7 +60,7 @@
 			<section>
 				<h3>Equipment</h3>
 				<ul class="links">
-					{#each app.equipment as eq (eq.name)}
+					{#each app.gameData.equipment as eq (eq.name)}
 						{@render linkCard(ARMY_PAGES.equipment(eq.name).navOptions)}
 					{/each}
 				</ul>
@@ -71,7 +69,7 @@
 			<section>
 				<h3>Pets</h3>
 				<ul class="links">
-					{#each app.pets as pet (pet.name)}
+					{#each app.gameData.pets as pet (pet.name)}
 						{@render linkCard(ARMY_PAGES.pet(pet.name).navOptions)}
 					{/each}
 				</ul>

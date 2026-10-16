@@ -11,7 +11,7 @@
 	const { name, level }: Props = $props();
 
 	const app = getContext<AppState>('app');
-	const levels = $derived(app.townHalls.map((th) => ArmyModel.getMaxHeroLevel(name, th.level, app)));
+	const levels = $derived(app.gameData.townHalls.map((th) => ArmyModel.getMaxHeroLevel(name, th.level, app.gameData)));
 	const isMaxLevel = $derived(level === Math.max(...levels));
 </script>
 

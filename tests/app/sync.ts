@@ -5,7 +5,7 @@ import { describe, it, beforeEach, beforeAll, afterAll } from 'vitest';
 import { Server } from '$server/api/Server';
 import { db } from '$server/db';
 import type { GameData, GameDataEquipment, GameDataHero, GameDataPet, GameDataTownHall, GameDataUnit } from '$server/game-data/schema';
-import type { UnitType } from '$shared/types';
+import type { UnitType } from '$shared/gameData';
 import { assert } from '../testutil';
 
 // TODO: better sync update tests, such as asserting renaming failing if armies use it, etc...

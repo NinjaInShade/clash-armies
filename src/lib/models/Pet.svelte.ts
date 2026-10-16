@@ -1,4 +1,5 @@
-import type { Pet, Optional, StaticGameData } from '$types';
+import type { Pet, StaticGameData } from '$shared/gameData';
+import type { Optional } from '$types';
 import { ArmyModel, type ArmyPet } from './Army.svelte';
 
 export class PetModel {
@@ -34,7 +35,7 @@ export class PetModel {
 	}
 
 	public static require(petId: number, gameData: StaticGameData) {
-		const pet = gameData.pets.find((p) => p.id === petId);
+		const pet = gameData.index.pets.byId(petId);
 		if (!pet) {
 			throw new Error(`Expected pet "${petId}"`);
 		}
@@ -42,7 +43,7 @@ export class PetModel {
 	}
 
 	public static requireByName(name: string, gameData: StaticGameData) {
-		const pet = gameData.pets.find((p) => p.name === name);
+		const pet = gameData.index.pets.byName(name);
 		if (!pet) {
 			throw new Error(`Expected pet "${name}"`);
 		}
@@ -50,7 +51,7 @@ export class PetModel {
 	}
 
 	public static requireByClashID(clashId: number, gameData: StaticGameData) {
-		const pet = gameData.pets.find((p) => p.clashId === clashId);
+		const pet = gameData.index.pets.byClashId(clashId);
 		if (!pet) {
 			throw new Error(`Expected pet "${clashId}"`);
 		}

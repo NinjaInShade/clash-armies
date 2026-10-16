@@ -36,7 +36,7 @@
 			<img src={ImgClanCastle} alt="Clash of clans clan castle" title="Has clan castle" />
 		</li>
 	{/if}
-	{#each app.heroNames as hero (hero)}
+	{#each app.gameData.index.heroes.names as hero (hero)}
 		{#if model.hasHero(hero)}
 			<li>
 				<HeroDisplay name={hero} />

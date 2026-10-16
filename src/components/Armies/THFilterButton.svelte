@@ -60,7 +60,7 @@
 <Menu bind:open={menuOpen} elRef={menuRef} matchWidth>
 	<div class="ca-menu th-menu">
 		<ul class="ca-menu-list">
-			{#each [...app.townHalls].reverse() as th (th.level)}
+			{#each [...app.gameData.townHalls].reverse() as th (th.level)}
 				{@const isSelected = value === th.level}
 				<li use:scrollIntoView={isSelected}>
 					<button

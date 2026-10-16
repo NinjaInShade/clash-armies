@@ -1,5 +1,6 @@
+import type { Unit, StaticGameData, Pet, Equipment } from '$shared/gameData';
 import { BANNERS } from '$shared/utils';
-import type { Unit, UnitHome, Banner, StaticGameData, Pet, Equipment } from '$types';
+import type { UnitHome, Banner } from '$types';
 import { CommentModel } from './Comment.svelte';
 import { EquipmentModel } from './Equipment.svelte';
 import { GuideModel } from './Guide.svelte';
@@ -324,11 +325,10 @@ export class ArmyModel {
 	}
 
 	public getStats() {
-		const validHeroes = this.gameData.heroes.map((hero) => hero.name);
 		return {
 			type: this.getArmyType(),
 			hasClanCastle: this.ccUnits.length > 0,
-			hasHeroes: validHeroes.some((hero) => this.hasHero(hero)),
+			hasHeroes: this.gameData.index.heroes.names.some((hero) => this.hasHero(hero)),
 			hasGuide: this.hasGuide,
 		};
 	}
@@ -362,15 +362,14 @@ export class ArmyModel {
 
 	public static getMaxHeroLevel(hero: string, townHall: number, gameData: StaticGameData) {
 		const thData = ArmyModel.requireTownHall(townHall, gameData);
-		const validHeroes = gameData.heroes.map((hero) => hero.name);
-		if (!validHeroes.includes(hero)) {
+		if (!gameData.index.heroes.byName(hero)) {
 			return -1;
 		}
 		return thData.heroMaxLevels[hero] ?? -1;
 	}
 
 	public static requireTownHall(level: number, gameData: StaticGameData) {
-		const th = gameData.townHalls.find((th) => th.level === level);
+		const th = gameData.index.townHalls.byLevel(level);
 		if (!th) {
 			throw new Error(`Expected town hall ${level}`);
 		}

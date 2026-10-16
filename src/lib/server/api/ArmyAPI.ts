@@ -609,7 +609,7 @@ export class ArmyAPI {
 	public async saveArmy(req: RequestEvent, data: unknown): Promise<number> {
 		const user = req.locals.requireAuth();
 
-		const model = validateArmy(data, this.gameData.data);
+		const model = validateArmy(data, this.gameData);
 		const { equipment, pets, guide, allUnits, tags } = model;
 
 		if (guide && typeof guide.textContent === 'string') {

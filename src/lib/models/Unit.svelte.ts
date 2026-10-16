@@ -1,5 +1,6 @@
+import type { Unit, StaticGameData } from '$shared/gameData';
 import { SUPER_TO_REGULAR } from '$shared/utils';
-import type { UnitHome, Unit, Optional, StaticGameData } from '$types';
+import type { UnitHome, Optional } from '$types';
 import { ArmyModel, type ArmyUnit } from './Army.svelte';
 
 export class UnitModel {
@@ -37,7 +38,7 @@ export class UnitModel {
 	}
 
 	public static require(unitId: number, gameData: StaticGameData) {
-		const unit = gameData.units.find((u) => u.id === unitId);
+		const unit = gameData.index.units.byId(unitId);
 		if (!unit) {
 			throw new Error(`Expected unit "${unitId}"`);
 		}
@@ -45,7 +46,8 @@ export class UnitModel {
 	}
 
 	public static requireTroopByName(name: string, gameData: StaticGameData) {
-		const unit = gameData.units.find((u) => (u.type === 'Troop' || u.type === 'Siege') && u.name === name);
+		const index = gameData.index;
+		const unit = index.troops.byName(name) ?? index.sieges.byName(name);
 		if (!unit) {
 			throw new Error(`Expected troop "${name}"`);
 		}
@@ -53,7 +55,7 @@ export class UnitModel {
 	}
 
 	public static requireSpellByName(name: string, gameData: StaticGameData) {
-		const unit = gameData.units.find((u) => u.type === 'Spell' && u.name === name);
+		const unit = gameData.index.spells.byName(name);
 		if (!unit) {
 			throw new Error(`Expected spell "${name}"`);
 		}
@@ -61,7 +63,8 @@ export class UnitModel {
 	}
 
 	public static requireTroopByClashID(clashId: number, gameData: StaticGameData) {
-		const unit = gameData.units.find((u) => (u.type === 'Troop' || u.type === 'Siege') && u.clashId === clashId);
+		const index = gameData.index;
+		const unit = index.troops.byClashId(clashId) ?? index.sieges.byClashId(clashId);
 		if (!unit) {
 			throw new Error(`Expected troop "${clashId}"`);
 		}
@@ -69,7 +72,7 @@ export class UnitModel {
 	}
 
 	public static requireSpellByClashID(clashId: number, gameData: StaticGameData) {
-		const unit = gameData.units.find((u) => u.type === 'Spell' && u.clashId === clashId);
+		const unit = gameData.index.spells.byClashId(clashId);
 		if (!unit) {
 			throw new Error(`Expected spell "${clashId}"`);
 		}
@@ -159,7 +162,7 @@ export class UnitModel {
 					return maxLevel;
 				}
 				// If super troops unlocked, level matches the max level of the regular troop version
-				const regularTroopVersion = gameData.units.find((x) => x.type === 'Troop' && x.name === SUPER_TO_REGULAR[name]);
+				const regularTroopVersion = gameData.index.troops.byName(SUPER_TO_REGULAR[name]);
 				if (!regularTroopVersion) {
 					throw new Error(`Expected to find regular troop version for "${name}"`);
 				}
@@ -210,7 +213,7 @@ export class UnitModel {
 					return maxLevel;
 				}
 				// If super troops unlocked, level matches the max level allowed for the regular troop version
-				const regularTroopVersion = gameData.units.find((x) => x.type === 'Troop' && x.name === SUPER_TO_REGULAR[name]);
+				const regularTroopVersion = gameData.index.troops.byName(SUPER_TO_REGULAR[name]);
 				if (!regularTroopVersion) {
 					throw new Error(`Expected to find regular troop version for "${name}"`);
 				}

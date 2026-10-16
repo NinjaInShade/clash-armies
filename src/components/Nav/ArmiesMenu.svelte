@@ -2,8 +2,8 @@
 	import { getContext } from 'svelte';
 	import { fade } from 'svelte/transition';
 	import { ARMY_PAGES } from '$client/pages';
+	import type { TownHall } from '$shared/gameData';
 	import type { AppState } from '$types';
-	import type { TownHall } from '$types';
 	import Menu from '../Menu.svelte';
 	import ResponsiveGridSlice from '../ResponsiveGridSlice.svelte';
 	import LinkCard from './LinkCard.svelte';
@@ -15,7 +15,7 @@
 	let { open = $bindable(), elRef }: Props = $props();
 
 	const app = getContext<AppState>('app');
-	const townHalls = $derived(app.townHalls.toReversed());
+	const townHalls = $derived(app.gameData.townHalls.toReversed());
 
 	const TH_WIDTH = 140;
 	const TH_ROWS_MAX = 2;

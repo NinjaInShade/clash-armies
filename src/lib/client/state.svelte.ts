@@ -1,7 +1,10 @@
 import { goto } from '$app/navigation';
 import Confirm from '$components/Confirm.svelte';
+import { createStaticGameData, type RawGameData } from '$shared/gameData';
 import { HTTPApi } from '$shared/http';
 import type { AppState, Modal, ToastNotification } from '$types';
+
+type InitialAppState = { gameData: RawGameData; user: AppState['user'] };
 
 const TOAST_DEFAULT_DURATION = 2500;
 
@@ -13,52 +16,29 @@ export function requireHTML() {
 	return html;
 }
 
-export function createAppState(initial: Pick<AppState, 'units' | 'townHalls' | 'heroes' | 'equipment' | 'pets' | 'user'>) {
+export function createAppState(initial: InitialAppState) {
 	const http = new HTTPApi();
 
-	let units = $state<AppState['units']>(initial.units);
-	let townHalls = $state<AppState['townHalls']>(initial.townHalls);
-	let heroes = $state<AppState['heroes']>(initial.heroes);
-	let equipment = $state<AppState['equipment']>(initial.equipment);
-	let pets = $state<AppState['pets']>(initial.pets);
+	// Raw since game data is only ever replaced entirely, never mutated
+	let gameData = $state.raw(createStaticGameData(initial.gameData));
 	let user = $state<AppState['user']>(initial.user);
 	let modals = $state<AppState['modals']>([]);
 	let notifications = $state<AppState['notifications']>([]);
 
 	return {
 		http,
-		get townHalls() {
-			return townHalls;
+		get gameData() {
+			return gameData;
 		},
-		set townHalls(newTownHalls: AppState['townHalls']) {
-			townHalls = newTownHalls;
-		},
-		get heroes() {
-			return heroes;
-		},
-		set heroes(newHeroes: AppState['heroes']) {
-			heroes = newHeroes;
-		},
-		get heroNames() {
-			return heroes.map((hero) => hero.name);
-		},
-		get units() {
-			return units;
-		},
-		set units(newUnits: AppState['units']) {
-			units = newUnits;
-		},
-		get equipment() {
-			return equipment;
-		},
-		set equipment(newEquipment: AppState['equipment']) {
-			equipment = newEquipment;
-		},
-		get pets() {
-			return pets;
-		},
-		set pets(newPets: AppState['pets']) {
-			pets = newPets;
+		updateGameData(data: RawGameData) {
+			const keys = ['units', 'townHalls', 'equipment', 'pets', 'heroes'] as const;
+
+			// Skip identical data (e.g. the layout effect's first run) to prevent unneccessary invalidation
+			if (keys.every((key) => data[key] === gameData[key])) {
+				return;
+			}
+
+			gameData = createStaticGameData(data);
 		},
 		get user() {
 			return user;

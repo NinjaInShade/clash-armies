@@ -2,8 +2,9 @@ import { ArmyModel } from '$models/Army.svelte';
 import { EquipmentModel } from '$models/Equipment.svelte';
 import { PetModel } from '$models/Pet.svelte';
 import { UnitModel } from '$models/Unit.svelte';
+import type { StaticGameData } from '$shared/gameData';
 import { validateArmy } from '$shared/validation';
-import type { StaticGameData, UnitHome } from '$types';
+import type { UnitHome } from '$types';
 
 /*
  * Kept separate from `$client/army` on purpose:
@@ -58,7 +59,7 @@ export function parseLink(fullLink: string, gameData: StaticGameData) {
 				const m = ARMY_LINK_HERO_PATTERN.exec(hero);
 				const groups = m?.groups;
 				if (groups) {
-					const heroName = model.gameData.heroes.find((hero) => hero.clashId === +groups.hero_id)?.name;
+					const heroName = gameData.index.heroes.byClashId(+groups.hero_id)?.name;
 					if (!heroName) {
 						throw new Error('Invalid hero ID');
 					}

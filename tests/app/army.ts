@@ -7,6 +7,7 @@ import { UnitModel } from '$models/Unit.svelte';
 import { Server } from '$server/api/Server';
 import type { SessionUser } from '$server/auth/session';
 import { db } from '$server/db';
+import type { UnitType, StaticGameData } from '$shared/gameData';
 import {
 	GUIDE_TEXT_CHAR_LIMIT,
 	ARMY_TAGS,
@@ -17,7 +18,6 @@ import {
 	MAX_FILTER_PETS,
 } from '$shared/utils';
 import { validateArmy, MAX_PAGE } from '$shared/validation';
-import type { UnitType, StaticGameData } from '$types';
 import { assert, createReq, USER, USER_2, USER_ADMIN, createUsers, makeData, assertArmies } from '../testutil';
 
 let gameData: StaticGameData;
@@ -34,7 +34,7 @@ let _reqAdminUser: SessionUser;
 beforeAll(async function () {
 	server = new Server(db);
 	await server.init();
-	gameData = server.gameData.data;
+	gameData = server.gameData;
 
 	await createUsers(server);
 });
@@ -1223,9 +1223,7 @@ describe('Validation', function () {
 			const data = makeData({
 				name: 'test',
 				townHall: th.level,
-				units: [
-					{ home: clanCastle ? 'clanCastle' : 'armyCamp', unitId: gameData.units.find((u) => u.type === type)?.id, amount: maxCapacity + (overflow ? 1 : 0) },
-				],
+				units: [{ home: clanCastle ? 'clanCastle' : 'armyCamp', unitId: gameData.unitsByType[type][0]?.id, amount: maxCapacity + (overflow ? 1 : 0) }],
 			});
 			if (overflow) {
 				const msg = `Town hall ${th.level} has a max ${clanCastle ? 'clan castle ' : ''}${longType} capacity of ${maxCapacity}, but this army exceeded that with ${maxCapacity + 1}`;

@@ -31,13 +31,13 @@
 
 	const { army }: Props = $props();
 	const app = getContext<AppState>('app');
-	const model = new ArmyModel(app, army);
+	const model = new ArmyModel(app.gameData, army);
 
 	// Other state
 	let errors = $state<APIErrors | null>(null);
 	let saveDisabled = $derived(!model.name || model.name.length < 2 || model.name.length > 25 || !model.units.length);
 	let showClanCastle = $state(model.ccUnits.length > 0);
-	let shownHeroes = $state(model.id ? app.heroNames.filter((hero) => model.hasHero(hero)) : null);
+	let shownHeroes = $state(model.id ? app.gameData.index.heroes.names.filter((hero) => model.hasHero(hero)) : null);
 
 	function addClanCastle() {
 		showClanCastle = true;
@@ -52,9 +52,9 @@
 	}
 
 	function getDefaultHeroes(thLvl: number) {
-		return app.heroNames
+		return app.gameData.index.heroes.names
 			.filter((hero) => {
-				return ArmyModel.getMaxHeroLevel(hero, thLvl, app) !== -1;
+				return ArmyModel.getMaxHeroLevel(hero, thLvl, app.gameData) !== -1;
 			})
 			.slice(0, 4);
 	}
@@ -105,7 +105,7 @@
 
 		showClanCastle = importedModel.ccUnits.length > 0;
 
-		const importedHeroes = app.heroNames.filter((hero) => importedModel.hasHero(hero));
+		const importedHeroes = app.gameData.index.heroes.names.filter((hero) => importedModel.hasHero(hero));
 		if (importedHeroes.length) {
 			shownHeroes = importedHeroes;
 		} else {
@@ -123,7 +123,7 @@
 	}
 
 	async function setTownHall(value: number) {
-		if (typeof value !== 'number' || value < 1 || value > app.townHalls.length) {
+		if (typeof value !== 'number' || !app.gameData.index.townHalls.byLevel(value)) {
 			throw new Error(`Town hall ${value} doesn't exist`);
 		}
 		if (value < model.townHall && (model.units.length || model.ccUnits.length || model.equipment.length || model.pets.length)) {
@@ -230,7 +230,7 @@
 		</Fieldset>
 		<Fieldset label="Town hall:" htmlName="town-all" style="padding: 0 8px; margin-top: 16px;" --input-width="100%">
 			<div class="town-halls-grid">
-				{#each app.townHalls as th (th.level)}
+				{#each app.gameData.townHalls as th (th.level)}
 					{@const isSelected = model.townHall === th.level}
 					{@const btnAttributes = { title: isSelected ? `Town hall ${th.level} is already selected` : `Town hall ${th.level}`, disabled: isSelected }}
 					<TownHall onclick={() => setTownHall(th.level)} level={th.level} {...btnAttributes} --width="100%" />
@@ -319,7 +319,7 @@
 					<ActionButton theme="danger" onclick={removeHeroes} class="title-action-btn">Remove</ActionButton>
 				</h2>
 			</div>
-			{#each app.heroNames as hero (hero)}
+			{#each app.gameData.index.heroes.names as hero (hero)}
 				{#if model.thData && ArmyModel.getMaxHeroLevel(hero, model.townHall, model.gameData) !== -1}
 					<div class="hero-picker-container">
 						<HeroPicker {model} {hero} bind:shownHeroes />

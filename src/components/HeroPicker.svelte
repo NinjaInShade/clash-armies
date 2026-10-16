@@ -3,7 +3,8 @@
 	import { ArmyModel } from '$models/Army.svelte';
 	import { EquipmentModel } from '$models/Equipment.svelte';
 	import { PetModel } from '$models/Pet.svelte';
-	import type { AppState, Pet } from '$types';
+	import type { Pet } from '$shared/gameData';
+	import type { AppState } from '$types';
 	import ActionButton from './ActionButton.svelte';
 	import AddHero from './AddHero.svelte';
 	import EquipmentDisplay from './EquipmentDisplay.svelte';
@@ -21,7 +22,7 @@
 	// Selected equipment/pets just for this hero
 	const _selectedEquipment = $derived(model.equipment.filter((eq) => eq.info.hero === hero));
 	const _selectedPets = $derived(model.pets.filter((p) => p.hero === hero));
-	const allEquipment = $derived(app.equipment.filter((eq) => eq.hero === hero));
+	const allEquipment = $derived(app.gameData.equipment.filter((eq) => eq.hero === hero));
 	const sortedEquipment = $derived([...allEquipment.filter((eq) => !eq.epic), ...allEquipment.filter((eq) => eq.epic)]);
 	const shown = $derived(shownHeroes.includes(hero));
 
@@ -101,7 +102,7 @@
 <div class="hero {hero.replaceAll(' ', '-').toLowerCase()}" class:shown>
 	{#if shown}
 		<div class="hero-container">
-			<HeroDisplay name={hero} level={ArmyModel.getMaxHeroLevel(hero, model.townHall, app)} />
+			<HeroDisplay name={hero} level={ArmyModel.getMaxHeroLevel(hero, model.townHall, app.gameData)} />
 			<ActionButton style="margin-top: 8px" theme="danger" onclick={removeHero}>Remove</ActionButton>
 		</div>
 		<div class="vertical-separator"></div>
@@ -153,7 +154,7 @@
 						{/if}
 					</div>
 					<ul class="picker-list">
-						{#each app.pets as pet (pet.name)}
+						{#each app.gameData.pets as pet (pet.name)}
 							{@const level = PetModel.getMaxLevel(pet.name, model.townHall, model.gameData)}
 							{@const title = getPetTitle(level, pet.name, model.pets)}
 							{@const equippedHero = model.pets.find((p) => p.info.name === pet.name)?.hero}

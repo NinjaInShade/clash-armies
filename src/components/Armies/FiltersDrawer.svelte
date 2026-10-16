@@ -48,14 +48,14 @@
 	const app = getContext<AppState>('app');
 
 	const unitsList = $derived.by(() => {
-		// TODO: shared util for stuff like this (see browse +page.svelte for another example).
-		const troops: PickUnit[] = [];
-		const spells: PickUnit[] = [];
-		const sieges: PickUnit[] = [];
-		const equipment: PickUnit[] = app.equipment
+		const { index, unitsByType, equipment: allEquipment, pets: allPets } = app.gameData;
+		const troops: PickUnit[] = unitsByType.Troop.map((unit) => ({ pickType: 'unit', ...unit }));
+		const spells: PickUnit[] = unitsByType.Spell.map((unit) => ({ pickType: 'unit', ...unit }));
+		const sieges: PickUnit[] = unitsByType.Siege.map((unit) => ({ pickType: 'unit', ...unit }));
+		const equipment: PickUnit[] = allEquipment
 			.toSorted((a, b) => {
-				const heroIndexA = app.heroNames.indexOf(a.hero);
-				const heroIndexB = app.heroNames.indexOf(b.hero);
+				const heroIndexA = index.heroes.names.indexOf(a.hero);
+				const heroIndexB = index.heroes.names.indexOf(b.hero);
 				if (+a.epic !== +b.epic) {
 					return +a.epic - +b.epic;
 				}
@@ -65,20 +65,7 @@
 				return 0;
 			})
 			.map((eq) => ({ pickType: 'equipment', ...eq }));
-		const pets: PickUnit[] = app.pets.map((u) => ({ pickType: 'pet', ...u }));
-		for (const unit of app.units) {
-			switch (unit.type) {
-				case 'Troop':
-					troops.push({ pickType: 'unit', ...unit });
-					break;
-				case 'Spell':
-					spells.push({ pickType: 'unit', ...unit });
-					break;
-				case 'Siege':
-					sieges.push({ pickType: 'unit', ...unit });
-					break;
-			}
-		}
+		const pets: PickUnit[] = allPets.map((u) => ({ pickType: 'pet', ...u }));
 		return [...troops, ...spells, ...sieges, ...equipment, ...pets];
 	});
 	// Kept in the same order as `unitsList`, rather than selection order

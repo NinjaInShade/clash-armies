@@ -86,25 +86,21 @@
 	 * should start as null and consumers should show loading animations until the values are set.
 	 */
 	const appState = createAppState({
-		// Frequently used data (cache)
-		units: data.units,
-		townHalls: data.townHalls,
-		equipment: data.equipment,
-		pets: data.pets,
-		heroes: data.heroes,
+		gameData: getGameData(),
 		user: extendUser(data.user, data.userNotifications),
 	});
 	setContext('app', appState);
 
 	$effect(() => {
 		// If layout data is invalidated, update app store
-		appState.units = data.units;
-		appState.townHalls = data.townHalls;
-		appState.equipment = data.equipment;
-		appState.pets = data.pets;
-		appState.heroes = data.heroes;
+		appState.updateGameData(getGameData());
 		appState.user = extendUser(data.user, data.userNotifications);
 	});
+
+	function getGameData() {
+		const { units, townHalls, equipment, pets, heroes } = data;
+		return { units, townHalls, equipment, pets, heroes };
+	}
 
 	function popModal() {
 		const lastModal = appState.modals.at(-1);

@@ -21,7 +21,7 @@
 
 	async function importUnits() {
 		try {
-			const importedModel = parseLink(link, app);
+			const importedModel = parseLink(link, app.gameData);
 			if (!importedModel.units.length && !importedModel.ccUnits.length && !importedModel.equipment.length && !importedModel.pets.length) {
 				error = "This import link didn't have any units - are you sure it's correct?";
 				return;

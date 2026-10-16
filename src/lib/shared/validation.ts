@@ -5,7 +5,7 @@ import { EquipmentModel } from '$models/Equipment.svelte';
 import { GuideModel } from '$models/Guide.svelte';
 import { PetModel } from '$models/Pet.svelte';
 import { UnitModel } from '$models/Unit.svelte';
-import type { StaticGameData } from '$types';
+import type { StaticGameData } from '$shared/gameData';
 import { BANNERS, VALID_UNIT_HOME, GUIDE_TEXT_CHAR_LIMIT, YOUTUBE_URL_REGEX, MAX_COMMENT_LENGTH, MAX_ARMY_TAGS, ARMY_TAGS } from './utils';
 
 export const numberSchema = z.number().int().positive();
@@ -62,8 +62,7 @@ export function validateArmy(data: unknown, gameData: StaticGameData): ArmyModel
 	const army = armySchema.parse(data);
 	const model = new ArmyModel(gameData, army);
 
-	const validHeroes = gameData.heroes.map((hero) => hero.name);
-	const heroesUsed = validHeroes.filter((hero) => hasHero(hero, model)).length;
+	const heroesUsed = gameData.index.heroes.names.filter((hero) => hasHero(hero, model)).length;
 	if (heroesUsed > 4) {
 		throw new Error('Cannot use more than 4 heroes');
 	}
@@ -181,7 +180,7 @@ export function validatePets(model: ArmyModel) {
 
 	for (const pet of model.pets) {
 		const hero = pet.hero.toLowerCase();
-		if (!model.gameData.heroes.find((heroData) => heroData.name === pet.hero)) {
+		if (!model.gameData.index.heroes.byName(pet.hero)) {
 			throw new Error(`Invalid hero "${hero}"`);
 		}
 

@@ -12,7 +12,9 @@
 
 	const app = getContext<AppState>('app');
 	const requiredThLvl = $derived.by(() => {
-		const kingThsLevel = app.townHalls.filter((th) => ArmyModel.getMaxHeroLevel('Barbarian King', th.level, app) !== -1).map((th) => th.level);
+		const kingThsLevel = app.gameData.townHalls
+			.filter((th) => ArmyModel.getMaxHeroLevel('Barbarian King', th.level, app.gameData) !== -1)
+			.map((th) => th.level);
 		return Math.min(...kingThsLevel);
 	});
 </script>

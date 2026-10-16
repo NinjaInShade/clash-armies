@@ -177,23 +177,23 @@ export class SitemapAPI {
 	 * Army list "index" pages that exist for each town hall, troop, spell, siege machine, hero, pet or equipment.
 	 */
 	private getGameDataURLs(armiesLastMod: Date | undefined) {
-		const gameData = this.server.gameData;
+		const { index } = this.server.gameData;
 		const urls: SitemapURL[] = [];
 
-		for (const level of gameData.validTownHalls) {
+		for (const level of index.townHalls.levels) {
 			urls.push({ path: `/armies/town-hall-${level}`, priority: 0.7, lastmod: armiesLastMod });
 		}
 
-		const slugPages: [slugs: Map<string, string>, segment: string][] = [
-			[gameData.troopSlugs, 'troops'],
-			[gameData.spellSlugs, 'spells'],
-			[gameData.siegeSlugs, 'sieges'],
-			[gameData.heroSlugs, 'heroes'],
-			[gameData.petSlugs, 'pets'],
-			[gameData.equipmentSlugs, 'equipment'],
+		const slugPages: [slugs: readonly string[], segment: string][] = [
+			[index.troops.slugs, 'troops'],
+			[index.spells.slugs, 'spells'],
+			[index.sieges.slugs, 'sieges'],
+			[index.heroes.slugs, 'heroes'],
+			[index.pets.slugs, 'pets'],
+			[index.equipment.slugs, 'equipment'],
 		];
 		for (const [slugs, segment] of slugPages) {
-			for (const slug of slugs.keys()) {
+			for (const slug of slugs) {
 				urls.push({ path: `/armies/${segment}/${slug}`, priority: 0.6, lastmod: armiesLastMod });
 			}
 		}

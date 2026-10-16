@@ -28,11 +28,11 @@
 	const app = getContext<AppState>('app');
 	const model = $derived.by(() => {
 		void army;
-		return untrack(() => new ArmyModel(app, army));
+		return untrack(() => new ArmyModel(app.gameData, army));
 	});
 
 	const stats = $derived(model.getStats());
-	const heroes = $derived(app.heroNames.filter((hero) => model.hasHero(hero)));
+	const heroes = $derived(app.gameData.index.heroes.names.filter((hero) => model.hasHero(hero)));
 
 	let menuBtn = $state<HTMLButtonElement>();
 	let menuOpen = $state(false);
@@ -115,7 +115,7 @@
 			</h2>
 		</header>
 		<div class="heroes-list">
-			{#each app.heroNames as hero (hero)}
+			{#each app.gameData.index.heroes.names as hero (hero)}
 				{#if model.hasHero(hero)}
 					<HeroDisplayFull {hero} {model} />
 				{/if}

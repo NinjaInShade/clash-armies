@@ -1,4 +1,5 @@
-import type { Equipment, Optional, StaticGameData } from '$types';
+import type { Equipment, StaticGameData } from '$shared/gameData';
+import type { Optional } from '$types';
 import { ArmyModel, type ArmyEquipment } from './Army.svelte';
 
 export class EquipmentModel {
@@ -30,7 +31,7 @@ export class EquipmentModel {
 	}
 
 	public static require(equipmentId: number, gameData: StaticGameData) {
-		const eq = gameData.equipment.find((eq) => eq.id === equipmentId);
+		const eq = gameData.index.equipment.byId(equipmentId);
 		if (!eq) {
 			throw new Error(`Expected equipment "${equipmentId}"`);
 		}
@@ -38,7 +39,7 @@ export class EquipmentModel {
 	}
 
 	public static requireByName(name: string, gameData: StaticGameData) {
-		const eq = gameData.equipment.find((p) => p.name === name);
+		const eq = gameData.index.equipment.byName(name);
 		if (!eq) {
 			throw new Error(`Expected equipment "${name}"`);
 		}
@@ -46,7 +47,7 @@ export class EquipmentModel {
 	}
 
 	public static requireByClashID(clashId: number, gameData: StaticGameData) {
-		const eq = gameData.equipment.find((eq) => eq.clashId === clashId);
+		const eq = gameData.index.equipment.byClashId(clashId);
 		if (!eq) {
 			throw new Error(`Expected equipment "${clashId}"`);
 		}

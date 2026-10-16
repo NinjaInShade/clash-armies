@@ -1,6 +1,7 @@
 import { mkParamStore } from '$client/params.svelte';
+import type { Unit, Equipment, Pet } from '$shared/gameData';
 import { ARMY_TAG_CODES, ARMY_TAGS_BY_CODE, type ArmyTag } from '$shared/utils';
-import type { AppState, Unit, Equipment, Pet } from '$types';
+import type { AppState } from '$types';
 
 export type PickUnit = (Unit & { pickType: 'unit' }) | (Equipment & { pickType: 'equipment' }) | (Pet & { pickType: 'pet' });
 
@@ -50,17 +51,17 @@ function deserializeUnits(app: AppState, value: string | null): PickUnit[] {
 		const id = +part.substring(1);
 		let found: PickUnit | undefined;
 		if (pickType === 'u') {
-			const _found = app.units.find((u) => u.id === id);
+			const _found = app.gameData.index.units.byId(id);
 			if (_found) {
 				found = { pickType: 'unit', ..._found };
 			}
 		} else if (pickType === 'e') {
-			const _found = app.equipment.find((u) => u.id === id);
+			const _found = app.gameData.index.equipment.byId(id);
 			if (_found) {
 				found = { pickType: 'equipment', ..._found };
 			}
 		} else if (pickType === 'p') {
-			const _found = app.pets.find((u) => u.id === id);
+			const _found = app.gameData.index.pets.byId(id);
 			if (_found) {
 				found = { pickType: 'pet', ..._found };
 			}

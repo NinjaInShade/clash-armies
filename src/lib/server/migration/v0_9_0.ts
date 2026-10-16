@@ -1,7 +1,6 @@
 import { sql } from 'kysely';
 import type { Database } from '$server/db';
 import type { MigrationFn } from '$server/migration/migrator';
-import type { Unit, Equipment } from '$types';
 
 // Mapping from old `town_halls` hero columns -> hero name.
 // Used to flatten denormalized columns into `town_hall_heroes_max`.

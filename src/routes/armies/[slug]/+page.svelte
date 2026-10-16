@@ -13,7 +13,7 @@
 	const app = getContext<AppState>('app');
 	const model = $derived.by(() => {
 		void army;
-		return untrack(() => new ArmyModel(app, army));
+		return untrack(() => new ArmyModel(app.gameData, army));
 	});
 	const stats = $derived(model.getStats());
 

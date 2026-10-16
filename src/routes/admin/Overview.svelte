@@ -2,7 +2,7 @@
 	import Table from '$components/Table.svelte';
 	import THWidgetDisplay from '$components/THWidgetDisplay.svelte';
 	import UnitTableDisplay from '$components/UnitTableDisplay.svelte';
-	import type { Unit, TownHall } from '$types';
+	import type { Unit, TownHall } from '$shared/gameData';
 	import type { ServerStats, AppStats } from './+page.server';
 
 	type Props = {

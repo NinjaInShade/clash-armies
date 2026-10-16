@@ -15,7 +15,7 @@
 	};
 	const { name, amount, level, title }: Props = $props();
 	const app = getContext<AppState>('app');
-	const levels = $derived(app.pets.find((p) => p.name === name)?.levels ?? []);
+	const levels = $derived(app.gameData.index.pets.byName(name)?.levels ?? []);
 	const isMaxLevel = $derived(level === Math.max(...levels.map((x) => x.level)));
 </script>
 

@@ -12,7 +12,7 @@
 
 	const app = getContext<AppState>('app');
 	const ccUnlocked = $derived(model.thData.maxCc !== null);
-	const ccMinThLevel = $derived(Math.min(...app.townHalls.filter((th) => th.maxCc !== null).map((th) => th.level)));
+	const ccMinThLevel = $derived(Math.min(...app.gameData.townHalls.filter((th) => th.maxCc !== null).map((th) => th.level)));
 </script>
 
 <div class="not-added">

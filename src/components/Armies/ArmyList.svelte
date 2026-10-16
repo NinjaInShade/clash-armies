@@ -88,7 +88,7 @@
 
 	const armies = $derived.by(() => {
 		return data.map((army) => {
-			return untrack(() => new ArmyModel(app, army));
+			return untrack(() => new ArmyModel(app.gameData, army));
 		});
 	});
 

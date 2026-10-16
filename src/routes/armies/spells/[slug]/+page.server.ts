@@ -6,12 +6,11 @@ import type { PageServerLoad } from './$types';
 export const load: PageServerLoad = async (req) => {
 	const slug = z.string().trim().min(1).parse(req.params.slug);
 	const server = req.locals.server;
-	const spellName = server.gameData.spellSlugs.get(slug);
-	const spellId = spellName ? server.gameData.spellNames.get(spellName) : undefined;
-	if (spellId === undefined) {
+	const spell = server.gameData.index.spells.bySlug(slug);
+	if (!spell) {
 		return error(404);
 	}
 	const query = server.army.parseArmyListQuery(req.url.searchParams);
-	const { armies, total } = await server.army.getArmies(req, { ...query, units: [...(query.units ?? []), spellId], sort: 'score', limit: ARMIES_PAGE_SIZE });
-	return { armies, total, name: spellName };
+	const { armies, total } = await server.army.getArmies(req, { ...query, units: [...(query.units ?? []), spell.id], sort: 'score', limit: ARMIES_PAGE_SIZE });
+	return { armies, total, name: spell.name };
 };

@@ -5,8 +5,7 @@ import JSON5 from 'json5';
 import type { Server } from '$server/api/Server';
 import { helpers, type Database } from '$server/db';
 import { logger, type Logger } from '$server/logger';
-import { encodeUnitName } from '$shared/utils';
-import type { Unit, Equipment, Pet, TownHall, StaticGameData, Hero, UnitType } from '$types';
+import { createStaticGameData, type Unit, type Equipment, type Pet, type TownHall, type StaticGameData, type Hero, type UnitType } from '$shared/gameData';
 import { GameDataSchema, type GameData as GameDataType, type GameDataUnit } from './schema';
 
 export type GameDataSettings = {
@@ -22,60 +21,12 @@ type GetUnitsOptions = {
 	type?: UnitType;
 };
 
-export class GameData {
+export class GameData implements StaticGameData {
 	private server: Server;
 	private log: Logger;
 	private settings: GameDataSettings;
 
-	/** Game units static data */
-	public units: Unit[] = [];
-	/** Game equipment static data */
-	public equipment: Equipment[] = [];
-	/** Game pets static data */
-	public pets: Pet[] = [];
-	/** Game town halls static data */
-	public townHalls: TownHall[] = [];
-	/** Game heroes static data */
-	public heroes: Hero[] = [];
-
-	/**
-	 * Cached map of valid troop names to their database IDs.
-	 * NOTE: use `this.units` filtered by type if you need the full {@link Unit} object.
-	 */
-	public troopNames = new Map<string, number>();
-	/**
-	 * Cached map of valid spell names to their database IDs.
-	 * NOTE: use `this.units` filtered by type if you need the full {@link Unit} object.
-	 */
-	public spellNames = new Map<string, number>();
-	/**
-	 * Cached map of valid siege machine names to their database IDs.
-	 * NOTE: use `this.units` filtered by type if you need the full {@link Unit} object.
-	 */
-	public siegeNames = new Map<string, number>();
-	/**
-	 * Cached map of valid equipment names to their database IDs.
-	 * NOTE: use `this.equipment` if you need the full {@link Equipment} object.
-	 */
-	public equipmentNames = new Map<string, number>();
-	/**
-	 * Cached map of valid pet names to their database IDs.
-	 * NOTE: use `this.pets` if you need the full {@link Pet} object.
-	 */
-	public petNames = new Map<string, number>();
-	/**
-	 * Cached set of valid town halls (numeric value).
-	 * NOTE: use `this.townHalls` if you need the full {@link TownHall} object.
-	 */
-	public validTownHalls = new Set<number>();
-
-	/** Reverse lookup maps: URL slug → canonical display name */
-	public troopSlugs = new Map<string, string>();
-	public spellSlugs = new Map<string, string>();
-	public siegeSlugs = new Map<string, string>();
-	public equipmentSlugs = new Map<string, string>();
-	public petSlugs = new Map<string, string>();
-	public heroSlugs = new Map<string, string>();
+	private _data: StaticGameData | undefined;
 
 	constructor(server: Server, settings: GameDataSettings = {}) {
 		this.server = server;
@@ -90,9 +41,50 @@ export class GameData {
 	 * Approximate RAM usage: ~185KB (at time of this commit). But unless big schema
 	 * changes happen in theory this shouldn't ever drastically increase.
 	 */
-	public get data(): StaticGameData {
-		const { units, equipment, pets, townHalls, heroes } = this;
-		return { units, equipment, pets, townHalls, heroes };
+	private get data(): StaticGameData {
+		if (!this._data) {
+			throw new Error('Game data accessed before being loaded');
+		}
+		return this._data;
+	}
+
+	/** Game units static data */
+	public get units() {
+		return this.data.units;
+	}
+
+	/** Game town halls static data */
+	public get townHalls() {
+		return this.data.townHalls;
+	}
+
+	/** Game equipment static data */
+	public get equipment() {
+		return this.data.equipment;
+	}
+
+	/** Game pets static data */
+	public get pets() {
+		return this.data.pets;
+	}
+
+	/** Game heroes static data */
+	public get heroes() {
+		return this.data.heroes;
+	}
+
+	/** Game units static data, grouped by type */
+	public get unitsByType() {
+		return this.data.unitsByType;
+	}
+
+	/**
+	 * Indexed lookups over the static data above.
+	 *
+	 * This is the same index the client builds from app state, so lookups read identically on both sides.
+	 */
+	public get index() {
+		return this.data.index;
 	}
 
 	/**
@@ -142,47 +134,17 @@ export class GameData {
 	}
 
 	/**
-	 * Loads game data from the database into local map/set caches.
+	 * Loads game data from the database and indexes it.
 	 * Intended to be ran after `sync` has occurred.
 	 */
 	public async loadData() {
-		this.units = await this.getUnitsData();
-		this.equipment = await this.getEquipmentData();
-		this.pets = await this.getPetsData();
-		this.townHalls = await this.getTownHallsData();
-		this.heroes = await this.getHeroesData();
-
-		for (const unit of this.units) {
-			const slug = encodeUnitName(unit.name);
-			switch (unit.type) {
-				case 'Troop':
-					this.troopNames.set(unit.name, unit.id);
-					this.troopSlugs.set(slug, unit.name);
-					break;
-				case 'Spell':
-					this.spellNames.set(unit.name, unit.id);
-					this.spellSlugs.set(slug, unit.name);
-					break;
-				case 'Siege':
-					this.siegeNames.set(unit.name, unit.id);
-					this.siegeSlugs.set(slug, unit.name);
-					break;
-			}
-		}
-		for (const eq of this.equipment) {
-			this.equipmentNames.set(eq.name, eq.id);
-			this.equipmentSlugs.set(encodeUnitName(eq.name), eq.name);
-		}
-		for (const pet of this.pets) {
-			this.petNames.set(pet.name, pet.id);
-			this.petSlugs.set(encodeUnitName(pet.name), pet.name);
-		}
-		for (const hero of this.heroes) {
-			this.heroSlugs.set(encodeUnitName(hero.name), hero.name);
-		}
-		for (const th of this.townHalls) {
-			this.validTownHalls.add(th.level);
-		}
+		this._data = createStaticGameData({
+			units: await this.getUnitsData(),
+			equipment: await this.getEquipmentData(),
+			pets: await this.getPetsData(),
+			townHalls: await this.getTownHallsData(),
+			heroes: await this.getHeroesData(),
+		});
 	}
 
 	private async syncHeroes(db: Database, data: GameDataType) {

@@ -24,7 +24,7 @@ export function generateLink(army: ArmyModel): string {
 	function buildHeroesStr(heroes: Record<string, { pet?: PetModel; eq1?: EquipmentModel; eq2?: EquipmentModel }>) {
 		return Object.entries(heroes)
 			.reduce<string[]>((prev, [name, hero]) => {
-				const heroData = army.gameData.heroes.find((hero) => hero.name === name);
+				const heroData = army.gameData.index.heroes.byName(name);
 				if (!heroData) {
 					throw new Error(`Unknown hero "${name}"`);
 				}

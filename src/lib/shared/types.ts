@@ -1,4 +1,5 @@
 import type { Component, ComponentProps } from 'svelte';
+import type { RawGameData, StaticGameData } from '$shared/gameData';
 import type { HTTPApi } from '$shared/http';
 import { BANNERS, VALID_UNIT_HOME } from '$shared/utils';
 
@@ -83,141 +84,8 @@ export type Session = {
 	createdAt: Date;
 };
 
-export type TownHall = {
-	level: number;
-	/** Max barracks level at this town hall */
-	maxBarracks: number;
-	/** Max dark barracks level at this town hall - null means not unlocked yet. */
-	maxDarkBarracks: number | null;
-	/** Max laboratory level at this town hall - null means not unlocked yet. */
-	maxLaboratory: number | null;
-	/** Max spell factory level at this town hall - null means not unlocked yet. */
-	maxSpellFactory: number | null;
-	/** Max dark spell factory level at this town hall - null means not unlocked yet. */
-	maxDarkSpellFactory: number | null;
-	/** Max workshop level at this town hall - null means not unlocked yet. */
-	maxWorkshop: number | null;
-	/** Max clan castle level at this town hall - null means not unlocked yet. */
-	maxCc: number | null;
-	/** Max blacksmith level at this town hall - null means not unlocked yet. */
-	maxBlacksmith: number | null;
-	/** Max pet house level at this town hall - null means not unlocked yet. */
-	maxPetHouse: number | null;
-	/**
-	 * Max level per hero at this town hall.
-	 * At a lower town hall, this may be fully or partially empty (since some heroes may not be unlocked).
-	 */
-	heroMaxLevels: Partial<Record<string, number>>;
-	/** Max available troops at this town hall (assuming max army camp). */
-	troopCapacity: number;
-	/** Max available spells at this town hall (assuming max spell factory). */
-	spellCapacity: number;
-	/** Max available siege machines at this town hall (assuming max workshop). */
-	siegeCapacity: number;
-	/** TODO: document */
-	ccLaboratoryCap: number;
-	/** Max available clan castle troops at this town hall (assuming max clan castle). */
-	ccTroopCapacity: number;
-	/** Max available clan castle spells at this town hall (assuming max clan castle). */
-	ccSpellCapacity: number;
-	/** Max available clan castle siege machines at this town hall (assuming max clan castle). */
-	ccSiegeCapacity: number;
-};
-
-export type UnitType = 'Troop' | 'Siege' | 'Spell';
 export type UnitHome = (typeof VALID_UNIT_HOME)[number];
 
-export type Hero = {
-	name: string;
-	clashId: number;
-	order: number;
-};
-
-export type BlackSmithLevel = {
-	id: number;
-	level: number;
-	maxCommon: number;
-	maxEpic: number;
-};
-export type UnitLevel = {
-	id: number;
-	unitId: number;
-	level: number;
-	/**
-	 * Min production building level required to unlock this unit level.
-	 * Building is determined by `Unit.productionBuilding` (Barrack, Spell Factory, Workshop, etc...).
-	 * A null value means this level is not gated by a production building.
-	 */
-	buildingLevel: number | null;
-	/**
-	 * Min laboratory level required to upgrade to this unit level.
-	 * A null value generally means level 1 (auto-unlocked when the unit itself is unlocked).
-	 */
-	laboratoryLevel: number | null;
-};
-export type EquipmentLevel = {
-	equipmentId: number;
-	level: number;
-	/**
-	 * Min blacksmith required to unlock this equipment level.
-	 * A null value means no specific blacksmith level required.
-	 */
-	blacksmithLevel: number | null;
-};
-export type PetLevel = {
-	id: number;
-	petId: number;
-	level: number;
-	/**
-	 * Min pet house level required to unlock this pet level.
-	 * A null value means no specific pet house level required.
-	 */
-	petHouseLevel: number | null;
-};
-
-export type Unit = {
-	/** ID of the unit in the `units` table */
-	id: number;
-	type: UnitType;
-	name: string;
-	clashId: number;
-	order: number;
-	housingSpace: number;
-	/**
-	 * Which building produces this unit (e.g. Barrack, Spell Factory, etc...).
-	 */
-	productionBuilding: string;
-	/**
-	 * True for super troop variants (e.g. Super Barbarian).
-	 * Max level mirrors the regular variant.
-	 */
-	isSuper: boolean;
-	isFlying: boolean;
-	isJumper: boolean;
-	airTargets: boolean;
-	groundTargets: boolean;
-	levels: UnitLevel[];
-};
-export type Equipment = {
-	/** ID of the hero equipment in the `equipment` table */
-	id: number;
-	/** Which hero this equipment can be applied to */
-	hero: string;
-	name: string;
-	clashId: number;
-	order: number;
-	/** True for epic-tier equipment. */
-	epic: boolean;
-	levels: EquipmentLevel[];
-};
-export type Pet = {
-	/** ID of the pet in the `pets` table */
-	id: number;
-	name: string;
-	clashId: number;
-	order: number;
-	levels: PetLevel[];
-};
 export type Guide = {
 	/** ID of the guide in the `army_guides` table */
 	id: number;
@@ -226,14 +94,6 @@ export type Guide = {
 	youtubeUrl: string | null;
 	createdTime: Date;
 	updatedTime: Date;
-};
-
-export type StaticGameData = {
-	units: Unit[];
-	townHalls: TownHall[];
-	equipment: Equipment[];
-	pets: Pet[];
-	heroes: Hero[];
 };
 
 type UserUtils = {
@@ -246,13 +106,9 @@ type UserUtils = {
 
 export type AppState = {
 	http: HTTPApi;
-	// Frequently used data (cache)
-	units: Unit[];
-	townHalls: TownHall[];
-	heroes: Hero[];
-	heroNames: string[];
-	equipment: Equipment[];
-	pets: Pet[];
+	/** Static game data (cache) */
+	gameData: StaticGameData;
+	updateGameData(data: RawGameData): void;
 	user: (User & UserUtils) | null;
 	// Modals
 	modals: Modal[];

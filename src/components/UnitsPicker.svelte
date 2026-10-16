@@ -2,8 +2,9 @@
 	import { getContext, untrack } from 'svelte';
 	import { ArmyModel } from '$models/Army.svelte';
 	import { UnitModel } from '$models/Unit.svelte';
+	import type { Unit, UnitType } from '$shared/gameData';
 	import { HOLD_ADD_SPEED } from '$shared/utils';
-	import type { AppState, Unit, UnitType, UnitHome } from '$types';
+	import type { AppState, UnitHome } from '$types';
 	import UnitDisplay from './UnitDisplay.svelte';
 
 	type TitleOptions = {
@@ -22,7 +23,7 @@
 
 	const selectedUnits = $derived(housedIn === 'armyCamp' ? model.units : model.ccUnits);
 	const capacity = $derived(housedIn === 'armyCamp' ? model.capacity : model.ccCapacity);
-	const allUnits = $derived(app.units.filter((u) => u.type === type));
+	const allUnits = $derived(app.gameData.unitsByType[type]);
 	const sortedUnits = $derived([...allUnits.filter((u) => !u.isSuper), ...allUnits.filter((u) => u.isSuper)]);
 	const heading = $derived(`Select ${type === 'Troop' ? 'troops' : type === 'Siege' ? 'siege machine' : 'spells'}`);
 
