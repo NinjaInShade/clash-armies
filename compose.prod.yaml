@@ -1,7 +1,7 @@
 name: clash-armies
 services:
   app:
-    image: ghcr.io/ninjainshade/clash-armies:${APP_VERSION}
+    image: ghcr.io/ninjainshade/clash-armies:${APP_VERSION:?}
     restart: unless-stopped
     depends_on:
       db:
@@ -9,7 +9,7 @@ services:
         condition: service_healthy
     env_file: .env
     ports:
-      - '127.0.0.1:${HOST_PORT}:3000'
+      - '127.0.0.1:${HOST_PORT:?}:3000'
     logging:
       driver: json-file
       options:
@@ -19,9 +19,9 @@ services:
     image: mariadb:11.3
     restart: unless-stopped
     environment:
-      MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
-      MARIADB_USER: ${DB_USER}
-      MARIADB_PASSWORD: ${DB_PASSWORD}
+      MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:?}
+      MARIADB_USER: ${DB_USER:?}
+      MARIADB_PASSWORD: ${DB_PASSWORD:?}
       MARIADB_DATABASE: clash-armies
     volumes:
       - clash-armies-db:/var/lib/mysql
