@@ -21,7 +21,7 @@
 		"build": "vite build",
 		"build:dev-image": "docker build -t clash-armies:devel .",
 		"build:db-types": "scripts/build-db-types.sh",
-		"test:before": "docker compose --env-file=.env.test --file=compose.test.yaml down -v && docker compose --env-file=.env.test --file=compose.test.yaml up -d",
+		"test:before": "docker compose --env-file=.env.test --file=compose.test.yaml up -d",
 		"test:coverage": "pnpm run test:before && vitest run --coverage",
 		"test:ui": "pnpm run test:before && vitest --ui --coverage.enabled=true",
 		"test": "pnpm run test:before && vitest run",

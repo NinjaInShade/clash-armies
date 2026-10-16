@@ -54,9 +54,13 @@ export const helpers = {
 	},
 };
 
-export async function waitForDatabase(db: Database): Promise<void> {
-	const maxAttempts = 20;
-	const delayMs = 500;
+type WaitForDatabaseOpts = {
+	maxAttempts?: number;
+	delayMs?: number;
+};
+
+export async function waitForDatabase(db: Database, opts: WaitForDatabaseOpts = {}): Promise<void> {
+	const { maxAttempts = 20, delayMs = 500 } = opts;
 
 	for (let attempt = 1; attempt <= maxAttempts; attempt++) {
 		try {

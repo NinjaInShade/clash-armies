@@ -47,6 +47,7 @@ export default defineConfig((env) => {
 	return {
 		test: {
 			include: ['tests/app/**/*.ts'],
+			globalSetup: ['tests/globalSetup.ts'],
 			coverage: {
 				exclude: ['build/**', 'scripts/**', 'discord/**', 'svelte.config.js', ...coverageConfigDefaults.exclude],
 			},
