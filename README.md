@@ -149,7 +149,7 @@ If you need help running Clash Armies locally, or have suggestions on improving 
 
 - `npm` >= 11.7.0
 - `pnpm` >= 11.0.3
-- `node` >= 26.3.0
+- `node` >= 26.12.0
 - `docker` >= 29.1.3
 - `docker compose` >= 5.1.3
 
