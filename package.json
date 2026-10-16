@@ -55,7 +55,7 @@
 		"mysql2": "^3.24.6",
 		"uuid": "^14.0.1",
 		"zeed-dom": "0.18.0",
-		"zod": "4.4.3"
+		"zod": "4.6.7"
 	},
 	"devDependencies": {
 		"@eslint/js": "^10.0.1",
