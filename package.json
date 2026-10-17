@@ -27,7 +27,9 @@
 		"test": "pnpm run test:before && vitest run",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json src",
 		"fmt": "oxfmt",
-		"fmt:check": "oxfmt --check"
+		"fmt:check": "oxfmt --check",
+		"lint": "eslint --fix",
+		"lint:check": "eslint"
 	},
 	"dependencies": {
 		"@floating-ui/dom": "^1.8.0",
