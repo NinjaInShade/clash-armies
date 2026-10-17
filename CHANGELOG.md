@@ -1,3 +1,13 @@
+## [0.13.0] - 2026-10-17
+
+- Fix account menu not closing after navigating to profile
+- Format army downloads to include comma separators
+- Improve army list pages performance by a factor of 4-6x
+- Improve app performance via unified indexed lookup API
+- Improve responsiveness of app docker startup
+- Improve test suite performance
+- Update project dependencies
+
 ## [0.12.6] - 2026-10-09
 
 - Add new Portal Pendant equipment
