@@ -852,6 +852,45 @@ describe('Fetching', function () {
 		assert.deepEqual(page3.map((a) => a.name).toSorted(), [names[4]]);
 	});
 
+	it('Should sort and paginate armies by score', async function () {
+		const barbarianId = UnitModel.requireTroopByName('Barbarian', gameData).id;
+		const units = [{ home: 'armyCamp' as const, unitId: barbarianId, amount: 10 }];
+		const lowId = await server.army.saveArmy(req, makeData({ name: 'score-low', townHall: 16, units }));
+		const midId = await server.army.saveArmy(req, makeData({ name: 'score-mid', townHall: 16, units }));
+		const highId = await server.army.saveArmy(req, makeData({ name: 'score-high', townHall: 16, units }));
+		await server.army.saveVote(req, { armyId: lowId, vote: -1 });
+		await server.army.saveVote(req, { armyId: midId, vote: 1 });
+		await server.army.saveVote(req, { armyId: highId, vote: 1 });
+		await server.army.saveVote(req2, { armyId: highId, vote: 1 });
+
+		const { armies: page1, total: total1 } = await server.army.getArmies(req, { sort: 'score', limit: 2, page: 1 });
+		const { armies: page2, total: total2 } = await server.army.getArmies(req, { sort: 'score', limit: 2, page: 2 });
+
+		assert.equal(total1, 3);
+		assert.equal(total2, 3);
+
+		assert.deepEqual(
+			page1.map((a) => a.name),
+			['score-high', 'score-mid']
+		);
+		assert.deepEqual(
+			page2.map((a) => a.name),
+			['score-low']
+		);
+
+		assert.isAbove(page1[0].score, page1[1].score);
+		assert.isAbove(page1[1].score, page2[0].score);
+
+		assert.deepEqual(
+			page1.map((a) => a.votes),
+			[2, 1]
+		);
+		assert.deepEqual(
+			page2.map((a) => a.votes),
+			[-1]
+		);
+	});
+
 	it('Should default to page 1 when limit is set without a page', async function () {
 		const barbarianId = UnitModel.requireTroopByName('Barbarian', gameData).id;
 		await server.army.saveArmy(req, makeData({ name: 'page-default-1', townHall: 16, units: [{ home: 'armyCamp', unitId: barbarianId, amount: 10 }] }));
