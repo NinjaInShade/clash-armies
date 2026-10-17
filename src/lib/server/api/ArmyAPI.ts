@@ -1,6 +1,6 @@
 import type { RequestEvent } from '@sveltejs/kit';
 import { generateJSON, generateHTML } from '@tiptap/html';
-import { sql } from 'kysely';
+import { sql, type Expression } from 'kysely';
 import { parseHTML } from 'zeed-dom';
 import z from 'zod';
 import type { Army } from '#models/Army.svelte.ts';
@@ -109,6 +109,13 @@ type SaveVoteOptions = {
 	vote: number;
 };
 
+type ArmyScoreSQLExpressions = {
+	votes: Expression<unknown>;
+	pageViews: Expression<unknown>;
+	copyLinkClicks: Expression<unknown>;
+	openLinkClicks: Expression<unknown>;
+};
+
 // Each field is it's own zod schema and not one `z.object` so we can parse each field independently.
 const armyListQueryFieldSchemas = {
 	search: z.string().trim().min(1).max(MAX_FILTER_SEARCH_LENGTH),
@@ -202,38 +209,26 @@ export class ArmyAPI {
 	}
 
 	public async getArmies(req: RequestEvent, options: GetArmiesOptions = {}) {
-		const {
-			ids,
-			username,
-			townHall,
-			hero,
-			equipments = [],
-			pets = [],
-			units = [],
-			search,
-			attackType,
-			hasGuide,
-			includeGuideContent = false,
-			includeFullComments = false,
-			noSuperTroops,
-			noEpicEquipment,
-			hasClanCastle,
-			hasEquipment,
-			hasPets,
-			tags = [],
-			sort,
-			page,
-			limit = 500,
-		} = options;
+		const { includeGuideContent = false, includeFullComments = false } = options;
 		const userId = req.locals.user?.id ?? null;
-		const weights = this.metrics.metricWeights;
 
-		let query = this.server.db
+		// For performance, fetching happens in two steps:
+		// (1) Filter, sort and paginate the armies, resolving just the ids of the matching page.
+		// (2) Query and build the full army data (units, comments, metrics, etc...) - for only those ids.
+		// Doing it all in one query means every JSON aggregate is built for *every* army, even when we return one (maybe filtered) page.
+		const { ids: pageIds, total } = await this.getArmyIds(options);
+
+		if (!pageIds.length) {
+			return { armies: [], total };
+		}
+
+		const rows = await this.server.db
 			.selectFrom('armies as a')
 			.leftJoin(
 				(eb) =>
 					eb
 						.selectFrom('army_units as au')
+						.where('au.armyId', 'in', pageIds)
 						.groupBy('au.armyId')
 						.select([
 							'au.armyId',
@@ -256,6 +251,7 @@ export class ArmyAPI {
 				(eb) =>
 					eb
 						.selectFrom('army_equipment as ae')
+						.where('ae.armyId', 'in', pageIds)
 						.groupBy('ae.armyId')
 						.select([
 							'ae.armyId',
@@ -276,6 +272,7 @@ export class ArmyAPI {
 				(eb) =>
 					eb
 						.selectFrom('army_pets as ap')
+						.where('ap.armyId', 'in', pageIds)
 						.groupBy('ap.armyId')
 						.select([
 							'ap.armyId',
@@ -298,6 +295,7 @@ export class ArmyAPI {
 					eb
 						.selectFrom('army_comments as ac')
 						.leftJoin('users as u', 'u.id', 'ac.createdBy')
+						.where('ac.armyId', 'in', pageIds)
 						.groupBy('ac.armyId')
 						.select((eb) => [
 							'ac.armyId',
@@ -326,6 +324,7 @@ export class ArmyAPI {
 				(eb) =>
 					eb
 						.selectFrom('army_tags as art')
+						.where('art.armyId', 'in', pageIds)
 						.groupBy('art.armyId')
 						.select(['art.armyId', helpers.jsonAgg('art.tag', { order: 'art.tag' }).as('tags')])
 						.as('art'),
@@ -339,6 +338,7 @@ export class ArmyAPI {
 				(eb) =>
 					eb
 						.selectFrom('army_votes')
+						.where('armyId', 'in', pageIds)
 						.select((eb) => ['armyId', eb.fn.coalesce(eb.fn.sum('vote'), sql.lit(0)).as('votes')])
 						.groupBy('armyId')
 						.as('av'),
@@ -346,13 +346,102 @@ export class ArmyAPI {
 			)
 			.leftJoin('army_metrics as metric_pv', (join) => join.onRef('metric_pv.armyId', '=', 'a.id').on('metric_pv.name', '=', 'page-view'))
 			.leftJoin('army_metrics as metric_cl', (join) => join.onRef('metric_cl.armyId', '=', 'a.id').on('metric_cl.name', '=', 'copy-link-click'))
-			.leftJoin('army_metrics as metric_ol', (join) => join.onRef('metric_ol.armyId', '=', 'a.id').on('metric_ol.name', '=', 'open-link-click'));
+			.leftJoin('army_metrics as metric_ol', (join) => join.onRef('metric_ol.armyId', '=', 'a.id').on('metric_ol.name', '=', 'open-link-click'))
+			.where('a.id', 'in', pageIds)
+			.groupBy('a.id')
+			.selectAll('a')
+			.select((eb) => [
+				this.armyScoreSQL({
+					votes: sql.ref('av.votes'),
+					pageViews: sql.ref('metric_pv.value'),
+					copyLinkClicks: sql.ref('metric_cl.value'),
+					openLinkClicks: sql.ref('metric_ol.value'),
+				}).as('score'),
+				eb.cast(eb.fn.coalesce('av.votes', sql.lit(0)), 'integer').as('votes'),
+				eb.cast(eb.fn.coalesce('metric_pv.value', sql.lit(0)), 'integer').as('pageViews'),
+				eb.cast(eb.fn.coalesce('metric_ol.value', sql.lit(0)), 'integer').as('openLinkClicks'),
+				eb.cast(eb.fn.coalesce('metric_cl.value', sql.lit(0)), 'integer').as('copyLinkClicks'),
+				'u.username',
+				'au.units',
+				'ae.equipment',
+				'ap.pets',
+				'ac.comments',
+				eb.cast(eb.fn.coalesce('ac.commentsCount', sql.lit(0)), 'integer').as('commentsCount'),
+				'art.tags',
+				sql<boolean>`(ag.id IS NOT NULL)`.as('hasGuide'),
+				(includeGuideContent
+					? sql<Army['guide']>`IF(ag.id, JSON_OBJECT(
+						'id', ag.id,
+						'textContent', ag.textContent,
+						'youtubeUrl', ag.youtubeUrl
+					), NULL)`
+					: sql<Army['guide']>`NULL`
+				).as('guide'),
+				sql<boolean>`(sa.id IS NOT NULL)`.as('userBookmarked'),
+				eb.fn.coalesce('uv.vote', sql.lit(0)).as('userVote'),
+			])
+			.execute();
+
+		// Restore the order resolved in the first step
+		const rowsById = new Map(rows.map((row) => [row.id, row]));
+		const armies = pageIds.map((id) => rowsById.get(id)).filter((army) => army !== undefined);
+
+		for (const army of armies) {
+			army.equipment ??= [];
+			army.pets ??= [];
+			army.tags ??= [];
+			army.comments ??= [];
+
+			for (const comment of army.comments) {
+				// JSON agg objects lose date type casting
+				comment.createdTime = new Date(`${comment.createdTime}Z`);
+				comment.updatedTime = new Date(`${comment.updatedTime}Z`);
+			}
+
+			// @ts-expect-error data is 0/1 number when it's queried from the database // TODO: I think TINYINT(1) should just be returning a boolean?
+			army.userBookmarked = army.userBookmarked === 1;
+			// @ts-expect-error data is 0/1 number when it's queried from the database // TODO: I think TINYINT(1) should just be returning a boolean?
+			army.hasGuide = army.hasGuide === 1;
+		}
+
+		return { armies, total };
+	}
+
+	/**
+	 * Returns the ids of armies matching the {@link getArmies} options, in sorted order, along with the total number of matches.
+	 *
+	 * Kept separate from fetching the full army data, so that heavier work only happens for the armies actually returned.
+	 */
+	private async getArmyIds(options: GetArmiesOptions) {
+		const {
+			ids,
+			username,
+			townHall,
+			hero,
+			equipments = [],
+			pets = [],
+			units = [],
+			search,
+			attackType,
+			hasGuide,
+			noSuperTroops,
+			noEpicEquipment,
+			hasClanCastle,
+			hasEquipment,
+			hasPets,
+			tags = [],
+			sort,
+			page,
+			limit = 500,
+		} = options;
+
+		let query = this.server.db.selectFrom('armies as a');
 
 		if (ids && ids.length) {
 			query = query.where('a.id', 'in', ids);
 		}
 		if (username) {
-			query = query.where('u.username', '=', username);
+			query = query.where((eb) => eb('a.createdBy', 'in', eb.selectFrom('users as u2').where('u2.username', '=', username).select('u2.id')));
 		}
 		if (townHall) {
 			query = query.where('a.townHall', '=', townHall);
@@ -444,7 +533,7 @@ export class ArmyAPI {
 			);
 		}
 		if (hasGuide) {
-			query = query.where('ag.id', 'is not', null);
+			query = query.where((eb) => eb.exists(eb.selectFrom('army_guides as ag2').whereRef('ag2.armyId', '=', 'a.id').select('ag2.id')));
 		}
 		if (noSuperTroops) {
 			query = query.where((eb) => {
@@ -479,10 +568,16 @@ export class ArmyAPI {
 			});
 		}
 		if (hasEquipment !== undefined) {
-			query = query.where('ae.armyId', hasEquipment ? 'is not' : 'is', null);
+			query = query.where((eb) => {
+				const hasAnyEquipment = eb.exists(eb.selectFrom('army_equipment as ae2').whereRef('ae2.armyId', '=', 'a.id').select('ae2.armyId'));
+				return hasEquipment ? hasAnyEquipment : eb.not(hasAnyEquipment);
+			});
 		}
 		if (hasPets !== undefined) {
-			query = query.where('ap.armyId', hasPets ? 'is not' : 'is', null);
+			query = query.where((eb) => {
+				const hasAnyPets = eb.exists(eb.selectFrom('army_pets as ap2').whereRef('ap2.armyId', '=', 'a.id').select('ap2.armyId'));
+				return hasPets ? hasAnyPets : eb.not(hasAnyPets);
+			});
 		}
 		if (tags.length) {
 			const uniqueTags = Array.from(new Set(tags));
@@ -499,92 +594,63 @@ export class ArmyAPI {
 		}
 
 		if (sort === 'score') {
-			// `score` shows a TS error but is a valid column - it's just not yet selected in Kysely's eyes.
-			// Putting the `orderBy` after `select` would fix it but you can't simply chain it without losing
-			// type safety of your results (it seems possible with weird workarounds, but I'd rather not at this time).
-			query = query.orderBy('score', 'desc').orderBy('createdTime', 'desc');
-		} else {
-			query = query.orderBy('createdTime', 'desc');
+			query = query.orderBy(
+				this.armyScoreSQL({
+					votes: sql`(SELECT SUM(vote) FROM army_votes WHERE armyId = a.id)`,
+					pageViews: sql`(SELECT value FROM army_metrics WHERE armyId = a.id AND name = 'page-view')`,
+					copyLinkClicks: sql`(SELECT value FROM army_metrics WHERE armyId = a.id AND name = 'copy-link-click')`,
+					openLinkClicks: sql`(SELECT value FROM army_metrics WHERE armyId = a.id AND name = 'open-link-click')`,
+				}),
+				'desc'
+			);
 		}
-		query = query.orderBy('a.id', 'asc');
+		query = query.orderBy('a.createdTime', 'desc').orderBy('a.id', 'asc');
 
 		if (limit) {
 			query = query.limit(limit).offset(((page ?? 1) - 1) * limit);
 		}
 
-		const armies = await query
-			.groupBy('a.id')
-			.selectAll('a')
+		const rows = await query
 			.select((eb) => [
-				// TODO: should not have to CAST, needs investigating
-				sql<number>`CAST((
-					(COALESCE(av.votes, 0) * ${weights.vote}) +
-					(COALESCE(metric_pv.value, 0) * ${weights.pageView}) +
-					(COALESCE(metric_cl.value, 0) * ${weights.copyLinkClick}) +
-					(COALESCE(metric_ol.value, 0) * ${weights.openLinkClick})
-				) AS INTEGER)`.as('score'),
-				eb.cast(eb.fn.coalesce('av.votes', sql.lit(0)), 'integer').as('votes'),
-				eb.cast(eb.fn.coalesce('metric_pv.value', sql.lit(0)), 'integer').as('pageViews'),
-				eb.cast(eb.fn.coalesce('metric_ol.value', sql.lit(0)), 'integer').as('openLinkClicks'),
-				eb.cast(eb.fn.coalesce('metric_cl.value', sql.lit(0)), 'integer').as('copyLinkClicks'),
-				'u.username',
-				'au.units',
-				'ae.equipment',
-				'ap.pets',
-				'ac.comments',
-				eb.cast(eb.fn.coalesce('ac.commentsCount', sql.lit(0)), 'integer').as('commentsCount'),
-				'art.tags',
-				sql<boolean>`(ag.id IS NOT NULL)`.as('hasGuide'),
-				(includeGuideContent
-					? sql<Army['guide']>`IF(ag.id, JSON_OBJECT(
-						'id', ag.id,
-						'textContent', ag.textContent,
-						'youtubeUrl', ag.youtubeUrl
-					), NULL)`
-					: sql<Army['guide']>`NULL`
-				).as('guide'),
-				sql<boolean>`(sa.id IS NOT NULL)`.as('userBookmarked'),
-				eb.fn.coalesce('uv.vote', sql.lit(0)).as('userVote'),
+				'a.id',
 				// Total rows matching the filters *before* the LIMIT/OFFSET are applied above.
 				// Uses window function to prevent running another query, with the trade-off that every row will get a `total` field.
 				eb.fn.countAll<number>().over().as('total'),
 			])
 			.execute();
 
-		let total = armies[0]?.total ?? 0;
+		let total = rows[0]?.total ?? 0;
 
 		// The window function only produces a total when at least one row comes back, so an offset past
 		// the end (stale bookmark, armies since deleted, etc...) would report zero and leave the client
 		// with no pagination controls to get back to a valid page.
-		if (!armies.length && limit && (page ?? 1) > 1) {
+		if (!rows.length && limit && (page ?? 1) > 1) {
 			const counted = await query
 				.clearLimit()
 				.clearOffset()
 				.clearOrderBy()
-				.select((eb) => eb.fn.count<number>('a.id').distinct().as('total'))
+				.select((eb) => eb.fn.countAll<number>().as('total'))
 				.executeTakeFirst();
 			total = Number(counted?.total ?? 0);
 		}
 
-		for (const army of armies) {
-			army.equipment ??= [];
-			army.pets ??= [];
-			army.tags ??= [];
-			army.comments ??= [];
+		return { ids: rows.map((row) => row.id), total };
+	}
 
-			for (const comment of army.comments) {
-				// JSON agg objects lose date type casting
-				comment.createdTime = new Date(`${comment.createdTime}Z`);
-				comment.updatedTime = new Date(`${comment.updatedTime}Z`);
-			}
-
-			// @ts-expect-error data is 0/1 number when it's queried from the database // TODO: I think TINYINT(1) should just be returning a boolean?
-			army.userBookmarked = army.userBookmarked === 1;
-			// @ts-expect-error data is 0/1 number when it's queried from the database // TODO: I think TINYINT(1) should just be returning a boolean?
-			army.hasGuide = army.hasGuide === 1;
-		}
-
-		return { armies, total };
+	/**
+	 * Army score used for sorting by score, as a weighted sum of an army's votes and metrics.
+	 *
+	 * Takes each input as a SQL expression so it can be computed from both joined columns or subqueries.
+	 */
+	private armyScoreSQL(values: ArmyScoreSQLExpressions) {
+		const weights = this.metrics.metricWeights;
+		// TODO: should not have to CAST, needs investigating
+		return sql<number>`CAST((
+			(COALESCE(${values.votes}, 0) * ${weights.vote}) +
+			(COALESCE(${values.pageViews}, 0) * ${weights.pageView}) +
+			(COALESCE(${values.copyLinkClicks}, 0) * ${weights.copyLinkClick}) +
+			(COALESCE(${values.openLinkClicks}, 0) * ${weights.openLinkClick})
+		) AS INTEGER)`;
 	}
 
 	public async getSavedArmies(req: RequestEvent, options: GetSavedArmiesOptions) {
