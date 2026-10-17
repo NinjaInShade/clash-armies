@@ -34,14 +34,14 @@ export const helpers = {
 	ago(interval: string) {
 		return sql<Date>`NOW() - INTERVAL ${sql.raw(interval)}`;
 	},
-	jsonAgg(col: string, orderBy?: { order: string; dir?: 'ASC' | 'DESC' }) {
+	jsonAgg<T = unknown>(col: string, orderBy?: { order: string; dir?: 'ASC' | 'DESC' }) {
 		const orderByClause = orderBy ? sql` ORDER BY ${sql.ref(orderBy.order)} ${sql.raw(orderBy.dir ?? 'ASC')}` : sql``;
-		return sql`JSON_ARRAYAGG(${sql.ref(col)}${orderByClause})`;
+		return sql<T[]>`JSON_ARRAYAGG(${sql.ref(col)}${orderByClause})`;
 	},
-	jsonAggObj(obj: Record<string, string>, orderBy?: { order: string; dir?: 'ASC' | 'DESC' }) {
+	jsonAggObj<T = unknown>(obj: Record<string, string>, orderBy?: { order: string; dir?: 'ASC' | 'DESC' }) {
 		const pairs = Object.entries(obj).map(([key, col]) => sql`'${sql.raw(key)}', ${sql.ref(col)}`);
 		const orderByClause = orderBy ? sql` ORDER BY ${sql.ref(orderBy.order)} ${sql.raw(orderBy.dir ?? 'ASC')}` : sql``;
-		return sql`JSON_ARRAYAGG(JSON_OBJECT(${sql.join(pairs, sql`,`)})${orderByClause})`;
+		return sql<T[]>`JSON_ARRAYAGG(JSON_OBJECT(${sql.join(pairs, sql`,`)})${orderByClause})`;
 	},
 	async upsert<TB extends keyof DB & string>(db: Kysely<DB>, table: TB, rows: InsertObject<DB, TB> | InsertObject<DB, TB>[]) {
 		const data = Array.isArray(rows) ? rows : [rows];

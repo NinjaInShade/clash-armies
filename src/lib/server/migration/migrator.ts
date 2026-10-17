@@ -60,7 +60,7 @@ export async function migrate(migration: Migration, db: Database) {
 					.execute();
 				log.info(`Finished migrating step ${migration.step}`);
 			} catch (err) {
-				throw new Error(`Failed to migrate step "${migration.step}": ${err}`);
+				throw new Error(`Failed to migrate step "${migration.step}"`, { cause: err });
 			}
 		}
 	});

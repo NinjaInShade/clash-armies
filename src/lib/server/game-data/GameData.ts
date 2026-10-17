@@ -5,7 +5,19 @@ import JSON5 from 'json5';
 import type { Server } from '#server/api/Server.ts';
 import { helpers, type Database } from '#server/db.ts';
 import { logger, type Logger } from '#server/logger.ts';
-import { createStaticGameData, type Unit, type Equipment, type Pet, type TownHall, type StaticGameData, type Hero, type UnitType } from '#shared/gameData.ts';
+import {
+	createStaticGameData,
+	type Unit,
+	type Equipment,
+	type Pet,
+	type TownHall,
+	type StaticGameData,
+	type Hero,
+	type UnitType,
+	type UnitLevel,
+	type EquipmentLevel,
+	type PetLevel,
+} from '#shared/gameData.ts';
 import { GameDataSchema, type GameData as GameDataType, type GameDataUnit } from './schema';
 
 export type GameDataSettings = {
@@ -316,7 +328,7 @@ export class GameData implements StaticGameData {
 				'u.airTargets',
 				'u.groundTargets',
 				helpers
-					.jsonAggObj(
+					.jsonAggObj<UnitLevel>(
 						{
 							id: 'ul.id',
 							unitId: 'ul.unitId',
@@ -347,7 +359,7 @@ export class GameData implements StaticGameData {
 				'eq.order',
 				'eq.epic',
 				helpers
-					.jsonAggObj(
+					.jsonAggObj<EquipmentLevel>(
 						{
 							id: 'eql.id',
 							equipmentId: 'eql.equipmentId',
@@ -375,7 +387,7 @@ export class GameData implements StaticGameData {
 				'p.clashId',
 				'p.order',
 				helpers
-					.jsonAggObj(
+					.jsonAggObj<PetLevel>(
 						{
 							id: 'pl.id',
 							petId: 'pl.petId',

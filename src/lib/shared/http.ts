@@ -54,7 +54,11 @@ export class HTTPApi {
 
 			if (!response.ok) {
 				const message = 'API error';
-				throw new HTTPError(message, response.status, body?.errors);
+				let errors: APIErrors | undefined;
+				if (typeof body === 'object' && body !== null && 'errors' in body) {
+					errors = body.errors as APIErrors;
+				}
+				throw new HTTPError(message, response.status, errors);
 			}
 
 			return body as T;
@@ -62,8 +66,13 @@ export class HTTPApi {
 			if (err instanceof HTTPError) {
 				throw err;
 			}
-
-			throw new HTTPError(err.message ?? 'Network error', 0);
+			let message: string;
+			if (err instanceof Error) {
+				message = err.message;
+			} else {
+				message = 'Network error';
+			}
+			throw new HTTPError(message, 0);
 		}
 	}
 }

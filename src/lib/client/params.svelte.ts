@@ -1,5 +1,6 @@
 import { goto } from '$app/navigation';
 import { page, type ReadonlyURLSearchParams } from '$app/state';
+import { SvelteURLSearchParams } from 'svelte/reactivity';
 
 type Serializers<T> = {
 	serialize(value: T): string;
@@ -49,7 +50,7 @@ let pendingPush = false;
  * Each call still builds its own mutation/resetKeys based on previous call(s).
  */
 async function updateSearchParams(mutate: (params: URLSearchParams) => void, options: ParamStoreOptions = {}): Promise<void> {
-	const params = new URLSearchParams(currentSearchParams().toString());
+	const params = new SvelteURLSearchParams(currentSearchParams().toString());
 	mutate(params);
 	for (const key of options.resetKeys ?? []) {
 		params.delete(key);

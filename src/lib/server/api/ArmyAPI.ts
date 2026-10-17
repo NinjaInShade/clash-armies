@@ -3,7 +3,7 @@ import { generateJSON, generateHTML } from '@tiptap/html';
 import { sql, type Expression } from 'kysely';
 import { parseHTML } from 'zeed-dom';
 import z from 'zod';
-import type { Army } from '#models/Army.svelte.ts';
+import type { Army, ArmyComment, ArmyEquipment, ArmyPet, ArmyUnit } from '#models/Army.svelte.ts';
 import { GuideModel } from '#models/Guide.svelte.ts';
 import { ArmyMetricsAPI } from '#server/api/ArmyMetricsAPI.ts';
 import type { Server } from '#server/api/Server.ts';
@@ -208,7 +208,7 @@ export class ArmyAPI {
 		};
 	}
 
-	public async getArmies(req: RequestEvent, options: GetArmiesOptions = {}) {
+	public async getArmies(req: RequestEvent, options: GetArmiesOptions = {}): Promise<{ armies: Army[]; total: number }> {
 		const { includeGuideContent = false, includeFullComments = false } = options;
 		const userId = req.locals.user?.id ?? null;
 
@@ -233,7 +233,7 @@ export class ArmyAPI {
 						.select([
 							'au.armyId',
 							helpers
-								.jsonAggObj(
+								.jsonAggObj<ArmyUnit>(
 									{
 										id: 'au.id',
 										home: 'au.home',
@@ -256,7 +256,7 @@ export class ArmyAPI {
 						.select([
 							'ae.armyId',
 							helpers
-								.jsonAggObj(
+								.jsonAggObj<ArmyEquipment>(
 									{
 										id: 'ae.id',
 										equipmentId: 'ae.equipmentId',
@@ -277,7 +277,7 @@ export class ArmyAPI {
 						.select([
 							'ap.armyId',
 							helpers
-								.jsonAggObj(
+								.jsonAggObj<ArmyPet>(
 									{
 										id: 'ap.id',
 										hero: 'ap.hero',
@@ -301,7 +301,7 @@ export class ArmyAPI {
 							'ac.armyId',
 							eb.fn.count<number>('ac.id').as('commentsCount'),
 							(includeFullComments
-								? helpers.jsonAggObj(
+								? helpers.jsonAggObj<ArmyComment>(
 										{
 											id: 'ac.id',
 											armyId: 'ac.armyId',
@@ -326,7 +326,7 @@ export class ArmyAPI {
 						.selectFrom('army_tags as art')
 						.where('art.armyId', 'in', pageIds)
 						.groupBy('art.armyId')
-						.select(['art.armyId', helpers.jsonAgg('art.tag', { order: 'art.tag' }).as('tags')])
+						.select(['art.armyId', helpers.jsonAgg<string>('art.tag', { order: 'art.tag' }).as('tags')])
 						.as('art'),
 				(join) => join.onRef('art.armyId', '=', 'a.id')
 			)
@@ -357,16 +357,16 @@ export class ArmyAPI {
 					copyLinkClicks: sql.ref('metric_cl.value'),
 					openLinkClicks: sql.ref('metric_ol.value'),
 				}).as('score'),
-				eb.cast(eb.fn.coalesce('av.votes', sql.lit(0)), 'integer').as('votes'),
-				eb.cast(eb.fn.coalesce('metric_pv.value', sql.lit(0)), 'integer').as('pageViews'),
-				eb.cast(eb.fn.coalesce('metric_ol.value', sql.lit(0)), 'integer').as('openLinkClicks'),
-				eb.cast(eb.fn.coalesce('metric_cl.value', sql.lit(0)), 'integer').as('copyLinkClicks'),
+				eb.cast<number>(eb.fn.coalesce('av.votes', sql.lit(0)), 'integer').as('votes'),
+				eb.cast<number>(eb.fn.coalesce('metric_pv.value', sql.lit(0)), 'integer').as('pageViews'),
+				eb.cast<number>(eb.fn.coalesce('metric_ol.value', sql.lit(0)), 'integer').as('openLinkClicks'),
+				eb.cast<number>(eb.fn.coalesce('metric_cl.value', sql.lit(0)), 'integer').as('copyLinkClicks'),
 				'u.username',
 				'au.units',
 				'ae.equipment',
 				'ap.pets',
 				'ac.comments',
-				eb.cast(eb.fn.coalesce('ac.commentsCount', sql.lit(0)), 'integer').as('commentsCount'),
+				eb.cast<number>(eb.fn.coalesce('ac.commentsCount', sql.lit(0)), 'integer').as('commentsCount'),
 				'art.tags',
 				sql<boolean>`(ag.id IS NOT NULL)`.as('hasGuide'),
 				(includeGuideContent

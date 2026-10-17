@@ -137,7 +137,7 @@ export function pluralize(string: string, count: number, suffix = 's') {
 export function debounce<F extends (...args: Parameters<F>) => ReturnType<F>>(fn: F, ms: number) {
 	let timeoutId: ReturnType<typeof setTimeout>;
 
-	const debounced = function (this: any, ...args: Parameters<F>) {
+	const debounced = function (this: unknown, ...args: Parameters<F>) {
 		clearTimeout(timeoutId);
 		timeoutId = setTimeout(() => {
 			fn.apply(this, args);

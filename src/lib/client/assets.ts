@@ -27,12 +27,12 @@ const petURLByName = createURLByNameMap(petFiles);
 
 export function bannerImgURL(bannerName: string, variant: 'regular' | 'small' | 'large' = 'regular') {
 	const variantName = `${bannerName}${variant !== 'regular' ? `_${variant}` : ''}`;
-	return bannerURLByName.get(variantName);
+	return requireURL(bannerURLByName, variantName);
 }
 
 export function thImgURL(level: number, variant: 'regular' | 'small' | 'large' = 'regular') {
 	const variantName = `${level}${variant !== 'regular' ? `_${variant}` : ''}`;
-	return thURLByName.get(variantName);
+	return requireURL(thURLByName, variantName);
 }
 
 /**
@@ -40,22 +40,35 @@ export function thImgURL(level: number, variant: 'regular' | 'small' | 'large' =
  */
 export function unitImgURL(unitName: string, variant: 'regular' | 'small' | 'thin' = 'regular') {
 	const variantName = `${unitName}${variant !== 'regular' ? `_${variant}` : ''}`;
-	return unitURLByName.get(variantName);
+	return requireURL(unitURLByName, variantName);
 }
 
 export function heroImgURL(hero: string, variant: 'regular' | 'full-height' = 'regular') {
 	const variantName = `${hero}${variant !== 'regular' ? `_${variant}` : ''}`;
-	return heroURLByName.get(variantName);
+	return requireURL(heroURLByName, variantName);
 }
 
 export function equipmentImgURL(equipment: string, variant: 'regular' | 'small' = 'regular') {
 	const variantName = `${equipment}${variant !== 'regular' ? `_${variant}` : ''}`;
-	return equipmentURLByName.get(variantName);
+	return requireURL(equipmentURLByName, variantName);
 }
 
 export function petImgURL(pet: string, variant: 'regular' = 'regular') {
 	const variantName = `${pet}${variant !== 'regular' ? `_${variant}` : ''}`;
-	return petURLByName.get(variantName);
+	return requireURL(petURLByName, variantName);
+}
+
+/**
+ * Throws if the asset doesn't exist.
+ *
+ * Every asset that goes through this is expected to resolve (a missing one is a bug).
+ */
+function requireURL(urlByName: Map<string, string>, name: string) {
+	const url = urlByName.get(name);
+	if (!url) {
+		throw new Error(`Expected image asset "${name}" to exist`);
+	}
+	return url;
 }
 
 function createURLByNameMap(globFiles: Record<string, string>) {

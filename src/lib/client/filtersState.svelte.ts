@@ -33,7 +33,7 @@ export function countActiveFilters(filters: Filters): number {
 function serializeUnits(units: PickUnit[]): string {
 	// This can be improved - right now *every* unit gets a prefix,
 	// but we really only need to specify prefix once and group them (e.g. u1-u2-e5 -> u1-2e5)
-	let encoded: string[] = [];
+	const encoded: string[] = [];
 	for (const unit of units) {
 		encoded.push(`${unit.pickType[0]}${unit.id}`);
 	}

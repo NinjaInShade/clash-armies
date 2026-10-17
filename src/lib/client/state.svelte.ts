@@ -1,3 +1,4 @@
+import { SvelteURL } from 'svelte/reactivity';
 import Confirm from '#components/Confirm.svelte';
 import { createStaticGameData, type RawGameData } from '#shared/gameData.ts';
 import { HTTPApi } from '#shared/http.ts';
@@ -103,11 +104,11 @@ export function createAppState(initial: InitialAppState) {
 		async requireAuth() {
 			const loc = window.location;
 
-			const redirectURL = new URL(`${loc.pathname}${loc.search}`, loc.origin);
+			const redirectURL = new SvelteURL(`${loc.pathname}${loc.search}`, loc.origin);
 			redirectURL.searchParams.set('scrollTop', window.scrollY.toString());
 
 			const encodedRedirect = encodeURIComponent(`${redirectURL.pathname}${redirectURL.search}`);
-			const authURL = new URL(`/api/login/google?r=${encodedRedirect}`, loc.origin);
+			const authURL = new SvelteURL(`/api/login/google?r=${encodedRedirect}`, loc.origin);
 			window.location.href = authURL.href;
 		},
 	};

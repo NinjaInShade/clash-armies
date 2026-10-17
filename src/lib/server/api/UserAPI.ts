@@ -44,7 +44,7 @@ export class UserAPI {
 		}
 
 		const users: User[] = await query
-			.select(['u.googleId', 'u.id', helpers.jsonAgg('ur.role').as('roles'), 'u.username', 'u.playerTag', 'u.createdTime'])
+			.select(['u.googleId', 'u.id', helpers.jsonAgg<string>('ur.role').as('roles'), 'u.username', 'u.playerTag', 'u.createdTime'])
 			.groupBy('u.id')
 			.execute();
 

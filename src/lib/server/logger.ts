@@ -156,7 +156,7 @@ const LOG_LEVELS = {
 	debug: 'dbug',
 } as const;
 
-const LOG_LEVELS_META = {
+const LOG_LEVELS_META: Record<LogLevel, { emoji: string; colour: keyof ColourTheme; emojiWidth?: number }> = {
 	info: {
 		emoji: '⚓',
 		colour: 'blue',
@@ -255,28 +255,28 @@ export class Logger {
 	/**
 	 * Logs an INFO message
 	 */
-	public info(...messages: any[]) {
+	public info(...messages: unknown[]) {
 		this._log('info', ...messages);
 	}
 
 	/**
 	 * Logs a GOOD message
 	 */
-	public good(...messages: any[]) {
+	public good(...messages: unknown[]) {
 		this._log('good', ...messages);
 	}
 
 	/**
 	 * Logs a WARN message
 	 */
-	public warn(...messages: any[]) {
+	public warn(...messages: unknown[]) {
 		this._log('warn', ...messages);
 	}
 
 	/**
 	 * Logs a FAIL message
 	 */
-	public error(...messages: any[]) {
+	public error(...messages: unknown[]) {
 		this._log('error', ...messages);
 	}
 
@@ -285,7 +285,7 @@ export class Logger {
 	 *
 	 * Only shows with LOG_DEBUG=1 env var
 	 */
-	public debug(...messages: any[]) {
+	public debug(...messages: unknown[]) {
 		const logDebug = process.env.LOG_DEBUG !== null;
 		if (logDebug) {
 			this._log('debug', ...messages);
@@ -300,7 +300,7 @@ export class Logger {
 	 *
 	 * @format - [date timestamp] [filename] [icon] [level]: msg
 	 */
-	private _log(logLevel: LogLevel, ...messages: any[]) {
+	private _log(logLevel: LogLevel, ...messages: unknown[]) {
 		const { emoji, colour, emojiWidth } = LOG_LEVELS_META[logLevel];
 		const type = LOG_LEVELS[logLevel];
 
@@ -334,7 +334,7 @@ export class Logger {
 	 * Process and return what user wants to log
 	 * In dev messages will be padded so they align nicely
 	 */
-	private generateMessages(messages: any[], metaLength: number) {
+	private generateMessages(messages: unknown[], metaLength: number) {
 		if (process.stdout.columns === undefined || !dev) {
 			return messages;
 		}
@@ -351,7 +351,7 @@ export class Logger {
 		const splitIntoChunks = (msg: string, padStart?: boolean) => {
 			// because of zero based indexing
 			const _availableSpace = availableSpace - 1;
-			const msgChunks: any[] = [];
+			const msgChunks: string[] = [];
 
 			let i = 0;
 			for (i; i < msg.length + _availableSpace;) {
@@ -375,10 +375,10 @@ export class Logger {
 			return msgChunks;
 		};
 
-		const chunks: any[] = [];
+		const chunks: unknown[] = [];
 
 		for (let i = 0; i < messages.length; i++) {
-			let msg = messages[i];
+			const msg = messages[i];
 			const prevMsg = messages[i - 1];
 
 			if (typeof msg === 'string') {
@@ -396,7 +396,7 @@ export class Logger {
 	/**
 	 * Generates meta info msg (time, namespace etc...)
 	 */
-	private generateMeta(meta: { emoji: string; colour: string; type: AbbrLogLevel }) {
+	private generateMeta(meta: { emoji: string; colour: keyof ColourTheme; type: AbbrLogLevel }) {
 		const { showDate, showTimestamp, showFilename, namespaceColour, colourTheme } = this.options;
 		const { emoji, colour, type } = meta;
 
@@ -500,7 +500,7 @@ function formatErrStack(stack: string, colourTheme: ColourTheme) {
 
 			const split = line.split(' ');
 			let at = split.at(0);
-			let fn = split.slice(1, -1).join(' ');
+			const fn = split.slice(1, -1).join(' ');
 			let loc = split.at(-1);
 
 			const cwd = process.cwd().toLowerCase().replaceAll('\\', '/');

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { page as pageState } from '$app/state';
+	import { SvelteURLSearchParams } from 'svelte/reactivity';
 	import { mkPageStore, currentSearchParams } from '#client/params.svelte.ts';
 	import ActionButton from '#components/ActionButton.svelte';
 
@@ -48,7 +49,7 @@
 	 * discover and index results, preserving any other active query parameters.
 	 */
 	function hrefForPage(p: number) {
-		const params = new URLSearchParams(searchParams.toString());
+		const params = new SvelteURLSearchParams(searchParams.toString());
 		if (p === 1) {
 			params.delete(pageParam);
 		} else {
