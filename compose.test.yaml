@@ -1,3 +1,4 @@
+name: clash-armies-test
 services:
   db:
     image: mariadb:11.3

@@ -1,3 +1,4 @@
+name: clash-armies
 services:
   app:
     image: ghcr.io/ninjainshade/clash-armies:${APP_VERSION}
