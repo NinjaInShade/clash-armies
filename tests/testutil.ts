@@ -111,5 +111,5 @@ const throwsAsync = async function (fn: (...args: unknown[]) => Promise<unknown>
 		}
 	}, pattern);
 };
-const assert = { ...vitest.assert, throwsAsync };
+const assert: Omit<typeof vitest.assert, 'throwsAsync'> & { throwsAsync: typeof throwsAsync } = { ...vitest.assert, throwsAsync };
 export { assert };
