@@ -283,10 +283,10 @@ export class Logger {
 	/**
 	 * Logs a DEBUG message
 	 *
-	 * Only shows with LOG_DEBUG=1 env var
+	 * Only shows when the LOG_DEBUG env var is set (e.g. LOG_DEBUG=1)
 	 */
 	public debug(...messages: unknown[]) {
-		const logDebug = process.env.LOG_DEBUG !== null;
+		const logDebug = Boolean(process.env.LOG_DEBUG);
 		if (logDebug) {
 			this._log('debug', ...messages);
 		}
