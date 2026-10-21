@@ -148,7 +148,7 @@ If you need help running Clash Armies locally, or have suggestions on improving 
 ### Prerequisites
 
 - `pnpm` >= 12.14.0
-- `node` >= 26.12.0
+- `node` >= 26.13.0
 - `docker` >= 29.1.3
 - `docker compose` >= 5.1.3
 
