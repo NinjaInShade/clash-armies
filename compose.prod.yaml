@@ -18,6 +18,8 @@ services:
   db:
     image: mariadb:12.3
     restart: unless-stopped
+    # Larger buffer pool (default 128M) so more data can be cached in memory, resulting in better performance with larger data
+    command: --innodb-buffer-pool-size=1G
     environment:
       MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:?}
       MARIADB_USER: ${DB_USER:?}
