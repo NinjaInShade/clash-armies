@@ -1,80 +1,87 @@
 <script lang="ts">
-	import TabStrip from '#components/TabStrip.svelte';
-	import type { PageData } from './$types';
-	import ConfigTab from './Config.svelte';
-	import OverviewTab from './Overview.svelte';
+    import TabStrip from '#components/TabStrip.svelte';
+    import type { PageData } from './$types';
+    import AppTab from './App.svelte';
+    import ProcessTab from './Process.svelte';
+    import ServerTab from './Server.svelte';
 
-	const { data }: { data: PageData } = $props();
-	const { serverStats, appStats, units, townHalls, metricWeights } = $derived(data);
+    const { data }: { data: PageData } = $props();
+    const { serverStats, processStats, appStats } = $derived(data);
 </script>
 
 <svelte:head>
-	<title>ClashArmies • Admin panel</title>
-	<!-- Note: this route shouldn't be indexable so no point in meta:description/canonical tags -->
+    <title>ClashArmies • Admin panel</title>
+    <!-- Note: this route shouldn't be indexable so no point in meta:description/canonical tags -->
 </svelte:head>
 
 <header>
-	<div class="container">
-		<h1 class="title">
-			<svg width="44" height="44" viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg">
-				<path
-					d="M52 30.5882H45.3318C44.8118 32.7294 43.9859 34.7176 42.8541 36.4918L47.5647 41.2024L41.1412 47.6259L36.4306 42.9153C34.6565 44.0165 32.6682 44.8424 30.5882 45.3318V52H21.4118V45.3318C19.3318 44.8424 17.3435 44.0165 15.5694 42.9153L10.8588 47.6259L4.37412 41.1412L9.08471 36.4306C7.98353 34.6565 7.15765 32.6682 6.66824 30.5882H0V21.5035H6.63765C7.12706 19.3624 7.98353 17.3741 9.08471 15.5694L4.37412 10.8588L10.7976 4.43529L15.5082 9.14588C17.2824 8.01412 19.3012 7.18823 21.4118 6.66823V0H30.5882V6.66823C32.6682 7.15765 34.6565 7.98353 36.4306 9.08471L41.1412 4.37412L47.6259 10.8588L42.9153 15.5694C44.0165 17.3741 44.8729 19.3624 45.3624 21.5035H52V30.5882ZM26 35.1765C31.0776 35.1765 35.1765 31.0776 35.1765 26C35.1765 20.9224 31.0776 16.8235 26 16.8235C20.9224 16.8235 16.8235 20.9224 16.8235 26C16.8235 31.0776 20.9224 35.1765 26 35.1765Z"
-					fill="var(--grey-100)"
-				/>
-			</svg>
-			Admin Panel
-		</h1>
-		<p class="body subtitle">Manage settings, data and more</p>
-	</div>
+    <div class="container">
+        <h1 class="title">
+            <svg width="44" height="44" viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path
+                    d="M52 30.5882H45.3318C44.8118 32.7294 43.9859 34.7176 42.8541 36.4918L47.5647 41.2024L41.1412 47.6259L36.4306 42.9153C34.6565 44.0165 32.6682 44.8424 30.5882 45.3318V52H21.4118V45.3318C19.3318 44.8424 17.3435 44.0165 15.5694 42.9153L10.8588 47.6259L4.37412 41.1412L9.08471 36.4306C7.98353 34.6565 7.15765 32.6682 6.66824 30.5882H0V21.5035H6.63765C7.12706 19.3624 7.98353 17.3741 9.08471 15.5694L4.37412 10.8588L10.7976 4.43529L15.5082 9.14588C17.2824 8.01412 19.3012 7.18823 21.4118 6.66823V0H30.5882V6.66823C32.6682 7.15765 34.6565 7.98353 36.4306 9.08471L41.1412 4.37412L47.6259 10.8588L42.9153 15.5694C44.0165 17.3741 44.8729 19.3624 45.3624 21.5035H52V30.5882ZM26 35.1765C31.0776 35.1765 35.1765 31.0776 35.1765 26C35.1765 20.9224 31.0776 16.8235 26 16.8235C20.9224 16.8235 16.8235 20.9224 16.8235 26C16.8235 31.0776 20.9224 35.1765 26 35.1765Z"
+                    fill="var(--grey-100)"
+                />
+            </svg>
+            Admin Panel
+        </h1>
+        <p class="body subtitle">Manage settings, data and more</p>
+    </div>
 </header>
 
 <main>
-	<div class="container">
-		<TabStrip
-			class="admin-tabs"
-			tabs={[
-				{
-					name: 'overview',
-					label: 'Overview',
-					component: OverviewTab,
-					componentProps: { serverStats, appStats, units, townHalls },
-				},
-				{
-					name: 'config',
-					label: 'Config',
-					component: ConfigTab,
-					componentProps: { metricWeights },
-				},
-			]}
-		/>
-	</div>
+    <div class="container">
+        <TabStrip
+            class="admin-tabs"
+            tabs={[
+                {
+                    name: 'app',
+                    label: 'App',
+                    component: AppTab,
+                    componentProps: { appStats },
+                },
+                {
+                    name: 'process',
+                    label: 'Process',
+                    component: ProcessTab,
+                    componentProps: { processStats },
+                },
+                {
+                    name: 'server',
+                    label: 'Server',
+                    component: ServerTab,
+                    componentProps: { serverStats },
+                },
+            ]}
+        />
+    </div>
 </main>
 
 <style>
-	header {
-		padding: 50px var(--side-padding) 16px var(--side-padding);
-	}
+    header {
+        padding: 50px var(--side-padding) 16px var(--side-padding);
+    }
 
-	.title {
-		display: flex;
-		align-items: center;
-		color: var(--grey-100);
-		line-height: var(--h1);
-		font-weight: 400;
-		gap: 0.3em;
-	}
+    .title {
+        display: flex;
+        align-items: center;
+        color: var(--grey-100);
+        line-height: var(--h1);
+        font-weight: 400;
+        gap: 0.3em;
+    }
 
-	.title svg {
-		flex-shrink: 0;
-		position: relative;
-		bottom: 4px;
-	}
+    .title svg {
+        flex-shrink: 0;
+        position: relative;
+        bottom: 4px;
+    }
 
-	.subtitle {
-		margin-top: 10px;
-	}
+    .subtitle {
+        margin-top: 10px;
+    }
 
-	main {
-		padding: 0 var(--side-padding);
-	}
+    main {
+        padding: 0 var(--side-padding);
+    }
 </style>

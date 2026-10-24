@@ -1,20 +1,35 @@
 import fsp from 'node:fs/promises';
 import os from 'node:os';
+import type { MetricWeights } from '#server/api/ArmyMetricsAPI.ts';
 import type { Server } from '#server/api/Server.ts';
+import type { Unit, TownHall } from '#shared/gameData.ts';
+import { DAY, HOUR, MINUTE, SECOND } from '#shared/utils.ts';
 import type { PageServerLoad } from './$types';
 
-export type ServerStats = {
-	usedDisk: string;
-	totalDisk: string;
-	usedMemory: string;
-	totalMemory: string;
-};
-
+/** General stats about the application */
 export type AppStats = {
 	totalUsers: number;
 	totalArmies: number;
 	totalComments: number;
 	armiesByTownHall: { townHall: number; count: number }[];
+	units: Unit[];
+	townHalls: TownHall[];
+	metricWeights: MetricWeights;
+};
+
+/** Stats about the running process */
+export type ProcessStats = {
+	rss: string;
+	uptime: string;
+	nodeVersion: string;
+};
+
+/** Stats about the physical server */
+export type ServerStats = {
+	usedDisk: string;
+	totalDisk: string;
+	usedMemory: string;
+	totalMemory: string;
 };
 
 export const load: PageServerLoad = async (req) => {
@@ -24,15 +39,15 @@ export const load: PageServerLoad = async (req) => {
 	});
 
 	const { server } = req.locals;
-	const stats = await getServerStats(server);
+
 	const appStats = await getAppStats(server);
+	const serverStats = await getServerStats(server);
+	const processStats = await getProcessStats();
 
 	return {
-		serverStats: stats,
 		appStats,
-		units: server.gameData.units,
-		townHalls: server.gameData.townHalls,
-		metricWeights: server.army.metrics.metricWeights,
+		serverStats,
+		processStats,
 	};
 };
 
@@ -63,6 +78,9 @@ async function getAppStats(server: Server) {
 		totalArmies: armiesResult[0]?.count ?? 0,
 		totalComments: commentsResult[0]?.count ?? 0,
 		armiesByTownHall: armiesByTHResult,
+		units: server.gameData.units,
+		townHalls: server.gameData.townHalls,
+		metricWeights: server.army.metrics.metricWeights,
 	};
 }
 
@@ -87,6 +105,14 @@ async function getServerStats(server: Server) {
 		totalMemory,
 		usedDisk,
 		totalDisk,
+	};
+}
+
+async function getProcessStats() {
+	return {
+		rss: formatBytesToMB(process.memoryUsage.rss()),
+		uptime: formatUptime(process.uptime() * SECOND),
+		nodeVersion: process.version,
 	};
 }
 
@@ -119,4 +145,21 @@ function getTotalMemory() {
 
 function formatBytesToGB(value: number) {
 	return (value / 1024 ** 3).toFixed(1);
+}
+
+function formatBytesToMB(value: number) {
+	return (value / 1024 ** 2).toFixed(0);
+}
+
+function formatUptime(ms: number) {
+	const days = Math.floor(ms / DAY);
+	const hours = Math.floor((ms % DAY) / HOUR);
+	const minutes = Math.floor((ms % HOUR) / MINUTE);
+	if (days) {
+		return `${days}d ${hours}h`;
+	} else if (hours) {
+		return `${hours}h ${minutes}m`;
+	} else {
+		return `${minutes}m`;
+	}
 }

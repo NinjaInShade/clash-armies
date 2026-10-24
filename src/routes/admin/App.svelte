@@ -3,15 +3,13 @@
 	import THWidgetDisplay from '#components/THWidgetDisplay.svelte';
 	import UnitTableDisplay from '#components/UnitTableDisplay.svelte';
 	import type { Unit, TownHall } from '#shared/gameData.ts';
-	import type { ServerStats, AppStats } from './+page.server';
+	import type { AppStats } from './+page.server';
+	import EditMetricWeights from './EditMetricWeights.svelte';
 
 	type Props = {
-		serverStats: ServerStats;
 		appStats: AppStats;
-		units: Unit[];
-		townHalls: TownHall[];
 	};
-	const { serverStats, appStats, units, townHalls }: Props = $props();
+	const { appStats }: Props = $props();
 
 	const armiesByTHColumns = [
 		{
@@ -77,39 +75,8 @@
 <section class="stats">
 	<div class="table-above">
 		<div>
-			<h2>Server</h2>
-			<p class="body">Server/system stats</p>
-		</div>
-		<div class="actions"></div>
-	</div>
-	<div class="stats-grid">
-		<div class="stats-card">
-			<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 36">
-				<path fill="currentColor" d="M30.86 8.43A2 2 0 0 0 28.94 7H7.06a2 2 0 0 0-1.93 1.47L2.29 20h31.42Z" class="clr-i-solid clr-i-solid-path-1" />
-				<path fill="currentColor" d="M2 22v7a2 2 0 0 0 2 2h28a2 2 0 0 0 2-2v-7Zm28 5h-4v-2h4Z" class="clr-i-solid clr-i-solid-path-2" />
-				<path fill="none" d="M0 0h36v36H0z" />
-			</svg>
-			<h3>Disk usage</h3>
-			<b>{serverStats.usedDisk}/{serverStats.totalDisk} GB</b>
-		</div>
-		<div class="stats-card">
-			<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
-				<path
-					fill="currentColor"
-					d="M232 56H24A16 16 0 0 0 8 72v128a8 8 0 0 0 16 0v-16h16v16a8 8 0 0 0 16 0v-16h16v16a8 8 0 0 0 16 0v-16h16v16a8 8 0 0 0 16 0v-16h16v16a8 8 0 0 0 16 0v-16h16v16a8 8 0 0 0 16 0v-16h16v16a8 8 0 0 0 16 0v-16h16v16a8 8 0 0 0 16 0V72a16 16 0 0 0-16-16m-24 40v48h-64V96Zm-96 0v48H48V96Z"
-				/>
-			</svg>
-			<h3>RAM usage</h3>
-			<b>{serverStats.usedMemory}/{serverStats.totalMemory} GB</b>
-		</div>
-	</div>
-</section>
-
-<section class="stats">
-	<div class="table-above">
-		<div>
 			<h2>App</h2>
-			<p class="body">Application stats</p>
+			<p class="body">Application stats and config</p>
 		</div>
 		<div class="actions"></div>
 	</div>
@@ -154,27 +121,38 @@
 <section class="town-halls">
 	<div class="table-above">
 		<div>
-			<h2>Town halls ({townHalls.length})</h2>
+			<h2>Town halls ({appStats.townHalls.length})</h2>
 			<p class="body">Town hall data</p>
 		</div>
 		<div class="actions"></div>
 	</div>
 	<div class="table-container">
-		<Table data={townHalls} columns={thColumns} bind:selectedKeys={selectedTHs} defaultSortKey="level" selectable />
+		<Table data={appStats.townHalls} columns={thColumns} bind:selectedKeys={selectedTHs} defaultSortKey="level" selectable />
 	</div>
 </section>
 
 <section class="units">
 	<div class="table-above">
 		<div>
-			<h2>Units ({units.length})</h2>
+			<h2>Units ({appStats.units.length})</h2>
 			<p class="body">Unit data</p>
 		</div>
 		<div class="actions"></div>
 	</div>
 	<div class="table-container">
-		<Table data={units} columns={unitColumns} bind:selectedKeys={selectedUnits} defaultSortKey="type" selectable />
+		<Table data={appStats.units} columns={unitColumns} bind:selectedKeys={selectedUnits} defaultSortKey="type" selectable />
 	</div>
+</section>
+
+<section class="metric-weights">
+	<div class="table-above">
+		<div>
+			<h2>Metric weights</h2>
+			<p class="body">Each multiplies its metric before summing into an army's ranking score</p>
+		</div>
+		<div class="actions"></div>
+	</div>
+	<EditMetricWeights weights={appStats.metricWeights} />
 </section>
 
 <style>
