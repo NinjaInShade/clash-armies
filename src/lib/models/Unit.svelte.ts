@@ -196,36 +196,28 @@ export class UnitModel {
 			return -1;
 		}
 
+		// Any unit can be donated, even one the town hall can't unlock yet, but in that case only its lowest level is available.
+		// Otherwise, the clan castle's laboratory cap is what limits higher levels.
 		let maxLevel = -1;
 
 		for (const levelData of unit.levels) {
 			const { level } = levelData;
 
-			// Check if level can be used based on the laboratory level cap
-			const labLevel = thData.ccLaboratoryCap ?? -1;
-			if (typeof levelData.laboratoryLevel === 'number' && levelData.laboratoryLevel > labLevel) {
-				return maxLevel;
-			}
-
 			if (type === 'Troop' && unit.isSuper) {
-				// Super troops are unlocked at town hall 11
-				if (thData.level < 11) {
-					return maxLevel;
-				}
-				// If super troops unlocked, level matches the max level allowed for the regular troop version
+				// Super troops can be donated at any town hall, but only once the laboratory cap allows the regular troop
+				// to reach the level it's boosted from (e.g. TH9 can receive Super Barbarians, but not Super Valkyries)
 				const regularTroopVersion = gameData.index.troops.byName(SUPER_TO_REGULAR[name]);
 				if (!regularTroopVersion) {
 					throw new Error(`Expected to find regular troop version for "${name}"`);
 				}
+				const regularMaxLevel = UnitModel.getMaxCcLevel(regularTroopVersion, townHall, gameData);
+				return level > regularMaxLevel ? -1 : regularMaxLevel;
+			}
 
-				// For super troop to be donated, the laboratory must be at least high enough for the regular troop to be boosted
-				// See `getUnitLevel` for more info on how this check works
-				const regularMaxLevel = UnitModel.getMaxLevel(regularTroopVersion, townHall, gameData);
-				if (level > regularMaxLevel) return maxLevel;
-
-				// If the laboratory is high enough to boost the regular troop,
-				// use the max level of the regular troop in line with the `getCcUnitLevel` rules
-				return UnitModel.getMaxCcLevel(regularTroopVersion, townHall, gameData);
+			// Check if level can be used based on the laboratory level cap
+			const labLevel = thData.ccLaboratoryCap ?? -1;
+			if (maxLevel !== -1 && typeof levelData.laboratoryLevel === 'number' && levelData.laboratoryLevel > labLevel) {
+				return maxLevel;
 			}
 
 			maxLevel = level;

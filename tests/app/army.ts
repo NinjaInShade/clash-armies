@@ -1424,25 +1424,40 @@ describe('Validation', function () {
 			validateArmy(data, gameData);
 		});
 
-		it('Should only allow super troop if the regular troop version is at a high enough level to be boosted', function () {
-			// Super valkyrie must be level 7 to be boosted (which requires lab level 10)
-			const thLabLvl9 = gameData.townHalls.find((th) => th.maxLaboratory === 9);
-			const thLabLvl10 = gameData.townHalls.find((th) => th.maxLaboratory === 10);
-			if (!thLabLvl9 || !thLabLvl10) {
-				throw new Error('Expected town hall data');
-			}
+		it('Should allow super troops before town hall 11 if the regular troop is at a high enough level to be boosted', function () {
+			// At TH9, the clan castle's laboratory cap allows level 8 barbarians (enough for Super Barbarians), but not level 7 valkyries (needed for Super Valkyries)
 			const data = makeData({
 				name: 'test',
-				townHall: thLabLvl9.level,
-				units: [{ home: 'clanCastle', unitId: UnitModel.requireTroopByName('Super Valkyrie', gameData).id, amount: 1 }],
+				townHall: 9,
+				units: [{ home: 'clanCastle', unitId: UnitModel.requireTroopByName('Super Barbarian', gameData).id, amount: 1 }],
 			});
-			// Should throw when lab is level 9
+			validateArmy(data, gameData);
+			data.units = [{ home: 'clanCastle', unitId: UnitModel.requireTroopByName('Super Valkyrie', gameData).id, amount: 1 }];
 			assert.throws(function () {
 				validateArmy(data, gameData);
-			}, `Clan castle unit "Super Valkyrie" isn't available at town hall ${thLabLvl9.level}`);
-			// Should not throw when lab is level 10
-			data.townHall = thLabLvl10.level;
+			}, `Clan castle unit "Super Valkyrie" isn't available at town hall 9`);
+			// Should not throw at TH10
+			data.townHall = 10;
 			validateArmy(data, gameData);
+		});
+
+		it('Should allow troops the town hall cannot unlock yet, at their lowest level', function () {
+			const ruinWitch = UnitModel.requireTroopByName('Ruin Witch', gameData);
+			const data = makeData({
+				name: 'test',
+				townHall: 9,
+				units: [{ home: 'clanCastle', unitId: ruinWitch.id, amount: 1 }],
+			});
+			validateArmy(data, gameData);
+			assert.strictEqual(UnitModel.getMaxCcLevel(ruinWitch, 9, gameData), 1);
+		});
+
+		it('Should donate super troops at their regular troop level', function () {
+			const superValkyrie = UnitModel.requireTroopByName('Super Valkyrie', gameData);
+			const valkyrie = UnitModel.requireTroopByName('Valkyrie', gameData);
+			for (const th of [10, 18]) {
+				assert.strictEqual(UnitModel.getMaxCcLevel(superValkyrie, th, gameData), UnitModel.getMaxCcLevel(valkyrie, th, gameData));
+			}
 		});
 
 		it('Should only allow battle drill once clan castle level 9 is unlocked', function () {
