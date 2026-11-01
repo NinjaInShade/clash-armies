@@ -1,3 +1,12 @@
+## [0.13.1] - 2026-11-01
+
+- Improve imprecise hero slot rules
+- Improve clan castle unit rules
+- Fix some incorrect game data
+- Fix logger.debug always logging
+- Add process tab to admin page
+- Update project dependencies
+
 ## [0.13.0] - 2026-10-17
 
 - Fix account menu not closing after navigating to profile
