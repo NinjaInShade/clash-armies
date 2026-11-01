@@ -186,6 +186,7 @@ export class GameData implements StaticGameData {
 				ccTroopCapacity: th.ccTroopCapacity,
 				ccSpellCapacity: th.ccSpellCapacity,
 				ccSiegeCapacity: th.ccSiegeCapacity,
+				heroSlots: th.heroSlots,
 			};
 		});
 		await helpers.upsert(db, 'town_halls', thRows);

@@ -56,7 +56,7 @@
 			.filter((hero) => {
 				return ArmyModel.getMaxHeroLevel(hero, thLvl, app.gameData) !== -1;
 			})
-			.slice(0, 4);
+			.slice(0, ArmyModel.requireTownHall(thLvl, app.gameData).heroSlots);
 	}
 
 	async function removeClanCastle() {
@@ -98,14 +98,17 @@
 			if (!confirmed) return;
 		}
 
+		// Links don't have a town hall, so only keep as many heroes (and their equipment/pets) as this town hall has slots for
+		const { heroSlots } = ArmyModel.requireTownHall(model.townHall, app.gameData);
+		const importedHeroes = app.gameData.index.heroes.names.filter((hero) => importedModel.hasHero(hero)).slice(0, heroSlots);
+
 		model.units = importedModel.units;
 		model.ccUnits = importedModel.ccUnits;
-		model.pets = importedModel.pets;
-		model.equipment = importedModel.equipment;
+		model.pets = importedModel.pets.filter((pet) => importedHeroes.includes(pet.hero));
+		model.equipment = importedModel.equipment.filter((eq) => importedHeroes.includes(eq.info.hero));
 
 		showClanCastle = importedModel.ccUnits.length > 0;
 
-		const importedHeroes = app.gameData.index.heroes.names.filter((hero) => importedModel.hasHero(hero));
 		if (importedHeroes.length) {
 			shownHeroes = importedHeroes;
 		} else {
@@ -137,6 +140,10 @@
 			} else {
 				return;
 			}
+		}
+		// Lowering the town hall with nothing selected clears nothing above, but can leave more heroes shown than it has slots for
+		if (shownHeroes && shownHeroes.length > ArmyModel.requireTownHall(value, app.gameData).heroSlots) {
+			shownHeroes = getDefaultHeroes(value);
 		}
 		model.townHall = value;
 	}

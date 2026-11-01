@@ -174,6 +174,7 @@ export interface TownHalls {
   ccSiegeCapacity: Generated<number | null>;
   ccSpellCapacity: Generated<number | null>;
   ccTroopCapacity: Generated<number | null>;
+  heroSlots: Generated<number>;
   level: number;
   maxBarracks: Generated<number | null>;
   maxBlacksmith: Generated<number | null>;

@@ -25,6 +25,7 @@
 			ccTroopCapacity: 0,
 			ccSpellCapacity: 0,
 			ccSiegeCapacity: 0,
+			heroSlots: 0,
 		},
 		{
 			level: 2,
@@ -44,6 +45,7 @@
 			ccTroopCapacity: 10,
 			ccSpellCapacity: 0,
 			ccSiegeCapacity: 0,
+			heroSlots: 0,
 		},
 		{
 			level: 3,
@@ -63,6 +65,7 @@
 			ccTroopCapacity: 10,
 			ccSpellCapacity: 0,
 			ccSiegeCapacity: 0,
+			heroSlots: 0,
 		},
 		{
 			level: 4,
@@ -82,6 +85,7 @@
 			ccTroopCapacity: 15,
 			ccSpellCapacity: 0,
 			ccSiegeCapacity: 0,
+			heroSlots: 1,
 			heroMaxLevels: [
 				{
 					hero: 'Barbarian King',
@@ -107,6 +111,7 @@
 			ccTroopCapacity: 15,
 			ccSpellCapacity: 0,
 			ccSiegeCapacity: 0,
+			heroSlots: 1,
 			heroMaxLevels: [
 				{
 					hero: 'Barbarian King',
@@ -132,6 +137,7 @@
 			ccTroopCapacity: 20,
 			ccSpellCapacity: 0,
 			ccSiegeCapacity: 0,
+			heroSlots: 1,
 			heroMaxLevels: [
 				{
 					hero: 'Barbarian King',
@@ -157,6 +163,7 @@
 			ccTroopCapacity: 20,
 			ccSpellCapacity: 0,
 			ccSiegeCapacity: 0,
+			heroSlots: 1,
 			heroMaxLevels: [
 				{
 					hero: 'Barbarian King',
@@ -182,6 +189,7 @@
 			ccTroopCapacity: 25,
 			ccSpellCapacity: 1,
 			ccSiegeCapacity: 0,
+			heroSlots: 1,
 			heroMaxLevels: [
 				{
 					hero: 'Archer Queen',
@@ -211,6 +219,7 @@
 			ccTroopCapacity: 30,
 			ccSpellCapacity: 1,
 			ccSiegeCapacity: 0,
+			heroSlots: 2,
 			heroMaxLevels: [
 				{
 					hero: 'Archer Queen',
@@ -244,6 +253,7 @@
 			ccTroopCapacity: 35,
 			ccSpellCapacity: 1,
 			ccSiegeCapacity: 1,
+			heroSlots: 2,
 			heroMaxLevels: [
 				{
 					hero: 'Archer Queen',
@@ -277,6 +287,7 @@
 			ccTroopCapacity: 35,
 			ccSpellCapacity: 2,
 			ccSiegeCapacity: 1,
+			heroSlots: 3,
 			heroMaxLevels: [
 				{
 					hero: 'Archer Queen',
@@ -314,6 +325,7 @@
 			ccTroopCapacity: 40,
 			ccSpellCapacity: 2,
 			ccSiegeCapacity: 1,
+			heroSlots: 3,
 			heroMaxLevels: [
 				{
 					hero: 'Archer Queen',
@@ -351,6 +363,7 @@
 			ccTroopCapacity: 45,
 			ccSpellCapacity: 2,
 			ccSiegeCapacity: 1,
+			heroSlots: 4,
 			heroMaxLevels: [
 				{
 					hero: 'Archer Queen',
@@ -392,6 +405,7 @@
 			ccTroopCapacity: 45,
 			ccSpellCapacity: 3,
 			ccSiegeCapacity: 1,
+			heroSlots: 4,
 			heroMaxLevels: [
 				{
 					hero: 'Archer Queen',
@@ -433,6 +447,7 @@
 			ccTroopCapacity: 50,
 			ccSpellCapacity: 3,
 			ccSiegeCapacity: 1,
+			heroSlots: 4,
 			heroMaxLevels: [
 				{
 					hero: 'Archer Queen',
@@ -478,6 +493,7 @@
 			ccTroopCapacity: 50,
 			ccSpellCapacity: 3,
 			ccSiegeCapacity: 2,
+			heroSlots: 4,
 			heroMaxLevels: [
 				{
 					hero: 'Archer Queen',
@@ -523,6 +539,7 @@
 			ccTroopCapacity: 55,
 			ccSpellCapacity: 3,
 			ccSiegeCapacity: 2,
+			heroSlots: 4,
 			heroMaxLevels: [
 				{
 					hero: 'Archer Queen',
@@ -568,6 +585,7 @@
 			ccTroopCapacity: 55,
 			ccSpellCapacity: 4,
 			ccSiegeCapacity: 2,
+			heroSlots: 4,
 			heroMaxLevels: [
 				{
 					hero: 'Archer Queen',

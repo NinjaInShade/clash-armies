@@ -171,6 +171,7 @@ describe('Game data sync', function () {
 					ccTroopCapacity: 60,
 					ccSpellCapacity: 70,
 					ccSiegeCapacity: 80,
+					heroSlots: 4,
 					heroMaxLevels: [
 						{
 							hero: 'Barbarian King',
@@ -196,6 +197,7 @@ describe('Game data sync', function () {
 					ccTroopCapacity: 70,
 					ccSpellCapacity: 80,
 					ccSiegeCapacity: 90,
+					heroSlots: 4,
 					heroMaxLevels: [
 						{
 							hero: 'Barbarian King',
@@ -245,6 +247,7 @@ describe('Game data sync', function () {
 				ccTroopCapacity: 60,
 				ccSpellCapacity: 70,
 				ccSiegeCapacity: 80,
+				heroSlots: 4,
 				heroMaxLevels: [
 					{
 						hero: 'Barbarian King',
@@ -294,6 +297,7 @@ describe('Game data sync', function () {
 				ccTroopCapacity: 60,
 				ccSpellCapacity: 70,
 				ccSiegeCapacity: 80,
+				heroSlots: 4,
 				heroMaxLevels: [
 					{
 						hero: 'Barbarian King',
@@ -340,6 +344,7 @@ describe('Game data sync', function () {
 				ccTroopCapacity: 60,
 				ccSpellCapacity: 70,
 				ccSiegeCapacity: 80,
+				heroSlots: 4,
 				heroMaxLevels: [
 					{
 						hero: 'Barbarian King',

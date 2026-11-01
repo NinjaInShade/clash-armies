@@ -73,6 +73,7 @@ const TownHallSchema = z.object({
 	ccTroopCapacity: z.int().nonnegative(),
 	ccSpellCapacity: z.int().nonnegative(),
 	ccSiegeCapacity: z.int().nonnegative(),
+	heroSlots: z.int().nonnegative(),
 	// Accept null/missing as "no heroes".
 	heroMaxLevels: z.optional(
 		z

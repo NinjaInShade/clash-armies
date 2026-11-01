@@ -4,6 +4,7 @@
 	import { EquipmentModel } from '#models/Equipment.svelte.ts';
 	import { PetModel } from '#models/Pet.svelte.ts';
 	import type { Pet } from '#shared/gameData.ts';
+	import { pluralize } from '#shared/utils.ts';
 	import type { AppState } from '#types';
 	import ActionButton from './ActionButton.svelte';
 	import AddHero from './AddHero.svelte';
@@ -184,12 +185,16 @@
 				</div>
 			{/if}
 		{:else}
-			{@const maxHeroesSelected = shownHeroes.length >= 4}
+			{@const { heroSlots } = model.thData}
+			{@const maxHeroesSelected = shownHeroes.length >= heroSlots}
+			{@const pluralisedSlots = pluralize('hero', heroSlots, 'es')}
 			<AddHero
 				{hero}
 				onClick={addHero}
 				disabled={maxHeroesSelected}
-				title={maxHeroesSelected ? `Cannot have more than 4 heroes\nRemove another hero to add the ${hero.toLowerCase()}` : ''}
+				title={maxHeroesSelected
+					? `Cannot have more than ${heroSlots} ${pluralisedSlots} at town hall ${model.townHall}.\n\nRemove another hero to add the ${hero.toLowerCase()}.`
+					: ''}
 			/>
 		{/if}
 	</div>

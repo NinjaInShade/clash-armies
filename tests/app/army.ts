@@ -1297,30 +1297,41 @@ describe('Validation', function () {
 		);
 	}
 
-	it('Should not allow more than 4 heroes', function () {
+	it("Should not allow more heroes than the town hall's hero slots", function () {
 		// The amount of heroes used by an army is defined by what equipment/pets are used
-		const data = makeData({
-			name: 'test',
-			townHall: 6,
-			units: [{ home: 'armyCamp', unitId: UnitModel.requireTroopByName('Barbarian', gameData).id, amount: 1 }],
-			equipment: [
-				// Barbarian King equipment
-				{ equipmentId: EquipmentModel.requireByName('Barbarian Puppet', gameData).id },
-				// Archer Queen equipment
-				{ equipmentId: EquipmentModel.requireByName('Archer Puppet', gameData).id },
-				// Royal Champion equipment
-				{ equipmentId: EquipmentModel.requireByName('Rocket Spear', gameData).id },
-				// Grand Warden equipment
-				{ equipmentId: EquipmentModel.requireByName('Eternal Tome', gameData).id },
-			],
-			pets: [
-				// Minion Prince
-				{ hero: 'Minion Prince', petId: PetModel.requireByName('Lassi', gameData).id },
-			],
-		});
-		assert.throws(function () {
+		const equipment = (names: string[]) => {
+			return names.map((name) => {
+				return { equipmentId: EquipmentModel.requireByName(name, gameData).id };
+			});
+		};
+
+		const units = [{ home: 'armyCamp' as const, unitId: UnitModel.requireTroopByName('Barbarian', gameData).id, amount: 1 }];
+		const fourHeroes = [
+			'Barbarian Puppet', // BK
+			'Archer Puppet', // AQ
+			'Eternal Tome', // GW
+			'Henchmen Puppet', // MP
+		];
+
+		{
+			// TH12 unlocks 4 heroes, but only has 3 slots
+			assert.throws(function () {
+				const data = makeData({ name: 'test', townHall: 12, units, equipment: equipment(fourHeroes) });
+				validateArmy(data, gameData);
+			}, 'Town hall 12 can only use 3 heroes, but this army used 4');
+			const data = makeData({ name: 'test', townHall: 12, units, equipment: equipment(fourHeroes.slice(0, 3)) });
 			validateArmy(data, gameData);
-		}, 'Cannot use more than 4 heroes');
+		}
+
+		{
+			// TH18 unlocks 5 heroes, but only has 4 slots (the current max)
+			assert.throws(function () {
+				const data = makeData({ name: 'test', townHall: 18, units, equipment: equipment([...fourHeroes, 'Rocket Spear']) });
+				validateArmy(data, gameData);
+			}, 'Town hall 18 can only use 4 heroes, but this army used 5');
+			const data = makeData({ name: 'test', townHall: 18, units, equipment: equipment(fourHeroes) });
+			validateArmy(data, gameData);
+		}
 	});
 
 	describe('Regular units', function () {

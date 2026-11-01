@@ -6,7 +6,7 @@ import { GuideModel } from '#models/Guide.svelte.ts';
 import { PetModel } from '#models/Pet.svelte.ts';
 import { UnitModel } from '#models/Unit.svelte.ts';
 import type { StaticGameData } from '#shared/gameData.ts';
-import { BANNERS, VALID_UNIT_HOME, GUIDE_TEXT_CHAR_LIMIT, YOUTUBE_URL_REGEX, MAX_COMMENT_LENGTH, MAX_ARMY_TAGS, ARMY_TAGS } from './utils';
+import { pluralize, BANNERS, VALID_UNIT_HOME, GUIDE_TEXT_CHAR_LIMIT, YOUTUBE_URL_REGEX, MAX_COMMENT_LENGTH, MAX_ARMY_TAGS, ARMY_TAGS } from './utils';
 
 export const numberSchema = z.number().int().positive();
 export const unitSchema = z.object({
@@ -62,15 +62,17 @@ export function validateArmy(data: unknown, gameData: StaticGameData): ArmyModel
 	const army = armySchema.parse(data);
 	const model = new ArmyModel(gameData, army);
 
-	const heroesUsed = gameData.index.heroes.names.filter((hero) => hasHero(hero, model)).length;
-	if (heroesUsed > 4) {
-		throw new Error('Cannot use more than 4 heroes');
-	}
-
 	validateUnits(model);
 	validateCcUnits(model);
 	validateEquipment(model);
 	validatePets(model);
+
+	const heroesUsed = gameData.index.heroes.names.filter((hero) => hasHero(hero, model)).length;
+	const thData = ArmyModel.requireTownHall(model.townHall, gameData);
+	if (heroesUsed > thData.heroSlots) {
+		const pluralisedSlots = pluralize('hero', thData.heroSlots, 'es');
+		throw new Error(`Town hall ${model.townHall} can only use ${thData.heroSlots} ${pluralisedSlots}, but this army used ${heroesUsed}`);
+	}
 	if (model.guide) {
 		validateGuide(model.guide);
 	}

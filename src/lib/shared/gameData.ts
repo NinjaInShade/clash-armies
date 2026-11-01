@@ -39,6 +39,8 @@ export type TownHall = {
 	ccSpellCapacity: number;
 	/** Max available clan castle siege machines at this town hall (assuming max clan castle). */
 	ccSiegeCapacity: number;
+	/** Most heroes an army can bring into battle at this town hall (i.e. the hero hall's slots, assuming max hero hall). */
+	heroSlots: number;
 };
 
 export type UnitType = 'Troop' | 'Siege' | 'Spell';
