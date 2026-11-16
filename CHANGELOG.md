@@ -1,3 +1,11 @@
+## [0.13.2] - 2026-11-16
+
+- Add town hall 19
+- Add new Squad troops
+- Add new Heroic spell
+- Add various new unit levels
+- Update Node version
+
 ## [0.13.1] - 2026-11-01
 
 - Improve imprecise hero slot rules
