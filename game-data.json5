@@ -18,6 +18,7 @@
 			maxCc: null,
 			maxBlacksmith: null,
 			maxPetHouse: null,
+			maxSquadBarracks: null,
 			troopCapacity: 20,
 			spellCapacity: 0,
 			siegeCapacity: 0,
@@ -38,6 +39,7 @@
 			maxCc: 1,
 			maxBlacksmith: null,
 			maxPetHouse: null,
+			maxSquadBarracks: null,
 			troopCapacity: 30,
 			spellCapacity: 0,
 			siegeCapacity: 0,
@@ -58,6 +60,7 @@
 			maxCc: 1,
 			maxBlacksmith: null,
 			maxPetHouse: null,
+			maxSquadBarracks: null,
 			troopCapacity: 70,
 			spellCapacity: 0,
 			siegeCapacity: 0,
@@ -78,6 +81,7 @@
 			maxCc: 2,
 			maxBlacksmith: null,
 			maxPetHouse: null,
+			maxSquadBarracks: null,
 			troopCapacity: 80,
 			spellCapacity: 0,
 			siegeCapacity: 0,
@@ -104,6 +108,7 @@
 			maxCc: 2,
 			maxBlacksmith: null,
 			maxPetHouse: null,
+			maxSquadBarracks: null,
 			troopCapacity: 135,
 			spellCapacity: 2,
 			siegeCapacity: 0,
@@ -130,6 +135,7 @@
 			maxCc: 3,
 			maxBlacksmith: null,
 			maxPetHouse: null,
+			maxSquadBarracks: null,
 			troopCapacity: 150,
 			spellCapacity: 4,
 			siegeCapacity: 0,
@@ -156,6 +162,7 @@
 			maxCc: 3,
 			maxBlacksmith: null,
 			maxPetHouse: null,
+			maxSquadBarracks: null,
 			troopCapacity: 200,
 			spellCapacity: 6,
 			siegeCapacity: 0,
@@ -182,6 +189,7 @@
 			maxCc: 4,
 			maxBlacksmith: 1,
 			maxPetHouse: null,
+			maxSquadBarracks: 1,
 			troopCapacity: 200,
 			spellCapacity: 7,
 			siegeCapacity: 0,
@@ -212,6 +220,7 @@
 			maxCc: 5,
 			maxBlacksmith: 2,
 			maxPetHouse: null,
+			maxSquadBarracks: 2,
 			troopCapacity: 220,
 			spellCapacity: 9,
 			siegeCapacity: 0,
@@ -246,6 +255,7 @@
 			maxCc: 6,
 			maxBlacksmith: 3,
 			maxPetHouse: null,
+			maxSquadBarracks: 3,
 			troopCapacity: 240,
 			spellCapacity: 11,
 			siegeCapacity: 0,
@@ -280,6 +290,7 @@
 			maxCc: 7,
 			maxBlacksmith: 4,
 			maxPetHouse: null,
+			maxSquadBarracks: 4,
 			troopCapacity: 260,
 			spellCapacity: 11,
 			siegeCapacity: 0,
@@ -318,6 +329,7 @@
 			maxCc: 8,
 			maxBlacksmith: 5,
 			maxPetHouse: null,
+			maxSquadBarracks: 5,
 			troopCapacity: 280,
 			spellCapacity: 11,
 			siegeCapacity: 1,
@@ -356,6 +368,7 @@
 			maxCc: 9,
 			maxBlacksmith: 6,
 			maxPetHouse: null,
+			maxSquadBarracks: 6,
 			troopCapacity: 300,
 			spellCapacity: 11,
 			siegeCapacity: 1,
@@ -398,6 +411,7 @@
 			maxCc: 10,
 			maxBlacksmith: 7,
 			maxPetHouse: 4,
+			maxSquadBarracks: 7,
 			troopCapacity: 300,
 			spellCapacity: 11,
 			siegeCapacity: 1,
@@ -440,6 +454,7 @@
 			maxCc: 11,
 			maxBlacksmith: 8,
 			maxPetHouse: 8,
+			maxSquadBarracks: 8,
 			troopCapacity: 320,
 			spellCapacity: 11,
 			siegeCapacity: 1,
@@ -486,6 +501,7 @@
 			maxCc: 12,
 			maxBlacksmith: 9,
 			maxPetHouse: 10,
+			maxSquadBarracks: 9,
 			troopCapacity: 320,
 			spellCapacity: 11,
 			siegeCapacity: 1,
@@ -526,12 +542,13 @@
 			maxBarracks: 19,
 			maxDarkBarracks: 13,
 			maxLaboratory: 15,
-			maxSpellFactory: 9,
+			maxSpellFactory: 10,
 			maxDarkSpellFactory: 8,
 			maxWorkshop: 9,
 			maxCc: 13,
 			maxBlacksmith: 10,
 			maxPetHouse: 11,
+			maxSquadBarracks: 10,
 			troopCapacity: 340,
 			spellCapacity: 11,
 			siegeCapacity: 1,
@@ -572,12 +589,13 @@
 			maxBarracks: 19,
 			maxDarkBarracks: 13,
 			maxLaboratory: 16,
-			maxSpellFactory: 9,
+			maxSpellFactory: 10,
 			maxDarkSpellFactory: 8,
 			maxWorkshop: 9,
 			maxCc: 14,
 			maxBlacksmith: 10,
 			maxPetHouse: 12,
+			maxSquadBarracks: 11,
 			troopCapacity: 352,
 			spellCapacity: 11,
 			siegeCapacity: 1,
@@ -610,6 +628,53 @@
 				{
 					hero: 'Royal Champion',
 					maxLevel: 55,
+				},
+			],
+		},
+		{
+			level: 19,
+			maxBarracks: 19,
+			maxDarkBarracks: 13,
+			maxLaboratory: 17,
+			maxSpellFactory: 10,
+			maxDarkSpellFactory: 8,
+			maxWorkshop: 9,
+			maxCc: 15,
+			maxBlacksmith: 10,
+			maxPetHouse: 12,
+			maxSquadBarracks: 12,
+			troopCapacity: 352,
+			spellCapacity: 11,
+			siegeCapacity: 1,
+			ccLaboratoryCap: 17,
+			ccTroopCapacity: 60,
+			ccSpellCapacity: 4,
+			ccSiegeCapacity: 2,
+			heroSlots: 4,
+			heroMaxLevels: [
+				{
+					hero: 'Archer Queen',
+					maxLevel: 115,
+				},
+				{
+					hero: 'Barbarian King',
+					maxLevel: 115,
+				},
+				{
+					hero: 'Dragon Duke',
+					maxLevel: 30,
+				},
+				{
+					hero: 'Grand Warden',
+					maxLevel: 90,
+				},
+				{
+					hero: 'Minion Prince',
+					maxLevel: 100,
+				},
+				{
+					hero: 'Royal Champion',
+					maxLevel: 60,
 				},
 			],
 		},
@@ -717,6 +782,11 @@
 					buildingLevel: 1,
 					laboratoryLevel: 16,
 				},
+				{
+					level: 14,
+					buildingLevel: 1,
+					laboratoryLevel: 17,
+				},
 			],
 		},
 		{
@@ -800,6 +870,11 @@
 					buildingLevel: 2,
 					laboratoryLevel: 16,
 				},
+				{
+					level: 15,
+					buildingLevel: 2,
+					laboratoryLevel: 17,
+				},
 			],
 		},
 		{
@@ -862,6 +937,11 @@
 					level: 10,
 					buildingLevel: 4,
 					laboratoryLevel: 16,
+				},
+				{
+					level: 11,
+					buildingLevel: 4,
+					laboratoryLevel: 17,
 				},
 			],
 		},
@@ -946,6 +1026,11 @@
 					buildingLevel: 3,
 					laboratoryLevel: 16,
 				},
+				{
+					level: 15,
+					buildingLevel: 3,
+					laboratoryLevel: 17,
+				},
 			],
 		},
 		{
@@ -1029,6 +1114,11 @@
 					buildingLevel: 5,
 					laboratoryLevel: 16,
 				},
+				{
+					level: 15,
+					buildingLevel: 5,
+					laboratoryLevel: 17,
+				},
 			],
 		},
 		{
@@ -1106,6 +1196,11 @@
 					level: 13,
 					buildingLevel: 6,
 					laboratoryLevel: 16,
+				},
+				{
+					level: 14,
+					buildingLevel: 6,
+					laboratoryLevel: 17,
 				},
 			],
 		},
@@ -1190,6 +1285,11 @@
 					buildingLevel: 7,
 					laboratoryLevel: 16,
 				},
+				{
+					level: 15,
+					buildingLevel: 7,
+					laboratoryLevel: 17,
+				},
 			],
 		},
 		{
@@ -1257,6 +1357,11 @@
 					level: 11,
 					buildingLevel: 8,
 					laboratoryLevel: 16,
+				},
+				{
+					level: 12,
+					buildingLevel: 8,
+					laboratoryLevel: 17,
 				},
 			],
 		},
@@ -1336,6 +1441,11 @@
 					buildingLevel: 9,
 					laboratoryLevel: 16,
 				},
+				{
+					level: 14,
+					buildingLevel: 9,
+					laboratoryLevel: 17,
+				},
 			],
 		},
 		{
@@ -1413,6 +1523,11 @@
 					level: 13,
 					buildingLevel: 10,
 					laboratoryLevel: 16,
+				},
+				{
+					level: 14,
+					buildingLevel: 10,
+					laboratoryLevel: 17,
 				},
 			],
 		},
@@ -1496,6 +1611,11 @@
 					level: 14,
 					buildingLevel: 1,
 					laboratoryLevel: 16,
+				},
+				{
+					level: 15,
+					buildingLevel: 1,
+					laboratoryLevel: 17,
 				},
 			],
 		},
@@ -1585,6 +1705,11 @@
 					buildingLevel: 2,
 					laboratoryLevel: 16,
 				},
+				{
+					level: 16,
+					buildingLevel: 2,
+					laboratoryLevel: 17,
+				},
 			],
 		},
 		{
@@ -1657,6 +1782,11 @@
 					level: 12,
 					buildingLevel: 3,
 					laboratoryLevel: 15,
+				},
+				{
+					level: 13,
+					buildingLevel: 3,
+					laboratoryLevel: 17,
 				},
 			],
 		},
@@ -1746,6 +1876,11 @@
 					buildingLevel: 4,
 					laboratoryLevel: 16,
 				},
+				{
+					level: 16,
+					buildingLevel: 4,
+					laboratoryLevel: 17,
+				},
 			],
 		},
 		{
@@ -1799,6 +1934,11 @@
 					buildingLevel: 5,
 					laboratoryLevel: 16,
 				},
+				{
+					level: 9,
+					buildingLevel: 5,
+					laboratoryLevel: 17,
+				},
 			],
 		},
 		{
@@ -1851,6 +1991,11 @@
 					level: 8,
 					buildingLevel: 6,
 					laboratoryLevel: 16,
+				},
+				{
+					level: 9,
+					buildingLevel: 6,
+					laboratoryLevel: 17,
 				},
 			],
 		},
@@ -1914,6 +2059,11 @@
 					level: 10,
 					buildingLevel: 7,
 					laboratoryLevel: 16,
+				},
+				{
+					level: 11,
+					buildingLevel: 7,
+					laboratoryLevel: 17,
 				},
 			],
 		},
@@ -1988,6 +2138,11 @@
 					buildingLevel: 11,
 					laboratoryLevel: 16,
 				},
+				{
+					level: 13,
+					buildingLevel: 11,
+					laboratoryLevel: 17,
+				},
 			],
 		},
 		{
@@ -2061,6 +2216,11 @@
 					buildingLevel: 12,
 					laboratoryLevel: 16,
 				},
+				{
+					level: 13,
+					buildingLevel: 12,
+					laboratoryLevel: 17,
+				},
 			],
 		},
 		{
@@ -2113,6 +2273,11 @@
 					level: 8,
 					buildingLevel: 14,
 					laboratoryLevel: 16,
+				},
+				{
+					level: 9,
+					buildingLevel: 14,
+					laboratoryLevel: 17,
 				},
 			],
 		},
@@ -2230,6 +2395,11 @@
 					buildingLevel: 13,
 					laboratoryLevel: 16,
 				},
+				{
+					level: 10,
+					buildingLevel: 13,
+					laboratoryLevel: 17,
+				},
 			],
 		},
 		{
@@ -2273,6 +2443,11 @@
 					buildingLevel: 15,
 					laboratoryLevel: 16,
 				},
+				{
+					level: 7,
+					buildingLevel: 15,
+					laboratoryLevel: 17,
+				},
 			],
 		},
 		{
@@ -2305,6 +2480,11 @@
 					level: 4,
 					buildingLevel: 9,
 					laboratoryLevel: 16,
+				},
+				{
+					level: 5,
+					buildingLevel: 9,
+					laboratoryLevel: 17,
 				},
 			],
 		},
@@ -2343,6 +2523,11 @@
 					level: 5,
 					buildingLevel: 16,
 					laboratoryLevel: 16,
+				},
+				{
+					level: 6,
+					buildingLevel: 16,
+					laboratoryLevel: 17,
 				},
 			],
 		},
@@ -2410,6 +2595,11 @@
 					buildingLevel: 17,
 					laboratoryLevel: 16,
 				},
+				{
+					level: 5,
+					buildingLevel: 17,
+					laboratoryLevel: 17,
+				},
 			],
 		},
 		{
@@ -2453,6 +2643,11 @@
 					buildingLevel: 11,
 					laboratoryLevel: 16,
 				},
+				{
+					level: 7,
+					buildingLevel: 11,
+					laboratoryLevel: 17,
+				},
 			],
 		},
 		{
@@ -2485,6 +2680,11 @@
 					level: 4,
 					buildingLevel: 18,
 					laboratoryLevel: 16,
+				},
+				{
+					level: 5,
+					buildingLevel: 18,
+					laboratoryLevel: 17,
 				},
 			],
 		},
@@ -2552,6 +2752,11 @@
 					buildingLevel: 13,
 					laboratoryLevel: 16,
 				},
+				{
+					level: 5,
+					buildingLevel: 13,
+					laboratoryLevel: 17,
+				},
 			],
 		},
 		{
@@ -2579,6 +2784,11 @@
 					level: 3,
 					buildingLevel: 19,
 					laboratoryLevel: 16,
+				},
+				{
+					level: 4,
+					buildingLevel: 19,
+					laboratoryLevel: 17,
 				},
 			],
 		},
@@ -2620,6 +2830,11 @@
 				},
 				{
 					level: 13,
+					buildingLevel: 1,
+					laboratoryLevel: 1,
+				},
+				{
+					level: 14,
 					buildingLevel: 1,
 					laboratoryLevel: 1,
 				},
@@ -2668,6 +2883,11 @@
 				},
 				{
 					level: 14,
+					buildingLevel: 2,
+					laboratoryLevel: 1,
+				},
+				{
+					level: 15,
 					buildingLevel: 2,
 					laboratoryLevel: 1,
 				},
@@ -2724,6 +2944,11 @@
 					buildingLevel: 5,
 					laboratoryLevel: 1,
 				},
+				{
+					level: 15,
+					buildingLevel: 5,
+					laboratoryLevel: 1,
+				},
 			],
 		},
 		{
@@ -2767,6 +2992,11 @@
 					buildingLevel: 3,
 					laboratoryLevel: 1,
 				},
+				{
+					level: 15,
+					buildingLevel: 3,
+					laboratoryLevel: 1,
+				},
 			],
 		},
 		{
@@ -2797,6 +3027,11 @@
 				},
 				{
 					level: 10,
+					buildingLevel: 4,
+					laboratoryLevel: 1,
+				},
+				{
+					level: 11,
 					buildingLevel: 4,
 					laboratoryLevel: 1,
 				},
@@ -2843,6 +3078,11 @@
 					buildingLevel: 12,
 					laboratoryLevel: 1,
 				},
+				{
+					level: 13,
+					buildingLevel: 12,
+					laboratoryLevel: 1,
+				},
 			],
 		},
 		{
@@ -2883,6 +3123,11 @@
 				},
 				{
 					level: 13,
+					buildingLevel: 6,
+					laboratoryLevel: 1,
+				},
+				{
+					level: 14,
 					buildingLevel: 6,
 					laboratoryLevel: 1,
 				},
@@ -2934,6 +3179,11 @@
 					buildingLevel: 11,
 					laboratoryLevel: 1,
 				},
+				{
+					level: 13,
+					buildingLevel: 11,
+					laboratoryLevel: 1,
+				},
 			],
 		},
 		{
@@ -2977,6 +3227,11 @@
 					buildingLevel: 3,
 					laboratoryLevel: 1,
 				},
+				{
+					level: 13,
+					buildingLevel: 3,
+					laboratoryLevel: 1,
+				},
 			],
 		},
 		{
@@ -3010,6 +3265,11 @@
 					buildingLevel: 5,
 					laboratoryLevel: 1,
 				},
+				{
+					level: 9,
+					buildingLevel: 5,
+					laboratoryLevel: 1,
+				},
 			],
 		},
 		{
@@ -3040,6 +3300,11 @@
 				},
 				{
 					level: 8,
+					buildingLevel: 6,
+					laboratoryLevel: 1,
+				},
+				{
+					level: 9,
 					buildingLevel: 6,
 					laboratoryLevel: 1,
 				},
@@ -3091,6 +3356,11 @@
 					buildingLevel: 7,
 					laboratoryLevel: 1,
 				},
+				{
+					level: 11,
+					buildingLevel: 7,
+					laboratoryLevel: 1,
+				},
 			],
 		},
 		{
@@ -3139,6 +3409,11 @@
 					buildingLevel: 9,
 					laboratoryLevel: 1,
 				},
+				{
+					level: 14,
+					buildingLevel: 9,
+					laboratoryLevel: 1,
+				},
 			],
 		},
 		{
@@ -3179,6 +3454,11 @@
 				},
 				{
 					level: 14,
+					buildingLevel: 7,
+					laboratoryLevel: 1,
+				},
+				{
+					level: 15,
 					buildingLevel: 7,
 					laboratoryLevel: 1,
 				},
@@ -3230,6 +3510,11 @@
 					buildingLevel: 1,
 					laboratoryLevel: 1,
 				},
+				{
+					level: 15,
+					buildingLevel: 1,
+					laboratoryLevel: 1,
+				},
 			],
 		},
 		{
@@ -3270,6 +3555,11 @@
 				},
 				{
 					level: 15,
+					buildingLevel: 2,
+					laboratoryLevel: 1,
+				},
+				{
+					level: 16,
 					buildingLevel: 2,
 					laboratoryLevel: 1,
 				},
@@ -3315,6 +3605,445 @@
 					level: 8,
 					buildingLevel: 14,
 					laboratoryLevel: 1,
+				},
+				{
+					level: 9,
+					buildingLevel: 14,
+					laboratoryLevel: 1,
+				},
+			],
+		},
+		{
+			name: 'Barch Squad',
+			clashId: 195,
+			productionBuilding: 'Squad Barrack',
+			housingSpace: 15,
+			isSuper: false,
+			isFlying: false,
+			isJumper: false,
+			airTargets: true,
+			groundTargets: true,
+			squadMembers: [
+				{
+					troop: 'Barbarian',
+					amount: 15,
+				},
+				{
+					troop: 'Archer',
+					amount: 15,
+				},
+			],
+			levels: [
+				{
+					level: 1,
+					buildingLevel: 1,
+					laboratoryLevel: 1,
+				},
+				{
+					level: 2,
+					buildingLevel: 1,
+					laboratoryLevel: 17,
+				},
+				{
+					level: 3,
+					buildingLevel: 1,
+					laboratoryLevel: 17,
+				},
+			],
+		},
+		{
+			name: 'Giant Wizard Squad',
+			clashId: 196,
+			productionBuilding: 'Squad Barrack',
+			housingSpace: 25,
+			isSuper: false,
+			isFlying: false,
+			isJumper: false,
+			airTargets: true,
+			groundTargets: true,
+			squadMembers: [
+				{
+					troop: 'Giant',
+					amount: 3,
+				},
+				{
+					troop: 'Wizard',
+					amount: 5,
+				},
+			],
+			levels: [
+				{
+					level: 1,
+					buildingLevel: 2,
+					laboratoryLevel: 1,
+				},
+				{
+					level: 2,
+					buildingLevel: 2,
+					laboratoryLevel: 17,
+				},
+				{
+					level: 3,
+					buildingLevel: 2,
+					laboratoryLevel: 17,
+				},
+			],
+		},
+		{
+			name: 'Wall Breaker Squad',
+			clashId: 197,
+			productionBuilding: 'Squad Barrack',
+			housingSpace: 8,
+			isSuper: false,
+			isFlying: false,
+			isJumper: false,
+			airTargets: false,
+			groundTargets: true,
+			squadMembers: [
+				{
+					troop: 'Wall Breaker',
+					amount: 5,
+				},
+			],
+			levels: [
+				{
+					level: 1,
+					buildingLevel: 3,
+					laboratoryLevel: 1,
+				},
+				{
+					level: 2,
+					buildingLevel: 3,
+					laboratoryLevel: 17,
+				},
+				{
+					level: 3,
+					buildingLevel: 3,
+					laboratoryLevel: 17,
+				},
+			],
+		},
+		{
+			name: 'Minion Squad',
+			clashId: 198,
+			productionBuilding: 'Squad Barrack',
+			housingSpace: 12,
+			isSuper: false,
+			isFlying: true,
+			isJumper: false,
+			airTargets: true,
+			groundTargets: true,
+			squadMembers: [
+				{
+					troop: 'Minion',
+					amount: 8,
+				},
+			],
+			levels: [
+				{
+					level: 1,
+					buildingLevel: 4,
+					laboratoryLevel: 1,
+				},
+				{
+					level: 2,
+					buildingLevel: 4,
+					laboratoryLevel: 17,
+				},
+				{
+					level: 3,
+					buildingLevel: 4,
+					laboratoryLevel: 17,
+				},
+			],
+		},
+		{
+			name: 'Balloon Squad',
+			clashId: 199,
+			productionBuilding: 'Squad Barrack',
+			housingSpace: 16,
+			isSuper: false,
+			isFlying: true,
+			isJumper: false,
+			airTargets: false,
+			groundTargets: true,
+			squadMembers: [
+				{
+					troop: 'Balloon',
+					amount: 4,
+				},
+			],
+			levels: [
+				{
+					level: 1,
+					buildingLevel: 5,
+					laboratoryLevel: 1,
+				},
+				{
+					level: 2,
+					buildingLevel: 5,
+					laboratoryLevel: 17,
+				},
+				{
+					level: 3,
+					buildingLevel: 5,
+					laboratoryLevel: 17,
+				},
+			],
+		},
+		{
+			name: 'Golem Witch Squad',
+			clashId: 200,
+			productionBuilding: 'Squad Barrack',
+			housingSpace: 55,
+			isSuper: false,
+			isFlying: false,
+			isJumper: false,
+			airTargets: true,
+			groundTargets: true,
+			squadMembers: [
+				{
+					troop: 'Golem',
+					amount: 1,
+				},
+				{
+					troop: 'Witch',
+					amount: 4,
+				},
+			],
+			levels: [
+				{
+					level: 1,
+					buildingLevel: 6,
+					laboratoryLevel: 1,
+				},
+				{
+					level: 2,
+					buildingLevel: 6,
+					laboratoryLevel: 17,
+				},
+				{
+					level: 3,
+					buildingLevel: 6,
+					laboratoryLevel: 17,
+				},
+			],
+		},
+		{
+			name: 'Hog Rider Squad',
+			clashId: 201,
+			productionBuilding: 'Squad Barrack',
+			housingSpace: 48,
+			isSuper: false,
+			isFlying: false,
+			isJumper: true,
+			airTargets: false,
+			groundTargets: true,
+			squadMembers: [
+				{
+					troop: 'Hog Rider',
+					amount: 12,
+				},
+			],
+			levels: [
+				{
+					level: 1,
+					buildingLevel: 7,
+					laboratoryLevel: 1,
+				},
+				{
+					level: 2,
+					buildingLevel: 7,
+					laboratoryLevel: 17,
+				},
+				{
+					level: 3,
+					buildingLevel: 7,
+					laboratoryLevel: 17,
+				},
+			],
+		},
+		{
+			name: 'Miner Squad',
+			clashId: 202,
+			productionBuilding: 'Squad Barrack',
+			housingSpace: 48,
+			isSuper: false,
+			isFlying: false,
+			isJumper: false,
+			airTargets: false,
+			groundTargets: true,
+			squadMembers: [
+				{
+					troop: 'Miner',
+					amount: 10,
+				},
+			],
+			levels: [
+				{
+					level: 1,
+					buildingLevel: 8,
+					laboratoryLevel: 1,
+				},
+				{
+					level: 2,
+					buildingLevel: 8,
+					laboratoryLevel: 17,
+				},
+				{
+					level: 3,
+					buildingLevel: 8,
+					laboratoryLevel: 17,
+				},
+			],
+		},
+		{
+			name: 'Healer Squad',
+			clashId: 203,
+			productionBuilding: 'Squad Barrack',
+			housingSpace: 70,
+			isSuper: false,
+			isFlying: true,
+			isJumper: false,
+			airTargets: false,
+			groundTargets: true,
+			squadMembers: [
+				{
+					troop: 'Balloon',
+					amount: 1,
+				},
+				{
+					troop: 'Healer',
+					amount: 5,
+				},
+			],
+			levels: [
+				{
+					level: 1,
+					buildingLevel: 9,
+					laboratoryLevel: 1,
+				},
+				{
+					level: 2,
+					buildingLevel: 9,
+					laboratoryLevel: 17,
+				},
+				{
+					level: 3,
+					buildingLevel: 9,
+					laboratoryLevel: 17,
+				},
+			],
+		},
+		{
+			name: 'P.E.K.K.A Titan Squad',
+			clashId: 204,
+			productionBuilding: 'Squad Barrack',
+			housingSpace: 46,
+			isSuper: false,
+			isFlying: false,
+			isJumper: false,
+			airTargets: true,
+			groundTargets: true,
+			squadMembers: [
+				{
+					troop: 'P.E.K.K.A',
+					amount: 1,
+				},
+				{
+					troop: 'Electro Titan',
+					amount: 1,
+				},
+			],
+			levels: [
+				{
+					level: 1,
+					buildingLevel: 10,
+					laboratoryLevel: 1,
+				},
+				{
+					level: 2,
+					buildingLevel: 10,
+					laboratoryLevel: 17,
+				},
+				{
+					level: 3,
+					buildingLevel: 10,
+					laboratoryLevel: 17,
+					housingSpace: 44,
+				},
+			],
+		},
+		{
+			name: 'Dragon Squad',
+			clashId: 205,
+			productionBuilding: 'Squad Barrack',
+			housingSpace: 85,
+			isSuper: false,
+			isFlying: true,
+			isJumper: false,
+			airTargets: true,
+			groundTargets: true,
+			squadMembers: [
+				{
+					troop: 'Dragon',
+					amount: 2,
+				},
+				{
+					troop: 'Dragon Rider',
+					amount: 2,
+				},
+			],
+			levels: [
+				{
+					level: 1,
+					buildingLevel: 11,
+					laboratoryLevel: 1,
+				},
+				{
+					level: 2,
+					buildingLevel: 11,
+					laboratoryLevel: 17,
+				},
+				{
+					level: 3,
+					buildingLevel: 11,
+					laboratoryLevel: 17,
+				},
+			],
+		},
+		{
+			name: 'Baby Dragon Squad',
+			clashId: 206,
+			productionBuilding: 'Squad Barrack',
+			housingSpace: 26,
+			isSuper: false,
+			isFlying: true,
+			isJumper: false,
+			airTargets: true,
+			groundTargets: true,
+			squadMembers: [
+				{
+					troop: 'Baby Dragon',
+					amount: 3,
+				},
+			],
+			levels: [
+				{
+					level: 1,
+					buildingLevel: 12,
+					laboratoryLevel: 1,
+				},
+				{
+					level: 2,
+					buildingLevel: 12,
+					laboratoryLevel: 17,
+				},
+				{
+					level: 3,
+					buildingLevel: 12,
+					laboratoryLevel: 17,
+					housingSpace: 24,
 				},
 			],
 		},
@@ -3396,6 +4125,11 @@
 					buildingLevel: 1,
 					laboratoryLevel: 16,
 				},
+				{
+					level: 14,
+					buildingLevel: 1,
+					laboratoryLevel: 17,
+				},
 			],
 		},
 		{
@@ -3468,6 +4202,11 @@
 					level: 12,
 					buildingLevel: 2,
 					laboratoryLevel: 16,
+				},
+				{
+					level: 13,
+					buildingLevel: 2,
+					laboratoryLevel: 17,
 				},
 			],
 		},
@@ -3681,6 +4420,11 @@
 					buildingLevel: 1,
 					laboratoryLevel: 16,
 				},
+				{
+					level: 13,
+					buildingLevel: 1,
+					laboratoryLevel: 17,
+				},
 			],
 		},
 		{
@@ -3771,6 +4515,11 @@
 					level: 7,
 					buildingLevel: 3,
 					laboratoryLevel: 16,
+				},
+				{
+					level: 8,
+					buildingLevel: 3,
+					laboratoryLevel: 17,
 				},
 			],
 		},
@@ -3935,6 +4684,11 @@
 					level: 8,
 					buildingLevel: 5,
 					laboratoryLevel: 16,
+				},
+				{
+					level: 9,
+					buildingLevel: 5,
+					laboratoryLevel: 17,
 				},
 			],
 		},
@@ -4202,6 +4956,44 @@
 					buildingLevel: 9,
 					laboratoryLevel: 16,
 				},
+				{
+					level: 5,
+					buildingLevel: 9,
+					laboratoryLevel: 17,
+				},
+			],
+		},
+		{
+			name: 'Heroic',
+			clashId: 153,
+			productionBuilding: 'Spell Factory',
+			housingSpace: 2,
+			isSuper: false,
+			isFlying: false,
+			isJumper: false,
+			airTargets: false,
+			groundTargets: false,
+			levels: [
+				{
+					level: 1,
+					buildingLevel: 10,
+					laboratoryLevel: 1,
+				},
+				{
+					level: 2,
+					buildingLevel: 10,
+					laboratoryLevel: 15,
+				},
+				{
+					level: 3,
+					buildingLevel: 10,
+					laboratoryLevel: 16,
+				},
+				{
+					level: 4,
+					buildingLevel: 10,
+					laboratoryLevel: 17,
+				},
 			],
 		},
 	],
@@ -4456,6 +5248,11 @@
 					level: 5,
 					buildingLevel: 6,
 					laboratoryLevel: 14,
+				},
+				{
+					level: 6,
+					buildingLevel: 6,
+					laboratoryLevel: 17,
 				},
 			],
 		},
@@ -5167,6 +5964,26 @@
 				{
 					level: 10,
 					petHouseLevel: 10,
+				},
+				{
+					level: 11,
+					petHouseLevel: 12,
+				},
+				{
+					level: 12,
+					petHouseLevel: 12,
+				},
+				{
+					level: 13,
+					petHouseLevel: 12,
+				},
+				{
+					level: 14,
+					petHouseLevel: 12,
+				},
+				{
+					level: 15,
+					petHouseLevel: 12,
 				},
 			],
 		},

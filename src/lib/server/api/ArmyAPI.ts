@@ -508,6 +508,7 @@ export class ArmyAPI {
 		if (attackType) {
 			// Mirrors `ArmyModel.getArmyType` logic for calculating the composition of the army.
 			// Consider making this a dedicated column updated on save, as the computation below can be quite inefficient.
+			// TODO: housing space based on unit level (i.e. squads)
 			let ratioCondition: ReturnType<typeof sql<boolean>>;
 			switch (attackType) {
 				case 'Air':

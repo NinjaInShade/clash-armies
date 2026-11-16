@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 	import type { ArmyModel } from '#models/Army.svelte.ts';
+	import { sortUnits } from '#shared/gameData.ts';
 	import { HOLD_REMOVE_SPEED } from '#shared/utils.ts';
 	import type { UnitHome } from '#types';
 	import UnitDisplay from './UnitDisplay.svelte';
@@ -15,7 +16,7 @@
 
 	const selectedUnits = $derived(housedIn === 'armyCamp' ? model.units : model.ccUnits);
 	const _troopUnits = $derived(selectedUnits.filter((unit) => unit.info.type === 'Troop'));
-	const troopUnits = $derived([..._troopUnits.filter((x) => !x.info.isSuper), ..._troopUnits.filter((x) => x.info.isSuper)]);
+	const troopUnits = $derived(sortUnits(_troopUnits, (x) => x.info));
 	const siegeUnits = $derived(selectedUnits.filter((unit) => unit.info.type === 'Siege'));
 	const spellUnits = $derived(selectedUnits.filter((unit) => unit.info.type === 'Spell'));
 

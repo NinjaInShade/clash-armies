@@ -102,7 +102,7 @@ export class ArmyModel {
 	public updatedTime?: Date;
 
 	public name = $state<string | null>(null);
-	public townHall = $state(18);
+	public townHall = $state(19);
 	public units = $state<UnitModel[]>([]);
 	public ccUnits = $state<UnitModel[]>([]);
 	public pets = $state<PetModel[]>([]);
@@ -227,11 +227,11 @@ export class ArmyModel {
 	}
 
 	public get housingSpaceUsed() {
-		return UnitModel.getTotals(this.units);
+		return UnitModel.getTotals(this.units, this.townHall);
 	}
 
 	public get ccHousingSpaceUsed() {
-		return UnitModel.getTotals(this.ccUnits);
+		return UnitModel.getTotals(this.ccUnits, this.townHall);
 	}
 
 	public get thData() {
@@ -342,7 +342,7 @@ export class ArmyModel {
 			if (unit.info.type === 'Spell') {
 				continue;
 			}
-			const weight = unit.amount * unit.info.housingSpace;
+			const weight = unit.amount * UnitModel.getHousingSpace(unit.info, unit.home, this.townHall, this.gameData);
 			if (unit.info.isFlying) {
 				airTotal += weight;
 			} else {

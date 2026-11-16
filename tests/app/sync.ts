@@ -41,6 +41,7 @@ describe('Game data sync', function () {
 			'equipment',
 			'pet_levels',
 			'pets',
+			'unit_squad_members',
 			'unit_levels',
 			'units',
 			'town_hall_heroes_max',
@@ -164,6 +165,7 @@ describe('Game data sync', function () {
 					maxCc: 7,
 					maxBlacksmith: 8,
 					maxPetHouse: 9,
+					maxSquadBarracks: 9,
 					troopCapacity: 20,
 					spellCapacity: 30,
 					siegeCapacity: 40,
@@ -190,6 +192,7 @@ describe('Game data sync', function () {
 					maxCc: 8,
 					maxBlacksmith: 9,
 					maxPetHouse: 10,
+					maxSquadBarracks: 10,
 					troopCapacity: 30,
 					spellCapacity: 40,
 					siegeCapacity: 50,
@@ -240,6 +243,7 @@ describe('Game data sync', function () {
 				maxCc: 7,
 				maxBlacksmith: 8,
 				maxPetHouse: 9,
+				maxSquadBarracks: 9,
 				troopCapacity: 20,
 				spellCapacity: 30,
 				siegeCapacity: 40,
@@ -290,6 +294,7 @@ describe('Game data sync', function () {
 				maxCc: 7,
 				maxBlacksmith: 8,
 				maxPetHouse: 9,
+				maxSquadBarracks: 9,
 				troopCapacity: 20,
 				spellCapacity: 30,
 				siegeCapacity: 40,
@@ -337,6 +342,7 @@ describe('Game data sync', function () {
 				maxCc: 7,
 				maxBlacksmith: 8,
 				maxPetHouse: 9,
+				maxSquadBarracks: 9,
 				troopCapacity: 20,
 				spellCapacity: 30,
 				siegeCapacity: 40,
@@ -389,14 +395,120 @@ describe('Game data sync', function () {
 			assert.sameDeepMembers(omitKeys(data, ['id', 'unitId']), expected);
 		}
 
+		async function assertSquadMembers(expected: unknown[]) {
+			const data = await server.db
+				.selectFrom('unit_squad_members as sm')
+				.innerJoin('units as s', 's.id', 'sm.squadId')
+				.innerJoin('units as u', 'u.id', 'sm.unitId')
+				.select(['s.name as squad', 'u.name as troop', 'sm.amount', 'sm.order'])
+				.execute();
+			assert.sameDeepMembers(data, expected);
+		}
+
 		function unitRow(unit: GameDataUnit, unitType: UnitType, idx: number) {
-			const { levels: _, ...row } = unit;
-			return { ...row, type: unitType, order: idx };
+			const { levels: _, squadMembers, ...row } = unit;
+			return { ...row, isSquad: Boolean(squadMembers), type: unitType, order: idx };
 		}
 
 		function unitLevelRows(unit: GameDataUnit) {
-			return unit.levels.map((lvl) => ({ unitName: unit.name, ...lvl }));
+			return unit.levels.map((lvl) => ({ unitName: unit.name, ...lvl, housingSpace: lvl.housingSpace ?? null }));
 		}
+
+		function squadMemberRows(squad: GameDataUnit) {
+			return (squad.squadMembers ?? []).map((m, idx) => ({ squad: squad.name, troop: m.troop, amount: m.amount, order: idx }));
+		}
+
+		function troop(name: string, overrides: Partial<GameDataUnit> = {}): GameDataUnit {
+			return {
+				name,
+				clashId: 0,
+				productionBuilding: 'Barrack',
+				housingSpace: 1,
+				isSuper: false,
+				isFlying: false,
+				isJumper: false,
+				airTargets: false,
+				groundTargets: true,
+				levels: [{ level: 1, buildingLevel: 1, laboratoryLevel: 1 }],
+				...overrides,
+			};
+		}
+
+		it('Should add and replace squad members', async function () {
+			const squad = troop('Barch Squad', {
+				productionBuilding: 'Squad Barrack',
+				housingSpace: 15,
+				squadMembers: [
+					{ troop: 'Barbarian', amount: 15 },
+					{ troop: 'Archer', amount: 15 },
+				],
+				levels: [
+					{ level: 1, buildingLevel: 1, laboratoryLevel: 1 },
+					{ level: 2, buildingLevel: 1, laboratoryLevel: 17, housingSpace: 12 },
+				],
+			});
+			gameData.troops.push(troop('Barbarian'), troop('Archer'), troop('Giant'), squad);
+			await syncGameData();
+			await assertUnits(
+				gameData.troops.map((t, idx) => unitRow(t, 'Troop', idx)),
+				'Troop'
+			);
+			await assertUnitLevels(
+				gameData.troops.flatMap((t) => unitLevelRows(t)),
+				'Troop'
+			);
+			await assertSquadMembers(squadMemberRows(squad));
+
+			// Composition changes replace the previous members
+			squad.squadMembers = [
+				{ troop: 'Giant', amount: 3 },
+				{ troop: 'Archer', amount: 5 },
+			];
+			await syncGameData();
+			await assertSquadMembers(squadMemberRows(squad));
+
+			// Loaded game data exposes the members and level-dependent housing space
+			await server.gameData.loadData();
+			const loaded = server.gameData.index.troops.byName('Barch Squad');
+			assert.isOk(loaded?.isSquad);
+			assert.deepEqual(
+				loaded?.squadMembers.map((m) => [server.gameData.index.troops.byId(m.unitId)?.name, m.amount]),
+				[
+					['Giant', 3],
+					['Archer', 5],
+				]
+			);
+			assert.deepEqual(
+				loaded?.levels.map((l) => l.housingSpace),
+				[null, 12]
+			);
+		});
+
+		it('Should reject invalid squads', async function () {
+			gameData.troops.push(troop('Barbarian'));
+			const invalidSquads = [
+				// Member isn't a troop
+				troop('Squad', { productionBuilding: 'Squad Barrack', squadMembers: [{ troop: 'Nope', amount: 1 }] }),
+				// Members without the squad production building
+				troop('Squad', { squadMembers: [{ troop: 'Barbarian', amount: 1 }] }),
+				// Squad production building without members
+				troop('Squad', { productionBuilding: 'Squad Barrack' }),
+				// Duplicate member
+				troop('Squad', {
+					productionBuilding: 'Squad Barrack',
+					squadMembers: [
+						{ troop: 'Barbarian', amount: 1 },
+						{ troop: 'Barbarian', amount: 2 },
+					],
+				}),
+			];
+			for (const squad of invalidSquads) {
+				gameData.troops = [troop('Barbarian'), squad];
+				await assert.throwsAsync(async () => {
+					await syncGameData();
+				});
+			}
+		});
 
 		// Covers "troops", "spells" and "sieges" sections in the game data file.
 		// They are all fundamentally units but separated in the file for ease of use.

@@ -184,6 +184,7 @@ export interface TownHalls {
   maxLaboratory: Generated<number | null>;
   maxPetHouse: Generated<number | null>;
   maxSpellFactory: Generated<number | null>;
+  maxSquadBarracks: Generated<number | null>;
   maxWorkshop: Generated<number | null>;
   siegeCapacity: Generated<number | null>;
   spellCapacity: Generated<number | null>;
@@ -192,6 +193,7 @@ export interface TownHalls {
 
 export interface UnitLevels {
   buildingLevel: Generated<number | null>;
+  housingSpace: Generated<number | null>;
   id: Generated<number>;
   laboratoryLevel: Generated<number | null>;
   level: number;
@@ -206,11 +208,19 @@ export interface Units {
   id: Generated<number>;
   isFlying: Generated<number>;
   isJumper: Generated<number>;
+  isSquad: Generated<number>;
   isSuper: Generated<number>;
   name: string;
   order: Generated<number>;
   productionBuilding: string;
   type: string;
+}
+
+export interface UnitSquadMembers {
+  amount: number;
+  order: Generated<number>;
+  squadId: number;
+  unitId: number;
 }
 
 export interface UserRoles {
@@ -252,6 +262,7 @@ export interface DB {
   town_hall_heroes_max: TownHallHeroesMax;
   town_halls: TownHalls;
   unit_levels: UnitLevels;
+  unit_squad_members: UnitSquadMembers;
   units: Units;
   user_roles: UserRoles;
   users: Users;

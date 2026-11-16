@@ -149,6 +149,9 @@ export function validateCcUnits(model: ArmyModel) {
 
 	// Check clan castle units can all be selected
 	for (const unit of ccUnits) {
+		if (unit.info.isSquad) {
+			throw new Error(`Squad "${unit.info.name}" can't be donated to the clan castle`);
+		}
 		if (UnitModel.getMaxCcLevel(unit.info, model.townHall, model.gameData) === -1) {
 			throw new Error(`Clan castle unit "${unit.info.name}" isn't available at town hall ${model.townHall}`);
 		}

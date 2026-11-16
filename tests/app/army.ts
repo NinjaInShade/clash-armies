@@ -1408,6 +1408,45 @@ describe('Validation', function () {
 			data.townHall = 12;
 			validateArmy(data, gameData);
 		});
+
+		it('Should only allow squads once the squad barracks unlocks them', function () {
+			for (const [squad, unlockedAt] of [
+				['Barch Squad', 8],
+				['Baby Dragon Squad', 19],
+			] as const) {
+				const data = makeData({
+					name: 'test',
+					townHall: unlockedAt - 1,
+					units: [{ home: 'armyCamp', unitId: UnitModel.requireTroopByName(squad, gameData).id, amount: 1 }],
+				});
+				assert.throws(
+					function () {
+						validateArmy(data, gameData);
+					},
+					`Unit "${squad}" isn't available at town hall ${unlockedAt - 1}`
+				);
+				data.townHall = unlockedAt;
+				validateArmy(data, gameData);
+			}
+		});
+
+		it('Should use the housing space of the squad level available at the town hall', function () {
+			const squad = UnitModel.requireTroopByName('P.E.K.K.A Titan Squad', gameData);
+			assert.strictEqual(UnitModel.getHousingSpace(squad, 'armyCamp', 18, gameData), 46);
+			assert.strictEqual(UnitModel.getHousingSpace(squad, 'armyCamp', 19, gameData), 44);
+
+			// 8 squads fit at TH19 (8 * 44 = 352), but not with the TH18 housing space (8 * 46 = 368)
+			const data = makeData({
+				name: 'test',
+				townHall: 19,
+				units: [{ home: 'armyCamp', unitId: squad.id, amount: 8 }],
+			});
+			validateArmy(data, gameData);
+			data.townHall = 18;
+			assert.throws(function () {
+				validateArmy(data, gameData);
+			}, `Town hall 18 has a max troop capacity of 352, but this army exceeded that with 368`);
+		});
 	});
 
 	describe('Clan castle units', function () {
@@ -1489,6 +1528,17 @@ describe('Validation', function () {
 			// Should not throw when clan castle is level 9
 			data.townHall = thCcLvl9.level;
 			validateArmy(data, gameData);
+		});
+
+		it('Should not allow squads', function () {
+			const data = makeData({
+				name: 'test',
+				townHall: 19,
+				units: [{ home: 'clanCastle', unitId: UnitModel.requireTroopByName('Barch Squad', gameData).id, amount: 1 }],
+			});
+			assert.throws(function () {
+				validateArmy(data, gameData);
+			}, `Squad "Barch Squad" can't be donated to the clan castle`);
 		});
 	});
 

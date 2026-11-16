@@ -1,5 +1,5 @@
 {
-	"cSpell.words": ["pekka"],
+	"cSpell.words": ["Barch", "pekka"],
 	"editor.formatOnSave": true,
 	"editor.defaultFormatter": "oxc.oxc-vscode",
 	"oxc.enable.oxfmt": true,

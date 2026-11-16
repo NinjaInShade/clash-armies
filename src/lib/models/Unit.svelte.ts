@@ -1,4 +1,4 @@
-import type { Unit, StaticGameData } from '#shared/gameData.ts';
+import { getHousingSpace, SQUAD_BARRACKS, type Unit, type StaticGameData } from '#shared/gameData.ts';
 import { SUPER_TO_REGULAR } from '#shared/utils.ts';
 import type { UnitHome, Optional } from '#types';
 import { ArmyModel, type ArmyUnit } from './Army.svelte';
@@ -80,17 +80,30 @@ export class UnitModel {
 	}
 
 	/**
-	 * Given the passed in units, calculates how much housing space has been used.
+	 * Given the passed in units, calculates how much housing space has been used at the town hall given.
 	 */
-	public static getTotals(units: UnitModel[]) {
+	public static getTotals(units: UnitModel[], townHall: number) {
 		return units.reduce(
 			(prev, curr) => {
 				const key = (curr.info.type.toLowerCase() + 's') as 'troops' | 'sieges' | 'spells';
-				prev[key] += curr.info.housingSpace * curr.amount;
+				prev[key] += UnitModel.getHousingSpace(curr.info, curr.home, townHall, curr.gameData) * curr.amount;
 				return prev;
 			},
 			{ troops: 0, sieges: 0, spells: 0 }
 		);
+	}
+
+	/**
+	 * Housing space the unit takes up at the town hall given, assuming it's at the highest level available there.
+	 *
+	 * Most units have a fixed housing space, but some (squads) take less as they level up.
+	 */
+	public static getHousingSpace(unit: Unit, home: UnitHome, townHall: number, gameData: StaticGameData): number {
+		if (!unit.levels.some((l) => l.housingSpace !== null)) {
+			return unit.housingSpace;
+		}
+		const level = home === 'clanCastle' ? UnitModel.getMaxCcLevel(unit, townHall, gameData) : UnitModel.getMaxLevel(unit, townHall, gameData);
+		return getHousingSpace(unit, level);
 	}
 
 	/**
@@ -112,7 +125,16 @@ export class UnitModel {
 			if (type === 'Troop') {
 				// Get the unit's production building level
 				const prod = unit.productionBuilding;
-				const prodLevel = prod === 'Barrack' ? (thData.maxBarracks ?? -1) : prod === 'Dark Elixir Barrack' ? (thData.maxDarkBarracks ?? -1) : null;
+				let prodLevel: number | null;
+				if (prod === 'Barrack') {
+					prodLevel = thData.maxBarracks ?? -1;
+				} else if (prod === 'Dark Elixir Barrack') {
+					prodLevel = thData.maxDarkBarracks ?? -1;
+				} else if (prod === SQUAD_BARRACKS) {
+					prodLevel = thData.maxSquadBarracks ?? -1;
+				} else {
+					prodLevel = null;
+				}
 				if (prodLevel === null) {
 					throw new Error(`Unrecognized production building "${unit.productionBuilding}" for troop "${name}"`);
 				}
@@ -193,6 +215,11 @@ export class UnitModel {
 		const { name, type } = unit;
 
 		if (thData.maxCc === null || (name === 'Battle Drill' && thData.maxCc < 9)) {
+			return -1;
+		}
+
+		// Squads can't be donated
+		if (unit.isSquad) {
 			return -1;
 		}
 

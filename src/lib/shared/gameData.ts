@@ -1,5 +1,8 @@
 import { encodeUnitName } from '#shared/utils.ts';
 
+/** Production building of squads */
+export const SQUAD_BARRACKS = 'Squad Barrack';
+
 export type TownHall = {
 	level: number;
 	/** Max barracks level at this town hall */
@@ -20,6 +23,8 @@ export type TownHall = {
 	maxBlacksmith: number | null;
 	/** Max pet house level at this town hall - null means not unlocked yet. */
 	maxPetHouse: number | null;
+	/** Max squad barracks level at this town hall - null means not unlocked yet. */
+	maxSquadBarracks: number | null;
 	/**
 	 * Max level per hero at this town hall.
 	 * At a lower town hall, this may be fully or partially empty (since some heroes may not be unlocked).
@@ -44,6 +49,44 @@ export type TownHall = {
 };
 
 export type UnitType = 'Troop' | 'Siege' | 'Spell';
+
+/**
+ * Sorts units into how they're grouped on the UI (squads, regular troops, then super troops).
+ *
+ * Order within each group is kept.
+ */
+export function sortUnits<T>(items: T[], getUnit: (item: T) => Unit): T[] {
+	const group = (item: T) => {
+		const unit = getUnit(item);
+		if (unit.isSuper) {
+			return 2;
+		}
+		if (!unit.isSquad) {
+			return 1;
+		}
+		return 0;
+	};
+	return items.toSorted((a, b) => group(a) - group(b));
+}
+
+/**
+ * Housing space a unit takes at the level given.
+ *
+ * A level that doesn't override housing space inherits it from the closest lower level that does, falling back
+ * to the unit's base housing space. A level below 1 (e.g. -1 for "not unlocked") gives the base housing space.
+ */
+export function getHousingSpace(unit: Unit, level: number): number {
+	let housingSpace = unit.housingSpace;
+	for (const levelData of unit.levels) {
+		if (levelData.level > level) {
+			break;
+		}
+		if (levelData.housingSpace !== null) {
+			housingSpace = levelData.housingSpace;
+		}
+	}
+	return housingSpace;
+}
 
 export type Hero = {
 	name: string;
@@ -73,6 +116,19 @@ export type UnitLevel = {
 	 * A null value generally means level 1 (auto-unlocked when the unit itself is unlocked).
 	 */
 	laboratoryLevel: number | null;
+	/**
+	 * Housing space from this level onwards, if it differs from `Unit.housingSpace` (e.g. some squads get smaller as they level up).
+	 *
+	 * A null value means it's inherited from the previous level - use {@link getHousingSpace} rather than reading this directly.
+	 */
+	housingSpace: number | null;
+};
+
+export type SquadMember = {
+	/** ID of the member troop in the `units` table */
+	unitId: number;
+	/** How many of this troop the squad deploys */
+	amount: number;
 };
 
 export type EquipmentLevel = {
@@ -103,6 +159,11 @@ export type Unit = {
 	name: string;
 	clashId: number;
 	order: number;
+	/**
+	 * Housing space at level 1.
+	 *
+	 * Some units (e.g. squads) change housing space as they level, so prefer {@link getHousingSpace} where the level is known.
+	 */
 	housingSpace: number;
 	/**
 	 * Which building produces this unit (e.g. Barrack, Spell Factory, etc...).
@@ -113,6 +174,16 @@ export type Unit = {
 	 * Max level mirrors the regular variant.
 	 */
 	isSuper: boolean;
+	/**
+	 * True for squads (e.g. Barch Squad). Squads are a troop made up of other troops (see `squadMembers`).
+	 *
+	 * Squads have their own squad level, and can't be donated.
+	 */
+	isSquad: boolean;
+	/**
+	 * The troops that make up this squad, empty if not a squad.
+	 */
+	squadMembers: SquadMember[];
 	isFlying: boolean;
 	isJumper: boolean;
 	airTargets: boolean;

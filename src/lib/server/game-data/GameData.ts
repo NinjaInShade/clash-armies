@@ -17,6 +17,7 @@ import {
 	type UnitLevel,
 	type EquipmentLevel,
 	type PetLevel,
+	type SquadMember,
 } from '#shared/gameData.ts';
 import { GameDataSchema, type GameData as GameDataType, type GameDataUnit } from './schema';
 
@@ -179,6 +180,7 @@ export class GameData implements StaticGameData {
 				maxCc: th.maxCc,
 				maxBlacksmith: th.maxBlacksmith,
 				maxPetHouse: th.maxPetHouse,
+				maxSquadBarracks: th.maxSquadBarracks,
 				troopCapacity: th.troopCapacity,
 				spellCapacity: th.spellCapacity,
 				siegeCapacity: th.siegeCapacity,
@@ -216,6 +218,7 @@ export class GameData implements StaticGameData {
 				productionBuilding: u.productionBuilding,
 				housingSpace: u.housingSpace,
 				isSuper: u.isSuper,
+				isSquad: Boolean(u.squadMembers),
 				isFlying: u.isFlying,
 				isJumper: u.isJumper,
 				airTargets: u.airTargets,
@@ -239,10 +242,35 @@ export class GameData implements StaticGameData {
 					level: l.level,
 					buildingLevel: l.buildingLevel,
 					laboratoryLevel: l.laboratoryLevel,
+					housingSpace: l.housingSpace ?? null,
 				};
 			});
 		});
 		await helpers.upsert(db, 'unit_levels', levelRows);
+
+		if (type === 'Troop') {
+			await this.syncSquadMembers(db, units, idByName);
+		}
+	}
+
+	private async syncSquadMembers(db: Database, troops: GameDataUnit[], idByName: Map<string, number>) {
+		const requireId = (name: string) => {
+			const id = idByName.get(name);
+			if (!id) {
+				throw new Error(`Missing unit ID for troop "${name}"`);
+			}
+			return id;
+		};
+		const memberRows = troops.flatMap((t) => {
+			const members = t.squadMembers ?? [];
+			return members.map((m, idx) => {
+				return { squadId: requireId(t.name), unitId: requireId(m.troop), amount: m.amount, order: idx };
+			});
+		});
+		await db.deleteFrom('unit_squad_members').execute();
+		if (memberRows.length) {
+			await db.insertInto('unit_squad_members').values(memberRows).execute();
+		}
 	}
 
 	private async syncPets(db: Database, data: GameDataType) {
@@ -305,16 +333,38 @@ export class GameData implements StaticGameData {
 		await helpers.upsert(db, 'equipment_levels', levelRows);
 	}
 
-	private async getUnitsData(options: GetUnitsOptions = {}) {
+	private async getUnitsData(options: GetUnitsOptions = {}): Promise<Unit[]> {
 		const { type } = options;
 
-		let query = this.server.db.selectFrom('units as u').leftJoin('unit_levels as ul', 'ul.unitId', 'u.id');
+		let query = this.server.db
+			.selectFrom('units as u')
+			.leftJoin('unit_levels as ul', 'ul.unitId', 'u.id')
+			.leftJoin(
+				(eb) =>
+					eb
+						.selectFrom('unit_squad_members as sm')
+						.groupBy('sm.squadId')
+						.select([
+							'sm.squadId',
+							helpers
+								.jsonAggObj<SquadMember>(
+									{
+										unitId: 'sm.unitId',
+										amount: 'sm.amount',
+									},
+									{ order: 'sm.order' }
+								)
+								.as('squadMembers'),
+						])
+						.as('sm'),
+				(join) => join.onRef('sm.squadId', '=', 'u.id')
+			);
 
 		if (type) {
 			query = query.where('u.type', '=', type);
 		}
 
-		const units: Unit[] = await query
+		const units: (Omit<Unit, 'squadMembers'> & { squadMembers: SquadMember[] | null })[] = await query
 			.select([
 				'u.id',
 				'u.type',
@@ -324,6 +374,7 @@ export class GameData implements StaticGameData {
 				'u.housingSpace',
 				'u.productionBuilding',
 				'u.isSuper',
+				'u.isSquad',
 				'u.isFlying',
 				'u.isJumper',
 				'u.airTargets',
@@ -336,14 +387,20 @@ export class GameData implements StaticGameData {
 							level: 'ul.level',
 							buildingLevel: 'ul.buildingLevel',
 							laboratoryLevel: 'ul.laboratoryLevel',
+							housingSpace: 'ul.housingSpace',
 						},
 						{ order: 'ul.level' }
 					)
 					.as('levels'),
+				'sm.squadMembers',
 			])
 			.groupBy('u.id')
 			.orderBy('u.order')
 			.execute();
+
+		for (const unit of units) {
+			unit.squadMembers ??= [];
+		}
 
 		return units;
 	}

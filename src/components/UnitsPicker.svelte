@@ -2,7 +2,7 @@
 	import { getContext, untrack } from 'svelte';
 	import { ArmyModel } from '#models/Army.svelte.ts';
 	import { UnitModel } from '#models/Unit.svelte.ts';
-	import type { Unit, UnitType } from '#shared/gameData.ts';
+	import { sortUnits, type Unit, type UnitType } from '#shared/gameData.ts';
 	import { HOLD_ADD_SPEED } from '#shared/utils.ts';
 	import type { AppState, UnitHome } from '#types';
 	import UnitDisplay from './UnitDisplay.svelte';
@@ -23,8 +23,9 @@
 
 	const selectedUnits = $derived(housedIn === 'armyCamp' ? model.units : model.ccUnits);
 	const capacity = $derived(housedIn === 'armyCamp' ? model.capacity : model.ccCapacity);
-	const allUnits = $derived(app.gameData.unitsByType[type]);
-	const sortedUnits = $derived([...allUnits.filter((u) => !u.isSuper), ...allUnits.filter((u) => u.isSuper)]);
+	// Squads can't be donated, so aren't offered for the clan castle at all
+	const allUnits = $derived(app.gameData.unitsByType[type].filter((u) => housedIn === 'armyCamp' || !u.isSquad));
+	const sortedUnits = $derived(sortUnits(allUnits, (u) => u));
 	const heading = $derived(`Select ${type === 'Troop' ? 'troops' : type === 'Siege' ? 'siege machine' : 'spells'}`);
 
 	let holdInterval: ReturnType<typeof setInterval> | null = null;
@@ -46,7 +47,7 @@
 		return untrack(() => {
 			const copy = selectedUnits.map((u) => new UnitModel(model.gameData, u));
 			const preview = add(unit, copy);
-			const { troops, sieges, spells } = UnitModel.getTotals(preview);
+			const { troops, sieges, spells } = UnitModel.getTotals(preview, model.townHall);
 			return troops > capacity.troops || sieges > capacity.sieges || spells > capacity.spells;
 		});
 	}

@@ -21,12 +21,20 @@
 	};
 	const { unit, display, level, amount, title }: Props = $props();
 	const app = getContext<AppState>('app');
-	const { name, type, isSuper } = $derived(unit);
+	const { name, type, isSuper, isSquad } = $derived(unit);
+
+	const defaultTitle = $derived.by(() => {
+		if (!isSquad) {
+			return name;
+		}
+		const members = unit.squadMembers.map((m) => `${m.amount}x ${app.gameData.index.units.byId(m.unitId)?.name}`);
+		return `${name} (${members.join(', ')})`;
+	});
 	const levels = $derived(app.gameData.index.units.byName(name)?.levels ?? []);
 	const isMaxLevel = $derived(level === Math.max(...levels.map((x) => x.level)));
 </script>
 
-<div class="unit-display {display} {type} {isSuper ? 'Super' : ''}" title={title ?? name}>
+<div class="unit-display {display} {type} {isSuper ? 'Super' : ''} {isSquad ? 'Squad' : ''}" title={title ?? defaultTitle}>
 	{#if amount}
 		<b class="unit-amount {display}">x{amount}</b>
 	{/if}
@@ -47,22 +55,40 @@
 		height: 100%;
 		width: 100%;
 		user-select: none;
+		background: radial-gradient(ellipse 85% 75% at 50% 58%, var(--card-centre) 0%, var(--card-edge) 100%);
 	}
 
 	.unit-display.Troop,
 	.unit-display.Siege {
-		background: linear-gradient(0deg, hsl(207, 64%, 45%) 0%, hsl(203, 100%, 66%) 100%);
+		--card-centre: hsl(203, 100%, 66%);
+		--card-edge: hsl(207, 64%, 45%);
+		--amount-top: rgb(78, 146, 210);
+		--amount-bottom: rgb(57, 110, 164);
 		background-color: #60a7d8;
 	}
 
 	.unit-display.Spell {
-		background: linear-gradient(0deg, hsl(251, 65%, 57%) 0%, hsl(252, 68%, 62%) 100%);
+		--card-centre: hsl(252, 68%, 62%);
+		--card-edge: hsl(251, 65%, 57%);
+		--amount-top: rgb(125, 93, 226);
+		--amount-bottom: rgb(77, 62, 167);
 		background-color: #655fd0;
 	}
 
 	.unit-display.Super {
-		background: linear-gradient(0deg, hsl(357, 51%, 27%) 0%, hsl(2, 45%, 47%) 100%);
+		--card-centre: hsl(2, 45%, 47%);
+		--card-edge: hsl(357, 51%, 27%);
+		--amount-top: rgb(133, 13, 19);
+		--amount-bottom: rgb(114, 48, 53);
 		background-color: #a2283f;
+	}
+
+	.unit-display.Squad {
+		--card-centre: hsl(100, 55%, 56%);
+		--card-edge: hsl(103, 45%, 38%);
+		--amount-top: rgb(103, 160, 75);
+		--amount-bottom: rgb(76, 120, 59);
+		background-color: #61b63a;
 	}
 
 	.unit-display.block {
@@ -93,22 +119,8 @@
 		text-shadow: none;
 		padding: 3px 0 1.5px 0;
 		width: 100%;
-	}
-
-	.Troop .unit-amount.block,
-	.Siege .unit-amount.block {
-		background: rgb(57, 110, 164);
-		background: linear-gradient(0deg, rgba(57, 110, 164, 1) 0%, rgba(78, 146, 210, 1) 100%);
-	}
-
-	.Spell .unit-amount.block {
-		background: rgb(77, 62, 167);
-		background: linear-gradient(0deg, rgba(77, 62, 167, 1) 0%, rgba(125, 93, 226, 1) 100%);
-	}
-
-	.Super .unit-amount.block {
-		background: rgb(114 48 53);
-		background: linear-gradient(0deg, rgb(114 48 53) 0%, rgba(133, 13, 19, 1) 100%);
+		background-color: var(--amount-bottom);
+		background-image: linear-gradient(0deg, var(--amount-bottom) 0%, var(--amount-top) 100%);
 	}
 
 	.unit-lvl {

@@ -123,9 +123,9 @@ export const OPEN_LINK_CLICK_METRIC = 'open-link-click';
  * The unit here can also be a hero/equipment/pet name.
  */
 export function encodeUnitName(name: string) {
-	if (name === 'P.E.K.K.A') {
-		// NOTE: pekka is a special case
-		return 'pekka';
+	if (name.includes('P.E.K.K.A')) {
+		// NOTE: pekka is a special case (also part of other names, e.g. "P.E.K.K.A Titan Squad")
+		name = name.replaceAll('P.E.K.K.A', 'pekka');
 	}
 	return name.replaceAll(' ', '-').toLowerCase();
 }
